@@ -1,0 +1,52 @@
+
+Avoir un depot tierce
+
+Pour chaque version de format de fichier de polaire, on doit avoir un fichier json qui specifie les noms de variable qu'on peut avoir
+
+Il faut un code qui lise une polaire, recupere la version de la polaire et check si chaque champ est licite point de vue json correspondant a la version
+
+L'utilisation de regex semble naturelle
+
+Le code peut soit rejeter (erreur), soit alerter
+
+Il faut que le code soit appelable depuis C++ et python
+
+Il est necessaire d'avoir de la retrocompatilibte
+
+Les interfaces de lecture des polaires devraient toujours reposer sur la toute derniere version par defaut
+
+Si on leur donne une polaire de version inférieure, elles doivent pouvoir mapper entre les noms d'ancienne version et les nouveaux
+
+Les mappings inter version devraient être encodés dans les fichiers json de spec de version
+
+Dans le code de lecture, le mapping de nom devrait être effectué au chargement, une seule fois.
+
+A chaque nouvelle version, on a un nouveau fichier json qui peut pointer vers le nom utilisé immédiatement précédent
+	genre {old <- new}
+	
+Le versionning ne doit pas se faire sur du semantic versionning mais sur un entier simple
+
+Pour les polaires déjà générée, il faudrait un outil de modification de version de fichier .nc 
+
+Voir à trouver une lib qui permette aussi d'inférer un nouveau nom par rapport à un ancien pour aider
+
+Voir à avoir une syntaxe de new, optional, deprecated etc... dans les fichiers json
+
+Le code de lecture devrait etre capable de gerer ces codes
+
+A partir du mapping json, il faudrait mettre en place un outil permettant de convertir une polaire ancienne en une polaire nouvelle (en choisissant la version ???)
+
+Les outils de check devraient tourner à chaque lecture de polaire 
+
+
+example
+
+{var: {
+
+}
+
+}
+
+
+
+
