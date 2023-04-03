@@ -17,14 +17,19 @@ option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
 
 
-
 cmake_policy(SET CMP0135 NEW)
+#cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0076 NEW)
 #=============================================================================
 # Dependencies
 #=============================================================================
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/URL.conf.cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+include(Add_version)
+
+
+include(Add_mathutils)
 include(Add_json)
 
 # netcdf related dependencies
@@ -37,4 +42,11 @@ include(Add_netcdf-cxx4)
 #set(PYBIND11_FINDPYTHON ON CACHE BOOL "")
 #include(add_pybind11)
 
+add_subdirectory(src/poem)
 
+
+
+
+if (POEM_BUILD_TESTS)
+  add_subdirectory(tests)
+endif ()

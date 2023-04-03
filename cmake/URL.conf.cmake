@@ -1,3 +1,12 @@
+# viper version
+set(${PROJECT_NAME}-version_URL git@d-ice.gitlab.host:common/dice-tools/cmake-version.git)
+set(${PROJECT_NAME}-version_TAG v1.3)
+
+# mathutils
+set(mathutils_URL git@frydom-ce.org:ce/mathutils.git)
+set(mathutils_TAG v1.15 CACHE STRING "mathutils version")
+set(MATHUTILS_BUILD_TESTS OFF CACHE BOOL "")
+set(MATHUTILS_BUILD_BOOST_TESTS OFF CACHE BOOL "")
 
 # nlohmann/json
 set(json_URL https://github.com/nlohmann/json.git)
@@ -7,7 +16,6 @@ set(json_TAG v3.6.1 CACHE STRING "json version")
 set(zlib_URL https://github.com/madler/zlib/archive/refs/tags/v1.2.12.tar.gz)
 set(zlib_TAG v1.2.12)
 set(zlib_PATCH zlib_v1.2.12.patch)
-
 
 # Curl
 set(curl_URL https://github.com/curl/curl/archive/refs/tags/curl-7_84_0.tar.gz)

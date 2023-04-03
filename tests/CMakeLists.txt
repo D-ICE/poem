@@ -1,0 +1,3 @@
+add_executable(test_load_polar5D test_load_polar5D.cpp)
+
+target_link_libraries(test_load_polar5D poem)
