@@ -3,6 +3,7 @@ add_library(poem)
 target_link_libraries(poem
         MathUtils::MathUtils
         netcdf-cxx4
+        nlohmann_json
         )
 
 set_property(TARGET poem PROPERTY POSITION_INDEPENDENT_CODE ON)

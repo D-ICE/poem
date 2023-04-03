@@ -1,3 +1,3 @@
 target_sources(poem PRIVATE
-        JSONScheme.cpp
+        PolarVersions.cpp
         )

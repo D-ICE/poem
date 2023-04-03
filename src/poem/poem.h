@@ -5,7 +5,7 @@
 #ifndef POEM_POEM_H
 #define POEM_POEM_H
 
-#include "json/JSONScheme.h"
+#include "json/PolarVersions.h"
 
 
 #endif //POEM_POEM_H

@@ -8,7 +8,7 @@ using namespace poem;
 
 int main() {
 
-  JSONScheme scheme(SCHEME_PATH);
+  PolarVersions scheme(SCHEME_PATH);
 
   return 0;
 }
