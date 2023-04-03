@@ -1,0 +1,13 @@
+{
+  "vars": {
+    "ActivePower": {
+      "info": "Sails active power",
+      "status": "new"
+
+    },
+    "*_Fx": {
+
+    }
+
+  }
+}

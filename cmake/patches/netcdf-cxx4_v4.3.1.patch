@@ -1,0 +1,135 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 60c699d..a014df0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -349,32 +349,33 @@ MARK_AS_ADVANCED(NCXX_CTEST_PROJECT_NAME
+ ###
+ # Find NetCDF
+ ###
+-IF(NOT netCDF_LIBRARIES AND NOT netCDF_INCLUDE_DIR)
+-  FIND_PACKAGE(netCDF QUIET)
+-ELSE()
+-  SET(netCDF_FOUND TRUE)
+-ENDIF()
+-
+-IF (netCDF_FOUND)
+-  INCLUDE_DIRECTORIES(SYSTEM ${netCDF_INCLUDE_DIR})
+-  SET(NETCDF_C_LIBRARY ${netCDF_LIBRARIES})
+-  SET(NETCDF_C_INCLUDE_DIR ${netCDF_INCLUDE_DIR})
+-ELSE()
+-  # netCDF not properly packaged. Try to find it manually.
+-  FIND_LIBRARY(NETCDF_C_LIBRARY NAMES netcdf libnetcdf)
+-  IF(NOT NETCDF_C_LIBRARY)
+-    MESSAGE(FATAL_ERROR "libnetcdf not found. Please reinstall and try again.")
+-  ELSE()
+-    MESSAGE(STATUS "Found netcdf: ${NETCDF_C_LIBRARY}")
+-    FIND_PATH(NC_H_INCLUDE_DIR "netcdf.h")
+-    IF(NOT NC_H_INCLUDE_DIR)
+-      MESSAGE(FATAL_ERROR "Directory containing netcdf.h cannot be found. Please reinstall and try again.")
+-    ELSE()
+-      GET_FILENAME_COMPONENT(netCDF_LIB_DIR "${NETCDF_C_LIBRARY}" REALPATH)
+-      INCLUDE_DIRECTORIES(SYSTEM ${NC_H_INCLUDE_DIR})
+-    ENDIF()
+-  ENDIF()
+-ENDIF()
++# IF(NOT netCDF_LIBRARIES AND NOT netCDF_INCLUDE_DIR)
++#   FIND_PACKAGE(netCDF QUIET)
++# ELSE()
++#   SET(netCDF_FOUND TRUE)
++# ENDIF()
++#
++# IF (netCDF_FOUND)
++#   INCLUDE_DIRECTORIES(SYSTEM ${netCDF_INCLUDE_DIR})
++#   SET(NETCDF_C_LIBRARY ${netCDF_LIBRARIES})
++#   SET(NETCDF_C_INCLUDE_DIR ${netCDF_INCLUDE_DIR})
++# ELSE()
++#   # netCDF not properly packaged. Try to find it manually.
++#   FIND_LIBRARY(NETCDF_C_LIBRARY NAMES netcdf libnetcdf)
++#   IF(NOT NETCDF_C_LIBRARY)
++#     MESSAGE(FATAL_ERROR "libnetcdf not found. Please reinstall and try again.")
++#   ELSE()
++#     MESSAGE(STATUS "Found netcdf: ${NETCDF_C_LIBRARY}")
++#     FIND_PATH(NC_H_INCLUDE_DIR "netcdf.h")
++#     IF(NOT NC_H_INCLUDE_DIR)
++#       MESSAGE(FATAL_ERROR "Directory containing netcdf.h cannot be found. Please reinstall and try again.")
++#     ELSE()
++#       GET_FILENAME_COMPONENT(netCDF_LIB_DIR "${NETCDF_C_LIBRARY}" REALPATH)
++#       INCLUDE_DIRECTORIES(SYSTEM ${NC_H_INCLUDE_DIR})
++#     ENDIF()
++#   ENDIF()
++# ENDIF()
++set(NETCDF_C_LIBRARY netcdf)
+
+ ###
+ # Check to see if netcdf-c was built with parallel.
+@@ -395,18 +396,18 @@ ENDIF(NC_HAS_DEF_VAR_FILTER)
+ ###
+ # Find HDF5
+ ###
+-IF(MSVC)
+-  SET(SEARCH_PACKAGE_NAME ${HDF5_PACKAGE_NAME})
+-  FIND_PACKAGE(HDF5 NAMES ${SEARCH_PACKAGE_NAME} COMPONENTS C HL NO_MODULES REQUIRED ${NC_HDF5_LINK_TYPE})
+-ELSE(MSVC)
+-  FIND_PACKAGE(HDF5 COMPONENTS C HL REQUIRED)
+-ENDIF(MSVC)
+-
+-CHECK_LIBRARY_EXISTS(${HDF5_C_LIBRARY_hdf5} H5free_memory "" HAVE_H5FREE_MEMORY)
+-IF(NOT HAVE_H5FREE_MEMORY)
+-  MESSAGE(STATUS "Plugin support requires libhdf5 with H5Free support. Your libhdf5 install does not provide H5Free.  Please install a newer version of libhdf5 if you require plugin compression support.")
+-  SET(NC_HAS_DEF_VAR_FILTER "")
+-ENDIF()
++# IF(MSVC)
++#   SET(SEARCH_PACKAGE_NAME ${HDF5_PACKAGE_NAME})
++#   FIND_PACKAGE(HDF5 NAMES ${SEARCH_PACKAGE_NAME} COMPONENTS C HL NO_MODULES REQUIRED ${NC_HDF5_LINK_TYPE})
++# ELSE(MSVC)
++#   FIND_PACKAGE(HDF5 COMPONENTS C HL REQUIRED)
++# ENDIF(MSVC)
++#
++# CHECK_LIBRARY_EXISTS(${HDF5_C_LIBRARY_hdf5} H5free_memory "" HAVE_H5FREE_MEMORY)
++# IF(NOT HAVE_H5FREE_MEMORY)
++#   MESSAGE(STATUS "Plugin support requires libhdf5 with H5Free support. Your libhdf5 install does not provide H5Free.  Please install a newer version of libhdf5 if you require plugin compression support.")
++#   SET(NC_HAS_DEF_VAR_FILTER "")
++# ENDIF()
+
+ ################################
+ # End 'seek out dependent libraries'
+@@ -602,7 +603,7 @@ INSTALL(PROGRAMS ${NCXX_BINARY_DIR}/ncxx4-config
+ SET(EXTRA_DIST ${EXTRA_DIST} ${CMAKE_SOURCE_DIR}/test_common.in)
+ SET(TOPSRCDIR "${CMAKE_SOURCE_DIR}")
+ SET(TOPBUILDDIR "${CMAKE_BINARY_DIR}")
+-configure_file(${CMAKE_SOURCE_DIR}/test_common.in ${CMAKE_BINARY_DIR}/test_common.sh @ONLY NEWLINE_STYLE LF)
++configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_common.in ${CMAKE_BINARY_DIR}/test_common.sh @ONLY NEWLINE_STYLE LF)
+
+ #####
+ # Options
+@@ -644,8 +645,8 @@ IF(NC_HAS_DEF_VAR_FILTER)
+   # Build cxx4/findplugin.sh
+   #####
+   SET(ISCMAKE "1")
+-  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cxx4/findplugin.in ${CMAKE_BINARY_DIR}/cxx4/findplugin.sh @ONLY NEWLINE_STYLE LF)
+-  CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/examples/findplugin.in ${CMAKE_BINARY_DIR}/examples/findplugin.sh @ONLY NEWLINE_STYLE LF)
++  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cxx4/findplugin.in ${CMAKE_BINARY_DIR}/cxx4/findplugin.sh @ONLY NEWLINE_STYLE LF)
++  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/examples/findplugin.in ${CMAKE_BINARY_DIR}/examples/findplugin.sh @ONLY NEWLINE_STYLE LF)
+
+   ADD_SUBDIRECTORY(plugins)
+ ENDIF(NC_HAS_DEF_VAR_FILTER)
+@@ -659,4 +660,4 @@ ENDIF()
+ ##
+ # CPack, CMakeInstallation.cmake file.
+ ##
+-INCLUDE(CMakeInstallation.cmake)
++# INCLUDE(CMakeInstallation.cmake)
+diff --git a/cxx4/CMakeLists.txt b/cxx4/CMakeLists.txt
+index b433786..02c2b21 100644
+--- a/cxx4/CMakeLists.txt
++++ b/cxx4/CMakeLists.txt
+@@ -27,8 +27,7 @@ IF(NCXX_ENABLE_TESTS)
+
+ ENDIF()
+
+-SET(ALL_TLL_LIBS ${NETCDF_C_LIBRARY})
+-SET(ALL_TLL_LIBS ${ALL_TLL_LIBS} ${HDF5_C_LIBRARY_hdf5})
++SET(ALL_TLL_LIBS ${ALL_TLL_LIBS} netcdf)
+ SET(ALL_TLL_LIBS ${ALL_TLL_LIBS} ${EXTRA_DEPS} PARENT_SCOPE)
+
+ ADD_LIBRARY(netcdf-cxx4 ${CXX_SOURCES})

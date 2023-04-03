@@ -1,0 +1,14 @@
+{
+  "vars": {
+    "TotalActivePower": {
+      "info": "Sails active power",
+      "status": "modified",
+      "old": "ActivePower"
+
+    },
+    "*_Fx": {
+
+    }
+
+  }
+}
