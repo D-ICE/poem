@@ -13,4 +13,4 @@ target_include_directories(poem PUBLIC
         )
 
 add_subdirectory(polars)
-
+add_subdirectory(json)

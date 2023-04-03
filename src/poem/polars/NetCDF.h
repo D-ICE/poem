@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <netcdf>
+#include <boost/array.hpp>
 
 #include <MathUtils/RegularGridInterpolator.h>
 #include <MathUtils/RegularGridNearest.h>
