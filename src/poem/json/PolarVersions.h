@@ -46,11 +46,19 @@ namespace poem {
 
   class Variable {
    public:
-    Variable(const std::string &name,
+
+    enum DIM_OR_VAR {
+      DIMENSION,
+      VARIABLE
+    };
+
+    Variable(DIM_OR_VAR dim_or_var,
+             const std::string &name,
              const std::string &type,
              const std::string &description,
              const std::string &unit,
              const std::vector<std::string> &options) :
+        m_dim_or_var(dim_or_var),
         m_name(name),
         m_type(type),
         m_description(description),
@@ -62,6 +70,8 @@ namespace poem {
 
     }
 
+    DIM_OR_VAR dim_or_var() const { return m_dim_or_var; }
+
     std::string name() const { return m_name; }
 
     std::string type() const { return m_type; }
@@ -71,6 +81,7 @@ namespace poem {
     std::string unit() const { return m_unit; }
 
    private:
+    DIM_OR_VAR m_dim_or_var;
     std::string m_name;
     std::string m_type;
     std::string m_description;
@@ -111,7 +122,7 @@ namespace poem {
         }
 
         m_variables_map.insert({it.key(),
-                                {name, type, description, unit, options}});
+                                {Variable::DIM_OR_VAR::VARIABLE, name, type, description, unit, options}});
 
       }
 
@@ -130,19 +141,13 @@ namespace poem {
         }
 
         m_dimensions_map.insert({it.key(),
-                                 {name, type, description, unit, options}});
+                                 {Variable::DIM_OR_VAR::DIMENSION, name, type, description, unit, options}});
 
       }
 
 
     }
 
-
-
-//    PolarVersion(const PolarVersion &other) :
-//        m_version(other.m_version),
-//        m_node(other.m_node),
-//        m_dimensions(other.m_dimensions) {}
 
     int version() const { return m_version; }
 
@@ -157,6 +162,14 @@ namespace poem {
         }
       }
       return "";
+    }
+
+    bool is_this_list_consistent_with_version(const std::vector<std::string> &name_list,
+                                              Variable::DIM_OR_VAR dim_or_var) const {
+      for (const auto &name : name_list) {
+        if (is_variable_recognized(name).empty()) return false;
+      }
+      return true;
     }
 
     Variable *get(const std::string &var_name) {
@@ -187,20 +200,22 @@ namespace poem {
     int head_version() const { return m_head_version; }
 
     const PolarVersion &get(int version) const {
-      check_version(version);
+      check_version_bounds(version);
       return m_versions.at(version - 1);
     }
 
+    bool is_this_list_consistent_with_version(const std::vector<std::string> &name_list,
+                                              int version,
+                                              Variable::DIM_OR_VAR dim_or_var) const {
+      return get(version).is_this_list_consistent_with_version(name_list, dim_or_var);
+    }
 
-//    PolarVersion& get(int version) {
-//      if (version > m_head_version) {
-//        throw std::runtime_error("Requested version higher than head");
-//      }
-//      return m_versions[version];
-//    }
 
    private:
-    void check_version(int version) const {
+    void check_version_bounds(int version) const {
+      if (version < 1) {
+        throw std::runtime_error("Polar version start at 1");
+      }
       if (version > m_head_version) {
         throw std::runtime_error("Requested version higher than head");
       }
@@ -214,6 +229,16 @@ namespace poem {
     int m_head_version;
     std::vector<PolarVersion> m_versions;
 
+  };
+
+  class NameMapper {
+   public:
+    NameMapper(int version_from, int version_to) {
+
+    }
+
+   private:
+    std::unordered_map<std::string, std::string> m_mapper;
   };
 
 }  // poem

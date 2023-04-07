@@ -19,15 +19,15 @@
 
   "variables": {
     "v1": {
-      "type": "int",
+      "type_": "int",
       "description": "n",
       "unit": "-",
       "tags": ["mandatory"]
     },
     "v2": {
-      "type": "double",
+      "type_": "double",
       "description": "variable",
-      "unit": "",
+      "unit": "kt",
       "tags": ["mandatory"]
     }
 
