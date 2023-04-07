@@ -18,20 +18,29 @@ TEST(poem, checkVersionConsistency) {
   std::vector<std::string> variables_names_correct{"v1", "v2"};
   std::vector<std::string> variables_names_incorrect{"v1", "v3"};
 
-  ASSERT_TRUE(polar_versions.is_this_list_consistent_with_version(variables_names_correct,
-                                                                  version,
-                                                                  poem::Variable::VARIABLE));
-  ASSERT_FALSE(polar_versions.is_this_list_consistent_with_version(variables_names_incorrect,
-                                                                  version,
-                                                                  poem::Variable::VARIABLE));
+  // First list is the correct list
+  ASSERT_TRUE(polar_versions.unknown_names(variables_names_correct,
+                                           version,
+                                           poem::Variable::VARIABLE).size() == 0);
 
-//  auto v1 = polar_versions.get(version);
+  // First list is for variables, not dimensions
+  ASSERT_FALSE(polar_versions.unknown_names(variables_names_correct,
+                                            version,
+                                            poem::Variable::DIMENSION).size() == 0);
 
-//  ASSERT_FALSE(v1.is_variable_recognized("v1").empty());
+  // Second list is not correct
+  ASSERT_FALSE(polar_versions.unknown_names(variables_names_incorrect,
+                                            version,
+                                            poem::Variable::VARIABLE).size() == 0);
 
-
-
-//  ASSERT_TRUE(polar_versions.are_variable_names_consistent(version, variables_names_correct));
-
+  version = 2;
+  // In version 2, v2 has been modified into v2_changed
+  ASSERT_FALSE(polar_versions.unknown_names(variables_names_correct,
+                                           version,
+                                           poem::Variable::VARIABLE).size() == 0);
+  variables_names_correct[1] = "v2_changed";
+  ASSERT_TRUE(polar_versions.unknown_names(variables_names_correct,
+                                            version,
+                                            poem::Variable::VARIABLE).size() == 0);
 
 }

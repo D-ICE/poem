@@ -13,6 +13,7 @@
 #include <unordered_map>
 
 #include <dunits/dunits.h>
+#include "poem/exceptions.h"
 
 namespace fs = std::filesystem;
 using json = nlohmann::json;
@@ -57,16 +58,33 @@ namespace poem {
              const std::string &type,
              const std::string &description,
              const std::string &unit,
-             const std::vector<std::string> &options) :
+             const std::vector<std::string> &tags) :
         m_dim_or_var(dim_or_var),
         m_name(name),
         m_type(type),
         m_description(description),
-        m_unit(unit) {
+        m_unit(unit),
+        m_old_name(""),
+        m_is_optional(true),
+        m_is_new(false) {
 
       if (!dunits::UnitsChecker::getInstance().is_valid_unit(unit, true)) {
         throw std::runtime_error("Unit " + unit + " is not known by DUNITS lib");
       }
+
+      for (const auto &tag: tags) {
+        if (tag == "mandatory") {
+          m_is_optional = false;
+
+        } else if (tag == "new") {
+          m_is_new = true;
+
+        } else {
+          throw std::runtime_error("Tag " + tag + " not known for variable " + name);
+
+        }
+      }
+
 
     }
 
@@ -80,12 +98,35 @@ namespace poem {
 
     std::string unit() const { return m_unit; }
 
+    bool is_optional() const {
+      return m_is_optional;
+    }
+
+    bool is_new() const {
+      return m_is_new;
+    }
+
+    void set_old_name(const std::string &old_name) {
+      assert(!old_name.empty());
+      m_old_name = old_name;
+    }
+
+    bool has_changed() const {
+      return !m_old_name.empty();
+    }
+
    private:
     DIM_OR_VAR m_dim_or_var;
     std::string m_name;
     std::string m_type;
     std::string m_description;
     std::string m_unit;
+
+    // Options
+    std::string m_old_name;
+    bool m_is_optional;
+    bool m_is_new;
+
 
   };
 
@@ -116,13 +157,17 @@ namespace poem {
         auto description = (*it)["description"].get<std::string>();
         auto unit = (*it)["unit"].get<std::string>();
 
-        std::vector<std::string> options;
-        if ((*it).find("options") != (*it).end()) {
-          options = (*it).get<std::vector<std::string>>();
+        std::vector<std::string> tags;
+        if ((*it).find("tags") != (*it).end()) {
+          tags = (*it)["tags"].get<std::vector<std::string>>();
         }
 
-        m_variables_map.insert({it.key(),
-                                {Variable::DIM_OR_VAR::VARIABLE, name, type, description, unit, options}});
+        auto var_entry = m_variables_map.insert({it.key(),
+                                                 {Variable::DIM_OR_VAR::VARIABLE, name, type, description, unit,
+                                                  tags}});
+        if ((*it).find("old_name") != ((*it).end())) {
+          (*var_entry.first).second.set_old_name((*it)["old_name"].get<std::string>());
+        }
 
       }
 
@@ -135,14 +180,17 @@ namespace poem {
         auto description = (*it)["description"].get<std::string>();
         auto unit = (*it)["unit"].get<std::string>();
 
-        std::vector<std::string> options;
-        if ((*it).find("options") != (*it).end()) {
-          options = (*it).get<std::vector<std::string>>();
+        std::vector<std::string> tags;
+        if ((*it).find("tags") != (*it).end()) {
+          tags = (*it)["tags"].get<std::vector<std::string>>();
         }
 
-        m_dimensions_map.insert({it.key(),
-                                 {Variable::DIM_OR_VAR::DIMENSION, name, type, description, unit, options}});
-
+        auto var_entry = m_dimensions_map.insert({it.key(),
+                                                  {Variable::DIM_OR_VAR::DIMENSION, name, type, description, unit,
+                                                   tags}});
+        if ((*it).find("old_name") != ((*it).end())) {
+          (*var_entry.first).second.set_old_name((*it)["old_name"].get<std::string>());
+        }
       }
 
 
@@ -155,8 +203,11 @@ namespace poem {
       return m_node.dump(indent);
     }
 
-    std::string is_variable_recognized(const std::string &name) const {
-      for (auto it = m_variables_map.begin(); it != m_variables_map.end(); ++it) {
+    std::string find_corresponding_key(const std::string &name, Variable::DIM_OR_VAR dim_or_var) const {
+      const std::unordered_map<std::string, Variable> *map =
+          (dim_or_var == Variable::VARIABLE) ? &m_variables_map : &m_dimensions_map;
+
+      for (auto it = map->begin(); it != map->end(); ++it) {
         if (std::regex_match(name, std::regex(it->first))) {
           return it->first;
         }
@@ -164,16 +215,20 @@ namespace poem {
       return "";
     }
 
-    bool is_this_list_consistent_with_version(const std::vector<std::string> &name_list,
-                                              Variable::DIM_OR_VAR dim_or_var) const {
-      for (const auto &name : name_list) {
-        if (is_variable_recognized(name).empty()) return false;
+    std::vector<std::string>
+    unknown_names(const std::vector<std::string> &name_list,
+                  Variable::DIM_OR_VAR dim_or_var) const {
+      std::vector<std::string> unknown_names;
+      for (const auto &name: name_list) {
+        if (find_corresponding_key(name, dim_or_var).empty()) {
+          unknown_names.push_back(name);
+        }
       }
-      return true;
+      return unknown_names;
     }
 
-    Variable *get(const std::string &var_name) {
-      auto key = is_variable_recognized(var_name);
+    Variable *get(const std::string &var_name, Variable::DIM_OR_VAR dim_or_var) {
+      auto key = find_corresponding_key(var_name, dim_or_var);
       if (key.empty()) {
         return nullptr;
       } else {
@@ -191,6 +246,32 @@ namespace poem {
 
   };
 
+/**
+ * Class that maps
+ */
+  class NameMapper {
+   public:
+    NameMapper(int version_from, int version_to, Variable::DIM_OR_VAR dim_or_var) :
+        m_version_from(version_from),
+        m_version_to(version_to),
+        m_dim_or_var(dim_or_var) {
+
+      assert(version_from >= version_to);
+
+
+    }
+
+
+   private:
+    friend class PolarVersions;
+
+    Variable::DIM_OR_VAR m_dim_or_var;
+    int m_version_from;
+    int m_version_to;
+
+    std::unordered_map<std::string, std::string> m_mapper;
+  };
+
 
   class PolarVersions {
 
@@ -204,10 +285,24 @@ namespace poem {
       return m_versions.at(version - 1);
     }
 
-    bool is_this_list_consistent_with_version(const std::vector<std::string> &name_list,
-                                              int version,
-                                              Variable::DIM_OR_VAR dim_or_var) const {
-      return get(version).is_this_list_consistent_with_version(name_list, dim_or_var);
+    std::vector<std::string>
+    unknown_names(const std::vector<std::string> &name_list,
+                  int version,
+                  Variable::DIM_OR_VAR dim_or_var) const {
+      return get(version).unknown_names(name_list, dim_or_var);
+    }
+
+    NameMapper get_mapper(int version_from, int version_to, Variable::DIM_OR_VAR dim_or_var) const {
+      if (version_from < version_to) {
+        throw std::runtime_error("version_from must be greater or equal to version_to");
+      }
+      NameMapper mapper(version_from, version_to, dim_or_var);
+      /*
+       * On itere sur le noms dans from et on cherche de proche en proche les noms de Vp correspondant en jouant sur les
+       * tags
+       */
+
+      NIY
     }
 
 
@@ -229,16 +324,6 @@ namespace poem {
     int m_head_version;
     std::vector<PolarVersion> m_versions;
 
-  };
-
-  class NameMapper {
-   public:
-    NameMapper(int version_from, int version_to) {
-
-    }
-
-   private:
-    std::unordered_map<std::string, std::string> m_mapper;
   };
 
 }  // poem

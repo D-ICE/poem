@@ -1,0 +1,36 @@
+{
+  "version": 3,
+  "polar_type": "p1",
+  "dimensions": {
+    "d1": {
+      "type_": "double",
+      "description": "first dim",
+      "unit": "kt",
+      "tags": ["mandatory"]
+    },
+    "d2": {
+      "type_": "double",
+      "description": "second dim",
+      "unit": "mps",
+      "tags": ["mandatory"]
+    }
+
+  },
+
+  "variables": {
+    "v2_changed": {
+      "old_name": "v2",
+      "type_": "double",
+      "description": "variable",
+      "unit": "kt",
+      "tags": ["mandatory"]
+    },
+    "v3": {
+      "type_": "double",
+      "description": "variable",
+      "unit": "kt",
+      "tags": ["new"]
+    }
+
+  }
+}
