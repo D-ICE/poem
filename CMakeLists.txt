@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 
 project(poem)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 14)
 
 #-----------------------------------------------------------------------------
 # Prevent in-source builds
@@ -28,7 +28,6 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/URL.conf.cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(Add_version)
-
 
 include(Add_mathutils)
 include(Add_json)
