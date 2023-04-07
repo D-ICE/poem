@@ -38,4 +38,8 @@ set(netcdf-cxx4_TAG v4.3.1)
 
 # dunits
 set(dunits_URL git@d-ice.gitlab.host:common/d-units.git)
-set(dunits_TAG develop)  # TODO: mettre tag
+set(dunits_TAG 1.1)  # TODO: mettre tag
+
+# google test
+set(googletest_URL https://github.com/google/googletest.git)
+set(googletest_TAG release-1.12.1)

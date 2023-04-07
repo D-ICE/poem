@@ -7,7 +7,6 @@
 
 #include "poem/poem.h"
 
-#include "poem/units/units.h"  // TODO: retirer
 #include "poem/exceptions.h"
 
 
@@ -15,9 +14,6 @@ using namespace poem;
 
 int main() {
 
-  std::cout << units::UnitsChecker::getInstance().is_valid_unit("kn", false) << std::endl;
-
-  return 1;
 
 //  units.is_valid_unit()
 

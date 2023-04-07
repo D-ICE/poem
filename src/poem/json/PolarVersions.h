@@ -12,6 +12,8 @@
 #include <fstream>
 #include <unordered_map>
 
+#include <dunits/dunits.h>
+
 namespace fs = std::filesystem;
 using json = nlohmann::json;
 
@@ -52,7 +54,13 @@ namespace poem {
         m_name(name),
         m_type(type),
         m_description(description),
-        m_unit(unit) {}
+        m_unit(unit) {
+
+      if (!dunits::UnitsChecker::getInstance().is_valid_unit(unit, true)) {
+        throw std::runtime_error("Unit " + unit + " is not known by DUNITS lib");
+      }
+
+    }
 
     std::string name() const { return m_name; }
 

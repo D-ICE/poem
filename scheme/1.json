@@ -83,193 +83,193 @@
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "CS": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "CD": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "WD": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "Hs": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "m"
     },
     "Tp": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "s"
     },
     "TWS": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "TWA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "AWS": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "AWA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "WA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "CA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "HDG": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "COG": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "STW": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "SOG": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "SurgeVelocity": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "SwayVelocity": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kt"
     },
     "LEEWAY": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "HEELING": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "BrakePower": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kW"
     },
     "TotalFuelConsumption": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kg/h"
     },
     "\\w+_propeller_handle_position": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "-"
     },
     "\\w+_propeller_rpm": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "rpm"
     },
     "\\w+_propeller_pitch_ratio": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "-"
     },
     "\\w+_propeller_efficiency": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "-"
     },
     "\\w+_propeller_advance_ratio": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "-"
     },
     "\\w+_propeller_delivered_power": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kW"
     },
     "rud_\\w+_rudder_deflection_angle": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "rud_\\w+_rudder_AoA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "TotalSailsActivePower": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kW"
     },
     "SailsDepoweringCoeff": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "-"
     },
     "\\w+_ActivePower": {
       "type_": "double",
@@ -281,74 +281,111 @@
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
     },
-    "manoeuvring_[XYKN]": {
+    "manoeuvring_[XY]": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
+    },
+    "manoeuvring_[KN]": {
+      "type_": "double",
+      "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
+      "description": "",
+      "unit": "kNm"
     },
     "added_wave_resistance_X": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
     },
     "\\w+_propeller_X": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
     },
     "dag_\\w+_deflection_angle": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
     "dag_\\w+_AoA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "deg"
     },
-    "Daggerboards_[XYKN]": {
+    "Daggerboards_[XY]": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
     },
-    "\\w+_rudder_[XYKN]": {
+    "Daggerboards_[KN]": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kNm"
     },
-    "wind_loads_[XYKN]": {
+    "\\w+_rudder_[XY]": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
     },
-    "\\w+_[XYKN]": {
+    "\\w+_rudder_[KN]": {
+      "type_": "double",
+      "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
+      "description": "",
+      "unit": "kNm"
+    },
+    "wind_loads_[XY]": {
+      "type_": "double",
+      "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
+      "description": "",
+      "unit": "kN"
+    },
+    "wind_loads_[KN]": {
+      "type_": "double",
+      "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
+      "description": "",
+      "unit": "kNm"
+    },
+    "\\w+_[XY]": {
       "note:" : "porte sur les voiles",
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kN"
     },
-    "Balance_[XYKN]": {
+    "\\w+_[KN]": {
+      "note:" : "porte sur les voiles",
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kNm"
+    },
+    "Balance_[XY]": {
+      "type_": "double",
+      "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
+      "description": "",
+      "unit": "kN"
+    },
+    "Balance_[KN]": {
+      "type_": "double",
+      "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
+      "description": "",
+      "unit": "kNm"
     },
     "Restoring_K": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
-      "unit": ""
+      "unit": "kNm"
     }
   }
 }
