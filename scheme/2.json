@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "polar_type": "ND",
   "dimensions": {
     "STW_kt": {
@@ -211,49 +211,49 @@
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_handle_position": {
+    "*_propeller_handle_position": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_rpm": {
+    "*_propeller_rpm": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_pitch_ratio": {
+    "*_propeller_pitch_ratio": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_efficiency": {
+    "*_propeller_efficiency": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_advance_ratio": {
+    "*_propeller_advance_ratio": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_delivered_power": {
+    "*_propeller_delivered_power": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "rud_\\w+_rudder_deflection_angle": {
+    "rud_*_rudder_deflection_angle": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "rud_\\w+_rudder_AoA": {
+    "rud_*_rudder_AoA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
@@ -271,11 +271,11 @@
       "description": "",
       "unit": ""
     },
-    "\\w+_ActivePower": {
+    "*_ActivePower": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
-      "description": "Active Power for one wind propulsion unit",
-      "unit": "kW"
+      "description": "",
+      "unit": ""
     },
     "calm_water_resistance_X": {
       "type_": "double",
@@ -295,19 +295,19 @@
       "description": "",
       "unit": ""
     },
-    "\\w+_propeller_X": {
+    "*_propeller_X": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "dag_\\w+_deflection_angle": {
+    "dag_*_deflection_angle": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
       "unit": ""
     },
-    "dag_\\w+_AoA": {
+    "dag_*_AoA": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
@@ -319,7 +319,7 @@
       "description": "",
       "unit": ""
     },
-    "\\w+_rudder_[XYKN]": {
+    "*_rudder_[XYKN]": {
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],
       "description": "",
@@ -331,7 +331,7 @@
       "description": "",
       "unit": ""
     },
-    "\\w+_[XYKN]": {
+    "*_[XYKN]": {
       "note:" : "porte sur les voiles",
       "type_": "double",
       "dimensions": ["STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"],

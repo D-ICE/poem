@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "polar_type": "p1",
+  "dimensions": {
+    "d1": {
+      "type_": "double",
+      "description": "first dim",
+      "unit": "kt",
+      "tags": ["mandatory"]
+    },
+    "d2": {
+      "type_": "double",
+      "description": "second dim",
+      "unit": "mps",
+      "tags": ["mandatory"]
+    }
+
+  },
+
+  "variables": {
+    "n": {
+      "type": "int",
+      "description": "n",
+      "unit": "-",
+      "tags": ["mandatory"]
+    },
+    "aaa": {
+      "type": "double",
+      "description": "variable",
+      "unit": "",
+      "tags": ["mandatory"]
+    },
+
+  }
+}

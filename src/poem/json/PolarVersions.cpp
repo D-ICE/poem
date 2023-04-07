@@ -31,7 +31,7 @@ namespace poem {
       m_versions.emplace_back(version_to_file(version), version);
     }
 
-    STOP
+//    STOP
 
   }
 

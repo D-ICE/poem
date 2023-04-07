@@ -36,3 +36,6 @@ set(netcdf-cxx4_URL "https://github.com/Unidata/netcdf-cxx4/archive/refs/tags/v4
 set(netcdf-cxx4_PATCH netcdf-cxx4_v4.3.1.patch)
 set(netcdf-cxx4_TAG v4.3.1)
 
+# dunits
+set(dunits_URL git@d-ice.gitlab.host:common/d-units.git)
+set(dunits_TAG develop)  # TODO: mettre tag

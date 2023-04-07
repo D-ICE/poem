@@ -31,6 +31,7 @@ include(Add_version)
 
 include(Add_mathutils)
 include(Add_json)
+include(Add_dunits)
 
 # netcdf related dependencies
 include(Add_zlib)
