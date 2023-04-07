@@ -18,8 +18,8 @@
   },
 
   "variables": {
-    "v2_changed": {
-      "old_name": "v2",
+    "v2_second_modif": {
+      "old_name": "v2_first_modif",
       "type_": "double",
       "description": "variable",
       "unit": "kt",
@@ -30,6 +30,11 @@
       "description": "variable",
       "unit": "kt",
       "tags": ["new"]
+    },
+    "var_\\w+": {
+      "type_": "double",
+      "description": "variable",
+      "unit": "kt"
     }
 
   }

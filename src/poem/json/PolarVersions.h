@@ -111,6 +111,10 @@ namespace poem {
       m_old_name = old_name;
     }
 
+    std::string old_name() const {
+      return m_old_name;
+    }
+
     bool has_changed() const {
       return !m_old_name.empty();
     }
@@ -289,6 +293,7 @@ namespace poem {
     unknown_names(const std::vector<std::string> &name_list,
                   int version,
                   Variable::DIM_OR_VAR dim_or_var) const {
+      // FIXME: il faudrait egalement checker que toutes les variable obligatoires sont bien presentes...
       return get(version).unknown_names(name_list, dim_or_var);
     }
 
@@ -305,8 +310,30 @@ namespace poem {
       NIY
     }
 
+//   private: // TODO: reactiver
+    std::pair<std::string, std::string> map_keys(int version_from, int version_to,
+                                                 const std::string &name_from, Variable::DIM_OR_VAR dim_or_var) {
 
-   private:
+      std::string name_to = name_from;
+
+      NIY
+      for (auto version = version_from; version >= version_to; --version) {
+        auto ver = get(version);
+        ver.find_corresponding_key(name_to, dim_or_var);
+
+        auto var = ver.get(name_to, dim_or_var);
+
+        if (!var) {
+          throw std::runtime_error("");
+        }
+        if (var->has_changed()) {
+          name_to = var->old_name();
+        }
+      }
+
+      return {name_from, name_to};
+    }
+
     void check_version_bounds(int version) const {
       if (version < 1) {
         throw std::runtime_error("Polar version start at 1");

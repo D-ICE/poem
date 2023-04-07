@@ -24,7 +24,7 @@
       "unit": "-",
       "tags": ["mandatory"]
     },
-    "v2_changed": {
+    "v2_first_modif": {
       "old_name": "v2",
       "type_": "double",
       "description": "variable",
@@ -32,6 +32,12 @@
       "tags": ["mandatory"]
     },
     "v3": {
+      "type_": "double",
+      "description": "variable",
+      "unit": "kt",
+      "tags": ["new"]
+    },
+    "var_\\w+": {
       "type_": "double",
       "description": "variable",
       "unit": "kt",

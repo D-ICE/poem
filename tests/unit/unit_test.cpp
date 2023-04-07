@@ -7,6 +7,22 @@
 
 #include "poem/poem.h"
 
+/*
+ * - pour une version de polaire donnee, pouvoir tester si une variable est reconnue.
+ * - pour une version de polaire donnee, verifier que celles obligatoires figurent bien dans une liste fournie
+ * - fournir un reader de polaire generique qui ne traite que les dimensions et les variables
+ * - checker aussi la presence des metadonnees
+ * - checker que les unites utilisees sont bien raccord avec la version
+ * - checker que les descriptions utilisees sont bien raccord avec la version
+ * - il faut un outil python de test de consistance de polaire (-> tools pousse sur pypi)
+ *
+ *
+ *
+ * Ou alors, on tient a jour un reader par version... -> trop relou...
+ */
+
+
+
 using namespace poem;
 
 PolarVersions polar_versions(SCHEME_PATH);
@@ -42,5 +58,13 @@ TEST(poem, checkVersionConsistency) {
   ASSERT_TRUE(polar_versions.unknown_names(variables_names_correct,
                                             version,
                                             poem::Variable::VARIABLE).size() == 0);
+
+}
+
+
+TEST(poem, testMapping) {
+//  auto pair = polar_versions.map_keys(3, 1, "v2_changed", Variable::DIM_OR_VAR::VARIABLE);
+//
+//  int i = 0;
 
 }
