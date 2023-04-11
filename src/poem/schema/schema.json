@@ -1,0 +1,22 @@
+{
+  "polar": {
+
+    "version": 1,
+
+    "attributes": {
+      "vessel_type": {
+        "type": "string",
+        "aliases": []
+      },
+      "polar_type": {
+
+      }
+    },
+    "dimensions": {
+
+    },
+    "variables": {
+
+    }
+  }
+}

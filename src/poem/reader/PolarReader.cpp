@@ -10,6 +10,9 @@
 #include <netcdf>
 #include <spdlog/spdlog.h>
 
+#include "poem/schema/schema.h"
+#include <nlohmann/json.hpp>
+
 
 namespace fs = std::filesystem;
 
@@ -41,6 +44,7 @@ namespace poem {
 
     spdlog::info("Polar type {}", polar_type);
 
+    std::cout << schema::schema << std::endl;
 
 
 

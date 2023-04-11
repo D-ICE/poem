@@ -1,0 +1,21 @@
+//
+// Created by frongere on 08/04/23.
+//
+
+#ifndef POEM_VERSIONS_H
+#define POEM_VERSIONS_H
+
+#include <string>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
+namespace poem::schema {
+
+  json schema = json::parse(R"(
+@POEM_SCHEMA@
+  )");
+
+}  // poem::schema
+
+#endif //POEM_VERSIONS_H
