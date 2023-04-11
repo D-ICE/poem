@@ -43,3 +43,7 @@ set(dunits_TAG 1.1)  # TODO: mettre tag
 # google test
 set(googletest_URL https://github.com/google/googletest.git)
 set(googletest_TAG release-1.12.1)
+
+# spdlog
+set(spdlog_URL https://github.com/gabime/spdlog)
+set(spdlog_TAG v1.8.5)
