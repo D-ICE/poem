@@ -1,0 +1,27 @@
+{
+  "doc": "by default, fields are optional",
+  "global_attributes": {
+    "info": {
+      "type": "string"
+    },
+    "esperado_version": {
+    },
+    "copyright": {
+    }
+  },
+  "dimensions": {
+  },
+  "variables": {
+    "ENV": {
+      "WIND": {
+      }
+    },
+    "HYDRO.MANOEUVRING": {
+      "doc": "Everything about manoeuvring of the ship :)",
+      "[XY]": {
+      },
+      "[KN]": {
+      }
+    }
+  }
+}
