@@ -1,3 +1,3 @@
 target_sources(poem PRIVATE
-        Writer.cpp
+        PolarWriter.cpp
         )
