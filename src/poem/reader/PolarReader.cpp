@@ -18,7 +18,7 @@ namespace fs = std::filesystem;
 
 namespace poem {
 
-  POLAR_TYPE PolarReader::Read(const std::string &nc_polar) {
+  void PolarReader::Read(const std::string &nc_polar) {
 
     // Does the file exist
     if (!fs::exists(nc_polar)) {

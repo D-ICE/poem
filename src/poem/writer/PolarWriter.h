@@ -5,14 +5,36 @@
 #ifndef POEM_POLARWRITER_H
 #define POEM_POLARWRITER_H
 
+#include "poem/schema/schema.h"
+#include "poem/exceptions.h"
+
 namespace poem {
 
+  class PolarBase;
+
   class PolarWriter {
+
    public:
-    explicit PolarWriter(int version) : m_version(version) {};
+    explicit PolarWriter(PolarBase* polar) :
+    m_polar(polar),
+    m_schema(schema::schema) {};
+
+    void write(const std::string &nc_file) const {
+
+      /*
+       * Pseudo code
+       *
+       *
+       *
+       */
+
+      NIY
+    }
 
    private:
-    int m_version;
+    PolarBase* m_polar;
+    json m_schema;
+
   };
 
 

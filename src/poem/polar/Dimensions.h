@@ -9,58 +9,130 @@
 #include <string>
 #include <array>
 
+#include "Common.h"
+
 #include "poem/exceptions.h"
 
 namespace poem {
 
-  class Dimension {
+  class DimensionID : public Named {
    public:
-    using Values = std::vector<double>;
-    using Iter = Values::const_iterator;
+    DimensionID(const std::string &name,
+                const std::string &unit,
+                const std::string &description,
+                double min,
+                double max) :
+        Named(name, unit, description, type::DOUBLE),
+        m_min(min),
+        m_max(max) {}
 
-    Dimension(const std::string &name, const Values &values, int version) :
-        m_name(name),
-        m_values(values),
-        m_version(version) {
-      // TODO: check name VS version
-    }
+    const double &min() const { return m_min; }
 
-    Iter begin() const { return m_values.cbegin(); }
-
-    Iter end() const { return m_values.cend(); }
+    const double &max() const { return m_max; }
 
    private:
-    int m_version;
-    std::string m_name;
+    double m_min;
+    double m_max;
+  };
+
+  template<size_t _dim>
+  class DimensionPoint;
+
+  template<size_t _dim>
+  class DimensionIDArray {
+   public:
+    using Array = std::array<std::shared_ptr<DimensionID>, _dim>;
+
+    explicit DimensionIDArray(const Array &array) : m_array(array) {}
+
+    DimensionID *get(size_t i) const { return m_array.at(i).get(); }
+
+    const size_t get_index(const std::string &name) const {
+      for (size_t i = 0; i < _dim; ++i) {
+        if (m_array.at(i)->name() == name) return i;
+      }
+      throw UnknownDimensionName();
+    }
+
+    std::shared_ptr<DimensionPoint<_dim>> get_point() const {
+      return std::make_shared<DimensionPoint<_dim>>(this);
+    }
+
+
+   private:
+    Array m_array;
+
+  };
+
+  template<size_t _dim>
+  class DimensionPoint {
+   public:
+    using Values = std::array<double, _dim>;
+
+    explicit DimensionPoint(const DimensionIDArray<_dim> *IDArray) :
+        m_ID_array(IDArray),
+        m_values({}) {}
+
+//    DimensionPoint(DimensionIDArray<_dim> *IDArray, const Values &values) :
+//        m_ID_array(IDArray),
+//        m_values(values) {
+//
+//      Check();
+//    }
+
+    void set(const Values &values) {
+      m_values = values;
+      Check();
+    }
+
+    const double &get(size_t i) const { return m_values.at(i); }
+
+    const double &get(const std::string &name) {
+      return m_values.at(m_ID_array->get_index(name));
+    }
+
+   private:
+    void Check() {
+      for (size_t i = 0; i < _dim; ++i) {
+        const double val = m_values.at(i);
+        DimensionID *ID = m_ID_array->get(i);
+        if (val < ID->min() || val > ID->max()) {
+          throw OutOfRangeDimension();
+        }
+      }
+    }
+
+   private:
+    const DimensionIDArray<_dim> *m_ID_array;
     Values m_values;
 
   };
 
 
-  template<size_t dim_>
-  class Dimensions {
-
+  /**
+   * A sampled dimension
+   */
+  class DimensionSample {
    public:
-    explicit Dimensions(int version) :
-        m_version(version),
-        m_nb_dim(0),
-        m_dimensions({}){
-      // TODO: check la coherence des noms par rapport a la version
-    }
+    using Values = std::vector<double>;
+    using Iter = Values::const_iterator;
 
-    void push_back(const std::string &name) {
-      NIY
-    }
+    DimensionSample(DimensionID *ID, const Values &values) :
+        m_ID(ID),
+        m_values(values) {}
 
+    size_t size() const { return m_values.size(); }
+
+    Iter begin() const { return m_values.cbegin(); }
+
+    Iter end() const { return m_values.cend(); }
+
+    const double *data() const { return m_values.data(); }
 
    private:
-    int m_nb_dim;
-
-    int m_version;
-    std::array<Dimension, dim_> m_dimensions;
-
+    DimensionID *m_ID;
+    std::vector<double> m_values;
   };
-
 
 }  // poem
 

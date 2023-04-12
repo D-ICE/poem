@@ -28,11 +28,7 @@ int main() {
   std::string polar_file(std::string(DATA_FOLDER) + "/polar_5D_STW_v1.nc");
   std::cout << polar_file << std::endl;
 
-  auto polar = reader.Read(polar_file);
-
-
-//  Dimensions<5> dimensions({"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"}, version);
-
+  reader.Read(polar_file);
 
 
   return 0;

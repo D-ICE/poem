@@ -16,7 +16,7 @@ namespace poem {
    public:
     PolarReader() {}
 
-    POLAR_TYPE Read(const std::string &nc_polar);
+    void Read(const std::string &nc_polar);
 
    private:
     int m_polar_version;
