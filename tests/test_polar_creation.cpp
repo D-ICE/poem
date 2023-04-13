@@ -75,51 +75,8 @@ int main() {
 
     leeway->set_point(&polar_point);
   }
-//
-//
-//
-//auto leeway_push_function = leeway->get_push_function();
-//
-//
-//
-//  PolarPoint<double, 3> polar_point(*dimension_point_set->begin(), 10.);
-//
-//  leeway_push_function(&polar_point);
-//
-//  /**
-//   * Populating the polars
-//   */
-//   for (auto& polar : polar_set) {
-////     std::cout << polar->name() << std::endl;
-////
-////     std::cout << polar->dim() << std::endl;
-////     std::cout << polar->type() << std::endl;
-//
-////     auto dimension_point_set = polar->dimension_point_set();
-//
-//
-//
-//
-//
-//
-//   }
 
-
-
-//  // Populating the polars
-////  for (const auto& dim_point : dim_points) {
-////    PolarPoint<double, 3> polar_point(dim_point, 5);
-////    leeway->push_bask({dim_point, 5});
-////    brake_power->push_bask({dim_point, 100});
-////  }
-////
-////
-////  PolarWriter writer(&polar_set);
-////  writer.write("");
-
-
-
-
+//  std::cout << leeway->is_filled() << std::endl;
 
 
   return 0;

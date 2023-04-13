@@ -11,10 +11,12 @@
 #include <map>
 #include <functional>
 #include <iostream>
+#include <algorithm>
 
 #include "Attributes.h"
 #include "Dimensions.h"
 #include "Variables.h"
+#include "spdlog/spdlog.h"
 
 
 namespace poem {
@@ -51,12 +53,8 @@ namespace poem {
 
     virtual void to_netcdf() const = 0;
 
-//    virtual void* begin() const = 0;
-//    virtual void* end() const = 0;
-
    protected:
     std::unique_ptr<VariableID> m_var_ID;
-    size_t m_dim;
 
   };
 
@@ -68,15 +66,30 @@ namespace poem {
   template<typename T, size_t _dim>
   class PolarPoint {
    public:
+    PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point) :
+        m_dimension_point(dimension_point),
+        m_has_value(false) {}
+
     PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point, const T &val) :
         m_dimension_point(dimension_point),
-        m_value(val) {}
+        m_value(val),
+        m_has_value(true) {}
 
-    const T &value() const { return m_value; }
+    void set_value(const T &val) {
+      m_value = val;
+      m_has_value = true;
+    }
 
-    const DimensionPoint<_dim>* dimension_point() const { return m_dimension_point.get(); }
+    const T &value() const {
+      return m_value;
+    }
+
+    bool has_value() const { return m_has_value; }
+
+    const DimensionPoint<_dim> *dimension_point() const { return m_dimension_point.get(); }
 
    private:
+    bool m_has_value;
     std::shared_ptr<DimensionPoint<_dim>> m_dimension_point;
     T m_value;
   };
@@ -90,8 +103,7 @@ namespace poem {
   template<typename T, size_t _dim>
   class Polar : public PolarBase {
    public:
-    using PolarPoints = std::map<const DimensionPoint<_dim>*, PolarPoint<T, _dim>>;
-//    using Iter = typename PolarPoints::const_iterator;
+    using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
 
     Polar(const std::string &name,
           const std::string &unit,
@@ -99,12 +111,11 @@ namespace poem {
           type::POEM_TYPES type,
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarBase(name, unit, description, type),
-        m_is_filled(false),
         m_dimension_point_set(dimension_point_set) {
 
 
-      for (const auto dimension_point : *m_dimension_point_set) {
-        PolarPoint<T, _dim> polar_point(dimension_point, 0.);
+      for (const auto dimension_point: *m_dimension_point_set) {
+        PolarPoint<T, _dim> polar_point(dimension_point);
         m_points.insert({dimension_point.get(), polar_point});
       }
 
@@ -119,20 +130,27 @@ namespace poem {
     void set_point(void *polar_point) override {
 
       auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
+      if (!polar_point_->has_value()) spdlog::critical("Attempting to set the polar with non-initialized polar point");
 
-      const DimensionPoint<_dim>* dimension_point = polar_point_->dimension_point();
+      const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
 
-      m_points.at(dimension_point) = *polar_point_;
-      /*
-       * TODO:
-       * 1- verifier que le dimension point correspond bien au prochain push_back de valeur
-       * 2- push du polar point
-       * 3- marque comme filled si on a tout
-       */
+      auto &internal_polar_point = m_points.at(dimension_point);
 
-      std::cout << polar_point_->value() << std::endl;
+      if (internal_polar_point.has_value()) {
+        spdlog::warn("The same polar point has been set more than one time");
+      }
+      internal_polar_point.set_value(polar_point_->value());
+
+      std::cout << is_filled() << std::endl;
     }
 
+    bool is_filled() const {
+      return std::all_of(m_points.begin(), m_points.end(),
+                  [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
+                    return x.second.has_value();
+                  }
+      );
+    }
 
     std::function<void(void *)> get_set_point_function() override {
       return [this](void *polar_point) {
@@ -141,8 +159,6 @@ namespace poem {
     }
 
    private:
-    bool m_is_filled;
-
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     PolarPoints m_points;
 
