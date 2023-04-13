@@ -8,5 +8,6 @@
 #include "exceptions.h"
 #include "polar/Polar.h"
 #include "reader/PolarReader.h"
+#include "writer/PolarWriter.h"
 
 #endif //POEM_POEM_H
