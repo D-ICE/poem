@@ -15,6 +15,9 @@
 
 namespace poem {
 
+  /**
+   *
+   */
   class DimensionID : public Named {
    public:
     DimensionID(const std::string &name,
@@ -41,6 +44,10 @@ namespace poem {
   template<size_t _dim>
   class DimensionPoint;
 
+  /**
+   *
+   * @tparam _dim
+   */
   template<size_t _dim>
   class DimensionIDSet {
    public:
@@ -70,6 +77,10 @@ namespace poem {
   template<size_t>
   class DimensionPointSet;
 
+  /**
+   *
+   * @tparam _dim
+   */
   template<size_t _dim>
   class DimensionPoint {
    public:
@@ -92,10 +103,6 @@ namespace poem {
       m_values = values;
       Check();
     }
-
-//    void set_origin_dimension_point_set(DimensionPointSet<_dim> *dimension_point_set) {
-//      m_origin_dimension_point_set = dimension_point_set;
-//    }
 
     const DimensionPointSet<_dim> *origin_dimension_point_set() const { return m_origin_dimension_point_set; }
 
@@ -125,50 +132,10 @@ namespace poem {
 
   };
 
-
-//  /**
-//   * A sampled dimension
-//   */
-//  class DimensionSample {
-//   public:
-//    using Values = std::vector<double>;
-//    using Iter = Values::const_iterator;
-//
-//    DimensionSample(DimensionID *ID, const Values &values) :
-//        m_ID(ID),
-//        m_values(values) {}
-//
-//    size_t size() const { return m_values.size(); }
-//
-//    Iter begin() const { return m_values.cbegin(); }
-//
-//    Iter end() const { return m_values.cend(); }
-//
-//    const double *data() const { return m_values.data(); }
-//
-//   private:
-//    DimensionID *m_ID;
-//    std::vector<double> m_values;
-//  };
-
-//  template <size_t _dim>
-//  class DimensionPointArray {
-//   public:
-//    DimensionPointArray() {}
-//
-//
-//
-//   private:
-//    std::vector<std::shared_ptr<DimensionPoint<_dim>>> m_points;
-//  };
-
-/*
- * Alors ici, plutot qu'une classe, on pourrait faire un builder
- *
- * .La classe finalement qui nous interesse reellement, c'est celle qui stocke les
- * DimensionPoint
- *
- */
+  /**
+   *
+   * @tparam _dim
+   */
   template<size_t _dim>
   class DimensionPointSet {
    public:
@@ -178,7 +145,7 @@ namespace poem {
     explicit DimensionPointSet(std::shared_ptr<DimensionIDSet<_dim>> dim_ID_array) :
         m_dimension_ID_set(dim_ID_array) {}
 
-    const DimensionIDSet<_dim>* dimension_ID_set() const { return m_dimension_ID_set.get(); }
+    const DimensionIDSet<_dim> *dimension_ID_set() const { return m_dimension_ID_set.get(); }
 
     /**
      * Set vector of values for each dimension. Must be called _dim times.
@@ -194,7 +161,7 @@ namespace poem {
 
     /**
      * Build the dimension point vector from vector of values for each dimension. It does the cartesian product of
-     * dimensions by making the first dimension move faster (the last dimension is the most outer for loop).
+     * dimensions by making the last dimension move faster (the last dimension is the most inner for loop).
      * Can only be called if every dimension has been filled with value vector. If it is not the case, a runtime exception
      * is thrown.
      * @return
@@ -231,10 +198,15 @@ namespace poem {
     // storage convention (and it is C compliant too...)
     template<size_t index>
     constexpr void meta_for_loop(typename DimensionPoint<_dim>::Values &values) {
-      for (const auto &element: m_dimension_vectors[index - 1]) {
-        values.at(index - 1) = element;
+      size_t i = _dim - index; // makes the last loop iterate on last dim
+      for (const auto &element: m_dimension_vectors[i]) {
+        values.at(i) = element;
         if constexpr (index == 1) {
           m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dimension_ID_set.get(), this, values));
+//          std::cout << " " << values[0]
+//                    << " " << values[1]
+//                    << " " << values[2]
+//                    << std::endl;
 
         } else {
           meta_for_loop<index - 1>(values);

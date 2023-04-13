@@ -207,7 +207,7 @@ namespace poem {
       }
       internal_polar_point.set_value(polar_point_->value());
 
-      std::cout << is_filled() << std::endl;
+//      std::cout << is_filled() << std::endl;
     }
 
     bool is_filled() const {
