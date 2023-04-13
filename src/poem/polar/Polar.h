@@ -119,6 +119,8 @@ namespace poem {
           nc_var.putVar(values.data());
           nc_var.putAtt("unit", dimension_ID->unit());
           nc_var.putAtt("description", dimension_ID->description());
+          nc_var.putAtt("min", std::to_string(dimension_ID->min()));
+          nc_var.putAtt("max", std::to_string(dimension_ID->max()));
         }
 //        netCDF::NcDim dim = dataFile.addDim(name, values.size());
 
