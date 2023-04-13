@@ -90,8 +90,8 @@ namespace poem {
   template<typename T, size_t _dim>
   class Polar : public PolarBase {
    public:
-    using PolarPoints = std::vector<PolarPoint<T, _dim>>;
-    using Iter = typename PolarPoints::const_iterator;
+    using PolarPoints = std::map<const DimensionPoint<_dim>*, PolarPoint<T, _dim>>;
+//    using Iter = typename PolarPoints::const_iterator;
 
     Polar(const std::string &name,
           const std::string &unit,
@@ -100,7 +100,15 @@ namespace poem {
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarBase(name, unit, description, type),
         m_is_filled(false),
-        m_dimension_point_set(dimension_point_set) {}
+        m_dimension_point_set(dimension_point_set) {
+
+
+      for (const auto dimension_point : *m_dimension_point_set) {
+        PolarPoint<T, _dim> polar_point(dimension_point, 0.);
+        m_points.insert({dimension_point.get(), polar_point});
+      }
+
+    }
 
     const size_t dim() const override { return _dim; }
 
@@ -112,24 +120,15 @@ namespace poem {
 
       auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
 
+      const DimensionPoint<_dim>* dimension_point = polar_point_->dimension_point();
+
+      m_points.at(dimension_point) = *polar_point_;
       /*
        * TODO:
        * 1- verifier que le dimension point correspond bien au prochain push_back de valeur
        * 2- push du polar point
        * 3- marque comme filled si on a tout
        */
-
-//      auto next_dimension_point = m_dimension_point_set->at(m_points.size());
-//      auto new_dimension_point = polar_point_->dimension_point();
-
-      // FIXME:
-//      if (new_dimension_point == next_dimension_point) {
-//        std::cout << polar_point_->value() << std::endl;
-//      }
-
-
-//      polar_point_->
-
 
       std::cout << polar_point_->value() << std::endl;
     }
