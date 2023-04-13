@@ -236,7 +236,7 @@ namespace poem {
     using PolarVector = std::vector<std::unique_ptr<PolarBase>>;
     using Iter = PolarVector::const_iterator;
 
-    PolarSet() = default;
+    explicit PolarSet(const Attributes& attributes) : m_attributes(attributes) {};
 
     template<typename T, size_t _dim>
     Polar<T, _dim> *New(const std::string &name,
@@ -270,11 +270,16 @@ namespace poem {
         // this file, if it already exists.
         netCDF::NcFile dataFile(nc_file, netCDF::NcFile::replace);
 
-        // TODO: ecrire les attributs
+        // Writing attributes
+        for (const auto& attribute : m_attributes) {
+          dataFile.putAtt(attribute.first, attribute.second);
+        }
 
         for (const auto &polar: m_polars) {
           polar->to_netcdf(dataFile);
         }
+
+        dataFile.getName() = "coucou";
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
@@ -285,6 +290,7 @@ namespace poem {
     }
 
    private:
+    Attributes m_attributes;
     PolarVector m_polars;
   };
 

@@ -9,8 +9,13 @@
 
 namespace poem {
 
+  /**
+   *
+   */
   class Attributes {
    public:
+    using Map = std::map<std::string, std::string>;
+    using Iter = Map::const_iterator;
 
     Attributes() = default;
 
@@ -26,8 +31,13 @@ namespace poem {
 
     const std::string &get(const std::string &name) const { return m_attributes.at(name); }
 
+    void set(const std::string &name, const std::string &val) { m_attributes.at(name) = val; }
+
+    Iter begin() const { return m_attributes.cbegin(); }
+    Iter end() const { return m_attributes.cend(); }
+
    private:
-    std::map<std::string, std::string> m_attributes;
+    Map m_attributes;
   };
 
 
