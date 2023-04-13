@@ -27,7 +27,12 @@ namespace poem {
                        const std::string &unit,
                        const std::string &description,
                        type::POEM_TYPES type) :
-        m_var_ID(std::make_unique<VariableID>(name, unit, description, type)) {}
+        m_var_ID(std::make_unique<VariableID>(name, unit, description, type)) {
+
+    }
+
+    const VariableID* variable_ID() const { return m_var_ID.get(); }
+
 
    protected:
     std::unique_ptr<VariableID> m_var_ID;

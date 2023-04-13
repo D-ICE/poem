@@ -112,39 +112,31 @@ namespace poem {
   };
 
 
-  /**
-   * A sampled dimension
-   */
-  class DimensionSample {
-   public:
-    using Values = std::vector<double>;
-    using Iter = Values::const_iterator;
-
-    DimensionSample(DimensionID *ID, const Values &values) :
-        m_ID(ID),
-        m_values(values) {}
-
-    size_t size() const { return m_values.size(); }
-
-    Iter begin() const { return m_values.cbegin(); }
-
-    Iter end() const { return m_values.cend(); }
-
-    const double *data() const { return m_values.data(); }
-
-   private:
-    DimensionID *m_ID;
-    std::vector<double> m_values;
-  };
-
-//  namespace internal {
-//    template<size_t _dim, class Callable>
-//    void meta_for_loop(std::array<std::vector<double>, _dim> vectors, Callable &&callable) {
+//  /**
+//   * A sampled dimension
+//   */
+//  class DimensionSample {
+//   public:
+//    using Values = std::vector<double>;
+//    using Iter = Values::const_iterator;
 //
-//    }
+//    DimensionSample(DimensionID *ID, const Values &values) :
+//        m_ID(ID),
+//        m_values(values) {}
 //
+//    size_t size() const { return m_values.size(); }
 //
-//  }  // poem::internal
+//    Iter begin() const { return m_values.cbegin(); }
+//
+//    Iter end() const { return m_values.cend(); }
+//
+//    const double *data() const { return m_values.data(); }
+//
+//   private:
+//    DimensionID *m_ID;
+//    std::vector<double> m_values;
+//  };
+
 
   template<size_t _dim>
   class DimensionSampleArray {

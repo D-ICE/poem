@@ -50,6 +50,7 @@ int main() {
   for (const auto& dim_point : dim_points) {
     PolarPoint<double, 3> polar_point(dim_point, 5);
     leeway->push_bask({dim_point, 5});
+    brake_power->push_bask({dim_point, 100});
   }
 
 

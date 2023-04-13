@@ -38,6 +38,8 @@ namespace poem {
 
     const std::string &description() const { return m_description; }
 
+    const type::POEM_TYPES &type() const { return m_type; }
+
    private:
     void check_unit() {
       // TODO
