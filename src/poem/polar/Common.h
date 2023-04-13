@@ -16,7 +16,8 @@ namespace poem {
       DOUBLE,
       INT
     };
-  }
+
+  }  // poem::type
 
   class Named {
    public:

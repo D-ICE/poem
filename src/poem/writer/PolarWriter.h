@@ -18,7 +18,7 @@ namespace poem {
     explicit PolarWriter(PolarSet *polar_set) :
         m_polar_set(polar_set) {};
 
-    void write(const std::string &nc_file) const;
+    int write(const std::string &nc_file) const;
 
    private:
     PolarSet *m_polar_set;

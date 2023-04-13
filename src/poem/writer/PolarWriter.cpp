@@ -5,47 +5,36 @@
 #include "PolarWriter.h"
 
 #include <iostream>
+#include <netcdf>
 
 #include "poem/polar/Polar.h"
 
 namespace poem {
 
-  void PolarWriter::write(const std::string &nc_file) const {
+  int PolarWriter::write(const std::string &nc_file) const {
 
+    // Return this in event of a problem
+    constexpr int nc_err = 2;
 
-//    for (const auto &polar: *m_polar_set) {
-    for (auto iter=m_polar_set->begin(); iter!=m_polar_set->end(); ++iter) {
-//      auto variable_ID = polar->variable_ID();
-      auto polar = (*iter).get();
+    try {
 
-//      auto type = polar->variable_ID()->type();
-//      std::cout << polar->variable_ID()->name() << std::endl;
+      // Create the file. The Replace parameter tells netCDF to overwrite
+      // this file, if it already exists.
+      netCDF::NcFile dataFile(nc_file, netCDF::NcFile::replace);
 
-      /*
-       * On voudrait pouvoir recuperer le dim_ID_array qui definit la signature des dimensions de la polaire
-       *
-       * On veut recuperer les points de polaire
-       *
-       *
-       *
-       */
+      // TODO: Ecrire les attributs
 
+      for (const auto &polar: *m_polar_set) {
+        polar->to_netcdf(dataFile);
+      }
 
-//      auto polar_ = static_cast<Polar<double, 3>*>(polar);
-
-//      for (const auto &point : *polar) {
-//
-//      }
-
-
-
-
-      int  i =1;
-
-
+    } catch (netCDF::exceptions::NcException &e) {
+      std::cerr << e.what() << std::endl;
+      return nc_err;
     }
 
-//    STOP
+
+    return 0;
   }
 
 

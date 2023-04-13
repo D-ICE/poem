@@ -59,7 +59,7 @@ int main() {
    *
    * A dimension point MUST be generated from a dimension point set
    */
-  PolarSet polar_set;
+  auto polar_set = std::make_shared<PolarSet>();
 
   // TODO: define and add attributes...
 
@@ -67,7 +67,7 @@ int main() {
   /**
    * Create new polars using New method of polar set
    */
-  auto leeway = polar_set.New<double, 3>("LEEWAY", "deg", "Leeway", type::DOUBLE, dimension_point_set);
+  auto leeway = polar_set->New<double, 3>("LEEWAY", "deg", "Leeway", type::DOUBLE, dimension_point_set);
 
 
   for (const auto& dimension_point : *dimension_point_set) {
@@ -76,7 +76,8 @@ int main() {
     leeway->set_point(&polar_point);
   }
 
-//  std::cout << leeway->is_filled() << std::endl;
+  std::string nc_file("essai.nc");
+  polar_set->to_netcdf(nc_file);
 
 
   return 0;

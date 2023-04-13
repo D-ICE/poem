@@ -13,6 +13,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include <netcdf>
+
 #include "Attributes.h"
 #include "Dimensions.h"
 #include "Variables.h"
@@ -51,7 +53,7 @@ namespace poem {
 
     virtual std::function<void(void *)> get_set_point_function() = 0;
 
-    virtual void to_netcdf() const = 0;
+    virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
    protected:
     std::unique_ptr<VariableID> m_var_ID;
@@ -123,8 +125,72 @@ namespace poem {
 
     const size_t dim() const override { return _dim; }
 
-    void to_netcdf() const override {
-      NIY
+    void to_netcdf(netCDF::NcFile &dataFile) const override {
+
+      // Storing dimensions
+      std::vector<netCDF::NcDim> dims;
+      dims.reserve(_dim);
+
+      for (size_t i=0; i<_dim; ++i) {
+        auto dimension_ID = m_dimension_point_set->dimension_ID_set()->get(i);
+        auto values = m_dimension_point_set->dimension_vector(i);
+
+        std::string name(dimension_ID->name());
+
+        // TODO: voir si on eut pas detecter que le nom est deja pris...
+        // Declaration of a new dimension ID
+        netCDF::NcDim dim = dataFile.addDim(name, values.size());
+
+        // The dimension as a variable
+        netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
+        nc_var.putVar(values.data());
+        nc_var.putAtt("unit", dimension_ID->unit());
+        nc_var.putAtt("description", dimension_ID->description());
+
+        dims.push_back(dim);
+
+      }
+
+      // Storing variable
+      if (!is_filled()) {
+        spdlog::critical("Attempting to write a polar in NetCDF file while the polar has not been totally populated");
+        CRITICAL_ERROR
+      }
+
+      // On recupere les valeurs sous forme de tableau
+      std::vector<T> values;
+      for (const auto &point : m_points) {
+        values.push_back(point.second.value());
+      }
+      // Le user guide netCDF dit qu'il utilise du row major order
+
+      // row major -> last dimension varies the fastest
+      // colum major -> first dimension varies the fastest
+
+      // Esperado -> first dim -> column major
+      // netCDF -> row major from doc -> last dim
+
+      // TODO: changer l'ordre du coup lors de la generation des points
+      //  on veut etre row major et donc que ce soit la derniere dimension qui evolue le plus rapidement
+
+
+      netCDF::NcVar nc_var;
+      switch (type()) {
+        case type::DOUBLE:
+          nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
+          // On recupere la data...
+
+
+
+          break;
+        case type::INT:
+          nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
+      }
+      nc_var.setCompression(true, true, 5);
+
+
+
+
     }
 
     void set_point(void *polar_point) override {
@@ -146,9 +212,9 @@ namespace poem {
 
     bool is_filled() const {
       return std::all_of(m_points.begin(), m_points.end(),
-                  [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
-                    return x.second.has_value();
-                  }
+                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
+                           return x.second.has_value();
+                         }
       );
     }
 
@@ -189,6 +255,30 @@ namespace poem {
 
     Iter end() const {
       return m_polars.cend();
+    }
+
+    int to_netcdf(const std::string &nc_file) const {
+
+      constexpr int nc_err = 2;
+
+      try {
+
+        // Create the file. The Replace parameter tells netCDF to overwrite
+        // this file, if it already exists.
+        netCDF::NcFile dataFile(nc_file, netCDF::NcFile::replace);
+
+        // TODO: ecrire les attributs
+
+        for (const auto &polar: m_polars) {
+          polar->to_netcdf(dataFile);
+        }
+
+      } catch (netCDF::exceptions::NcException &e) {
+        std::cerr << e.what() << std::endl;
+        return nc_err;
+      }
+
+      return 0;
     }
 
    private:

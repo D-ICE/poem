@@ -75,12 +75,12 @@ namespace poem {
    public:
     using Values = std::array<double, _dim>;
 
-    DimensionPoint(const DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim>* dimension_point_set) :
+    DimensionPoint(const DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set) :
         m_ID_array(IDArray),
         m_values({}),
         m_origin_dimension_point_set(dimension_point_set) {}
 
-    DimensionPoint(DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim>* dimension_point_set, const Values &values) :
+    DimensionPoint(DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set, const Values &values) :
         m_ID_array(IDArray),
         m_values(values),
         m_origin_dimension_point_set(dimension_point_set) {
@@ -176,7 +176,9 @@ namespace poem {
     using Iter = typename DimensionPointVector::const_iterator;
 
     explicit DimensionPointSet(std::shared_ptr<DimensionIDSet<_dim>> dim_ID_array) :
-        m_dim_ID_array(dim_ID_array) {}
+        m_dimension_ID_set(dim_ID_array) {}
+
+    const DimensionIDSet<_dim>* dimension_ID_set() const { return m_dimension_ID_set.get(); }
 
     /**
      * Set vector of values for each dimension. Must be called _dim times.
@@ -184,9 +186,11 @@ namespace poem {
      * @param values vector of values for the dimension (non-repeating increasing order)
      */
     void set_dimension_vector(const std::string &name, const std::vector<double> &values) {
-      size_t i = m_dim_ID_array->get_index(name);
-      m_vectors.at(i) = values;
+      size_t i = m_dimension_ID_set->get_index(name);
+      m_dimension_vectors.at(i) = values;
     }
+
+    const std::vector<double> dimension_vector(size_t i) const { return m_dimension_vectors.at(i); }
 
     /**
      * Build the dimension point vector from vector of values for each dimension. It does the cartesian product of
@@ -201,7 +205,7 @@ namespace poem {
       // Get the necessary size
       size_t size = 1;
       for (size_t i = 0; i < _dim; ++i) {
-        size *= m_vectors.at(i).size();
+        size *= m_dimension_vectors.at(i).size();
       }
       m_dimension_points.reserve(size);
 
@@ -210,11 +214,12 @@ namespace poem {
 
     }
 
-    DimensionPoint<_dim>* at(size_t i) {
+    DimensionPoint<_dim> *at(size_t i) {
       return m_dimension_points.at(i).get();
     }
 
     Iter begin() const { return m_dimension_points.cbegin(); }
+
     Iter end() const { return m_dimension_points.cend(); }
 
     const size_t size() const { return m_dimension_points.size(); }
@@ -225,10 +230,10 @@ namespace poem {
     // Dimension that move faster is the first
     template<size_t index>
     constexpr void meta_for_loop(typename DimensionPoint<_dim>::Values &values) {
-      for (const auto &element: m_vectors[index - 1]) {
+      for (const auto &element: m_dimension_vectors[index - 1]) {
         values.at(index - 1) = element;
         if constexpr (index == 1) {
-          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dim_ID_array.get(), this, values));
+          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dimension_ID_set.get(), this, values));
 
         } else {
           meta_for_loop<index - 1>(values);
@@ -237,7 +242,7 @@ namespace poem {
     }
 
     void check_is_filled() const {
-      for (const auto &vector: m_vectors) {
+      for (const auto &vector: m_dimension_vectors) {
         if (vector.empty()) {
           throw std::runtime_error("DimensionSampleArray is not totally filled. Cannot generate DimensionPoint vector");
         }
@@ -245,8 +250,8 @@ namespace poem {
     }
 
    private:
-    std::shared_ptr<DimensionIDSet<_dim>> m_dim_ID_array;
-    std::array<std::vector<double>, _dim> m_vectors;
+    std::shared_ptr<DimensionIDSet<_dim>> m_dimension_ID_set;
+    std::array<std::vector<double>, _dim> m_dimension_vectors;
 
     DimensionPointVector m_dimension_points;
 
