@@ -24,7 +24,10 @@ namespace poem {
                 double max) :
         Named(name, unit, description, type::DOUBLE),
         m_min(min),
-        m_max(max) {}
+        m_max(max) {
+
+      // TODO: c'est ici qu'on veut faire le check par rapport au schema
+    }
 
     const double &min() const { return m_min; }
 
@@ -73,12 +76,12 @@ namespace poem {
         m_ID_array(IDArray),
         m_values({}) {}
 
-//    DimensionPoint(DimensionIDArray<_dim> *IDArray, const Values &values) :
-//        m_ID_array(IDArray),
-//        m_values(values) {
-//
-//      Check();
-//    }
+    DimensionPoint(DimensionIDArray<_dim> *IDArray, const Values &values) :
+        m_ID_array(IDArray),
+        m_values(values) {
+
+      Check();
+    }
 
     void set(const Values &values) {
       m_values = values;
@@ -132,6 +135,68 @@ namespace poem {
    private:
     DimensionID *m_ID;
     std::vector<double> m_values;
+  };
+
+//  namespace internal {
+//    template<size_t _dim, class Callable>
+//    void meta_for_loop(std::array<std::vector<double>, _dim> vectors, Callable &&callable) {
+//
+//    }
+//
+//
+//  }  // poem::internal
+
+  template<size_t _dim>
+  class DimensionSampleArray {
+   public:
+    explicit DimensionSampleArray(std::shared_ptr<DimensionIDArray<_dim>> dim_ID_array) :
+        m_dim_ID_array(dim_ID_array) {}
+
+    void set(const std::string &name, const std::vector<double> &values) {
+      size_t i = m_dim_ID_array->get_index(name);
+      m_vectors.at(i) = values;
+    }
+
+    std::vector<std::shared_ptr<DimensionPoint<_dim>>> get_dimension_points_vector() const {
+      check_is_filled();
+
+      std::vector<std::shared_ptr<DimensionPoint<_dim>>> points;
+
+      typename DimensionPoint<_dim>::Values values;
+      meta_for_loop<_dim>(points, values);
+
+      return points;
+    }
+
+   private:
+    // Adapted from https://stackoverflow.com/questions/34535795/n-dimensionally-nested-metaloops-with-templates
+    template <size_t index>
+    constexpr void meta_for_loop(std::vector<std::shared_ptr<DimensionPoint<_dim>>>& points,
+                                 typename DimensionPoint<_dim>::Values &values) const {
+      for (const auto& element : m_vectors[index - 1]) {
+        values.at(index - 1) = element;
+        if constexpr (index == 1) {
+          auto point = std::make_shared<DimensionPoint<_dim>>(m_dim_ID_array.get(), values);
+          points.push_back(point);
+
+        } else {
+          meta_for_loop<index - 1>(points, values);
+        }
+      }
+    }
+
+   private:
+    void check_is_filled() const {
+      for (const auto &vector: m_vectors) {
+        if (vector.empty()) {
+          throw std::runtime_error("DimensionSampleArray is not totally filled. Cannot generate DimensionPoint vector");
+        }
+      }
+    }
+
+   private:
+    std::shared_ptr<DimensionIDArray<_dim>> m_dim_ID_array;
+    std::array<std::vector<double>, _dim> m_vectors;
   };
 
 }  // poem

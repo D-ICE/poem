@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "poem/poem.h"
+#include <MathUtils/VectorGeneration.h>
 
 using namespace poem;
 
@@ -28,12 +29,31 @@ int main() {
   auto brake_power = polar_set.New<double, 3>("BrakePower", "kW", "Brake Power", type::DOUBLE, dim_ID_array);
 
   // Create a new dimension point
-  auto dim_point = dim_ID_array->get_point();
-  dim_point->set({1, 2, 3});
+//  auto dim_point = dim_ID_array->get_point();
+//  dim_point->set({1, 2, 3});
+
+
+
+
+  // Create a DimensionSampleArray
+  DimensionSampleArray<3> dimension_sample_array(dim_ID_array);
+
+  // Create samples for the dimensions
+  // FIXME: arange ne fonctionne vraiment pas comme voulu...
+  dimension_sample_array.set("STW_kt", mathutils::arange<double>(0, 20, 1));
+  dimension_sample_array.set("TWS_kt", mathutils::arange<double>(0, 60, 5));
+  dimension_sample_array.set("TWA_deg", mathutils::arange<double>(0, 180, 15));
+
+  auto dim_points = dimension_sample_array.get_dimension_points_vector();
 
   // Create a polar point
-  PolarPoint<double, 3> polar_point(dim_point, 5);
-  leeway->push_bask({dim_point, 5});
+  for (const auto& dim_point : dim_points) {
+    PolarPoint<double, 3> polar_point(dim_point, 5);
+    leeway->push_bask({dim_point, 5});
+  }
+
+
+
 
 
 
