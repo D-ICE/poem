@@ -26,7 +26,7 @@ int main() {
    * A shared_ptr is used as several polars are likely to share this coordinate system
    * Dimensions are ordered
    */
-  DimensionIDSet<3>::Array array{STW, TWS, TWA};
+  DimensionIDSet<3>::IDSet array{STW, TWS, TWA};
   auto dimension_ID_set = std::make_shared<DimensionIDSet<3>>(array);
 
   /**

@@ -41,9 +41,6 @@ namespace poem {
     double m_max;
   };
 
-  template<size_t _dim>
-  class DimensionPoint;
-
   /**
    *
    * @tparam _dim
@@ -51,9 +48,9 @@ namespace poem {
   template<size_t _dim>
   class DimensionIDSet {
    public:
-    using Array = std::array<std::shared_ptr<DimensionID>, _dim>;
+    using IDSet = std::array<std::shared_ptr<DimensionID>, _dim>;
 
-    explicit DimensionIDSet(const Array &array) : m_array(array) {}
+    explicit DimensionIDSet(const IDSet &array) : m_array(array) {}
 
     DimensionID *get(size_t i) const { return m_array.at(i).get(); }
 
@@ -64,16 +61,12 @@ namespace poem {
       throw UnknownDimensionName();
     }
 
-    std::shared_ptr<DimensionPoint<_dim>> get_point() const {
-      return std::make_shared<DimensionPoint<_dim>>(this);
-    }
-
-
    private:
-    Array m_array;
+    IDSet m_array;
 
   };
 
+  // Forward declaration
   template<size_t>
   class DimensionPointSet;
 
