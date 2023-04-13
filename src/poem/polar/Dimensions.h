@@ -227,7 +227,8 @@ namespace poem {
 
    private:
     // Adapted from https://stackoverflow.com/questions/34535795/n-dimensionally-nested-metaloops-with-templates
-    // Dimension that move faster is the first
+    // We use row major convention (last dimension varies the fastest) to be directly compliant with NetCDF internal
+    // storage convention (and it is C compliant too...)
     template<size_t index>
     constexpr void meta_for_loop(typename DimensionPoint<_dim>::Values &values) {
       for (const auto &element: m_dimension_vectors[index - 1]) {
