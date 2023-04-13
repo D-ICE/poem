@@ -10,21 +10,21 @@
 
 namespace poem {
 
-  class PolarSet;
-
-  class PolarWriter {
-
-   public:
-    explicit PolarWriter(PolarSet *polar_set) :
-        m_polar_set(polar_set) {};
-
-    int write(const std::string &nc_file) const;
-
-   private:
-    PolarSet *m_polar_set;
-//    json m_schema;
-
-  };
+//  class PolarSet;
+//
+//  class PolarWriter {
+//
+//   public:
+//    explicit PolarWriter(PolarSet *polar_set) :
+//        m_polar_set(polar_set) {};
+//
+//    int write(const std::string &nc_file) const;
+//
+//   private:
+//    PolarSet *m_polar_set;
+////    json m_schema;
+//
+//  };
 
 
 }  // poem

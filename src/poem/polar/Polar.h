@@ -14,19 +14,19 @@
 #include <algorithm>
 
 #include <netcdf>
+#include <spdlog/spdlog.h>
 
 #include "Attributes.h"
 #include "Dimensions.h"
 #include "Variables.h"
-#include "spdlog/spdlog.h"
+#include "PolarPoint.h"
 
 
 namespace poem {
 
-  /*
-   * Une polaire est une variable munie
+  /**
+   * Base class for a polar to be used for polymorphism into a PolarSet
    */
-
   class PolarBase {
    public:
     explicit PolarBase(const std::string &name,
@@ -61,46 +61,12 @@ namespace poem {
   };
 
   /**
-   * Represents a point of a polar along with its dimension values
-   * @tparam T type of the value
-   * @tparam _dim dimension of the point
-   */
-  template<typename T, size_t _dim>
-  class PolarPoint {
-   public:
-    PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point) :
-        m_dimension_point(dimension_point),
-        m_has_value(false) {}
-
-    PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point, const T &val) :
-        m_dimension_point(dimension_point),
-        m_value(val),
-        m_has_value(true) {}
-
-    void set_value(const T &val) {
-      m_value = val;
-      m_has_value = true;
-    }
-
-    const T &value() const {
-      return m_value;
-    }
-
-    bool has_value() const { return m_has_value; }
-
-    const DimensionPoint<_dim> *dimension_point() const { return m_dimension_point.get(); }
-
-   private:
-    bool m_has_value;
-    std::shared_ptr<DimensionPoint<_dim>> m_dimension_point;
-    T m_value;
-  };
-
-
-  /**
    * Represents a polar for one variable
-   * @tparam T
-   * @tparam _dim
+   *
+   * Should not be implemented directly but via a PolarSet
+   *
+   * @tparam T datatype of the polar
+   * @tparam _dim number of dimensions of the polar
    */
   template<typename T, size_t _dim>
   class Polar : public PolarBase {
@@ -129,7 +95,7 @@ namespace poem {
 
       // Storing variable
       if (!is_filled()) {
-        spdlog::critical("Attempting to write a polar in NetCDF file while the polar has not been totally populated");
+        spdlog::critical("Attempting to write a polar to disk while it is not totally populated");
         CRITICAL_ERROR
       }
 
@@ -208,7 +174,6 @@ namespace poem {
       }
       internal_polar_point.set_value(polar_point_->value());
 
-//      std::cout << is_filled() << std::endl;
     }
 
     bool is_filled() const {
@@ -231,6 +196,11 @@ namespace poem {
 
   };
 
+  /**
+   * Represents a set of polars.
+   *
+   * This is what we manipulate directly.
+   */
   class PolarSet {
    public:
     using PolarVector = std::vector<std::unique_ptr<PolarBase>>;

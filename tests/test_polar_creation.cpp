@@ -59,7 +59,8 @@ int main() {
   attributes.add_attribute("vessel_type", "HYBRID MOTOR AND SAIL VESSEL");
   attributes.add_attribute("control_variable", "SPEED");
   attributes.add_attribute("polar_type", "ND");
-  attributes.add_attribute("note", "Wind and Waves are on starboard tack and enclosed data are consistent with this, in NED convention");
+  attributes.add_attribute("note",
+                           "Wind and Waves are on starboard tack and enclosed data are consistent with this, in NED convention");
   attributes.add_attribute("vessel_name", "neoliner");
   attributes.add_attribute("loading_case", "design");
   attributes.add_attribute("digital_twin", "{}");
@@ -90,7 +91,7 @@ int main() {
 
 
   double val = 0.;
-  for (const auto& dimension_point : *dimension_point_set) {
+  for (const auto &dimension_point: *dimension_point_set) {
     PolarPoint<double, 3> polar_point(dimension_point, val);
     leeway->set_point(&polar_point);
     leeway2->set_point(&polar_point);
