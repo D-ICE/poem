@@ -18,7 +18,7 @@ namespace poem {
   template<typename T, size_t _dim>
   class PolarPoint {
    public:
-    PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point) :
+    explicit PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point) :
         m_dimension_point(dimension_point),
         m_has_value(false) {}
 

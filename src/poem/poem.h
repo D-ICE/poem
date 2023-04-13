@@ -6,7 +6,7 @@
 #define POEM_POEM_H
 
 #include "exceptions.h"
-#include "polar/Polar.h"
+#include "polar/PolarSet.h"
 #include "reader/PolarReader.h"
 #include "writer/PolarWriter.h"
 

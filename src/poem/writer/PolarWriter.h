@@ -10,6 +10,11 @@
 
 namespace poem {
 
+  enum WRITER_TYPE {
+    NETCDF,
+    CSV
+  };
+
 //  class PolarSet;
 //
 //  class PolarWriter {
