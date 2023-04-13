@@ -127,6 +127,12 @@ namespace poem {
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
 
+      // Storing variable
+      if (!is_filled()) {
+        spdlog::critical("Attempting to write a polar in NetCDF file while the polar has not been totally populated");
+        CRITICAL_ERROR
+      }
+
       // Storing dimensions
       std::vector<netCDF::NcDim> dims;
       dims.reserve(_dim);
@@ -139,57 +145,52 @@ namespace poem {
 
         // TODO: voir si on eut pas detecter que le nom est deja pris...
         // Declaration of a new dimension ID
-        netCDF::NcDim dim = dataFile.addDim(name, values.size());
+        auto dim = dataFile.getDim(name);
+        if (dim.isNull()) {
+          dim = dataFile.addDim(name, values.size());
 
-        // The dimension as a variable
-        netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
-        nc_var.putVar(values.data());
-        nc_var.putAtt("unit", dimension_ID->unit());
-        nc_var.putAtt("description", dimension_ID->description());
+          // The dimension as a variable
+          netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
+          nc_var.putVar(values.data());
+          nc_var.putAtt("unit", dimension_ID->unit());
+          nc_var.putAtt("description", dimension_ID->description());
+        }
+//        netCDF::NcDim dim = dataFile.addDim(name, values.size());
 
         dims.push_back(dim);
 
       }
 
-      // Storing variable
-      if (!is_filled()) {
-        spdlog::critical("Attempting to write a polar in NetCDF file while the polar has not been totally populated");
+      // Storing the values
+
+      netCDF::NcVar nc_var = dataFile.getVar(name());
+
+      if (nc_var.isNull()) {
+
+        switch (type()) {
+          case type::DOUBLE:
+            nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
+            break;
+          case type::INT:
+            nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
+
+        }
+        nc_var.setCompression(true, true, 5);
+
+        // Get the values as a flat vector
+        std::vector<T> values;
+        for (const auto &point : m_points) {
+          values.push_back(point.second.value());
+        }
+
+        nc_var.putVar(values.data());
+        nc_var.putAtt("unit", unit());
+        nc_var.putAtt("description", description());
+
+      } else {
+        spdlog::critical("Attempting to store more than one time a variable with the same name");
         CRITICAL_ERROR
       }
-
-      // On recupere les valeurs sous forme de tableau
-      std::vector<T> values;
-      for (const auto &point : m_points) {
-        values.push_back(point.second.value());
-      }
-      // Le user guide netCDF dit qu'il utilise du row major order
-
-      // row major -> last dimension varies the fastest
-      // colum major -> first dimension varies the fastest
-
-      // Esperado -> first dim -> column major
-      // netCDF -> row major from doc -> last dim
-
-      // TODO: changer l'ordre du coup lors de la generation des points
-      //  on veut etre row major et donc que ce soit la derniere dimension qui evolue le plus rapidement
-
-
-      netCDF::NcVar nc_var;
-      switch (type()) {
-        case type::DOUBLE:
-          nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
-          // On recupere la data...
-
-
-
-          break;
-        case type::INT:
-          nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
-      }
-      nc_var.setCompression(true, true, 5);
-
-
-
 
     }
 
@@ -258,6 +259,8 @@ namespace poem {
     }
 
     int to_netcdf(const std::string &nc_file) const {
+
+      spdlog::info("Writing NetCDF file {}", nc_file);
 
       constexpr int nc_err = 2;
 

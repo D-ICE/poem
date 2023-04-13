@@ -68,12 +68,16 @@ int main() {
    * Create new polars using New method of polar set
    */
   auto leeway = polar_set->New<double, 3>("LEEWAY", "deg", "Leeway", type::DOUBLE, dimension_point_set);
+  auto leeway2 = polar_set->New<double, 3>("LEEWAY2", "deg", "Leeway", type::DOUBLE, dimension_point_set);
 
 
+  double val = 0.;
   for (const auto& dimension_point : *dimension_point_set) {
-    PolarPoint<double, 3> polar_point(dimension_point, 10.);
-
+    PolarPoint<double, 3> polar_point(dimension_point, val);
     leeway->set_point(&polar_point);
+    leeway2->set_point(&polar_point);
+
+    val += 1.;
   }
 
   std::string nc_file("essai.nc");
