@@ -8,15 +8,18 @@
 #include <iostream>
 #include <string>
 
-#include "poem/polar/Polar.h"
+
 
 namespace poem {
+
+  // Forward declaration
+  class PolarSet;
 
   class PolarReader {
    public:
     PolarReader() {}
 
-    void Read(const std::string &nc_polar);
+    std::shared_ptr<PolarSet> Read(const std::string &nc_polar);
 
    private:
     int m_polar_version;

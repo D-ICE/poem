@@ -9,16 +9,17 @@
 
 #include <netcdf>
 #include <spdlog/spdlog.h>
+#include <map>
 
-#include "poem/schema/schema.h"
-#include <nlohmann/json.hpp>
-
+//#include "poem/schema/schema.h"
+//#include <nlohmann/json.hpp>
+#include "poem/polar/PolarSet.h"
 
 namespace fs = std::filesystem;
 
 namespace poem {
 
-  void PolarReader::Read(const std::string &nc_polar) {
+  std::shared_ptr<PolarSet> PolarReader::Read(const std::string &nc_polar) {
 
     // Does the file exist
     if (!fs::exists(nc_polar)) {
@@ -26,30 +27,77 @@ namespace poem {
     }
 
     spdlog::info("Reading polar file {}", nc_polar);
-    netCDF::NcFile datafile(nc_polar, netCDF::NcFile::read);
+    netCDF::NcFile dataFile(nc_polar, netCDF::NcFile::read);
 
-    // Get polar version
-    try {
-      datafile.getAtt("polar_version").getValues(&m_polar_version);
-    } catch(netCDF::exceptions::NcBadId &e) {
-      spdlog::warn("Polar version not found. Assuming version 1");
-      m_polar_version = 1;
+    // Getting attributes
+    auto atts_ = dataFile.getAtts();
+    Attributes attributes;
+    for (const auto &att_: atts_) {
+      auto att_name = att_.first;
+      std::string att_val;
+      att_.second.getValues(att_val);
+      attributes.add_attribute(att_name, att_val);
     }
 
-    spdlog::info("Polar version {}", m_polar_version);
+    // The new polar set
+    auto polar_set = std::make_shared<PolarSet>(attributes);
 
-    // Get polar type (is that 5D_VPP, 5D_PPP, CDA?)
-    std::string polar_type;
-    datafile.getAtt("polar_type").getValues(polar_type);
+    // Get the dimensions
+    auto dims_ = dataFile.getDims();
+    std::map<std::string, std::shared_ptr<DimensionID>> dim_map;
+    for (const auto& dim_ : dims_) {
+      auto dim_name = dim_.first;
 
-    spdlog::info("Polar type {}", polar_type);
+      auto dim_var = dataFile.getVar(dim_name);
 
-    std::cout << schema::schema << std::endl;
+      std::string unit, description, min, max;
+      dim_var.getAtt("unit").getValues(unit);
+      dim_var.getAtt("description").getValues(description);
+      dim_var.getAtt("min").getValues(min);
+      dim_var.getAtt("max").getValues(max);
+
+
+
+
+//      auto dim_group = nc_dim.getParentGroup();
+//      std::string unit;
+//      dim_group.getAtt("unit").getValues(unit);
+//      auto group = dataFile.get
+
+
+      STOP
+
+    }
+
+
+    // Get the variables
+    auto vars_ = dataFile.getVars();
+    for (const auto& var_ : vars_) {
+      auto var_name = var_.first;
+      auto nc_var = var_.second;
+
+
+
+    }
+
+
+
+
+//    // Getting dimensions
+//    auto dimensions = dataFile.getDims();
+//
+//    std::vector<std::string> dim_names;
+//    for (const auto& dim : dimensions) {
+//      std::cout << dim.first << std::endl;
+//      dim_names.push_back(dim.first);
+//    }
 
 
 
 
 
+
+    return polar_set;
   }
 
 

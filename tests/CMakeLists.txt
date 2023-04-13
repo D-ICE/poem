@@ -5,3 +5,6 @@ target_compile_definitions(first PRIVATE DATA_FOLDER="${PROJECT_SOURCE_DIR}/test
 
 add_executable(test_polar_creation test_polar_creation.cpp)
 target_link_libraries(test_polar_creation poem MathUtils::MathUtils)
+
+add_executable(test_read_netcdf test_read_netcdf.cpp)
+target_link_libraries(test_read_netcdf poem)
