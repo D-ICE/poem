@@ -55,7 +55,7 @@ namespace poem {
       for (const auto &var_: vars_) {
         auto var_name = var_.first;
 
-        // Ici on peut tester si la variable est associee a une dimension
+        // If the variable corresponds to a dimension, we do not proceed
         if (m_dimension_map.find(var_name) != m_dimension_map.end()) {
           continue;
         }
@@ -86,8 +86,8 @@ namespace poem {
 
         auto dim_var = m_dataFile->getVar(dim_name);
 
+        // TODO: on devrait plutot faire un load dynamique...
         std::string unit, description, min_str, max_str;
-
         dim_var.getAtt("unit").getValues(unit);
         dim_var.getAtt("description").getValues(description);
         dim_var.getAtt("min").getValues(min_str);
@@ -169,7 +169,7 @@ namespace poem {
 
         dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_ID_set);
 
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < _dim; ++i) {
 
           auto dim = nc_var.getDim(i);
           auto dim_size = dim.getSize();
@@ -207,6 +207,7 @@ namespace poem {
 
       auto var_name = nc_var.getName();
 
+      // TODO: on devrait plutot faire un load dynamique ?
       std::string unit, description;
       nc_var.getAtt("unit").getValues(unit);
       nc_var.getAtt("description").getValues(description);
