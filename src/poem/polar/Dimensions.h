@@ -52,9 +52,6 @@ namespace poem {
 
     explicit DimensionIDSet(const IDSet &array) :
         m_ID_set(array) {
-//      for (size_t i = 0; i < _dim; ++i) {
-//        m_hash_name += array.at(i)->name();
-//      }
     }
 
     DimensionID *get(size_t i) const { return m_ID_set.at(i).get(); }
@@ -205,10 +202,6 @@ namespace poem {
         values.at(i) = element;
         if constexpr (index == 1) {
           m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dimension_ID_set.get(), this, values));
-//          std::cout << " " << values[0]
-//                    << " " << values[1]
-//                    << " " << values[2]
-//                    << std::endl;
 
         } else {
           meta_for_loop<index - 1>(values);

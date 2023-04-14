@@ -236,9 +236,7 @@ namespace poem {
     std::map<std::string, std::shared_ptr<DimensionID>> m_dimension_map;
     std::map<std::string, std::shared_ptr<DimensionPointSetBase>> m_dim_ID_set_registry;
 
-
   };
-
 
 }  // poem
 

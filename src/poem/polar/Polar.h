@@ -36,8 +36,6 @@ namespace poem {
 
     }
 
-//    const VariableID *variable_ID() const { return m_var_ID.get(); }
-
     virtual const size_t dim() const = 0;
 
     const std::string &name() const { return m_var_ID->name(); }
@@ -128,7 +126,6 @@ namespace poem {
       }
 
       // Storing the values
-
       netCDF::NcVar nc_var = dataFile.getVar(name());
 
       if (nc_var.isNull()) {
