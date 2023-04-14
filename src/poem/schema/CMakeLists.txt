@@ -5,3 +5,5 @@ message(STATUS ${PROJECT_BINARY_DIR})
 message(STATUS ${CMAKE_CURRENT_BINARY_DIR}/../../)
 
 target_include_directories(poem PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/../../)
+
+add_subdirectory(test)

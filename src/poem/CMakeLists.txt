@@ -9,7 +9,5 @@ target_link_libraries(poem PUBLIC
         dunits
         )
 
-#add_subdirectory(polar)
-#add_subdirectory(reader)
 add_subdirectory(writer)
-#add_subdirectory(schema)
+add_subdirectory(schema)

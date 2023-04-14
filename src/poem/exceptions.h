@@ -37,22 +37,6 @@ namespace poem {
     }
   };
 
-  struct OutOfRangeDimension : public std::exception {
-    OutOfRangeDimension() = default;
-    const char *what() const throw() override {
-      return "Out of range of dimension";
-    }
-  };
-
-  struct UnknownDimensionName : public std::exception {
-    UnknownDimensionName() = default;
-    const char *what() const throw() override {
-      return "Unknown Dimension Name";
-    }
-  };
-
-
-
 }  // poem
 
 #endif //POEM_EXCEPTIONS_H

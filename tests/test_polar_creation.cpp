@@ -16,9 +16,9 @@ int main() {
    * Here we define 3 dimensions based on their name, unit, description and bound values
    * DimensionID are the unique identifiers of a dimension
    */
-  auto STW = std::make_shared<DimensionID>("STW_kt", "kt", "Speed Through Water", 0, 20);
-  auto TWS = std::make_shared<DimensionID>("TWS_kt", "kt", "True Wind Speed", 0, 60);
-  auto TWA = std::make_shared<DimensionID>("TWA_deg", "deg", "True Wind Angle", 0, 180);
+  auto d1 = std::make_shared<DimensionID>("d1", "-", "d1", 0, 20);
+  auto d2 = std::make_shared<DimensionID>("d2", "-", "d2", 0, 60);
+  auto d3 = std::make_shared<DimensionID>("d3", "-", "d3", 0, 180);
 
   /**
    * Create the dimension ID set
@@ -26,7 +26,7 @@ int main() {
    * A shared_ptr is used as several polars are likely to share this coordinate system
    * Dimensions are ordered
    */
-  DimensionIDSet<3>::IDSet dim_ID_set{STW, TWS, TWA};
+  DimensionIDSet<3>::IDSet dim_ID_set{d1, d2, d3};
   auto dimension_ID_set = std::make_shared<DimensionIDSet<3>>(dim_ID_set);
 
   /**
@@ -42,9 +42,9 @@ int main() {
 
   // Create samples for the dimensions
   // FIXME: arange ne fonctionne vraiment pas comme voulu...
-  dimension_point_set->set_dimension_vector("STW_kt", mathutils::arange<double>(0, 20, 1));
-  dimension_point_set->set_dimension_vector("TWS_kt", mathutils::arange<double>(0, 60, 5));
-  dimension_point_set->set_dimension_vector("TWA_deg", mathutils::arange<double>(0, 180, 15));
+  dimension_point_set->set_dimension_vector("d1", mathutils::arange<double>(0, 20, 1));
+  dimension_point_set->set_dimension_vector("d2", mathutils::arange<double>(0, 60, 5));
+  dimension_point_set->set_dimension_vector("d3", mathutils::arange<double>(0, 180, 15));
 
   dimension_point_set->build();
 
@@ -82,14 +82,11 @@ int main() {
    */
   auto polar_set = std::make_shared<PolarSet>(attributes);
 
-  // TODO: define and add attributes...
-
-
   /**
    * Create new polars using New method of polar set
    */
-  auto var1 = polar_set->New<double, 3>("var1", "kW", "var1", type::DOUBLE, dimension_point_set);
-  auto var2 = polar_set->New<double, 3>("var2", "deg", "var2", type::DOUBLE, dimension_point_set);
+  auto var1 = polar_set->New<double, 3>("var1", "-", "var1", type::DOUBLE, dimension_point_set);
+  auto var2 = polar_set->New<double, 3>("var2", "-", "var2", type::DOUBLE, dimension_point_set);
 
 
   double val = 0.;
@@ -101,9 +98,8 @@ int main() {
     val += 1.;
   }
 
-  std::string nc_file("essai.nc");
+  std::string nc_file("test_polar.nc");
   polar_set->to_netcdf(nc_file);
-
 
   return 0;
 }

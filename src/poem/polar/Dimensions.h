@@ -60,7 +60,8 @@ namespace poem {
       for (size_t i = 0; i < _dim; ++i) {
         if (m_ID_set.at(i)->name() == name) return i;
       }
-      throw UnknownDimensionName();
+      spdlog::critical("Unknown dimension name {}", name);
+      CRITICAL_ERROR
     }
 
    private:
@@ -114,7 +115,9 @@ namespace poem {
         const double val = m_values.at(i);
         DimensionID *ID = m_ID_array->get(i);
         if (val < ID->min() || val > ID->max()) {
-          throw OutOfRangeDimension();
+          spdlog::critical("For dimension {}, values {} is out of range [{}, {}]",
+                           ID->name(), val, ID->min(), ID->max());
+          CRITICAL_ERROR
         }
       }
     }
