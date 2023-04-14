@@ -41,21 +41,6 @@ namespace poem {
     double m_max;
   };
 
-//  class DimensionIDSetBase {
-//   public:
-//    DimensionIDSetBase() = default;
-//
-//    virtual ~DimensionIDSetBase() = default;
-//
-////    void set_hash_name(const std::string &hash_name) { m_hash_name = hash_name; }
-//
-//    const std::string &hash_name() const { return m_hash_name; }
-//
-//   protected:
-//    std::string m_hash_name;
-//  };
-
-
   /**
    *
    * @tparam _dim

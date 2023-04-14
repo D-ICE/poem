@@ -84,7 +84,10 @@ namespace poem {
         NIY
 
       } else if (dim_count == 3) {
+
         // TODO: faire appel a une fonction template dim_ pour eviter le boiler...
+
+        auto type = nc_var.getType();
 
         std::string hash_name;
         for (int i = 0; i < 3; ++i) {
@@ -130,8 +133,6 @@ namespace poem {
         std::string unit, description;
         nc_var.getAtt("unit").getValues(unit);
         nc_var.getAtt("description").getValues(description);
-
-        auto type = nc_var.getType();
 
         size_t var_size = dimension_point_set->size();
 
