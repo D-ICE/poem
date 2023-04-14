@@ -6,6 +6,7 @@ target_link_libraries(poem PUBLIC
         netcdf-cxx4
         spdlog
         nlohmann_json
+        dunits
         )
 
 #add_subdirectory(polar)

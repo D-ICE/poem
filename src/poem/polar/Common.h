@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <dunits/dunits.h>
+
 #include "poem/exceptions.h"
 
 namespace poem {
@@ -43,7 +45,10 @@ namespace poem {
 
    private:
     void check_unit() {
-      // TODO
+      if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
+        spdlog::critical("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
+        CRITICAL_ERROR
+      }
     }
 
    protected:
