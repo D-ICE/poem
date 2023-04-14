@@ -108,6 +108,8 @@ int main() {
     val_int += 1;
   }
 
+  SchemaChecker::getInstance().check(polar_set.get());
+
   std::string nc_file("test_polar.nc");
   polar_set->to_netcdf(nc_file);
 

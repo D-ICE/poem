@@ -29,7 +29,6 @@ namespace poem {
         m_min(min),
         m_max(max) {
 
-      // TODO: c'est ici qu'on veut faire le check par rapport au schema
     }
 
     const double &min() const { return m_min; }

@@ -1,4 +1,5 @@
 target_sources(poem PRIVATE
+        Schema.cpp
         SchemaChecker.cpp
         )
 
