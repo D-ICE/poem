@@ -41,6 +41,21 @@ namespace poem {
     double m_max;
   };
 
+//  class DimensionIDSetBase {
+//   public:
+//    DimensionIDSetBase() = default;
+//
+//    virtual ~DimensionIDSetBase() = default;
+//
+////    void set_hash_name(const std::string &hash_name) { m_hash_name = hash_name; }
+//
+//    const std::string &hash_name() const { return m_hash_name; }
+//
+//   protected:
+//    std::string m_hash_name;
+//  };
+
+
   /**
    *
    * @tparam _dim
@@ -50,19 +65,24 @@ namespace poem {
    public:
     using IDSet = std::array<std::shared_ptr<DimensionID>, _dim>;
 
-    explicit DimensionIDSet(const IDSet &array) : m_array(array) {}
+    explicit DimensionIDSet(const IDSet &array) :
+        m_ID_set(array) {
+//      for (size_t i = 0; i < _dim; ++i) {
+//        m_hash_name += array.at(i)->name();
+//      }
+    }
 
-    DimensionID *get(size_t i) const { return m_array.at(i).get(); }
+    DimensionID *get(size_t i) const { return m_ID_set.at(i).get(); }
 
     const size_t get_index(const std::string &name) const {
       for (size_t i = 0; i < _dim; ++i) {
-        if (m_array.at(i)->name() == name) return i;
+        if (m_ID_set.at(i)->name() == name) return i;
       }
       throw UnknownDimensionName();
     }
 
    private:
-    IDSet m_array;
+    IDSet m_ID_set;
 
   };
 
@@ -125,12 +145,16 @@ namespace poem {
 
   };
 
+  struct DimensionPointSetBase {
+    virtual ~DimensionPointSetBase() = default;  // To make it polymorphic for usage of std::dynamic_cast in polar reader
+  };
+
   /**
    *
    * @tparam _dim
    */
   template<size_t _dim>
-  class DimensionPointSet {
+  class DimensionPointSet : public DimensionPointSetBase {
    public:
     using DimensionPointVector = std::vector<std::shared_ptr<DimensionPoint<_dim>>>;
     using Iter = typename DimensionPointVector::const_iterator;

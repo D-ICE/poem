@@ -26,8 +26,8 @@ int main() {
    * A shared_ptr is used as several polars are likely to share this coordinate system
    * Dimensions are ordered
    */
-  DimensionIDSet<3>::IDSet array{STW, TWS, TWA};
-  auto dimension_ID_set = std::make_shared<DimensionIDSet<3>>(array);
+  DimensionIDSet<3>::IDSet dim_ID_set{STW, TWS, TWA};
+  auto dimension_ID_set = std::make_shared<DimensionIDSet<3>>(dim_ID_set);
 
   /**
    * Create a dimension point set
@@ -36,6 +36,8 @@ int main() {
    * A dimension point set is first populated with vector of samples data for each of the dimensions. Once done, it must
    * be built to generate a cartesian product of every dimension and generate internally a vector of dimension points
    */
+
+   // TODO: composer un DimensionPointSet<_dim> avec un array de SampledDim...
   auto dimension_point_set = std::make_shared<DimensionPointSet<3>>(dimension_ID_set);
 
   // Create samples for the dimensions

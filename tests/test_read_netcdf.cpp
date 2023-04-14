@@ -12,8 +12,9 @@ int main() {
 
   PolarReader reader;
 
-  reader.Read(nc_file);
+  auto polar_set = reader.Read(nc_file);
 
+  polar_set->to_netcdf("rewrite.nc");
 
 
   return 0;
