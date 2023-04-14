@@ -1,6 +1,9 @@
 {
+
   "version": "1",
+
   "global_attributes": {
+
     "polar_version": {
       "type": "string"
     },
@@ -13,13 +16,60 @@
     "attopt_*": {
       "type": "string"
     }
+
   },
 
   "dimensions": {
+
+    "attributes": {
+      "unit": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "min": {
+        "type": "double"
+      },
+      "max": {
+        "type": "double"
+      }
+
+    },
+
+    "fields": {
+
+      "d1": {
+        "type": "double"
+      },
+      "d2": {
+        "type": "double"
+      },
+      "d3": {
+        "type": "double"
+      }
+
+    }
 
   },
 
   "variables": {
 
-  }
+    "attributes": {
+
+      "unit": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+
+    },
+
+    "fields": {
+
+    }
+
+  },
+
 }
