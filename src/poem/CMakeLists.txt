@@ -7,6 +7,7 @@ target_link_libraries(poem PUBLIC
         spdlog
         nlohmann_json
         dunits
+        Glob
         )
 
 add_subdirectory(writer)

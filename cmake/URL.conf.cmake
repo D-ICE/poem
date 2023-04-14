@@ -47,3 +47,7 @@ set(googletest_TAG release-1.12.1)
 # spdlog
 set(spdlog_URL https://github.com/gabime/spdlog)
 set(spdlog_TAG v1.8.5)
+
+# glob
+set(glob_URL https://github.com/p-ranav/glob.git)
+set(glob_TAG v0.0.1)

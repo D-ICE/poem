@@ -1,6 +1,18 @@
 {
+  "version": "1",
   "global_attributes": {
-
+    "polar_version": {
+      "type": "string"
+    },
+    "att_mandatory": {
+      "type": "string"
+    },
+    "att_optional": {
+      "type": "string"
+    },
+    "attopt_*": {
+      "type": "string"
+    }
   },
 
   "dimensions": {
