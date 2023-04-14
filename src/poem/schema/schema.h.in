@@ -2,8 +2,8 @@
 // Created by frongere on 08/04/23.
 //
 
-#ifndef POEM_VERSIONS_H
-#define POEM_VERSIONS_H
+#ifndef POEM_SCHEMA_H
+#define POEM_SCHEMA_H
 
 #include <string>
 #include <nlohmann/json.hpp>
@@ -18,4 +18,4 @@ namespace poem::schema {
 
 }  // poem::schema
 
-#endif //POEM_VERSIONS_H
+#endif //POEM_SCHEMA_H

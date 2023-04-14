@@ -1,7 +1,5 @@
 {
 
-  "version": "1",
-
   "global_attributes": {
 
     "polar_version": {
@@ -67,9 +65,16 @@
     },
 
     "fields": {
-
+      "var_double": {
+        "type": "double",
+        "dimensions": ["d1", "d2", "d3"]
+      },
+      "var_int": {
+        "type": "int",
+        "dimensions": ["d1", "d2"]
+      }
     }
 
-  },
+  }
 
 }
