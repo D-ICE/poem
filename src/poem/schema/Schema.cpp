@@ -8,8 +8,11 @@
 
 namespace poem {
 
-  Schema::Schema(const json &json_schema) {
-    NIY
+  Schema::Schema(const json &json_schema) :
+      m_json_schema(json_schema) {
+//    NIY
+
+
   }
 
 }  // poem

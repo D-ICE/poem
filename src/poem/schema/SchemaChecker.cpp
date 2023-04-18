@@ -9,7 +9,7 @@
 namespace poem {
 
   void SchemaChecker::check(const PolarSet *polar_set) {
-    NIY
+//    NIY
   }
 
 }  // poem

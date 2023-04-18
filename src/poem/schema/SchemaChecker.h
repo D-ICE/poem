@@ -34,7 +34,7 @@ namespace poem {
     void operator=(const SchemaChecker &) = delete;
 
    public:
-    void check(const PolarSet* polar_set);
+    void check(const PolarSet *polar_set);
 
    private:
     #ifndef SCHEMA_TEST
@@ -43,14 +43,12 @@ namespace poem {
     }
     #else
 
-    SchemaChecker() : m_json_schema(schema_test::schema_test) {
-      m_schema = std::make_unique<Schema>(m_json_schema);
-    }
+    SchemaChecker() :
+        m_schema(std::make_unique<Schema>(schema_test::schema_test)) {}
 
     #endif
 
    private:
-    json m_json_schema;
     std::unique_ptr<Schema> m_schema;
 
   };

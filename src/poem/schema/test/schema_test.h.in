@@ -12,7 +12,7 @@ using json = nlohmann::json;
 
 namespace poem::schema_test {
 
-  json schema_test = json::parse(R"(
+  static json schema_test = json::parse(R"(
 @SCHEMA_TEST@
   )");
 

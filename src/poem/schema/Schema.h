@@ -15,6 +15,9 @@ namespace poem {
    public:
     explicit Schema(const json& json_schema);
 
+   private:
+    json m_json_schema;
+
   };
 
 }  // poem
