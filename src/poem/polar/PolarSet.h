@@ -8,41 +8,11 @@
 #include <memory>
 
 #include "Polar.h"
+#include "Attributes.h"
+
+#include "poem/schema/Schema.h"
 
 namespace poem {
-
-  /**
-   * Represents different attributes (metadata) to be added to a PolarSet
-   */
-  class Attributes {
-   public:
-    using Map = std::map<std::string, std::string>;
-    using Iter = Map::const_iterator;
-
-    Attributes() = default;
-
-    Attributes(const Attributes &other) = default;
-
-    void add_attribute(const std::string &name, const std::string &val) {
-      m_attributes.insert({name, val});
-    }
-
-    bool contains(const std::string &name) {
-      return m_attributes.find(name) != m_attributes.end();
-    }
-
-    const std::string &get(const std::string &name) const { return m_attributes.at(name); }
-
-    void set(const std::string &name, const std::string &val) { m_attributes.at(name) = val; }
-
-    Iter begin() const { return m_attributes.cbegin(); }
-    Iter end() const { return m_attributes.cend(); }
-
-   private:
-    Map m_attributes;
-  };
-
-
 
   /**
  * Represents a set of polars.
@@ -54,7 +24,17 @@ namespace poem {
     using PolarVector = std::vector<std::unique_ptr<PolarBase>>;
     using Iter = PolarVector::const_iterator;
 
-    explicit PolarSet(const Attributes& attributes) : m_attributes(attributes) {};
+    PolarSet(const Attributes &attributes, const Schema &schema) :
+        m_attributes(attributes),
+        m_schema(schema) {
+
+      // TODO: ajouter le schema s'il n'y est pas
+      if (!m_attributes.contains("schema")) {
+        m_attributes.add_attribute("schema", schema.json_str());
+      }
+
+      m_schema.check_attributes(&m_attributes);
+    };
 
     template<typename T, size_t _dim>
     Polar<T, _dim> *New(const std::string &name,
@@ -89,15 +69,13 @@ namespace poem {
         netCDF::NcFile dataFile(nc_file, netCDF::NcFile::replace);
 
         // Writing attributes
-        for (const auto& attribute : m_attributes) {
+        for (const auto &attribute: m_attributes) {
           dataFile.putAtt(attribute.first, attribute.second);
         }
 
         for (const auto &polar: m_polars) {
           polar->to_netcdf(dataFile);
         }
-
-        dataFile.getName() = "coucou";
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
@@ -110,6 +88,8 @@ namespace poem {
    private:
     Attributes m_attributes;
     PolarVector m_polars;
+
+    Schema m_schema;
   };
 
 }  // poem

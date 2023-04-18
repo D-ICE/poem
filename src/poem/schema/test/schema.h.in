@@ -1,0 +1,18 @@
+//
+// Created by frongere on 14/04/23.
+//
+
+#ifndef POEM_SCHEMA_TEST_H
+#define POEM_SCHEMA_TEST_H
+
+#include <string>
+
+namespace poem::schema {
+
+  static std::string schema_str = R"(
+@SCHEMA_TEST@
+  )";
+
+}  // poem::schema
+
+#endif //POEM_SCHEMA_TEST_H

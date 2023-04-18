@@ -65,7 +65,7 @@ int main() {
    */
 
   Attributes attributes;
-  attributes.add_attribute("att_mandatory", "mandatory attribute");
+  attributes.add_attribute("att_required", "required attribute");
   attributes.add_attribute("att_optional", "optional attribute");
   attributes.add_attribute("attopt_glob", "optional attribute with glob syntax");
 
@@ -80,8 +80,11 @@ int main() {
    * A polar point is composed of a pointer to a dimension point and a value. This is really a point in the polar.
    *
    * A dimension point MUST be generated from a dimension point set
+   *
+   * A polar is always written following the last schema specification
    */
-  auto polar_set = std::make_shared<PolarSet>(attributes);
+  auto schema = GetCurrentSchema();
+  auto polar_set = std::make_shared<PolarSet>(attributes, GetCurrentSchema());
 
   /**
    * Create new polars using New method of polar set
@@ -108,7 +111,7 @@ int main() {
     val_int += 1;
   }
 
-  SchemaChecker::getInstance().check(polar_set.get());
+//  SchemaChecker::getInstance().check(polar_set.get());
 
   std::string nc_file("test_polar.nc");
   polar_set->to_netcdf(nc_file);

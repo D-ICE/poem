@@ -44,8 +44,11 @@ namespace poem {
       // Getting attributes
       auto attributes = load_attributes();
 
+      auto schema_str = attributes.get("schema");
+      Schema schema(schema_str);
+
       // The new polar set
-      m_polar_set = std::make_shared<PolarSet>(attributes);
+      m_polar_set = std::make_shared<PolarSet>(attributes, schema);
 
       // Get the dimensions
       load_dimensions();
@@ -68,6 +71,7 @@ namespace poem {
     }
 
    private:
+
     const Attributes load_attributes() const {
       auto atts_ = m_dataFile->getAtts();
       Attributes attributes;
@@ -107,17 +111,17 @@ namespace poem {
 
       switch (nbdim) {
         case 1:
-          return load_variable < 1 > (var_name);
+          return load_variable<1>(var_name);
         case 2:
-          return load_variable < 2 > (var_name);
+          return load_variable<2>(var_name);
         case 3:
-          return load_variable < 3 > (var_name);
+          return load_variable<3>(var_name);
         case 4:
-          return load_variable < 4 > (var_name);
+          return load_variable<4>(var_name);
         case 5:
-          return load_variable < 5 > (var_name);
+          return load_variable<5>(var_name);
         case 6:
-          return load_variable < 6 > (var_name);
+          return load_variable<6>(var_name);
         default:
           spdlog::critical("Polar dimensions lower than 2 or higher than 6 are forbidden");
           CRITICAL_ERROR
@@ -148,7 +152,7 @@ namespace poem {
       auto nc_var = m_dataFile->getVar(var_name);
 
       std::string hash_name;
-      for (int i = 0; i < 3; ++i) {
+      for (int i = 0; i < _dim; ++i) {
         hash_name += nc_var.getDim(i).getName();
       }
 

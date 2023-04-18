@@ -8,8 +8,8 @@
 
 namespace poem {
 
-  void SchemaChecker::check(const PolarSet *polar_set) {
-//    NIY
-  }
+//  void SchemaChecker::check(const PolarSet *polar_set) {
+////    NIY
+//  }
 
 }  // poem

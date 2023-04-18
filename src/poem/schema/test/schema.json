@@ -1,12 +1,14 @@
 {
 
   "global_attributes": {
-
-    "polar_version": {
-      "type": "string"
+    "schema": {
+      "type": "string",
+      "tags": ["required"]
     },
-    "att_mandatory": {
-      "type": "string"
+    "att_required": {
+      "type": "string",
+      "tags": ["required"],
+      "aliases": ["att1"]
     },
     "att_optional": {
       "type": "string"

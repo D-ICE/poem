@@ -1,22 +1,84 @@
 {
-  "NDPOLAR": {
+  "global_attributes": {
+    "schema": {
+      "doc": "The schema that has been used to write this polar",
+      "type": "string",
+      "tags": ["required"]
+    },
+    "polar_type": {
+      "doc": "The type of polar that is described in the NetCDF file. Must be ND here",
+      "type": "string",
+      "tags": ["required"]
+    }
+  },
 
-    "version": 1,
+  "dimensions": {
 
     "attributes": {
-      "vessel_type": {
-        "type": "string",
-        "aliases": []
+      "unit": {
+        "doc": "The unit of the dimension. Must be valid according to dunits library",
+        "type": "string"
       },
-      "polar_type": {
-
+      "description": {
+        "doc": "The description of the dimension",
+        "type": "string"
+      },
+      "min": {
+        "doc": "The minimum value that the dimension can take",
+        "type": "double"
+      },
+      "max": {
+        "doc": "The maximum value that the dimension can take",
+        "type": "double"
       }
-    },
-    "dimensions": {
 
     },
-    "variables": {
+
+    "fields": {
+
+      "STW_kt": {
+        "type": "double"
+      },
+      "TWS_kt": {
+        "type": "double"
+      },
+      "TWA_deg": {
+        "type": "double"
+      },
+      "WA_deg": {
+        "type": "double"
+      },
+      "Hs_m": {
+        "type": "double"
+      }
 
     }
+
+  },
+
+  "variables": {
+
+    "attributes": {
+
+      "unit": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+
+    },
+
+    "fields": {
+      "var_double": {
+        "type": "double",
+        "dimensions": ["d1", "d2", "d3"]
+      },
+      "var_int": {
+        "type": "int",
+        "dimensions": ["d1", "d2"]
+      }
+    }
+
   }
 }
