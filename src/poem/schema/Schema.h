@@ -41,9 +41,9 @@ namespace poem {
 
     }
 
-    bool is_required() { return m_required; }
+    bool is_required() const { return m_required; }
 
-    bool is_deprecated() { return m_deprecated; }
+    bool is_deprecated() const { return m_deprecated; }
 
     std::vector<std::string> aliases() const { return m_aliases; }
 
@@ -69,6 +69,10 @@ namespace poem {
    public:
     explicit Schema(const std::string &json_str);
 
+    bool operator==(const Schema& other) const {
+      return m_json_schema == other.m_json_schema;
+    }
+
     const std::string &json_str() const;
 
     void check_attributes(Attributes* attributes);
@@ -80,7 +84,7 @@ namespace poem {
 
     void load_variables();
 
-   private:
+   protected:
     std::string m_json_str;
 
     json m_json_schema;
@@ -90,7 +94,17 @@ namespace poem {
   };
 
 
-  const Schema GetCurrentSchema();
+  class LastSchema : public Schema {
+   public:
+    static Schema &getInstance();
+
+    LastSchema(const LastSchema &) = delete;
+    void operator=(const LastSchema &) = delete;
+
+   private:
+    LastSchema();
+
+  };
 
 
 }  // poem

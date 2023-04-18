@@ -8,7 +8,8 @@
     "polar_type": {
       "doc": "The type of polar that is described in the NetCDF file. Must be ND here",
       "type": "string",
-      "tags": ["required"]
+      "tags": ["required"],
+      "values": ["ND", "CDA"]
     }
   },
 

@@ -11,4 +11,5 @@ target_link_libraries(poem PUBLIC
         )
 
 add_subdirectory(writer)
+add_subdirectory(reader)
 add_subdirectory(schema)

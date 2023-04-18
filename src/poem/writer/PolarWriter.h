@@ -9,6 +9,14 @@
 
 namespace poem {
 
+  // Forward declaration
+  class PolarSet;
+
+  class PolarWriter {
+   public:
+    explicit PolarWriter(const PolarSet* polar_set);
+
+  };
 
 
 }  // poem

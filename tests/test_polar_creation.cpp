@@ -65,9 +65,9 @@ int main() {
    */
 
   Attributes attributes;
-  attributes.add_attribute("att_required", "required attribute");
-  attributes.add_attribute("att_optional", "optional attribute");
-  attributes.add_attribute("attopt_glob", "optional attribute with glob syntax");
+  attributes.add_attribute("polar_type", "ND");
+//  attributes.add_attribute("att_optional", "optional attribute");
+//  attributes.add_attribute("attopt_glob", "optional attribute with glob syntax");
 
   /**
    * Create a polar set
@@ -83,8 +83,8 @@ int main() {
    *
    * A polar is always written following the last schema specification
    */
-  auto schema = GetCurrentSchema();
-  auto polar_set = std::make_shared<PolarSet>(attributes, GetCurrentSchema());
+
+  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());
 
   /**
    * Create new polars using New method of polar set

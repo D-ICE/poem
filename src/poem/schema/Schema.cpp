@@ -40,16 +40,50 @@ namespace poem {
     /*
      * 1- on itere sur les attributs et on verifie qu'ils correspondent tous
      * 2- on itere sur les attributs du schema et on verifie que chaque attribut requis est bien la
+     *
+     * attributes sont les noms writer
+     *
+     * schema atts sont les noms reader (derniere version donc)
+     *
+     * on veut faire de la map reader -> writer et dans reader, on doit trouver un alias qui va bien
+     *
+     * on est cense de fait toujours avoir version reader >= version writer
+     *
      */
 
+    // this->m_schema, c'est le schema d'ecriture de la polaire
+    // LastSchema::getInstance() c'est le schema de lecture (le dernier, toujours)
+
+    // Au write, on veut pouvoir checker que les champs donnes sont compliant avec le dernier schema
+    //  pour pouvoir faire evoluer le schema au besoin
+
+    // Au read, on veut pouvoir mettre en relation le schema read (le dernier) et le schema write qui avait ete utilise
+
+
+
+    if (*this == LastSchema::getInstance()) {
+      spdlog::info("Schema corresponds to the very last schema definition");
+    }
+
+    // Are the attributes consistent with the given schema?
     for (const auto &attribute : *attributes) {
       if (m_global_attributes_map.find(attribute.first) == m_global_attributes_map.end()) {
         // Maybe the
-        spdlog::critical("Attribute {} is not in the scheme", attribute.first);
+        spdlog::critical("Attribute \"{}\" is not in the scheme", attribute.first);
         CRITICAL_ERROR
       }
     }
 
+    // Are every required attributes from schema present in attributes
+    for (const auto& schema_atts : m_global_attributes_map) {
+      if (schema_atts.second.is_required() && !attributes->contains(schema_atts.first)) {
+
+        // Ok, not found with this name... looking for the aliases
+
+        spdlog::critical("Required attribute \"{}\" not found in polar", schema_atts.first);
+        CRITICAL_ERROR
+      }
+    }
 
 
 
@@ -71,8 +105,15 @@ namespace poem {
     // TODO
   }
 
-  const Schema GetCurrentSchema() {
-    return Schema(schema::schema_str);
+//  const Schema GetCurrentSchema() {
+//    return Schema(schema::schema_str);
+//  }
+
+  Schema &LastSchema::getInstance() {
+    static LastSchema instance;
+    return instance;
   }
+
+  LastSchema::LastSchema() : Schema(schema::schema_str) {}
 
 }  // poem
