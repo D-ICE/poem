@@ -7,7 +7,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "poem/polar/Attributes.h"
+
 
 using json = nlohmann::json;
 
@@ -65,6 +65,10 @@ namespace poem {
 
   };
 
+  // Forward declaration
+  class Attributes;
+  class PolarBase;
+
   class Schema {
    public:
     explicit Schema(const std::string &json_str);
@@ -75,7 +79,9 @@ namespace poem {
 
     const std::string &json_str() const;
 
-    void check_attributes(Attributes* attributes);
+    void check_attributes(Attributes* attributes) const;
+
+    void check_polar(PolarBase* polar) const;
 
    private:
     void load_global_attributes();

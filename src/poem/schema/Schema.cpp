@@ -7,13 +7,10 @@
 #include <spdlog/spdlog.h>
 
 
-//#ifndef SCHEMA_TEST
+#include "poem/polar/Attributes.h"
+#include "poem/polar/Polar.h"
+
 #include "poem/schema/schema.h"
-//#else
-//
-//#include "poem/schema/test/schema.h"
-//
-//#endif
 
 #include <iostream>
 
@@ -36,7 +33,7 @@ namespace poem {
     return m_json_str;
   }
 
-  void Schema::check_attributes(Attributes *attributes) {
+  void Schema::check_attributes(Attributes *attributes) const {
     /*
      * 1- on itere sur les attributs et on verifie qu'ils correspondent tous
      * 2- on itere sur les attributs du schema et on verifie que chaque attribut requis est bien la
@@ -85,8 +82,10 @@ namespace poem {
       }
     }
 
+  }
 
-
+  void Schema::check_polar(PolarBase* polar) const {
+    //TODO
   }
 
   void Schema::load_global_attributes() {

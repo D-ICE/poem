@@ -21,8 +21,8 @@ namespace poem {
  */
   class PolarSet {
    public:
-    using PolarVector = std::vector<std::unique_ptr<PolarBase>>;
-    using Iter = PolarVector::const_iterator;
+    using PolarMap = std::unordered_map<std::string, std::unique_ptr<PolarBase>>;
+//    using Iter = PolarVector::const_iterator;
 
     PolarSet(const Attributes &attributes, const Schema &schema) :
         m_attributes(attributes),
@@ -44,16 +44,12 @@ namespace poem {
                         std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);
-      m_polars.push_back(std::move(polar));
-      return static_cast<Polar<T, _dim> *>(m_polars.back().get());
-    }
 
-    Iter begin() const {
-      return m_polars.cbegin();
-    }
+      m_polars_map.insert({name, std::move(polar)});
+      auto polar_ptr = m_polars_map[name].get();
+      m_schema.check_polar(polar_ptr);
 
-    Iter end() const {
-      return m_polars.cend();
+      return static_cast<Polar<T, _dim> *>(polar_ptr);
     }
 
     int to_netcdf(const std::string &nc_file) const {
@@ -73,8 +69,8 @@ namespace poem {
           dataFile.putAtt(attribute.first, attribute.second);
         }
 
-        for (const auto &polar: m_polars) {
-          polar->to_netcdf(dataFile);
+        for (const auto &polar: m_polars_map) {
+          polar.second->to_netcdf(dataFile);
         }
 
       } catch (netCDF::exceptions::NcException &e) {
@@ -87,7 +83,7 @@ namespace poem {
 
    private:
     Attributes m_attributes;
-    PolarVector m_polars;
+    PolarMap m_polars_map;
 
     Schema m_schema;
   };

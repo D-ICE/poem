@@ -18,10 +18,6 @@ namespace poem {
     using Map = std::map<std::string, std::string>;
     using Iter = Map::const_iterator;
 
-//    Attributes() = default;
-//
-//    Attributes(const Attributes &other) = default;
-
     void add_attribute(const std::string &name, const std::string &val) {
       m_attributes.insert({name, val});
     }
