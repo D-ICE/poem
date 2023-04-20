@@ -45,7 +45,7 @@ namespace poem {
     return m_is_last;
   }
 
-  const GlobalAttributeSchema &Schema::get_attribute_schema(const std::string &name) const {
+  const SchemaElement &Schema::get_attribute_schema(const std::string &name) const {
     return m_global_attributes_map.at(name);
   }
 
@@ -100,58 +100,75 @@ namespace poem {
   }
 
   std::string Schema::get_current_attribute_name(const std::string &name) const {
-    std::string current_name;
 
+    std::string current_name;
     if (m_global_attributes_map.find(name) != m_global_attributes_map.end()) {
       current_name = name;
 
     } else {
-
-//      bool found = false;
       for (const auto& attribute : m_global_attributes_map) {
-        auto aliases = attribute.second.aliases();
-        auto iter = std::find(aliases.begin(), aliases.end(), name);
-        if (iter != aliases.end()) {
-          // name has been found in aliases
-//          found = true;
-          current_name = *iter;
-          break;
-        }
+        current_name = attribute.second.get_alias(name);
+        if (!current_name.empty()) break;
       }
 
-//      if (!found) {
-//        spdlog::critical("No backward compatibility between schema for attribute named {}", name);
-//        CRITICAL_ERROR;
-//      }
-
     }
-
     return current_name;
   }
 
   void Schema::load_global_attributes() {
     auto node = m_json_schema["global_attributes"];
     for (auto iter = node.begin(); iter != node.end(); ++iter) {
-      GlobalAttributeSchema attribute(iter.value());
+      SchemaElement attribute(iter.value());
+      // TODO: voir comment on gere quand c'est deprecated
       m_global_attributes_map.insert({iter.key(), attribute});
     }
   }
 
   void Schema::load_dimensions() {
-    // TODO
+
+    auto node_att = m_json_schema["dimensions"]["attributes"];
+    for (auto iter = node_att.begin(); iter != node_att.end(); ++iter) {
+      std::string type = node_att[iter.key()]["type"];
+      m_dimensions_attributes_map.insert({iter.key(), type});
+      // TODO: verifier que type est bien connu...
+    }
+
+    auto node_field = m_json_schema["dimensions"]["fields"];
+    for (auto iter = node_field.begin(); iter != node_field.end(); ++iter) {
+      SchemaElement dimension(iter.value());
+      // TODO: voir comment on gere quand c'est deprecated
+      m_dimensions_map.insert({iter.key(), dimension});
+    }
+
   }
 
   void Schema::load_variables() {
-    // TODO
+
+    auto node_att = m_json_schema["variables"]["attributes"];
+    for (auto iter = node_att.begin(); iter != node_att.end(); ++iter) {
+      std::string type = node_att[iter.key()]["type"];
+      m_variables_attributes_map.insert({iter.key(), type});
+      // TODO: verifier que type est bien connu...
+    }
+
+    auto node_field = m_json_schema["variables"]["fields"];
+    for (auto iter = node_field.begin(); iter != node_field.end(); ++iter) {
+      SchemaVariable variable(iter.value());
+      // TODO: voir comment on gere quand c'est deprecated
+      m_variables_map.insert({iter.key(), variable});
+
+      // Here we check that variables are depending on existing dimensions
+      auto var_dims = variable.dimensions_names();
+      for (const auto &dim_name : var_dims) {
+        if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
+          spdlog::critical("In schema definition, variable {} is said to depend on dimension "
+                           "{} which has not been defined", iter.key(), dim_name);
+          CRITICAL_ERROR
+        }
+      }
+    }
+
   }
-
-
-
-
-
-//  const Schema GetCurrentSchema() {
-//    return Schema(schema::schema_str);
-//  }
 
   LastSchema &LastSchema::getInstance() {
     static LastSchema instance;

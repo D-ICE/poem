@@ -20,13 +20,18 @@ namespace poem {
    *
    */
 
-  class GlobalAttributeSchema {
+  /**
+   * SchemaElement defines a general field of a PolarSet (global attributes, dimensions or variables)
+   *
+   * This is where we define the logic for schema evolution
+   */
+  class SchemaElement {
    public:
-    explicit GlobalAttributeSchema(const json &node) :
+    explicit SchemaElement(const json &node) :
         m_required(false),
         m_deprecated(false) {
 
-      m_type = node["type"].get<std::string>();
+      m_type = node["type"].get<std::string>();  // TODO: verifier que type est bien connu...
 
       // TODO: faire de methodes statiques pour les recherche...
       auto tags = get<std::vector<std::string>>(node, "tags");
@@ -44,7 +49,14 @@ namespace poem {
 
     bool is_deprecated() const { return m_deprecated; }
 
-    std::vector<std::string> aliases() const { return m_aliases; }
+    std::string get_alias(const std::string &name) const {
+      std::string alias;
+      auto iter = std::find(m_aliases.begin(), m_aliases.end(), name);
+      if (iter != m_aliases.end()) {
+        alias = *iter;
+      }
+      return alias;
+    }
 
 
     template<typename T>
@@ -56,13 +68,25 @@ namespace poem {
       return val;
     }
 
-   private:
+   protected:
     std::string m_type;
     bool m_required;
     bool m_deprecated;
     std::vector<std::string> m_aliases;
-
   };
+
+  class SchemaVariable : public SchemaElement {
+   public:
+    explicit SchemaVariable(const json &node) :
+        SchemaElement(node),
+        m_dimensions_names(get<std::vector<std::string>>(node, "dimensions")) {}
+
+    const std::vector<std::string> &dimensions_names() const { return m_dimensions_names; }
+
+   private:
+    std::vector<std::string> m_dimensions_names;
+  };
+
 
   // Forward declaration
   class Attributes;
@@ -71,7 +95,7 @@ namespace poem {
 
   class Schema {
    public:
-    explicit Schema(const std::string &json_str, bool check_is_last=true);
+    explicit Schema(const std::string &json_str, bool check_is_last = true);
 
     bool operator==(const Schema &other) const;
 
@@ -79,7 +103,7 @@ namespace poem {
 
     bool is_last() const;
 
-    const GlobalAttributeSchema& get_attribute_schema(const std::string& name) const;
+    const SchemaElement &get_attribute_schema(const std::string &name) const;
 
     void check_attributes(Attributes *attributes) const;
 
@@ -100,7 +124,14 @@ namespace poem {
 
     json m_json_schema;
 
-    std::unordered_map<std::string, GlobalAttributeSchema> m_global_attributes_map;
+    std::unordered_map<std::string, SchemaElement> m_global_attributes_map;
+
+    std::unordered_map<std::string, std::string> m_dimensions_attributes_map;
+    std::unordered_map<std::string, SchemaElement> m_dimensions_map;
+
+    std::unordered_map<std::string, std::string> m_variables_attributes_map;
+    std::unordered_map<std::string, SchemaVariable> m_variables_map;
+
     // TODO: faire map de dimensions et de variables aussi
 
   };

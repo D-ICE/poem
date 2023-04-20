@@ -18,19 +18,23 @@
     "attributes": {
       "unit": {
         "doc": "The unit of the dimension. Must be valid according to dunits library",
-        "type": "string"
+        "type": "string",
+        "tags": ["required"]
       },
       "description": {
         "doc": "The description of the dimension",
-        "type": "string"
+        "type": "string",
+        "tags": ["required"]
       },
       "min": {
         "doc": "The minimum value that the dimension can take",
-        "type": "double"
+        "type": "double",
+        "tags": ["required"]
       },
       "max": {
         "doc": "The maximum value that the dimension can take",
-        "type": "double"
+        "type": "double",
+        "tags": ["required"]
       }
 
     },
@@ -38,19 +42,29 @@
     "fields": {
 
       "STW_kt": {
-        "type": "double"
+        "doc": "Speed Through Water",
+        "type": "double",
+        "tags": ["required"]
       },
       "TWS_kt": {
-        "type": "double"
+        "doc": "True Wind Speed",
+        "type": "double",
+        "tags": ["required"]
       },
       "TWA_deg": {
-        "type": "double"
+        "doc": "True Wind Angle",
+        "type": "double",
+        "tags": ["required"]
       },
       "WA_deg": {
-        "type": "double"
+        "doc": "Wave Angle",
+        "type": "double",
+        "tags": ["required"]
       },
       "Hs_m": {
-        "type": "double"
+        "doc": "Waves Significant Height",
+        "type": "double",
+        "tags": ["required"]
       }
 
     }
@@ -62,22 +76,25 @@
     "attributes": {
 
       "unit": {
+        "doc": "The unit of the variable",
         "type": "string"
       },
       "description": {
+        "doc": "The description of the variable",
         "type": "string"
       }
 
     },
 
     "fields": {
-      "var_double": {
+      "TotalBrakePower": {
+        "doc": "The Total Brake Power of the vessel",
         "type": "double",
-        "dimensions": ["d1", "d2", "d3"]
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "var_int": {
         "type": "int",
-        "dimensions": ["d1", "d2"]
+        "dimensions": ["STW_kt", "TWS_kt"]
       }
     }
 
