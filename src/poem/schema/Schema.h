@@ -8,7 +8,6 @@
 #include <nlohmann/json.hpp>
 
 
-
 using json = nlohmann::json;
 
 namespace poem {
@@ -67,21 +66,26 @@ namespace poem {
 
   // Forward declaration
   class Attributes;
+
   class PolarBase;
 
   class Schema {
    public:
-    explicit Schema(const std::string &json_str);
+    explicit Schema(const std::string &json_str, bool check_is_last=true);
 
-    bool operator==(const Schema& other) const {
-      return m_json_schema == other.m_json_schema;
-    }
+    bool operator==(const Schema &other) const;
 
     const std::string &json_str() const;
 
-    void check_attributes(Attributes* attributes) const;
+    bool is_last() const;
 
-    void check_polar(PolarBase* polar) const;
+    const GlobalAttributeSchema& get_attribute_schema(const std::string& name) const;
+
+    void check_attributes(Attributes *attributes) const;
+
+    void check_polar(PolarBase *polar) const;
+
+    std::string get_current_attribute_name(const std::string &name) const;
 
    private:
     void load_global_attributes();
@@ -91,20 +95,25 @@ namespace poem {
     void load_variables();
 
    protected:
+    mutable bool m_is_last;
     std::string m_json_str;
 
     json m_json_schema;
 
     std::unordered_map<std::string, GlobalAttributeSchema> m_global_attributes_map;
+    // TODO: faire map de dimensions et de variables aussi
 
   };
 
 
   class LastSchema : public Schema {
    public:
-    static Schema &getInstance();
+    static LastSchema &getInstance();
+
+//    static LastSchema &getInstance()
 
     LastSchema(const LastSchema &) = delete;
+
     void operator=(const LastSchema &) = delete;
 
    private:

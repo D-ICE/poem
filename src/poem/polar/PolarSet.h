@@ -22,7 +22,7 @@ namespace poem {
   class PolarSet {
    public:
     using PolarMap = std::unordered_map<std::string, std::unique_ptr<PolarBase>>;
-//    using Iter = PolarVector::const_iterator;
+    using NameMap = std::unordered_map<std::string, std::string>;
 
     PolarSet(const Attributes &attributes, const Schema &schema) :
         m_attributes(attributes),
@@ -33,7 +33,11 @@ namespace poem {
         m_attributes.add_attribute("schema", schema.json_str());
       }
 
+      // Check that the given attributes are compliant with the current schema
       m_schema.check_attributes(&m_attributes);
+
+      // Generating map
+      generate_attributes_name_map();
     };
 
     template<typename T, size_t _dim>
@@ -47,11 +51,17 @@ namespace poem {
 
       m_polars_map.insert({name, std::move(polar)});
       auto polar_ptr = m_polars_map[name].get();
+
+      // Check that the polar is compliant with the current schema
       m_schema.check_polar(polar_ptr);
+
+      // Generate map
+      generate_polar_name_map();
 
       return static_cast<Polar<T, _dim> *>(polar_ptr);
     }
 
+//   private:
     int to_netcdf(const std::string &nc_file) const {
 
       spdlog::info("Writing NetCDF file {}", nc_file);
@@ -82,8 +92,46 @@ namespace poem {
     }
 
    private:
+
+    void generate_attributes_name_map() {
+      // TODO
+      for (const auto& attribute : m_attributes) {
+        auto name = attribute.first;
+        if (name == "schema") continue;
+
+        if (m_schema.is_last()) {
+          // The attribute has not changed
+          m_attributes_name_map.insert({name, name});
+
+        } else {
+          // The attribute may have changed
+          auto current_name = LastSchema::getInstance().get_current_attribute_name(name);
+
+          // Si current name est vide, on a pas trouve d'alias nulle part
+          if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
+            spdlog::critical("No schema compatibility for attribute named {}", name);
+            CRITICAL_ERROR
+          }
+
+          m_attributes_name_map.insert({current_name, name});
+
+        }
+
+      }
+
+    }
+
+    void generate_polar_name_map() {
+      // TODO
+    }
+
+   private:
     Attributes m_attributes;
+    NameMap m_attributes_name_map;
+
     PolarMap m_polars_map;
+    NameMap m_dimensions_name_map;
+    NameMap m_polar_name_map;
 
     Schema m_schema;
   };

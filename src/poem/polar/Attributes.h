@@ -11,8 +11,8 @@
 namespace poem {
 
   /**
- * Represents different attributes (metadata) to be added to a PolarSet
- */
+   * Represents different attributes (metadata) to be added to a PolarSet
+   */
   class Attributes {
    public:
     using Map = std::map<std::string, std::string>;
@@ -36,6 +36,7 @@ namespace poem {
 
    private:
     Map m_attributes;
+
   };
 
 }  // poem
