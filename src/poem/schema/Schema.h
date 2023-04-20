@@ -7,6 +7,11 @@
 
 #include <nlohmann/json.hpp>
 
+// TODO: mettre dans le .cpp
+#include <spdlog/spdlog.h>
+#include "poem/exceptions.h"
+// TODO FIN
+
 
 using json = nlohmann::json;
 
@@ -20,16 +25,37 @@ namespace poem {
    *
    */
 
+  #define REQUIRED_SCHEMA_ELEMENT_FIELDS {"doc", "type"}
+
   /**
    * SchemaElement defines a general field of a PolarSet (global attributes, dimensions or variables)
    *
    * This is where we define the logic for schema evolution
    */
   class SchemaElement {
+
    public:
-    explicit SchemaElement(const json &node) :
+    explicit SchemaElement(const std::string &name, const json &node) :
+        m_name(name),
         m_required(false),
         m_deprecated(false) {
+
+      std::vector<std::string> required = REQUIRED_SCHEMA_ELEMENT_FIELDS;
+
+      for (const auto &field: required) {
+        if (node.find(field) == node.end()) {
+          spdlog::critical(R"(In {} schema element definition, field {} is required)", m_name, field);
+          CRITICAL_ERROR
+        }
+      }
+
+      // TODO:
+      //  tester que doc n'est pas vide (forcer a commenter dans le schema !!)
+      //  tester que type est connu
+
+
+      // Tester si les champs requis sont presents (type, doc) -> on force a ecrire un schema de qualite
+      // FIXME: si type ou autre n'est pas present, les messages d'erreur ne sont pas suffisamment explicites
 
       m_type = node["type"].get<std::string>();  // TODO: verifier que type est bien connu...
 
@@ -37,11 +63,20 @@ namespace poem {
       auto tags = get<std::vector<std::string>>(node, "tags");
 
       for (const auto &tag: tags) {
-        if (tag == "required") m_required = true;
-        if (tag == "deprecated") m_deprecated = true;
+        if (tag == "required") {
+          m_required = true;
+        } else if (tag == "deprecated") {
+          m_deprecated = true;
+        } else {
+          spdlog::critical(R"(In {} schema element definition, tag {} is unknown)", m_name, tag);
+          CRITICAL_ERROR
+        }
       }
 
       m_aliases = get<std::vector<std::string>>(node, "aliases");
+
+      // TODO: eventuellement tester qu'on a pas d'autres champs inconnus pour ne pas mettre n'importe quoi dans le
+      //  schema
 
     }
 
@@ -69,6 +104,7 @@ namespace poem {
     }
 
    protected:
+    std::string m_name;
     std::string m_type;
     bool m_required;
     bool m_deprecated;
@@ -77,8 +113,8 @@ namespace poem {
 
   class SchemaVariable : public SchemaElement {
    public:
-    explicit SchemaVariable(const json &node) :
-        SchemaElement(node),
+    explicit SchemaVariable(const std::string &name, const json &node) :
+        SchemaElement(name, node),
         m_dimensions_names(get<std::vector<std::string>>(node, "dimensions")) {}
 
     const std::vector<std::string> &dimensions_names() const { return m_dimensions_names; }
@@ -136,12 +172,14 @@ namespace poem {
 
   };
 
-
+  /**
+   * Exactly the same as Schema but reserved for the very last version of the schema in poem library
+   *
+   * Follows a Singleton pattern to get only one instance at runtime
+   */
   class LastSchema : public Schema {
    public:
     static LastSchema &getInstance();
-
-//    static LastSchema &getInstance()
 
     LastSchema(const LastSchema &) = delete;
 

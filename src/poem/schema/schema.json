@@ -1,6 +1,7 @@
 {
   "global_attributes": {
     "schema": {
+      "_todo": "Voir si on garde ce champ ?",
       "doc": "The schema that has been used to write this polar",
       "type": "string",
       "tags": ["required"]
@@ -87,14 +88,17 @@
     },
 
     "fields": {
-      "TotalBrakePower": {
-        "doc": "The Total Brake Power of the vessel",
+      "BrakePower": {
+        "doc": "Total Brake Power of the vessel",
         "type": "double",
-        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
+        "tags": ["required"]
       },
       "var_int": {
+        "doc": "",
         "type": "int",
-        "dimensions": ["STW_kt", "TWS_kt"]
+        "dimensions": ["STW_kt", "TWS_kt"],
+        "taggs": ["required -> FIXME on peut mettre la cle taggs..."]
       }
     }
 

@@ -2,19 +2,14 @@
 // Created by frongere on 14/04/23.
 //
 
+#include <iostream>
+
 #include "Schema.h"
 
-#include <spdlog/spdlog.h>
-
-
+#include "poem/schema/schema.h"
 #include "poem/polar/Attributes.h"
 #include "poem/polar/Polar.h"
 
-#include "poem/schema/schema.h"
-
-#include <iostream>
-
-#include "poem/exceptions.h"
 
 namespace poem {
 
@@ -74,10 +69,14 @@ namespace poem {
 
 
     // Are the attributes consistent with the given schema?
+    /*
+     * FIXME: Doit-on empecher de mettre des choses qui ne sont pas connues par le schema ??
+     *  Doit'on mettre une option de check strict ?
+     */
     for (const auto &attribute: *attributes) {
       if (m_global_attributes_map.find(attribute.first) == m_global_attributes_map.end()) {
-        // Maybe the
-        spdlog::critical("Attribute \"{}\" is not in the scheme", attribute.first);
+        // Ici on
+        spdlog::critical(R"(Global attribute "{}" is not in the writer schema)", attribute.first);
         CRITICAL_ERROR
       }
     }
@@ -88,7 +87,7 @@ namespace poem {
 
         // Ok, not found with this name... looking for the aliases
 
-        spdlog::critical("Required attribute \"{}\" not found in polar", schema_atts.first);
+        spdlog::critical(R"(Required attribute "{}" not found in polar)", schema_atts.first);
         CRITICAL_ERROR
       }
     }
@@ -96,7 +95,26 @@ namespace poem {
   }
 
   void Schema::check_polar(PolarBase *polar) const {
-    //TODO
+
+    auto polar_name = polar->name();
+
+    /*
+     * FIXME: Doit-on empecher de mettre des choses qui ne sont pas connues par le schema ??
+     *  Doit'on mettre une option de check strict ?
+     */
+
+    // Check if polar_name is present in variables map
+    if (m_variables_map.find(polar_name) == m_variables_map.end()) {
+      // The variable is not known
+      spdlog::critical(R"(Variable "{}" is not known by the given schema)", polar_name);
+      CRITICAL_ERROR
+    }
+
+    // Are every required variables of the schema present?
+//    TODO
+
+
+
   }
 
   std::string Schema::get_current_attribute_name(const std::string &name) const {
@@ -106,7 +124,7 @@ namespace poem {
       current_name = name;
 
     } else {
-      for (const auto& attribute : m_global_attributes_map) {
+      for (const auto &attribute: m_global_attributes_map) {
         current_name = attribute.second.get_alias(name);
         if (!current_name.empty()) break;
       }
@@ -118,7 +136,7 @@ namespace poem {
   void Schema::load_global_attributes() {
     auto node = m_json_schema["global_attributes"];
     for (auto iter = node.begin(); iter != node.end(); ++iter) {
-      SchemaElement attribute(iter.value());
+      SchemaElement attribute(iter.key(), iter.value());
       // TODO: voir comment on gere quand c'est deprecated
       m_global_attributes_map.insert({iter.key(), attribute});
     }
@@ -135,7 +153,7 @@ namespace poem {
 
     auto node_field = m_json_schema["dimensions"]["fields"];
     for (auto iter = node_field.begin(); iter != node_field.end(); ++iter) {
-      SchemaElement dimension(iter.value());
+      SchemaElement dimension(iter.key(), iter.value());
       // TODO: voir comment on gere quand c'est deprecated
       m_dimensions_map.insert({iter.key(), dimension});
     }
@@ -153,16 +171,16 @@ namespace poem {
 
     auto node_field = m_json_schema["variables"]["fields"];
     for (auto iter = node_field.begin(); iter != node_field.end(); ++iter) {
-      SchemaVariable variable(iter.value());
+      SchemaVariable variable(iter.key(), iter.value());
       // TODO: voir comment on gere quand c'est deprecated
       m_variables_map.insert({iter.key(), variable});
 
       // Here we check that variables are depending on existing dimensions
       auto var_dims = variable.dimensions_names();
-      for (const auto &dim_name : var_dims) {
+      for (const auto &dim_name: var_dims) {
         if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
-          spdlog::critical("In schema definition, variable {} is said to depend on dimension "
-                           "{} which has not been defined", iter.key(), dim_name);
+          spdlog::critical(R"(In schema definition, variable "{}" is said to depend on dimension "
+                           ""{}" which has not been defined)", iter.key(), dim_name);
           CRITICAL_ERROR
         }
       }

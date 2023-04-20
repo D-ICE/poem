@@ -9,6 +9,7 @@
 #include <exception>
 
 #define STOP throw StopForDevelopment();
+#define TODO throw Todo();
 #define NIY throw NotImplementedYet();
 #define CRITICAL_ERROR throw CriticalError();
 
@@ -27,6 +28,13 @@ namespace poem {
     StopForDevelopment() = default;
     const char *what() const throw() override {
       return "This stop for development purpose";
+    }
+  };
+
+  struct Todo : public std::exception {
+    Todo() = default;
+    const char *what() const throw() override {
+      return "This stop as something is to be implemented here";
     }
   };
 

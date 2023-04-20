@@ -101,6 +101,7 @@ namespace poem {
       dims.reserve(_dim);
 
       for (size_t i=0; i<_dim; ++i) {
+
         auto dimension_ID = m_dimension_point_set->dimension_ID_set()->get(i);
         auto values = m_dimension_point_set->dimension_vector(i);
 
@@ -115,6 +116,11 @@ namespace poem {
           // The dimension as a variable
           netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
           nc_var.putVar(values.data());
+          /*
+           * FIXME: les attributs ici sont completement decorreles du schema...
+           *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
+           */
+
           nc_var.putAtt("unit", dimension_ID->unit());
           nc_var.putAtt("description", dimension_ID->description());
           nc_var.putAtt("min", std::to_string(dimension_ID->min()));
