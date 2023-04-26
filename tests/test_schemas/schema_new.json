@@ -10,7 +10,7 @@
       "doc": "The type of polar that is described in the NetCDF file. Must be ND here",
       "type": "string",
       "tags": ["required"],
-      "_values": ["ND", "CDA"]
+      "values": ["ND", "CDA"]
     }
   },
 

@@ -5,6 +5,7 @@
 #ifndef POEM_SCHEMA_H
 #define POEM_SCHEMA_H
 
+#include <filesystem>
 #include <nlohmann/json.hpp>
 
 // TODO: mettre dans le .cpp
@@ -15,7 +16,7 @@
 #define KNOWN_SCHEMA_ELEMENT_FIELDS {"doc", "type", "tags", "dimensions"}
 #define REQUIRED_SCHEMA_ELEMENT_FIELDS {"doc", "type"}
 
-
+namespace fs = std::filesystem;
 using json = nlohmann::json;
 
 namespace poem {
@@ -47,12 +48,12 @@ namespace poem {
         m_required(false),
         m_deprecated(false) {
 
-      std::vector<std::string> required = REQUIRED_SCHEMA_ELEMENT_FIELDS;
+      static std::vector<std::string> required = REQUIRED_SCHEMA_ELEMENT_FIELDS;
 
       // Every required fields must be present...
       for (const auto &field: required) {
         if (node.find(field) == node.end()) {
-          spdlog::critical(R"(In {} schema element definition, field {} is required)", m_name, field);
+          spdlog::critical(R"(In "{}" schema element definition, field "{}" is required)", m_name, field);
           CRITICAL_ERROR
         }
       }
@@ -80,7 +81,7 @@ namespace poem {
         } else if (tag == "deprecated") {
           m_deprecated = true;
         } else {
-          spdlog::critical(R"(In "{}" schema element definition, tag "{}" is unknown)", m_name, tag);
+          spdlog::critical(R"(In "{}" schema element tags definition, tag "{}" is unknown)", m_name, tag);
           CRITICAL_ERROR
         }
       }
@@ -92,8 +93,9 @@ namespace poem {
       std::vector<std::string> known_fields = KNOWN_SCHEMA_ELEMENT_FIELDS;
       for (auto iter = node.begin(); iter != node.end(); ++iter) {
         auto key = iter.key();
-        if (std::find(known_fields.begin(), known_fields.end(), iter.key()) == known_fields.end()) {
-          spdlog::warn(R"(Field {} is not a known field)", iter.key());
+        if (key[0] == '_') continue;  // fields that start with underscore '_' are hidden
+        if (std::find(known_fields.begin(), known_fields.end(), key) == known_fields.end()) {
+          spdlog::warn(R"(In "{}" schema element, field "{}" is not a known field)", m_name, iter.key());
         }
       }
 
@@ -138,7 +140,7 @@ namespace poem {
 
       // Dimensions field must be present for variables
       if (node.find("dimensions") == node.end()) {
-        spdlog::critical(R"("dimensions" fiels must be present in variable schema definition (in variable "{}"))",
+        spdlog::critical(R"("dimensions" fields must be present in variable schema definition (in variable "{}"))",
                          name);
         CRITICAL_ERROR
       }
@@ -159,7 +161,7 @@ namespace poem {
 
   class Schema {
    public:
-    explicit Schema(const std::string &json_str, bool check_is_last = true);
+    Schema(const std::string &json_str, bool check_is_last = true);
 
     bool operator==(const Schema &other) const;
 
@@ -213,6 +215,10 @@ namespace poem {
   class LastSchema : public Schema {
    public:
     static LastSchema &getInstance();
+
+//    #ifdef TEST_SCHEMAS_DIR
+//    void set
+//    #endif
 
     LastSchema(const LastSchema &) = delete;
 

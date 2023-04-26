@@ -8,13 +8,4 @@ configure_file(${CMAKE_CURRENT_LIST_DIR}/schema.h.in ${CMAKE_CURRENT_BINARY_DIR}
 # Force cmake configure is schema.json has changed
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_LIST_DIR}/schema.json)
 
-## ESSAI double remplacement
-#configure_file(${CMAKE_CURRENT_LIST_DIR}/schema.h.in ${CMAKE_CURRENT_BINARY_DIR}/schema.h.in)
-#configure_file(${CMAKE_CURRENT_BINARY_DIR}/schema.h.in ${CMAKE_CURRENT_BINARY_DIR}/schema.h)
-##ESSAI
-
 target_include_directories(poem PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/../../)
-
-#if (${POEM_BUILD_TESTS})
-#    add_subdirectory(test)
-#endif ()

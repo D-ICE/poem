@@ -9,8 +9,7 @@
     "polar_type": {
       "doc": "The type of polar that is described in the NetCDF file. Must be ND here",
       "type": "string",
-      "tags": ["required"],
-      "_values": ["ND", "CDA"]
+      "tags": ["required"]
     }
   },
 
@@ -96,7 +95,6 @@
       },
 
       "var_int": {
-        "_note": "garder tant qu'on se fait pas envoyer paitre...",
         "doc": "Here is the doc",
         "type": "int",
         "dimensions": ["STW_kt", "TWS_kt"],
