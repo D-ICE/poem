@@ -87,9 +87,13 @@ TEST(POLAR, WRITE) {
 
   Schema schema_old(buffer.str());
 
+  // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utilise...
+
 
 //  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());
   auto polar_set = std::make_shared<PolarSet>(attributes, schema_old);
+
+
 
 
 }

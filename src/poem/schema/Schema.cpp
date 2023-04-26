@@ -13,15 +13,16 @@
 
 namespace poem {
 
-  Schema::Schema(const std::string &json_str, bool check_is_last) :
+  Schema::Schema(const std::string &json_str, bool check_is_newest) :
 //      m_json_str(json_str),
       m_json_schema(json::parse(json_str)),
-      m_is_last(false) {
+      m_is_newest(false) {
 
-    if (check_is_last) {
-      m_is_last = *this == LastSchema::getInstance();
+    if (check_is_newest) {
+      m_is_newest = (*this == NewestSchema::getInstance());
     }
 
+    // Load the different parts of the schema
     load_global_attributes();
     load_dimensions();
     load_variables();
@@ -36,8 +37,8 @@ namespace poem {
     return m_json_schema.dump();
   }
 
-  bool Schema::is_last() const {
-    return m_is_last;
+  bool Schema::is_newest() const {
+    return m_is_newest;
   }
 
   const SchemaElement &Schema::get_attribute_schema(const std::string &name) const {
@@ -64,7 +65,7 @@ namespace poem {
      */
 
     // this->m_schema, c'est le schema d'ecriture de la polaire
-    // LastSchema::getInstance() c'est le schema de lecture (le dernier, toujours)
+    // NewestSchema::getInstance() c'est le schema de lecture (le dernier, toujours)
 
     // Au write, on veut pouvoir checker que les champs donnes sont compliant avec le dernier schema
     //  pour pouvoir faire evoluer le schema au besoin
@@ -187,13 +188,13 @@ namespace poem {
 
   }
 
-  LastSchema &LastSchema::getInstance() {
-    static LastSchema instance;
+  NewestSchema &NewestSchema::getInstance() {
+    static NewestSchema instance;
     return instance;
   }
 
-  LastSchema::LastSchema() : Schema(schema::schema_str, false) {
-    m_is_last = true;
+  NewestSchema::NewestSchema() : Schema(schema::schema_str, false) {
+    m_is_newest = true;
   }
 
 }  // poem

@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
+
+
 // TODO: mettre dans le .cpp
 #include <spdlog/spdlog.h>
 #include "poem/exceptions.h"
@@ -161,13 +163,13 @@ namespace poem {
 
   class Schema {
    public:
-    Schema(const std::string &json_str, bool check_is_last = true);
+    Schema(const std::string &json_str, bool check_is_newest = true);
 
     bool operator==(const Schema &other) const;
 
     std::string json_str() const;
 
-    bool is_last() const;
+    bool is_newest() const;
 
     const SchemaElement &get_attribute_schema(const std::string &name) const;
 
@@ -190,7 +192,7 @@ namespace poem {
     void load_variables();
 
    protected:
-    mutable bool m_is_last;
+    mutable bool m_is_newest;
 //    std::string m_json_str;
 
     json m_json_schema;
@@ -208,71 +210,26 @@ namespace poem {
   };
 
   /**
-   * Exactly the same as Schema but reserved for the very last version of the schema in poem library
+   * Exactly the same as Schema but reserved for the very newest version of the schema in poem library
    *
    * Follows a Singleton pattern to get only one instance at runtime
    */
-  class LastSchema : public Schema {
+  class NewestSchema : public Schema {
    public:
-    static LastSchema &getInstance();
+    static NewestSchema &getInstance();
 
-//    #ifdef TEST_SCHEMAS_DIR
-//    void set
-//    #endif
+    NewestSchema(const NewestSchema &) = delete;
 
-    LastSchema(const LastSchema &) = delete;
-
-    void operator=(const LastSchema &) = delete;
+    void operator=(const NewestSchema &) = delete;
 
    private:
-    LastSchema();
+    NewestSchema();
 
   };
 
 
-  template<typename T, size_t _dim>
-  void Schema::check_polar(Polar<T, _dim> *polar) const {
-
-    auto polar_name = polar->name();
-
-    /*
-     * FIXME: Doit-on empecher de mettre des choses qui ne sont pas connues par le schema ??
-     *  Doit'on mettre une option de check strict ?
-     */
-
-    // Check if polar_name is present in variables map
-    if (m_variables_map.find(polar_name) == m_variables_map.end()) {
-      // The variable is not known
-      spdlog::critical(R"(Variable "{}" is not known by the given schema)", polar_name);
-      CRITICAL_ERROR
-    }
-
-    // Pas possible de check ici que les variables requises par le scheme sont toutes la
-    // Il faut une methode speciale de PolarSet qui declenche le check une fois qu'on est certain
-    // qu'on a identifie toutes les variables qui seront ajoutees
-
-
-    // Maintentant il faut check la consistance de dimensions...
-
-    // On veut recuperer le type et la dimension de la variable
-
-    auto dimension_ID_set = polar->dimension_point_set()->dimension_ID_set();
-    // On veut verifier que toutes les dimensions sont bien existantes
-    for (size_t i = 0; i < _dim; ++i) {
-      auto dim_ID = dimension_ID_set->get(i);
-      auto dim_name = dim_ID->name();
-
-      if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
-        spdlog::critical(R"(Variable "{}" is said to depend on dimension "{}" which is not known by the schema)",
-                         polar_name, dim_name);
-        CRITICAL_ERROR
-      }
-
-    }
-
-  }
-
-
 }  // poem
+
+#include "Schema.hpp"
 
 #endif //POEM_SCHEMA_H

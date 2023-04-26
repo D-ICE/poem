@@ -28,9 +28,12 @@ namespace poem {
         m_attributes(attributes),
         m_schema(schema) {
 
-      // TODO: ajouter le schema s'il n'y est pas
+      // We automatically add the current schema as attribute if not found in the attributes
       if (!m_attributes.contains("schema")) {
         m_attributes.add_attribute("schema", schema.json_str());
+      } else {
+        // FIXME: Verify that this is the same attribute as given in the ctor!!
+//        if (!m_attributes)
       }
 
       // Check that the given attributes are compliant with the current schema
@@ -61,9 +64,14 @@ namespace poem {
       return polar_ptr;
     }
 
-    bool is_using_newest_schema() const { return m_schema.is_last(); }
+    bool is_using_newest_schema() const { return m_schema.is_newest(); }
 
     const Attributes& attributes() const { return m_attributes; }
+
+    /*
+     * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
+     */
+
 
     int to_netcdf(const std::string &nc_file) const {
 
@@ -102,13 +110,13 @@ namespace poem {
         auto name = attribute.first;
         if (name == "schema") continue;
 
-        if (m_schema.is_last()) {
+        if (m_schema.is_newest()) {
           // The attribute has not changed
           m_attributes_name_map.insert({name, name});
 
         } else {
           // The attribute may have changed
-          auto current_name = LastSchema::getInstance().get_current_attribute_name(name);
+          auto current_name = NewestSchema::getInstance().get_current_attribute_name(name);
 
           // Si current name est vide, on a pas trouve d'alias nulle part
           if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
@@ -126,11 +134,11 @@ namespace poem {
 
     void generate_polar_name_map(const std::string &polar_name) {
 
-      if (m_schema.is_last()) {
+      if (m_schema.is_newest()) {
         m_polar_name_map.insert({polar_name, polar_name});
 
       } else {
-        auto current_name = LastSchema::getInstance().get_current_variable_name(polar_name);
+        auto current_name = NewestSchema::getInstance().get_current_variable_name(polar_name);
 
         if (current_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
           spdlog::critical("No schema compatibility for polar named {}", polar_name);

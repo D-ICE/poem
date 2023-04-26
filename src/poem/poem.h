@@ -10,6 +10,4 @@
 #include "reader/PolarReader.h"
 #include "writer/PolarWriter.h"
 
-#include "poem/schema/SchemaChecker.h"
-
 #endif //POEM_POEM_H
