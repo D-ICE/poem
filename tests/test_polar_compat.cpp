@@ -55,7 +55,7 @@ TEST(POLAR, WRITE) {
   dimension_point_environment->set_dimension_vector("TWA_deg", TWA_vector);
   dimension_point_environment->set_dimension_vector("WA_deg", WA_vector);
   dimension_point_environment->set_dimension_vector("Hs_m", Hs_vector);
-  dimension_point_environment->build();
+//  dimension_point_environment->build();  // TODO: il faut qu'on m'envoir chier si pas built..
 
   /**
    * Creating attributes
@@ -87,7 +87,8 @@ TEST(POLAR, WRITE) {
 
   Schema schema_old(buffer.str());
 
-  // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utilise...
+  // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utiliser...
+
 
 
 //  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());

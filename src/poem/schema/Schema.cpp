@@ -14,7 +14,6 @@
 namespace poem {
 
   Schema::Schema(const std::string &json_str, bool check_is_newest) :
-//      m_json_str(json_str),
       m_json_schema(json::parse(json_str)),
       m_is_newest(false) {
 

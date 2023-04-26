@@ -193,7 +193,6 @@ namespace poem {
 
    protected:
     mutable bool m_is_newest;
-//    std::string m_json_str;
 
     json m_json_schema;
 
