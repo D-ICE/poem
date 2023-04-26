@@ -59,7 +59,15 @@ namespace poem {
       for (size_t i = 0; i < _dim; ++i) {
         if (m_ID_set.at(i)->name() == name) return i;
       }
-      spdlog::critical("Unknown dimension name {}", name);
+
+      std::string available_names = "{";
+      for (const auto &dim_ID: m_ID_set) {
+        available_names += dim_ID->name() + "; ";
+      }
+      available_names += "}";
+
+      spdlog::critical(R"(In DimensionIDSet, attempting to access to non registered dimension name "{}".
+                       Available dimensions for this set are {})", name, available_names);
       CRITICAL_ERROR
     }
 

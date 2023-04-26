@@ -97,7 +97,7 @@
 
       "var_int": {
         "_note": "garder tant qu'on se fait pas envoyer paitre...",
-        "doc": "okay, here is the doc",
+        "doc": "Here is the doc",
         "type": "int",
         "dimensions": ["STW_kt", "TWS_kt"],
         "tags": ["required"]

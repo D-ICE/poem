@@ -51,6 +51,12 @@ add_subdirectory(src/poem)
 
 
 if (POEM_BUILD_TESTS)
+  # TODO: mettre en place les tests unitaires avec gtest...
   include(Add_mathutils)
   add_subdirectory(tests)
+endif ()
+
+if (POEM_BUILD_TOOLS)
+  include(Add_argparse)
+  add_subdirectory(tools)
 endif ()

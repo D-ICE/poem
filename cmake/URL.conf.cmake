@@ -51,3 +51,7 @@ set(spdlog_TAG v1.8.5)
 # glob
 set(glob_URL https://github.com/p-ranav/glob.git)
 set(glob_TAG v0.0.1)
+
+# argparse
+set(argparse_URL https://github.com/p-ranav/argparse.git)
+set(argparse_TAG v2.2 CACHE STRING "argparse version")
