@@ -34,7 +34,7 @@ namespace poem {
   struct Todo : public std::exception {
     Todo() = default;
     const char *what() const throw() override {
-      return "This stop as something is to be implemented here";
+      return "SOMETHING IS TO BE IMPLEMENTED HERE";
     }
   };
 

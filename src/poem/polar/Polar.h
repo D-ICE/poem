@@ -38,6 +38,8 @@ namespace poem {
 
     virtual const size_t dim() const = 0;
 
+//    const VariableID* variableId() const { return m_var_ID.get(); }
+
     const std::string &name() const { return m_var_ID->name(); }
 
     const std::string &unit() const { return m_var_ID->unit(); }
@@ -87,6 +89,10 @@ namespace poem {
     }
 
     const size_t dim() const override { return _dim; }
+
+    const DimensionPointSet<_dim>* dimension_point_set() const {
+      return m_dimension_point_set.get();
+    }
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
 

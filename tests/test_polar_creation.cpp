@@ -16,11 +16,11 @@ int main() {
    * Here we define 3 dimensions based on their name, unit, description and bound values
    * DimensionID are the unique identifiers of a dimension
    */
-  auto STW = std::make_shared<DimensionID>("STW", "kt", "Speed Through Water", 0, 20);
-  auto TWS = std::make_shared<DimensionID>("TWS", "kt", "True Wind Speed", 0, 60);
-  auto TWA = std::make_shared<DimensionID>("TWA", "deg", "True Wind Angle", 0, 180);
-  auto WA = std::make_shared<DimensionID>("WA", "deg", "Waves Angle", 0, 180);
-  auto Hs = std::make_shared<DimensionID>("Hs", "m", "Waves Significant Height", 0, 8);
+  auto STW = std::make_shared<DimensionID>("STW_kt", "kt", "Speed Through Water", 0, 20);
+  auto TWS = std::make_shared<DimensionID>("TWS_kt", "kt", "True Wind Speed", 0, 60);
+  auto TWA = std::make_shared<DimensionID>("TWA_deg", "deg", "True Wind Angle", 0, 180);
+  auto WA = std::make_shared<DimensionID>("WA_deg", "deg", "Waves Angle", 0, 180);
+  auto Hs = std::make_shared<DimensionID>("Hs_m", "m", "Waves Significant Height", 0, 8);
 
   /**
    * Create the dimension ID set
@@ -49,11 +49,11 @@ int main() {
   auto Hs_vector = mathutils::arange<double>(0, 8, 1);
 
   auto dimension_point_environment = std::make_shared<DimensionPointSet<5>>(dimension_ID_environment);
-  dimension_point_environment->set_dimension_vector("STW", STW_vector);
-  dimension_point_environment->set_dimension_vector("TWS", TWS_vector);
-  dimension_point_environment->set_dimension_vector("TWA", TWA_vector);
-  dimension_point_environment->set_dimension_vector("WA", WA_vector);
-  dimension_point_environment->set_dimension_vector("Hs", Hs_vector);
+  dimension_point_environment->set_dimension_vector("STW_kt", STW_vector);
+  dimension_point_environment->set_dimension_vector("TWS_kt", TWS_vector);
+  dimension_point_environment->set_dimension_vector("TWA_deg", TWA_vector);
+  dimension_point_environment->set_dimension_vector("WA_deg", WA_vector);
+  dimension_point_environment->set_dimension_vector("Hs_m", Hs_vector);
   dimension_point_environment->build();
 
   /**

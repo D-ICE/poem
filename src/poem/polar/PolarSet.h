@@ -50,15 +50,15 @@ namespace poem {
       auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);
 
       m_polars_map.insert({name, std::move(polar)});
-      auto polar_ptr = m_polars_map[name].get();
+      auto polar_ptr = static_cast<Polar<T, _dim> *>(m_polars_map[name].get());
 
       // Check that the polar is compliant with the current schema
-      m_schema.check_polar(polar_ptr);
+      m_schema.check_polar<T, _dim>(polar_ptr);
 
       // Generate map
-      generate_polar_name_map();
+      generate_polar_name_map(name);
 
-      return static_cast<Polar<T, _dim> *>(polar_ptr);
+      return polar_ptr;
     }
 
 //   private:
@@ -95,7 +95,7 @@ namespace poem {
 
     void generate_attributes_name_map() {
       // TODO
-      for (const auto& attribute : m_attributes) {
+      for (const auto &attribute: m_attributes) {
         auto name = attribute.first;
         if (name == "schema") continue;
 
@@ -121,8 +121,23 @@ namespace poem {
 
     }
 
-    void generate_polar_name_map() {
-      // TODO
+    void generate_polar_name_map(const std::string &polar_name) {
+
+      if (m_schema.is_last()) {
+        m_polar_name_map.insert({polar_name, polar_name});
+
+      } else {
+        auto current_name = LastSchema::getInstance().get_current_variable_name(polar_name);
+
+        if (current_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
+          spdlog::critical("No schema compatibility for polar named {}", polar_name);
+          CRITICAL_ERROR
+        }
+
+        m_polar_name_map.insert({current_name, polar_name});
+
+      }
+
     }
 
    private:

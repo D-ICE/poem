@@ -44,6 +44,10 @@ namespace poem {
     return m_global_attributes_map.at(name);
   }
 
+  const SchemaVariable &Schema::get_variable_schema(const std::string &name) const {
+    return m_variables_map.at(name);
+  }
+
   void Schema::check_attributes(Attributes *attributes) const {
     /*
      * 1- on itere sur les attributs et on verifie qu'ils correspondent tous
@@ -94,28 +98,6 @@ namespace poem {
 
   }
 
-  void Schema::check_polar(PolarBase *polar) const {
-
-    auto polar_name = polar->name();
-
-    /*
-     * FIXME: Doit-on empecher de mettre des choses qui ne sont pas connues par le schema ??
-     *  Doit'on mettre une option de check strict ?
-     */
-
-    // Check if polar_name is present in variables map
-    if (m_variables_map.find(polar_name) == m_variables_map.end()) {
-      // The variable is not known
-      spdlog::critical(R"(Variable "{}" is not known by the given schema)", polar_name);
-      CRITICAL_ERROR
-    }
-
-    // Are every required variables of the schema present?
-//    TODO
-
-
-
-  }
 
   std::string Schema::get_current_attribute_name(const std::string &name) const {
 
@@ -140,6 +122,23 @@ namespace poem {
       // TODO: voir comment on gere quand c'est deprecated
       m_global_attributes_map.insert({iter.key(), attribute});
     }
+  }
+
+  std::string Schema::get_current_variable_name(const std::string &name) const {
+
+    std::string current_name;
+    if (m_variables_map.find(name) != m_variables_map.end()) {
+      current_name = name;
+
+    } else {
+      for (const auto &variable: m_variables_map) {
+        current_name = variable.second.get_alias(name);
+        if (!current_name.empty()) break;
+      }
+
+    }
+
+    return current_name;
   }
 
   void Schema::load_dimensions() {

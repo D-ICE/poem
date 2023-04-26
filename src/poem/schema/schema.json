@@ -94,11 +94,13 @@
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
         "tags": ["required"]
       },
+
       "var_int": {
-        "doc": "",
+        "_note": "garder tant qu'on se fait pas envoyer paitre...",
+        "doc": "okay, here is the doc",
         "type": "int",
         "dimensions": ["STW_kt", "TWS_kt"],
-        "taggs": ["required -> FIXME on peut mettre la cle taggs..."]
+        "tags": ["required"]
       }
     }
 
