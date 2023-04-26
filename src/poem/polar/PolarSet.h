@@ -61,7 +61,10 @@ namespace poem {
       return polar_ptr;
     }
 
-//   private:
+    bool is_using_newest_schema() const { return m_schema.is_last(); }
+
+    const Attributes& attributes() const { return m_attributes; }
+
     int to_netcdf(const std::string &nc_file) const {
 
       spdlog::info("Writing NetCDF file {}", nc_file);

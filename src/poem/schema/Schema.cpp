@@ -14,7 +14,7 @@
 namespace poem {
 
   Schema::Schema(const std::string &json_str, bool check_is_last) :
-      m_json_str(json_str),
+//      m_json_str(json_str),
       m_json_schema(json::parse(json_str)),
       m_is_last(false) {
 
@@ -32,8 +32,8 @@ namespace poem {
     return m_json_schema == other.m_json_schema;
   }
 
-  const std::string &Schema::json_str() const {
-    return m_json_str;
+  std::string Schema::json_str() const {
+    return m_json_schema.dump();
   }
 
   bool Schema::is_last() const {

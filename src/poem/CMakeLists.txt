@@ -11,6 +11,9 @@ target_link_libraries(poem PUBLIC
         Glob
         )
 
+set_target_properties(poem PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 add_subdirectory(writer)
 add_subdirectory(reader)
 add_subdirectory(schema)

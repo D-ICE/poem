@@ -163,7 +163,7 @@ namespace poem {
 
     bool operator==(const Schema &other) const;
 
-    const std::string &json_str() const;
+    std::string json_str() const;
 
     bool is_last() const;
 
@@ -189,7 +189,7 @@ namespace poem {
 
    protected:
     mutable bool m_is_last;
-    std::string m_json_str;
+//    std::string m_json_str;
 
     json m_json_schema;
 
