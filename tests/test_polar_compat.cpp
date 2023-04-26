@@ -50,11 +50,11 @@ TEST(POLAR, WRITE) {
   auto Hs_vector = mathutils::arange<double>(0, 8, 1);
 
   auto dimension_point_environment = std::make_shared<DimensionPointSet<5>>(dimension_ID_environment);
-  dimension_point_environment->set_dimension_vector("STW_kt", STW_vector);
-  dimension_point_environment->set_dimension_vector("TWS_kt", TWS_vector);
-  dimension_point_environment->set_dimension_vector("TWA_deg", TWA_vector);
-  dimension_point_environment->set_dimension_vector("WA_deg", WA_vector);
-  dimension_point_environment->set_dimension_vector("Hs_m", Hs_vector);
+  dimension_point_environment->set_dimension_values("STW_kt", STW_vector);
+  dimension_point_environment->set_dimension_values("TWS_kt", TWS_vector);
+  dimension_point_environment->set_dimension_values("TWA_deg", TWA_vector);
+  dimension_point_environment->set_dimension_values("WA_deg", WA_vector);
+  dimension_point_environment->set_dimension_values("Hs_m", Hs_vector);
 //  dimension_point_environment->build();  // TODO: il faut qu'on m'envoir chier si pas built..
 
   /**

@@ -155,7 +155,7 @@ namespace poem {
         std::vector<double> values(dim_size);
         var.getVar(values.data());
 
-        dimension_point_set->set_dimension_vector(dim_name, values);
+        dimension_point_set->set_dimension_values(dim_name, values);
       }
 
       dimension_point_set->build();

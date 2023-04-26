@@ -161,7 +161,7 @@ namespace poem {
      * @param name dimension name
      * @param values vector of values for the dimension (non-repeating increasing order)
      */
-    void set_dimension_vector(const std::string &name, const std::vector<double> &values) {
+    void set_dimension_values(const std::string &name, const std::vector<double> &values) {
       size_t i = m_dimension_ID_set->get_index(name);
       m_dimension_vectors.at(i) = values;
     }
