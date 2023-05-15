@@ -134,6 +134,7 @@ namespace poem {
     if (m_dim_ID_set_registry.find(hash_name) != m_dim_ID_set_registry.end()) {
       // This dimension point set is already registered, getting it from registry
       dimension_point_set = std::dynamic_pointer_cast<DimensionPointSet<_dim>>(m_dim_ID_set_registry.at(hash_name));
+
     } else {
 
       typename DimensionIDSet<_dim>::IDSet dim_ID_set;

@@ -16,16 +16,24 @@
 namespace poem {
 
   /**
-   *
+   * DimensionID declares the IDentity of a dimension
    */
   class DimensionID : public Named {
    public:
+    /**
+     * Constructor
+     * @param name the name of the dimension
+     * @param unit the unit used for that dimension
+     * @param description described the dimension
+     * @param min the minimum value of the dimension used in the polar table
+     * @param max the maximum value of the dimension used in the polar table
+     */
     DimensionID(const std::string &name,
                 const std::string &unit,
                 const std::string &description,
                 double min,
                 double max) :
-        Named(name, unit, description, type::DOUBLE),
+        Named(name, unit, description, type::DOUBLE), // A dimension has always the type DOUBLE (interpolation coord)
         m_min(min),
         m_max(max) {
 
@@ -41,8 +49,8 @@ namespace poem {
   };
 
   /**
-   *
-   * @tparam _dim
+   * DimensionIDSet declares a set of DimensionID that defines the ID of a set of dimensions of a polar
+   * @tparam _dim the number of dimensions of a polar
    */
   template<size_t _dim>
   class DimensionIDSet {
@@ -81,38 +89,45 @@ namespace poem {
   class DimensionPointSet;
 
   /**
+   * A DimensionPoint describes one valued point of a DimensionPointSet. It defines a polar coordinate of dimension _dim
    *
-   * @tparam _dim
+   * It must not be instantiated outside a DimensionPointSet as it needs to retain the DimensionPointSet it belongs to.
+   * As a result, we never instantiate it directly but only obtain a DimensionPoint from a DimensionPointSet that has
+   * been built.
+   *
+   *
+   *
+   * @tparam _dim the dimension of the DimensionPoint (number of components)
    */
   template<size_t _dim>
   class DimensionPoint {
    public:
     using Values = std::array<double, _dim>;
 
-    DimensionPoint(const DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set) :
-        m_ID_array(IDArray),
-        m_values({}),
-        m_origin_dimension_point_set(dimension_point_set) {}
+//    DimensionPoint(const DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set) :
+//        m_ID_array(IDArray),
+//        m_values({}),
+//        m_origin_dimension_point_set(dimension_point_set) {}
 
-    DimensionPoint(DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set, const Values &values) :
-        m_ID_array(IDArray),
+    // FIXME: pourquoi on a le DimensionIDSet ? On devrait l'avoir deja dans le DimensionPointSet non ?
+    DimensionPoint(DimensionPointSet<_dim> *dimension_point_set, const Values &values) :
         m_values(values),
-        m_origin_dimension_point_set(dimension_point_set) {
+        m_dimension_point_set(dimension_point_set) {
 
       Check();
     }
 
-    void set(const Values &values) {
-      m_values = values;
-      Check();
-    }
+//    void set(const Values &values) {
+//      m_values = values;
+//      Check();
+//    }
 
-    const DimensionPointSet<_dim> *origin_dimension_point_set() const { return m_origin_dimension_point_set; }
+    const DimensionPointSet<_dim> *dimension_point_set() const { return m_dimension_point_set; }
 
     const double &get(size_t i) const { return m_values.at(i); }
 
     const double &get(const std::string &name) {
-      return m_values.at(m_ID_array->get_index(name));
+      return m_values.at(m_dimension_point_set->dimension_ID_set()->get_index(name));
     }
 
    private:
@@ -120,7 +135,7 @@ namespace poem {
       // Checking if the given values are well between min and max for each dimension
       for (size_t i = 0; i < _dim; ++i) {
         const double val = m_values.at(i);
-        DimensionID *ID = m_ID_array->get(i);
+        DimensionID *ID = m_dimension_point_set->dimension_ID_set()->get(i);
         if (val < ID->min() || val > ID->max()) {
           spdlog::critical("For dimension {}, values {} is out of range [{}, {}]",
                            ID->name(), val, ID->min(), ID->max());
@@ -130,10 +145,9 @@ namespace poem {
     }
 
    private:
-    const DimensionIDSet<_dim> *m_ID_array;
     Values m_values;
 
-    DimensionPointSet<_dim> *m_origin_dimension_point_set;
+    DimensionPointSet<_dim> *m_dimension_point_set;
 
   };
 
@@ -142,6 +156,16 @@ namespace poem {
   };
 
   /**
+   * A DimensionPointSet represents a set of DimensionPoint built from the cartesian product of value vectors given for
+   * each dimension.
+   *
+   * First this class is instantiated given a DimensionIDSet that define the dimensions.
+   * Second, each dimension must be given a value vector
+   * Third, the cartesian product of dimensions is pre-processed by calling the *build* method.
+   * Note that dimensions have precedence in DimensionIDSet (first, second etc...) and that the last dimension is the
+   * one that is moving faster so that the resulting _dim-dimensional arrays are row-major.
+   *
+   * Iterators are available to iterate on every of the points of the DimensionPointSet
    *
    * @tparam _dim
    */
@@ -151,8 +175,11 @@ namespace poem {
     using DimensionPointVector = std::vector<std::shared_ptr<DimensionPoint<_dim>>>;
     using Iter = typename DimensionPointVector::const_iterator;
 
-    explicit DimensionPointSet(std::shared_ptr<DimensionIDSet<_dim>> dim_ID_array) :
-        m_dimension_ID_set(dim_ID_array) {}
+    explicit DimensionPointSet(std::shared_ptr<DimensionIDSet<_dim>> dimension_ID_set) :
+        m_is_built(false),
+        m_dimension_ID_set(dimension_ID_set) {}
+
+    bool is_built() const { return m_is_built; }
 
     const DimensionIDSet<_dim> *dimension_ID_set() const { return m_dimension_ID_set.get(); }
 
@@ -188,6 +215,7 @@ namespace poem {
       typename DimensionPoint<_dim>::Values values;
       meta_for_loop<_dim>(values);
 
+      m_is_built = true;
     }
 
     DimensionPoint<_dim> *at(size_t i) {
@@ -211,7 +239,7 @@ namespace poem {
       for (const auto &element: m_dimension_vectors[i]) {
         values.at(i) = element;
         if constexpr (index == 1) {
-          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dimension_ID_set.get(), this, values));
+          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(this, values));
 
         } else {
           meta_for_loop<index - 1>(values);
@@ -228,6 +256,8 @@ namespace poem {
     }
 
    private:
+    bool m_is_built;
+
     std::shared_ptr<DimensionIDSet<_dim>> m_dimension_ID_set;
     std::array<std::vector<double>, _dim> m_dimension_vectors;
 

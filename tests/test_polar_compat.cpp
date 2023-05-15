@@ -89,15 +89,28 @@ TEST(POLAR, WRITE) {
 
   // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utiliser pour
 
-
-
 //  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());
   auto polar_set = std::make_shared<PolarSet>(attributes, schema_old);
 
-  // TODO: ajouter les variables !!
+  // Adding variable
+  auto brake_power = polar_set->New<double, 5>("BrakePower",
+                                               "kW",
+                                               "Brake Power",
+                                               type::POEM_TYPES::DOUBLE,
+                                               dimension_point_environment);
 
 
-//  polar_set->to_netcdf("essai.nc");
+  // Populating variable
+  double val = 0.;
+  for (const auto &dimension_point: *dimension_point_environment) {
+    PolarPoint<double, 5> polar_point(dimension_point, val);
+    brake_power->set_point(&polar_point);
+
+    val += 1.1;
+  }
+
+
+  polar_set->to_netcdf("essai.nc");
 
   /*
    * Dans le test unitaire, on veut

@@ -98,6 +98,7 @@ namespace poem {
 
       // Storing variable
       if (!is_filled()) {
+        // FIXME: is_filled est true meme si la variable est vide...
         spdlog::critical("Attempting to write a polar to disk while it is not totally populated");
         CRITICAL_ERROR
       }

@@ -23,6 +23,13 @@ namespace poem {
 
   class Named {
    public:
+    /**
+     * Constructor
+     * @param name the name of the dimension
+     * @param unit the unit used for that dimension
+     * @param description described the dimension
+     * @param type the type of the enclosed data
+     */
     Named(const std::string &name,
           const std::string &unit,
           const std::string &description,
