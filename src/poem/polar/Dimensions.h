@@ -95,8 +95,6 @@ namespace poem {
    * As a result, we never instantiate it directly but only obtain a DimensionPoint from a DimensionPointSet that has
    * been built.
    *
-   *
-   *
    * @tparam _dim the dimension of the DimensionPoint (number of components)
    */
   template<size_t _dim>

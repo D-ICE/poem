@@ -2,4 +2,5 @@
 cmake-build-*
 tests/data
 
-docs/build
+docs/API/build
+docs/guide/build
