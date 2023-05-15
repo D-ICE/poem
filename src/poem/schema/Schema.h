@@ -167,7 +167,7 @@ namespace poem {
 
     bool operator==(const Schema &other) const;
 
-    std::string json_str() const;
+    std::string json_str(const int indent=-1) const;
 
     bool is_newest() const;
 

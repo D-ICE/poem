@@ -75,7 +75,12 @@ namespace poem {
 
     int to_netcdf(const std::string &nc_file) const {
 
-      spdlog::info("Writing NetCDF file {}", nc_file);
+      fs::path nc_file_path(nc_file);
+      if (nc_file_path.is_relative()) {
+        nc_file_path = fs::current_path() / nc_file_path;
+      }
+
+      spdlog::info("Writing NetCDF file {}", std::string(nc_file_path));
 
       constexpr int nc_err = 2;
 
@@ -83,7 +88,7 @@ namespace poem {
 
         // Create the file. The Replace parameter tells netCDF to overwrite
         // this file, if it already exists.
-        netCDF::NcFile dataFile(nc_file, netCDF::NcFile::replace);
+        netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
 
         // Writing attributes
         for (const auto &attribute: m_attributes) {

@@ -40,7 +40,6 @@ TEST(POLAR, WRITE) {
    * be built to generate a cartesian product of every dimension and generate internally a vector of dimension points
    */
 
-
   // Create samples for the dimensions
   // FIXME: arange ne fonctionne vraiment pas comme voulu...
   auto STW_vector = mathutils::arange<double>(0, 20, 1);
@@ -66,6 +65,7 @@ TEST(POLAR, WRITE) {
 
   /**
    * Create a polar set
+   *
    * A polar set allows to group several polars into one unique structure. This is really what is further used
    * to write or read on disk.
    * The polar set has attributes that are global attributes into NetCDF files
@@ -77,24 +77,42 @@ TEST(POLAR, WRITE) {
    * A dimension point MUST be generated from a dimension point set
    *
    * A polar is always written following the last schema specification
+   *
    */
 
   auto schema_dir = fs::path(TEST_SCHEMAS_DIR);
-//  std::string old = ;
   std::ifstream ifs(schema_dir / "schema_old.json");
   std::stringstream buffer;
   buffer << ifs.rdbuf();
 
   Schema schema_old(buffer.str());
 
-  // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utiliser...
+  // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utiliser pour
 
 
 
 //  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());
   auto polar_set = std::make_shared<PolarSet>(attributes, schema_old);
 
+  // TODO: ajouter les variables !!
 
 
+//  polar_set->to_netcdf("essai.nc");
+
+  /*
+   * Dans le test unitaire, on veut
+   *
+   * 1 - creer une polaire avec un ancien schema
+   * 2 - ecrire la polaire avec cet ancien schema
+   * 3 - lire la polaire ainsi creee
+   * 4 - lire les variables qui ont change et tester les mappings
+   *
+   */
+
+
+
+  int i = 0;
 
 }
+
+

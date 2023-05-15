@@ -2,8 +2,6 @@
 // Created by frongere on 14/04/23.
 //
 
-#include <iostream>
-
 #include "Schema.h"
 
 #include "poem/schema/schema.h"
@@ -32,8 +30,8 @@ namespace poem {
     return m_json_schema == other.m_json_schema;
   }
 
-  std::string Schema::json_str() const {
-    return m_json_schema.dump();
+  std::string Schema::json_str(const int indent) const {
+    return m_json_schema.dump(indent);
   }
 
   bool Schema::is_newest() const {
@@ -174,7 +172,7 @@ namespace poem {
       // TODO: voir comment on gere quand c'est deprecated
       m_variables_map.insert({iter.key(), variable});
 
-      // Here we check that variables are depending on existing dimensions
+      // Here we check that variables depend on existing dimensions
       auto var_dims = variable.dimensions_names();
       for (const auto &dim_name: var_dims) {
         if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
@@ -193,6 +191,7 @@ namespace poem {
   }
 
   NewestSchema::NewestSchema() : Schema(schema::schema_str, false) {
+    // schema::schema_str is the very last version of schema
     m_is_newest = true;
   }
 
