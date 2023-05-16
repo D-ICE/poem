@@ -87,7 +87,7 @@
     },
 
     "fields": {
-      "BrakePower": {
+      "TotalBrakePower": {
         "doc": "Total Brake Power of the vessel",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],

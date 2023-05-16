@@ -24,9 +24,15 @@ namespace poem {
     using PolarMap = std::unordered_map<std::string, std::unique_ptr<PolarBase>>;
     using NameMap = std::unordered_map<std::string, std::string>;
 
-    PolarSet(const Attributes &attributes, const Schema &schema) :
+    PolarSet(const Attributes &attributes, const Schema &schema, const Schema &newest_schema) :
         m_attributes(attributes),
-        m_schema(schema) {
+        m_schema(schema),
+        m_newest_schema(newest_schema) {
+
+      if (!m_newest_schema.is_newest()) {
+        spdlog::critical("Not the newest schema given to PolarSet");
+      }
+
 
       // We automatically add the current schema as attribute if not found in the attributes
       if (!m_attributes.contains("schema")) {
@@ -68,7 +74,7 @@ namespace poem {
 
     bool is_using_newest_schema() const { return m_schema.is_newest(); }
 
-    const Attributes& attributes() const { return m_attributes; }
+    const Attributes &attributes() const { return m_attributes; }
 
     /*
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
@@ -123,7 +129,7 @@ namespace poem {
 
         } else {
           // The attribute may have changed
-          auto current_name = NewestSchema::getInstance().get_current_attribute_name(name);
+          auto current_name = m_newest_schema.get_newest_attribute_name(name);
 
           // Si current name est vide, on a pas trouve d'alias nulle part
           if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
@@ -145,14 +151,20 @@ namespace poem {
         m_polar_name_map.insert({polar_name, polar_name});
 
       } else {
-        auto current_name = NewestSchema::getInstance().get_current_variable_name(polar_name);
+        auto newest_name = m_newest_schema.get_newest_variable_name(polar_name);
 
-        if (current_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
+        if (newest_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
           spdlog::critical("No schema compatibility for polar named {}", polar_name);
           CRITICAL_ERROR
         }
 
-        m_polar_name_map.insert({current_name, polar_name});
+        if (newest_name.empty()) {
+          spdlog::critical("Variable name from old schema has no equivalent in the newest schema");
+          CRITICAL_ERROR
+          // TODO: voir i on ne fait qu'un warning ?
+        }
+
+        m_polar_name_map.insert({newest_name, polar_name});
 
       }
 
@@ -167,6 +179,7 @@ namespace poem {
     NameMap m_polar_name_map;
 
     Schema m_schema;
+    Schema m_newest_schema;
   };
 
 }  // poem

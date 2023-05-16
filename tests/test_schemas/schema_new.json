@@ -10,7 +10,7 @@
       "doc": "The type of polar that is described in the NetCDF file. Must be ND here",
       "type": "string",
       "tags": ["required"],
-      "values": ["ND", "CDA"]
+      "_values": ["ND", "CDA"]
     }
   },
 
@@ -92,7 +92,8 @@
         "doc": "Total Brake Power of the vessel",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
-        "tags": ["required"]
+        "tags": ["required"],
+        "aliases": ["TotalBrakePower"]
       },
 
       "var_int": {

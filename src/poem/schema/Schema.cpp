@@ -11,13 +11,9 @@
 
 namespace poem {
 
-  Schema::Schema(const std::string &json_str, bool check_is_newest) :
+  Schema::Schema(const std::string &json_str, bool is_newest) :
       m_json_schema(json::parse(json_str)),
-      m_is_newest(false) {
-
-    if (check_is_newest) {
-      m_is_newest = (*this == NewestSchema::getInstance());
-    }
+      m_is_newest(is_newest) {
 
     // Load the different parts of the schema
     load_global_attributes();
@@ -97,20 +93,23 @@ namespace poem {
   }
 
 
-  std::string Schema::get_current_attribute_name(const std::string &name) const {
+  std::string Schema::get_newest_attribute_name(const std::string &name) const {
 
-    std::string current_name;
+    std::string newest_name;
     if (m_global_attributes_map.find(name) != m_global_attributes_map.end()) {
-      current_name = name;
+      newest_name = name;
 
     } else {
+
       for (const auto &attribute: m_global_attributes_map) {
-        current_name = attribute.second.get_alias(name);
-        if (!current_name.empty()) break;
+        if (attribute.second.is_alias(name)) {
+          newest_name = attribute.first;
+          break;
+        }
       }
 
     }
-    return current_name;
+    return newest_name;
   }
 
   void Schema::load_global_attributes() {
@@ -122,21 +121,22 @@ namespace poem {
     }
   }
 
-  std::string Schema::get_current_variable_name(const std::string &name) const {
+  std::string Schema::get_newest_variable_name(const std::string &name) const {
 
-    std::string current_name;
+    std::string newest_name;
     if (m_variables_map.find(name) != m_variables_map.end()) {
-      current_name = name;
+      newest_name = name;
 
     } else {
       for (const auto &variable: m_variables_map) {
-        current_name = variable.second.get_alias(name);
-        if (!current_name.empty()) break;
+        if (variable.second.is_alias(name)) {
+          newest_name = variable.first;
+          break;
+        }
       }
-
     }
 
-    return current_name;
+    return newest_name;
   }
 
   void Schema::load_dimensions() {
@@ -185,14 +185,8 @@ namespace poem {
 
   }
 
-  NewestSchema &NewestSchema::getInstance() {
-    static NewestSchema instance;
-    return instance;
-  }
-
-  NewestSchema::NewestSchema() : Schema(schema::schema_str, false) {
-    // schema::schema_str is the very last version of schema
-    m_is_newest = true;
+  Schema get_newest_schema() {
+    return {schema::schema_str, true};
   }
 
 }  // poem

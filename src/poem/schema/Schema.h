@@ -15,7 +15,7 @@
 #include "poem/exceptions.h"
 // TODO FIN
 
-#define KNOWN_SCHEMA_ELEMENT_FIELDS {"doc", "type", "tags", "dimensions"}
+#define KNOWN_SCHEMA_ELEMENT_FIELDS {"doc", "type", "tags", "dimensions", "aliases"}
 #define REQUIRED_SCHEMA_ELEMENT_FIELDS {"doc", "type"}
 
 namespace fs = std::filesystem;
@@ -33,8 +33,6 @@ namespace poem {
    *
    *
    */
-
-
 
 
   /**
@@ -107,13 +105,8 @@ namespace poem {
 
     bool is_deprecated() const { return m_deprecated; }
 
-    std::string get_alias(const std::string &name) const {
-      std::string alias;
-      auto iter = std::find(m_aliases.begin(), m_aliases.end(), name);
-      if (iter != m_aliases.end()) {
-        alias = *iter;
-      }
-      return alias;
+    bool is_alias(const std::string &name) const {
+      return std::find(m_aliases.begin(), m_aliases.end(), name) != m_aliases.end();
     }
 
 
@@ -163,7 +156,7 @@ namespace poem {
 
   class Schema {
    public:
-    Schema(const std::string &json_str, bool check_is_newest = true);
+    Schema(const std::string &json_str, bool is_newest);
 
     bool operator==(const Schema &other) const;
 
@@ -180,9 +173,9 @@ namespace poem {
     template<typename T, size_t _dim>
     void check_polar(Polar<T, _dim> *polar) const;
 
-    std::string get_current_attribute_name(const std::string &name) const;
+    std::string get_newest_attribute_name(const std::string &name) const;
 
-    std::string get_current_variable_name(const std::string &name) const;
+    std::string get_newest_variable_name(const std::string &name) const;
 
    private:
     void load_global_attributes();
@@ -208,24 +201,7 @@ namespace poem {
 
   };
 
-  /**
-   * Exactly the same as Schema but reserved for the very newest version of the schema in poem library
-   *
-   * Follows a Singleton pattern to get only one instance at runtime
-   */
-  class NewestSchema : public Schema {
-   public:
-    static NewestSchema &getInstance();
-
-    NewestSchema(const NewestSchema &) = delete;
-
-    void operator=(const NewestSchema &) = delete;
-
-   private:
-    NewestSchema();
-
-  };
-
+  Schema get_newest_schema();
 
 }  // poem
 

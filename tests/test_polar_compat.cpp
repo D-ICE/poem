@@ -10,6 +10,15 @@
 
 using namespace poem;
 
+std::string get_json_str_from_file(const std::string &filename) {
+  auto schema_dir = fs::path(TEST_SCHEMAS_DIR);
+  std::ifstream ifs(schema_dir / filename);
+  std::stringstream buffer;
+  buffer << ifs.rdbuf();
+  return buffer.str();
+}
+
+
 TEST(POLAR, WRITE) {
 
   /**
@@ -80,20 +89,18 @@ TEST(POLAR, WRITE) {
    *
    */
 
-  auto schema_dir = fs::path(TEST_SCHEMAS_DIR);
-  std::ifstream ifs(schema_dir / "schema_old.json");
-  std::stringstream buffer;
-  buffer << ifs.rdbuf();
+  // Overriding the newest schema for the test
+  Schema newest_schema(get_json_str_from_file("schema_new.json"), true);
 
-  Schema schema_old(buffer.str());
+  Schema schema_old(get_json_str_from_file("schema_old.json"), false);
 
-  // TODO: Ici, on veut pouvoir dire au LatestSchema quel json utiliser pour
+  // TODO: Ici, on veut pouvoir dire au NewestSchema quel json utiliser
 
 //  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());
-  auto polar_set = std::make_shared<PolarSet>(attributes, schema_old);
+  auto polar_set = std::make_shared<PolarSet>(attributes, schema_old, newest_schema);
 
   // Adding variable
-  auto brake_power = polar_set->New<double, 5>("BrakePower",
+  auto brake_power = polar_set->New<double, 5>("TotalBrakePower",
                                                "kW",
                                                "Brake Power",
                                                type::POEM_TYPES::DOUBLE,
@@ -108,6 +115,10 @@ TEST(POLAR, WRITE) {
 
     val += 1.1;
   }
+
+
+//  polar_set->get_polar("BrakePower");
+
 
 
   polar_set->to_netcdf("essai.nc");

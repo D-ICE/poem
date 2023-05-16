@@ -19,11 +19,12 @@ namespace poem {
     auto attributes = load_attributes();
 
     // FIXME: on veut pouvoir lire ND et CDA...
+    Schema newest_schema = get_newest_schema();
 
-    Schema schema(attributes.get("schema")); // This is the schema used to write the file, not the last one...
+    Schema schema(attributes.get("schema"), false); // This is the schema used to write the file, not the last one...
 
     // The new polar set
-    m_polar_set = std::make_shared<PolarSet>(attributes, schema);
+    m_polar_set = std::make_shared<PolarSet>(attributes, schema, newest_schema);
 
     // Get the dimensions
     load_dimensions();

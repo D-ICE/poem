@@ -248,7 +248,8 @@ namespace poem {
     void check_is_filled() const {
       for (const auto &vector: m_dimension_vectors) {
         if (vector.empty()) {
-          throw std::runtime_error("DimensionSampleArray is not totally filled. Cannot generate DimensionPoint vector");
+          spdlog::critical("DimensionSampleArray is not totally filled. Cannot generate DimensionPoint vector");
+          CRITICAL_ERROR
         }
       }
     }
