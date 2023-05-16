@@ -52,6 +52,8 @@ namespace poem {
 
     virtual std::function<void(void *)> get_set_point_function() = 0;
 
+    virtual void* eval(void *dimension_point) const = 0;
+
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
    protected:
@@ -90,8 +92,21 @@ namespace poem {
 
     const size_t dim() const override { return _dim; }
 
-    const DimensionPointSet<_dim>* dimension_point_set() const {
+    const DimensionPointSet<_dim> *dimension_point_set() const {
       return m_dimension_point_set.get();
+    }
+
+    // TODO: voir si on garde
+    void* eval(void* dimension_point) const override {
+      c_current_value = 2; // TEST
+
+      auto point = static_cast<std::array<T, _dim>*>(dimension_point);
+
+      // TODO: terminer et interpoler !!!
+
+
+
+      return &c_current_value;
     }
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
@@ -107,7 +122,7 @@ namespace poem {
       std::vector<netCDF::NcDim> dims;
       dims.reserve(_dim);
 
-      for (size_t i=0; i<_dim; ++i) {
+      for (size_t i = 0; i < _dim; ++i) {
 
         auto dimension_ID = m_dimension_point_set->dimension_ID_set()->get(i);
         auto values = m_dimension_point_set->dimension_vector(i);
@@ -155,7 +170,7 @@ namespace poem {
 
         // Get the values as a flat vector
         std::vector<T> values;
-        for (const auto &point : m_points) {
+        for (const auto &point: m_points) {
           values.push_back(point.second.value());
         }
 
@@ -203,6 +218,8 @@ namespace poem {
    private:
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     PolarPoints m_points;
+
+    mutable T c_current_value;
 
   };
 

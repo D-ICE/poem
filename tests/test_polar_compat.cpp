@@ -116,12 +116,19 @@ TEST(POLAR, WRITE) {
     val += 1.1;
   }
 
+  // Essai d'appel a eval direct sur polar set
+  std::array<double, 5> point = {1, 2, 3, 4, 5};
+  std::cout << polar_set->eval<double>("BrakePower", &point) << std::endl;
 
-//  polar_set->get_polar("BrakePower");
+
+  // Essai d'extraction de polaire
+  auto brake_power_polar = polar_set->get_polar<double, 5>("BrakePower");
+//  auto dim_point_set = brake_power_polar->dimension_point_set();
 
 
 
-  polar_set->to_netcdf("essai.nc");
+
+//  polar_set->to_netcdf("essai.nc");
 
   /*
    * Dans le test unitaire, on veut

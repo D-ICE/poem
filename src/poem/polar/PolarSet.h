@@ -72,6 +72,8 @@ namespace poem {
       return polar_ptr;
     }
 
+
+
     bool is_using_newest_schema() const { return m_schema.is_newest(); }
 
     const Attributes &attributes() const { return m_attributes; }
@@ -79,6 +81,36 @@ namespace poem {
     /*
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
+
+    // TODO: voir si on garde
+    template<typename T, size_t _dim>
+    const Polar<T, _dim> *get_polar(const std::string &name) const {
+      std::string old_name;
+      try {
+        old_name = m_polar_name_map.at(name);
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("Polar name {} does not exist.");
+        CRITICAL_ERROR
+      }
+
+      return static_cast<Polar<T, _dim>*>(m_polars_map.at(old_name).get());
+    }
+
+    // TODO: voir si on garde
+    template <typename T>
+    T eval(const std::string &name, void* dimension_point) const { // TODO: point devrait etre type ???
+      std::string old_name;
+      try {
+        old_name = m_polar_name_map.at(name);
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("Polar name {} does not exist.");
+        CRITICAL_ERROR
+      }
+
+      auto polar = m_polars_map.at(old_name).get();
+      return *static_cast<double*>(polar->eval(dimension_point));
+
+    }
 
 
     int to_netcdf(const std::string &nc_file) const {
