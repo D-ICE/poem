@@ -56,13 +56,19 @@ namespace poem {
 
 //    virtual std::function<void(void *)> get_set_point_function() = 0;
 
-    virtual void build() = 0;
+    virtual void build_interpolator() = 0;
+
+    virtual void build_nearest() = 0;
 
     template<typename T, size_t _dim>
     T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
       return static_cast<const Polar<T, _dim> *>(this)->interp(dimension_point, bound_check);
     }
 
+    template<typename T, size_t _dim>
+    T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      return static_cast<const Polar<T, _dim> *>(this)->nearest(dimension_point, bound_check);
+    }
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
@@ -84,6 +90,7 @@ namespace poem {
    public:
     using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
     using InterpolatorND = mathutils::RegularGridInterpolator<T, _dim>;
+    using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
     Polar(const std::string &name,
           const std::string &unit,
@@ -91,8 +98,9 @@ namespace poem {
           type::POEM_TYPES type,
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarBase(name, unit, description, type),
-        m_dimension_point_set(dimension_point_set),
-        m_is_built(false) {
+        m_interpolator_is_built(false),
+        m_nearest_is_built(false),
+        m_dimension_point_set(dimension_point_set) {
 
 
       for (const auto dimension_point: *m_dimension_point_set) {
@@ -108,7 +116,7 @@ namespace poem {
       return m_dimension_point_set.get();
     }
 
-    void build() override {
+    void build_interpolator() override {
 
       if (!is_filled()) {
         spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
@@ -142,15 +150,63 @@ namespace poem {
       std::copy(data.begin(), data.end(), array.data());
       m_interpolator->AddVar(array);
 
-      m_is_built = true;
+      m_interpolator_is_built = true;
+    }
+
+    void build_nearest() override {
+
+      if (!is_filled()) {
+        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
+        CRITICAL_ERROR
+      }
+
+      m_nearest = std::make_unique<NearestND>();
+
+      using NDArray = boost::multi_array<T, _dim>;
+      using IndexArray = boost::array<typename NDArray::index, _dim>;
+      IndexArray shape;
+
+      size_t num_elements = 1;
+      for (size_t i = 0; i < _dim; ++i) {
+        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
+        auto dim_vector = m_dimension_point_set->dimension_vector(i);
+
+        shape[i] = dim_vector.size();
+        num_elements *= shape[i];
+
+        m_nearest->AddCoord(dim_vector);
+      }
+
+      std::vector<T> data;
+      data.reserve(num_elements);
+      for (const auto &point: m_points) {
+        data.push_back(point.second.value());
+      }
+
+      NDArray array(shape);
+      std::copy(data.begin(), data.end(), array.data());
+      m_nearest->AddVar(array);
+
+      m_nearest_is_built = true;
+
     }
 
     T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
-      if (!m_is_built) {
-        const_cast<Polar<T, _dim>*>(this)->build();
+      if (!m_interpolator_is_built) {
+        const_cast<Polar<T, _dim> *>(this)->build_interpolator();
       }
 
       return m_interpolator->Interp(dimension_point, bound_check);
+    }
+
+    T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      if (!m_nearest_is_built) {
+        const_cast<Polar<T, _dim> *>(this)->build_nearest();
+      }
+
+      // FIXME: bound_check non utilise encore dans RegularGridNearest
+
+      return m_nearest->Nearest(dimension_point).val();
     }
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
@@ -260,13 +316,14 @@ namespace poem {
 //    }
 
    private:
-    bool m_is_built;
+    bool m_interpolator_is_built;
+    bool m_nearest_is_built;
 
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     PolarPoints m_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;
-    // FIXME: ajouter l'outil nearest
+    std::unique_ptr<NearestND> m_nearest;
 
   };
 

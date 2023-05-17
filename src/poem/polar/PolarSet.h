@@ -94,11 +94,10 @@ namespace poem {
       return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
     }
 
-    // TODO: voir si on garde
     template<typename T, size_t _dim>
     T interp(const std::string &name,
-             const std::array<T, _dim> dimension_point,
-             bool bound_check = true) const { // TODO: point devrait etre type ???
+             const std::array<T, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
+             bool bound_check = true) const {
 
       std::string old_name;
       try {
@@ -111,6 +110,22 @@ namespace poem {
       auto polar = m_polars_map.at(old_name).get();
       return polar->interp<T, _dim>(dimension_point, bound_check);
 
+    }
+
+    template<typename T, size_t _dim>
+    T nearest(const std::string &name,
+             const std::array<double, _dim> dimension_point,
+             bool bound_check = true) const {
+      std::string old_name;
+      try {
+        old_name = m_polar_name_map.at(name);
+      } catch (const std::out_of_range &e) {
+        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
+        CRITICAL_ERROR
+      }
+
+      auto polar = m_polars_map.at(old_name).get();
+      return polar->nearest<T, _dim>(dimension_point, bound_check);
     }
 
 

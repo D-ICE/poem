@@ -147,6 +147,11 @@ TEST(POLAR, WRITE) {
   auto value = polar_set->interp<double, 5>("BrakePower", {0.5, 1.5, 0, 0, 0}, true);
   ASSERT_DOUBLE_EQ(value, 1.5);
 
+  ASSERT_DOUBLE_EQ(brake_power_polar->nearest({0.1, 1.1, 0, 0, 0}, true), 0);
+  ASSERT_DOUBLE_EQ(brake_power_polar->nearest({0.1, 1.9, 0, 0, 0}, true), 1);
+  ASSERT_DOUBLE_EQ(brake_power_polar->nearest({0.9, 1.1, 0, 0, 0}, true), 2);
+  ASSERT_DOUBLE_EQ(brake_power_polar->nearest({0.9, 1.9, 0, 0, 0}, true), 3);
+
 
 //  polar_set->to_netcdf("essai.nc");
 
