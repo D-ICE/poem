@@ -75,7 +75,7 @@ namespace poem {
 
     void build() {
 
-      for (auto &polar : m_polars_map) {
+      for (auto &polar: m_polars_map) {
         polar.second->build();
       }
 
@@ -107,8 +107,10 @@ namespace poem {
 
     // TODO: voir si on garde
     template<typename T, size_t _dim>
-    T eval(const std::string &name,
-           const std::array<T, _dim> dimension_point) const { // TODO: point devrait etre type ???
+    T interp(const std::string &name,
+             const std::array<T, _dim> dimension_point,
+             bool bound_check = true) const { // TODO: point devrait etre type ???
+
       std::string old_name;
       try {
         old_name = m_polar_name_map.at(name);
@@ -117,8 +119,10 @@ namespace poem {
         CRITICAL_ERROR
       }
 
+//      if (!m_is_built) build(); // TODO
+
       auto polar = m_polars_map.at(old_name).get();
-      return *static_cast<double *>(polar->eval(&dimension_point));
+      return polar->interp<T, _dim>(dimension_point, bound_check);
 
     }
 

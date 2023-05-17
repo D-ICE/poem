@@ -25,6 +25,10 @@
 
 namespace poem {
 
+  // forward declaration
+  template<typename T, size_t _dim>
+  class Polar;
+
   /**
    * Base class for a polar to be used for polymorphism into a PolarSet
    */
@@ -40,8 +44,6 @@ namespace poem {
 
     virtual const size_t dim() const = 0;
 
-//    const VariableID* variableId() const { return m_var_ID.get(); }
-
     const std::string &name() const { return m_var_ID->name(); }
 
     const std::string &unit() const { return m_var_ID->unit(); }
@@ -52,11 +54,15 @@ namespace poem {
 
     virtual void set_point(void *polar_point) = 0;
 
-    virtual std::function<void(void *)> get_set_point_function() = 0;
+//    virtual std::function<void(void *)> get_set_point_function() = 0;
 
     virtual void build() = 0;
 
-    virtual void *eval(const void *dimension_point) const = 0;
+    template<typename T, size_t _dim>
+    T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
+      return static_cast<const Polar<T, _dim> *>(this)->interp(dimension_point, bound_check);
+    }
+
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
@@ -106,7 +112,7 @@ namespace poem {
 
       if (!is_filled()) {
         spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
-        CRITICAL_ERROR;
+        CRITICAL_ERROR
       }
 
       m_interpolator = std::make_unique<InterpolatorND>();
@@ -126,41 +132,25 @@ namespace poem {
         m_interpolator->AddCoord(dim_vector);
       }
 
-      NDArray array(shape);
-
       std::vector<T> data;
       data.reserve(num_elements);
-
       for (const auto &point: m_points) {
         data.push_back(point.second.value());
       }
 
+      NDArray array(shape);
       std::copy(data.begin(), data.end(), array.data());
-
       m_interpolator->AddVar(array);
 
       m_is_built = true;
     }
 
-    // TODO: voir si on garde
-    void *eval(const void *dimension_point) const override {
+    T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
+      if (!m_is_built) {
+        const_cast<Polar<T, _dim>*>(this)->build();
+      }
 
-
-      auto point = static_cast<const std::array<T, _dim> *>(dimension_point);
-      // TODO: tester que tout est dans les ranges des dimensions
-
-
-
-      // TODO: terminer et interpoler !!!
-
-
-      c_current_value = 2; // TEST
-
-
-
-
-
-      return &c_current_value;
+      return m_interpolator->Interp(dimension_point, bound_check);
     }
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
@@ -263,11 +253,11 @@ namespace poem {
       );
     }
 
-    std::function<void(void *)> get_set_point_function() override {
-      return [this](void *polar_point) {
-        set_point(polar_point);
-      };
-    }
+//    std::function<void(void *)> get_set_point_function() override {
+//      return [this](void *polar_point) {
+//        set_point(polar_point);
+//      };
+//    }
 
    private:
     bool m_is_built;
@@ -276,8 +266,6 @@ namespace poem {
     PolarPoints m_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;
-
-    mutable T c_current_value;
 
   };
 

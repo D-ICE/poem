@@ -51,11 +51,20 @@ TEST(POLAR, WRITE) {
 
   // Create samples for the dimensions
   // FIXME: arange ne fonctionne vraiment pas comme voulu...
-  auto STW_vector = mathutils::arange<double>(0, 20, 1);
-  auto TWS_vector = mathutils::arange<double>(0, 60, 5);
-  auto TWA_vector = mathutils::arange<double>(0, 180, 15);
-  auto WA_vector = mathutils::arange<double>(0, 180, 15);
-  auto Hs_vector = mathutils::arange<double>(0, 8, 1);
+//  auto STW_vector = mathutils::arange<double>(0, 20, 1);
+//  auto TWS_vector = mathutils::arange<double>(0, 60, 5);
+//  auto TWA_vector = mathutils::arange<double>(0, 180, 15);
+//  auto WA_vector = mathutils::arange<double>(0, 180, 15);
+//  auto Hs_vector = mathutils::arange<double>(0, 8, 1);
+
+  std::vector<double> STW_vector = {0, 1};
+  std::vector<double> TWS_vector = {1, 2};
+//  std::vector<double> TWA_vector = {2, 3};
+//  std::vector<double> WA_vector = {3, 4};
+//  std::vector<double> Hs_vector = {4, 5};
+  std::vector<double> TWA_vector = {0};
+  std::vector<double> WA_vector = {0};
+  std::vector<double> Hs_vector = {0};
 
   auto dimension_point_environment = std::make_shared<DimensionPointSet<5>>(dimension_ID_environment);
   dimension_point_environment->set_dimension_values("STW_kt", STW_vector);
@@ -111,26 +120,34 @@ TEST(POLAR, WRITE) {
   // Populating variable
   double val = 0.;
   for (const auto &dimension_point: *dimension_point_environment) {
+    for (int i=0; i<5; ++i) {
+      std::cout << dimension_point->get(i) << "\t";
+    }
+
     PolarPoint<double, 5> polar_point(dimension_point, val);
+
+    std::cout << "-> " << val << std::endl;
+
     brake_power->set_point(&polar_point);
 
-    val += 1.1;
+    val += 1;
   }
-
-  polar_set->build();
-
-
-  // Essai d'appel a eval direct sur polar set
-//  std::array<double, 5> point = {1, 2, 3, 4, 5};
-  std::cout << polar_set->eval<double, 5>("BrakePower", {1, 2, 3, 4, 5}) << std::endl;
-
 
   // Essai d'extraction de polaire
   auto brake_power_polar = polar_set->get_polar<double, 5>("BrakePower");
-//  auto dim_point_set = brake_power_polar->dimension_point_set();
 
-//  brake_power_polar->build();
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({0, 1, 0, 0, 0}, true), 0.0);
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({0, 2, 0, 0, 0}, true), 1.0);
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({1, 1, 0, 0, 0}, true), 2.0);
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({1, 2, 0, 0, 0}, true), 3.0);
 
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({0, 1.5, 0, 0, 0}, true), 0.5);
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({0.5, 1, 0, 0, 0}, true), 1.0);
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({0.5, 2, 0, 0, 0}, true), 2.0);
+  ASSERT_DOUBLE_EQ(brake_power_polar->interp({1, 1.5, 0, 0, 0}, true), 2.5);
+
+  auto value = polar_set->interp<double, 5>("BrakePower", {0.5, 1.5, 0, 0, 0}, true);
+  ASSERT_DOUBLE_EQ(value, 1.5);
 
 
 //  polar_set->to_netcdf("essai.nc");
