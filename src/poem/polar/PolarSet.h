@@ -15,17 +15,16 @@
 namespace poem {
 
   /**
- * Represents a set of polars.
- *
- * This is what we manipulate directly.
- */
+   * Represents a set of polars.
+   *
+   * This is what we manipulate directly.
+   */
   class PolarSet {
    public:
     using PolarMap = std::unordered_map<std::string, std::unique_ptr<PolarBase>>;
     using NameMap = std::unordered_map<std::string, std::string>;
 
     PolarSet(const Attributes &attributes, const Schema &schema, const Schema &newest_schema) :
-        m_is_built(false),
         m_attributes(attributes),
         m_schema(schema),
         m_newest_schema(newest_schema) {
@@ -73,16 +72,6 @@ namespace poem {
       return polar_ptr;
     }
 
-    void build() {
-
-      for (auto &polar: m_polars_map) {
-        polar.second->build();
-      }
-
-      m_is_built = true;
-    }
-
-
     bool is_using_newest_schema() const { return m_schema.is_newest(); }
 
     const Attributes &attributes() const { return m_attributes; }
@@ -118,8 +107,6 @@ namespace poem {
         spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
         CRITICAL_ERROR
       }
-
-//      if (!m_is_built) build(); // TODO
 
       auto polar = m_polars_map.at(old_name).get();
       return polar->interp<T, _dim>(dimension_point, bound_check);
@@ -217,8 +204,6 @@ namespace poem {
     }
 
    private:
-    bool m_is_built;
-
     Attributes m_attributes;
     NameMap m_attributes_name_map;
 

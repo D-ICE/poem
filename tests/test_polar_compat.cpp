@@ -115,8 +115,6 @@ TEST(POLAR, WRITE) {
                                                type::POEM_TYPES::DOUBLE,
                                                dimension_point_environment);
 
-  ASSERT_THROW(polar_set->build(), CriticalError);
-
   // Populating variable
   double val = 0.;
   for (const auto &dimension_point: *dimension_point_environment) {

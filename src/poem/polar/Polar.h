@@ -266,6 +266,7 @@ namespace poem {
     PolarPoints m_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;
+    // FIXME: ajouter l'outil nearest
 
   };
 
