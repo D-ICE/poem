@@ -117,8 +117,8 @@ TEST(POLAR, WRITE) {
   }
 
   // Essai d'appel a eval direct sur polar set
-  std::array<double, 5> point = {1, 2, 3, 4, 5};
-  std::cout << polar_set->eval<double>("BrakePower", &point) << std::endl;
+//  std::array<double, 5> point = {1, 2, 3, 4, 5};
+  std::cout << polar_set->eval<double, 5>("BrakePower", {1, 2, 3, 4, 5}) << std::endl;
 
 
   // Essai d'extraction de polaire

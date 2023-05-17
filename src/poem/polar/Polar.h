@@ -52,7 +52,7 @@ namespace poem {
 
     virtual std::function<void(void *)> get_set_point_function() = 0;
 
-    virtual void* eval(void *dimension_point) const = 0;
+    virtual void* eval(const void *dimension_point) const = 0;
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
@@ -97,10 +97,13 @@ namespace poem {
     }
 
     // TODO: voir si on garde
-    void* eval(void* dimension_point) const override {
+    void* eval(const void* dimension_point) const override {
       c_current_value = 2; // TEST
 
-      auto point = static_cast<std::array<T, _dim>*>(dimension_point);
+      auto point = static_cast<const std::array<T, _dim>*>(dimension_point);
+      // TODO: tester que tout est dans les ranges des dimensions
+
+
 
       // TODO: terminer et interpoler !!!
 

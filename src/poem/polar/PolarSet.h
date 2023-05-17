@@ -97,18 +97,18 @@ namespace poem {
     }
 
     // TODO: voir si on garde
-    template <typename T>
-    T eval(const std::string &name, void* dimension_point) const { // TODO: point devrait etre type ???
+    template <typename T, size_t _dim>
+    T eval(const std::string &name, const std::array<T, _dim> dimension_point) const { // TODO: point devrait etre type ???
       std::string old_name;
       try {
         old_name = m_polar_name_map.at(name);
       } catch (const std::out_of_range &e) {
-        spdlog::critical("Polar name {} does not exist.");
+        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
         CRITICAL_ERROR
       }
 
       auto polar = m_polars_map.at(old_name).get();
-      return *static_cast<double*>(polar->eval(dimension_point));
+      return *static_cast<double*>(polar->eval(&dimension_point));
 
     }
 
