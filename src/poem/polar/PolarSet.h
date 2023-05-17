@@ -80,7 +80,6 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
-    // TODO: voir si on garde
     template<typename T, size_t _dim>
     Polar<T, _dim> *get_polar(const std::string &name) const {
       std::string old_name;
@@ -96,7 +95,7 @@ namespace poem {
 
     template<typename T, size_t _dim>
     T interp(const std::string &name,
-             const std::array<T, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
+             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
              bool bound_check = true) const {
 
       std::string old_name;

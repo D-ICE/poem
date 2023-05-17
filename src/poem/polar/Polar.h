@@ -61,7 +61,7 @@ namespace poem {
     virtual void build_nearest() = 0;
 
     template<typename T, size_t _dim>
-    T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
+    T interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       return static_cast<const Polar<T, _dim> *>(this)->interp(dimension_point, bound_check);
     }
 

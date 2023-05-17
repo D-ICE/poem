@@ -105,7 +105,6 @@ TEST(POLAR, WRITE) {
 
   // TODO: Ici, on veut pouvoir dire au NewestSchema quel json utiliser
 
-//  auto polar_set = std::make_shared<PolarSet>(attributes, LastSchema::getInstance());
   auto polar_set = std::make_shared<PolarSet>(attributes, schema_old, newest_schema);
 
   // Adding variable
@@ -162,6 +161,27 @@ TEST(POLAR, WRITE) {
    * 2 - ecrire la polaire avec cet ancien schema
    * 3 - lire la polaire ainsi creee
    * 4 - lire les variables qui ont change et tester les mappings
+   *
+   *
+   * Le mapping fonctionne
+   *
+   * Reste a
+   *
+   * - permettre de faire du vecteur de PolarSet
+   *
+   * - verifier que les tags required fonctionnent pour les dimensions
+   * - verifier les types avec type
+   * - faire fonctionner le champ values
+   * - ajouter un tag deprecated
+   * - mettre en place des regex
+   * - utiliser le doc lors du write et du read
+   * - le systeme de schema devrait rendre facile la conversion d'une ancienne polaire vers une nouvelle
+   *
+   *
+   * Elaborer le schema correspondant aux polaires ESPERADO
+   *
+   * Integrer poem a ESPERADO
+   * Integrer poem a mship
    *
    */
 
