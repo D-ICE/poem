@@ -191,7 +191,7 @@ namespace poem {
       m_dimension_vectors.at(i) = values;
     }
 
-    const std::vector<double> dimension_vector(size_t i) const { return m_dimension_vectors.at(i); }
+    const std::vector<double> &dimension_vector(size_t i) const { return m_dimension_vectors.at(i); }
 
     /**
      * Build the dimension point vector from vector of values for each dimension. It does the cartesian product of

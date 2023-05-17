@@ -15,6 +15,8 @@
 
 #include <netcdf>
 #include <spdlog/spdlog.h>
+#include <MathUtils/RegularGridInterpolator.h>
+#include <MathUtils/RegularGridNearest.h>
 
 #include "Dimensions.h"
 #include "Variables.h"
@@ -52,7 +54,9 @@ namespace poem {
 
     virtual std::function<void(void *)> get_set_point_function() = 0;
 
-    virtual void* eval(const void *dimension_point) const = 0;
+    virtual void build() = 0;
+
+    virtual void *eval(const void *dimension_point) const = 0;
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
@@ -73,6 +77,7 @@ namespace poem {
   class Polar : public PolarBase {
    public:
     using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
+    using InterpolatorND = mathutils::RegularGridInterpolator<T, _dim>;
 
     Polar(const std::string &name,
           const std::string &unit,
@@ -80,7 +85,8 @@ namespace poem {
           type::POEM_TYPES type,
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarBase(name, unit, description, type),
-        m_dimension_point_set(dimension_point_set) {
+        m_dimension_point_set(dimension_point_set),
+        m_is_built(false) {
 
 
       for (const auto dimension_point: *m_dimension_point_set) {
@@ -96,16 +102,61 @@ namespace poem {
       return m_dimension_point_set.get();
     }
 
-    // TODO: voir si on garde
-    void* eval(const void* dimension_point) const override {
-      c_current_value = 2; // TEST
+    void build() override {
 
-      auto point = static_cast<const std::array<T, _dim>*>(dimension_point);
+      if (!is_filled()) {
+        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
+        CRITICAL_ERROR;
+      }
+
+      m_interpolator = std::make_unique<InterpolatorND>();
+
+      using NDArray = boost::multi_array<T, _dim>;
+      using IndexArray = boost::array<typename NDArray::index, _dim>;
+      IndexArray shape;
+
+      size_t num_elements = 1;
+      for (size_t i = 0; i < _dim; ++i) {
+        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
+        auto dim_vector = m_dimension_point_set->dimension_vector(i);
+
+        shape[i] = dim_vector.size();
+        num_elements *= shape[i];
+
+        m_interpolator->AddCoord(dim_vector);
+      }
+
+      NDArray array(shape);
+
+      std::vector<T> data;
+      data.reserve(num_elements);
+
+      for (const auto &point: m_points) {
+        data.push_back(point.second.value());
+      }
+
+      std::copy(data.begin(), data.end(), array.data());
+
+      m_interpolator->AddVar(array);
+
+      m_is_built = true;
+    }
+
+    // TODO: voir si on garde
+    void *eval(const void *dimension_point) const override {
+
+
+      auto point = static_cast<const std::array<T, _dim> *>(dimension_point);
       // TODO: tester que tout est dans les ranges des dimensions
 
 
 
       // TODO: terminer et interpoler !!!
+
+
+      c_current_value = 2; // TEST
+
+
 
 
 
@@ -219,8 +270,12 @@ namespace poem {
     }
 
    private:
+    bool m_is_built;
+
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     PolarPoints m_points;
+
+    std::unique_ptr<InterpolatorND> m_interpolator;
 
     mutable T c_current_value;
 

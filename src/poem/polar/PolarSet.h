@@ -25,6 +25,7 @@ namespace poem {
     using NameMap = std::unordered_map<std::string, std::string>;
 
     PolarSet(const Attributes &attributes, const Schema &schema, const Schema &newest_schema) :
+        m_is_built(false),
         m_attributes(attributes),
         m_schema(schema),
         m_newest_schema(newest_schema) {
@@ -72,6 +73,14 @@ namespace poem {
       return polar_ptr;
     }
 
+    void build() {
+
+      for (auto &polar : m_polars_map) {
+        polar.second->build();
+      }
+
+      m_is_built = true;
+    }
 
 
     bool is_using_newest_schema() const { return m_schema.is_newest(); }
@@ -84,7 +93,7 @@ namespace poem {
 
     // TODO: voir si on garde
     template<typename T, size_t _dim>
-    const Polar<T, _dim> *get_polar(const std::string &name) const {
+    Polar<T, _dim> *get_polar(const std::string &name) const {
       std::string old_name;
       try {
         old_name = m_polar_name_map.at(name);
@@ -93,12 +102,13 @@ namespace poem {
         CRITICAL_ERROR
       }
 
-      return static_cast<Polar<T, _dim>*>(m_polars_map.at(old_name).get());
+      return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
     }
 
     // TODO: voir si on garde
-    template <typename T, size_t _dim>
-    T eval(const std::string &name, const std::array<T, _dim> dimension_point) const { // TODO: point devrait etre type ???
+    template<typename T, size_t _dim>
+    T eval(const std::string &name,
+           const std::array<T, _dim> dimension_point) const { // TODO: point devrait etre type ???
       std::string old_name;
       try {
         old_name = m_polar_name_map.at(name);
@@ -108,7 +118,7 @@ namespace poem {
       }
 
       auto polar = m_polars_map.at(old_name).get();
-      return *static_cast<double*>(polar->eval(&dimension_point));
+      return *static_cast<double *>(polar->eval(&dimension_point));
 
     }
 
@@ -203,6 +213,8 @@ namespace poem {
     }
 
    private:
+    bool m_is_built;
+
     Attributes m_attributes;
     NameMap m_attributes_name_map;
 

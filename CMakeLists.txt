@@ -29,7 +29,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(Add_version)
 
-
+include(Add_mathutils)
 include(Add_json)
 include(Add_glob)
 include(Add_spdlog)
@@ -48,7 +48,7 @@ include(Add_netcdf-cxx4)
 add_subdirectory(src/poem)
 
 if (POEM_BUILD_UNIT_TESTS)
-  include(Add_mathutils)
+
   include(Add_googletest)
   enable_testing()
   add_subdirectory(tests)

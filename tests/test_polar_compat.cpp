@@ -106,6 +106,7 @@ TEST(POLAR, WRITE) {
                                                type::POEM_TYPES::DOUBLE,
                                                dimension_point_environment);
 
+  ASSERT_THROW(polar_set->build(), CriticalError);
 
   // Populating variable
   double val = 0.;
@@ -116,6 +117,9 @@ TEST(POLAR, WRITE) {
     val += 1.1;
   }
 
+  polar_set->build();
+
+
   // Essai d'appel a eval direct sur polar set
 //  std::array<double, 5> point = {1, 2, 3, 4, 5};
   std::cout << polar_set->eval<double, 5>("BrakePower", {1, 2, 3, 4, 5}) << std::endl;
@@ -125,6 +129,7 @@ TEST(POLAR, WRITE) {
   auto brake_power_polar = polar_set->get_polar<double, 5>("BrakePower");
 //  auto dim_point_set = brake_power_polar->dimension_point_set();
 
+//  brake_power_polar->build();
 
 
 
