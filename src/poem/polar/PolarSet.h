@@ -88,20 +88,20 @@ namespace poem {
       return is_filled;
     }
 
-    std::vector<PolarSet*> split(const size_t chunk_size) const {
-
-//      size_t nviews = size() / chunk_size;
-//      size_t rem = size() % chunk_size;
-
-      // FIXME: on va preferer une fonction qui genere un vecteur de PolarSet
-
-
-
-
-
-
-
-    }
+//    std::vector<PolarSet*> split(const size_t chunk_size) const {
+//
+////      size_t nviews = size() / chunk_size;
+////      size_t rem = size() % chunk_size;
+//
+//      // FIXME: on va preferer une fonction qui genere un vecteur de PolarSet
+//
+//
+//
+//
+//
+//
+//
+//    }
 
     /*
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...

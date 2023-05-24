@@ -105,10 +105,9 @@ namespace poem {
         m_nearest_is_built(false),
         m_dimension_point_set(dimension_point_set) {
 
-
       for (const auto dimension_point: *m_dimension_point_set) {
         PolarPoint<T, _dim> polar_point(dimension_point);
-        m_points.insert({dimension_point.get(), polar_point});
+        m_polar_points.insert({dimension_point.get(), polar_point});
       }
 
     }
@@ -145,7 +144,7 @@ namespace poem {
 
       std::vector<T> data;
       data.reserve(num_elements);
-      for (const auto &point: m_points) {
+      for (const auto &point: m_polar_points) {
         data.push_back(point.second.value());
       }
 
@@ -182,7 +181,7 @@ namespace poem {
 
       std::vector<T> data;
       data.reserve(num_elements);
-      for (const auto &point: m_points) {
+      for (const auto &point: m_polar_points) {
         data.push_back(point.second.value());
       }
 
@@ -273,7 +272,7 @@ namespace poem {
 
         // Get the values as a flat vector
         std::vector<T> values;
-        for (const auto &point: m_points) {
+        for (const auto &point: m_polar_points) {
           values.push_back(point.second.value());
         }
 
@@ -295,7 +294,7 @@ namespace poem {
 
       const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
 
-      auto &internal_polar_point = m_points.at(dimension_point);
+      auto &internal_polar_point = m_polar_points.at(dimension_point);
 
       if (internal_polar_point.has_value()) {
         spdlog::warn("The same polar point has been set more than one time");
@@ -305,7 +304,7 @@ namespace poem {
     }
 
     bool is_filled() const override {
-      return std::all_of(m_points.begin(), m_points.end(),
+      return std::all_of(m_polar_points.begin(), m_polar_points.end(),
                          [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
                            return x.second.has_value();
                          }
@@ -324,7 +323,7 @@ namespace poem {
     bool m_nearest_is_built;
 
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
-    PolarPoints m_points;
+    PolarPoints m_polar_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;
     std::unique_ptr<NearestND> m_nearest;
