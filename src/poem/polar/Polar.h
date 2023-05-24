@@ -54,7 +54,10 @@ namespace poem {
 
     virtual void set_point(void *polar_point) = 0;
 
-//    virtual std::function<void(void *)> get_set_point_function() = 0;
+    virtual bool is_filled() const = 0;
+
+    // FIXME: pas le plus elegant le void void...
+    virtual std::function<void(void *)> get_set_point_function() = 0;
 
     virtual void build_interpolator() = 0;
 
@@ -301,7 +304,7 @@ namespace poem {
 
     }
 
-    bool is_filled() const {
+    bool is_filled() const override {
       return std::all_of(m_points.begin(), m_points.end(),
                          [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
                            return x.second.has_value();
@@ -309,11 +312,12 @@ namespace poem {
       );
     }
 
-//    std::function<void(void *)> get_set_point_function() override {
-//      return [this](void *polar_point) {
-//        set_point(polar_point);
-//      };
-//    }
+    // FIXME: pas le plus elegant le void void...
+    std::function<void(void *)> get_set_point_function() override {
+      return [this](void *polar_point) {
+        set_point(polar_point);
+      };
+    }
 
    private:
     bool m_interpolator_is_built;
@@ -326,6 +330,18 @@ namespace poem {
     std::unique_ptr<NearestND> m_nearest;
 
   };
+
+  /**
+   *
+   */
+  class PolarView {
+   public:
+    PolarView() = default;
+
+   private:
+
+  };
+
 
 }  // poem
 

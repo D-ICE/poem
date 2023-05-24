@@ -100,17 +100,16 @@ namespace poem {
   template<size_t _dim>
   class DimensionPoint {
    public:
-    using Values = std::array<double, _dim>;
+    using Components = std::array<double, _dim>;
 
 //    DimensionPoint(const DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set) :
 //        m_ID_array(IDArray),
 //        m_values({}),
 //        m_origin_dimension_point_set(dimension_point_set) {}
 
-    // FIXME: pourquoi on a le DimensionIDSet ? On devrait l'avoir deja dans le DimensionPointSet non ?
-    DimensionPoint(DimensionPointSet<_dim> *dimension_point_set, const Values &values) :
-        m_values(values),
-        m_dimension_point_set(dimension_point_set) {
+    DimensionPoint(std::shared_ptr<DimensionIDSet<_dim>> dimensionIdSet, const Components &components) :
+        m_components(components),
+        m_dimensionIdSet(dimensionIdSet) {
 
       Check();
     }
@@ -120,20 +119,20 @@ namespace poem {
 //      Check();
 //    }
 
-    const DimensionPointSet<_dim> *dimension_point_set() const { return m_dimension_point_set; }
+//    const DimensionPointSet<_dim> *dimension_point_set() const { return m_dimension_point_set; }
 
-    const double &get(size_t i) const { return m_values.at(i); }
+    const double &get(size_t i) const { return m_components.at(i); }
 
     const double &get(const std::string &name) {
-      return m_values.at(m_dimension_point_set->dimension_ID_set()->get_index(name));
+      return m_components.at(m_dimensionIdSet->get_index(name));
     }
 
    private:
     void Check() {
       // Checking if the given values are well between min and max for each dimension
       for (size_t i = 0; i < _dim; ++i) {
-        const double val = m_values.at(i);
-        DimensionID *ID = m_dimension_point_set->dimension_ID_set()->get(i);
+        const double val = m_components.at(i);
+        DimensionID *ID = m_dimensionIdSet->get(i);
         if (val < ID->min() || val > ID->max()) {
           spdlog::critical("For dimension {}, values {} is out of range [{}, {}]",
                            ID->name(), val, ID->min(), ID->max());
@@ -143,9 +142,10 @@ namespace poem {
     }
 
    private:
-    Values m_values;
+    Components m_components;
 
-    DimensionPointSet<_dim> *m_dimension_point_set;
+//    DimensionPointSet<_dim> *m_dimension_point_set;
+    std::shared_ptr<DimensionIDSet<_dim>> m_dimensionIdSet;
 
   };
 
@@ -210,7 +210,7 @@ namespace poem {
       }
       m_dimension_points.reserve(size);
 
-      typename DimensionPoint<_dim>::Values values;
+      typename DimensionPoint<_dim>::Components values;
       meta_for_loop<_dim>(values);
 
       m_is_built = true;
@@ -232,12 +232,12 @@ namespace poem {
     // We use row major convention (last dimension varies the fastest) to be directly compliant with NetCDF internal
     // storage convention (and it is C compliant too...)
     template<size_t index>
-    constexpr void meta_for_loop(typename DimensionPoint<_dim>::Values &values) {
+    constexpr void meta_for_loop(typename DimensionPoint<_dim>::Components &values) {
       size_t i = _dim - index; // makes the last loop iterate on last dim
       for (const auto &element: m_dimension_vectors[i]) {
         values.at(i) = element;
         if constexpr (index == 1) {
-          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(this, values));
+          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dimension_ID_set, values));
 
         } else {
           meta_for_loop<index - 1>(values);

@@ -76,6 +76,33 @@ namespace poem {
 
     const Attributes &attributes() const { return m_attributes; }
 
+    bool is_filled() const {
+      bool is_filled = true;
+      for (const auto &polar : m_polars_map) {
+        if (!polar.second->is_filled()) {
+          is_filled = false;
+          break;
+        }
+      }
+
+      return is_filled;
+    }
+
+    std::vector<PolarSet*> split(const size_t chunk_size) const {
+
+//      size_t nviews = size() / chunk_size;
+//      size_t rem = size() % chunk_size;
+
+      // FIXME: on va preferer une fonction qui genere un vecteur de PolarSet
+
+
+
+
+
+
+
+    }
+
     /*
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
@@ -113,8 +140,8 @@ namespace poem {
 
     template<typename T, size_t _dim>
     T nearest(const std::string &name,
-             const std::array<double, _dim> dimension_point,
-             bool bound_check = true) const {
+              const std::array<double, _dim> dimension_point,
+              bool bound_check = true) const {
       std::string old_name;
       try {
         old_name = m_polar_name_map.at(name);
