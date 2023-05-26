@@ -11,6 +11,35 @@
       "type": "string",
       "tags": ["required"],
       "_values": ["ND", "CDA"]
+    },
+    "info": {
+      "doc": "information on polar",
+      "type": "string"
+    },
+    "version": {
+      "doc": "The version of the generator",
+      "type": "string"
+    },
+    "copyright": {
+      "doc": "Copyright",
+      "type": "string"
+    },
+    "date": {
+      "doc": "The date of creation of the polar",
+      "type": "string"
+    },
+    "vessel_type": {
+      "doc": "The type of vessel",
+      "type": "string",
+      "_values": ["MOTOR", "HYBRID", "SAILING"]
+    },
+    "control_variable": {
+      "doc": "The control variable of the polars. If no control (pure sailing vessel), this is None",
+      "type": "string"
+    },
+    "max_BrakePower_kW": {
+      "doc": "Maximum brake power available for the propulsion",
+      "type": "string"
     }
   },
 
