@@ -220,6 +220,85 @@ namespace poem {
       return m_dimension_points.at(i).get();
     }
 
+    std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const size_t chunk_size) const {
+
+      size_t nviews = size() / chunk_size;
+      size_t rem = size() % chunk_size;
+
+      std::vector<std::shared_ptr<DimensionPointSet<_dim>>> dimension_point_set_vector;
+//      std::vector<HybridPolarView *> views;
+
+      if (nviews == 0) {
+        // We have only one view with rem polar points inside
+        dimension_point_set_vector.reserve(1);
+
+        DimensionPointVector dim_point_vector;
+        dim_point_vector.reserve(rem);
+        for (size_t i = 0; i < rem; ++i) {
+          dim_point_vector.push_back(m_dimension_points[i]);
+        }
+
+//        m_views.push_back(std::make_unique<HybridPolarView>(m_ctrl_var_name, polar_points_view));
+        auto dim_point_set = std::make_shared<DimensionPointSet<_dim>>(m_dimension_ID_set);
+        dim_point_set->m_dimension_points = dim_point_vector;
+        dim_point_set->m_is_built = true;
+
+        dimension_point_set_vector.push_back(dim_point_set);
+
+      } else {
+        // TODO: continuer !!!
+        // Global polar is split in nviews with similar number of polar points inside (modulo rem)
+        // Here we have a kind of static balancing
+
+        dimension_point_set_vector.reserve(nviews);
+//        views.reserve(nviews);
+
+        // Managing cases where rem > nviews. We have to balance more than one element from rem in each view
+        size_t s;
+        size_t rem2;
+        if (rem <= nviews) {
+          s = 1;
+          rem2 = 0;
+        } else {
+          s = rem / nviews;
+          rem2 = rem % nviews;
+        }
+
+        size_t offset = 0;
+        size_t size;
+        for (size_t iview = 0; iview < nviews; ++iview) {
+          size = chunk_size;
+          if (rem > 0) {
+            size += s;
+            rem -= s;
+            if (rem2 > 0) {
+              size++;
+              rem2--;
+              rem--;
+            }
+          }
+
+          DimensionPointVector dim_point_vector;
+//          std::vector<Polar5DPoint> polar_points_view;
+          dim_point_vector.reserve(size);
+          for (size_t i = offset; i < offset + size; ++i) {
+            dim_point_vector.push_back(m_dimension_points[i]);
+          }
+
+          auto dim_point_set = std::make_shared<DimensionPointSet<_dim>>(m_dimension_ID_set);
+          dim_point_set->m_dimension_points = dim_point_vector;
+          dim_point_set->m_is_built = true;
+
+          dimension_point_set_vector.push_back(dim_point_set);
+
+          offset += size;
+        }
+
+      }
+
+      return dimension_point_set_vector;
+    }
+
     Iter begin() const { return m_dimension_points.cbegin(); }
 
     Iter end() const { return m_dimension_points.cend(); }
