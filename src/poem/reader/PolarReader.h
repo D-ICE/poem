@@ -45,10 +45,8 @@ namespace poem {
     template<size_t _dim>
     void load_variable(const std::string &var_name);
 
-    template<typename T, size_t _dim>
-    void load_variable(const std::string &var_name);
 
-    template<type::POEM_TYPES type, size_t _dim>
+    template<size_t _dim>
     void load_var_data(netCDF::NcVar &nc_var, std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set);
 
    private:

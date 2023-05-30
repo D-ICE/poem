@@ -103,25 +103,8 @@ namespace poem {
 
   }
 
+
   template<size_t _dim>
-  void PolarReader::load_variable(const std::string &var_name) {
-    auto nc_var = m_dataFile->getVar(var_name);
-    auto type = nc_var.getType();
-
-    switch (type.getId()) {
-      case netCDF::NcType::nc_DOUBLE:
-        load_variable<double, _dim>(var_name);
-        return;
-      case netCDF::NcType::nc_INT:
-        load_variable<int, _dim>(var_name);
-        return;
-      default:
-        spdlog::critical("Type {} is not managed yet", type.getTypeClass());
-        CRITICAL_ERROR
-    }
-  }
-
-  template<typename T, size_t _dim>
   void PolarReader::load_variable(const std::string &var_name) {
     auto nc_var = m_dataFile->getVar(var_name);
 
@@ -166,22 +149,11 @@ namespace poem {
 
     }
 
-    auto nc_type = nc_var.getType();
 
-    switch (nc_type.getId()) {
-      case netCDF::NcType::nc_DOUBLE:
-        return load_var_data<type::DOUBLE, _dim>(nc_var, dimension_point_set);
-      case netCDF::NcType::nc_INT:
-        return load_var_data<type::INT, _dim>(nc_var, dimension_point_set);
-      default:
-        // We should never get here
-        spdlog::critical("Type {} is not managed yet", nc_type.getTypeClass());
-        CRITICAL_ERROR
-    }
 
   }
 
-  template<type::POEM_TYPES type, size_t _dim>
+  template<size_t _dim>
   void PolarReader::load_var_data(netCDF::NcVar &nc_var, std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
     auto var_name = nc_var.getName();
@@ -192,7 +164,7 @@ namespace poem {
     nc_var.getAtt("description").getValues(description);
 
     size_t var_size = dimension_point_set->size();
-    auto polar = m_polar_set->New<double, _dim>(var_name, unit, description, type, dimension_point_set);
+    auto polar = m_polar_set->New<_dim>(var_name, unit, description, dimension_point_set);
 
     // Get the values of the variable
     std::vector<double> values(var_size);
@@ -200,7 +172,7 @@ namespace poem {
 
     size_t i = 0;
     for (const auto &dimension_point: *dimension_point_set) {
-      PolarPoint<double, _dim> polar_point(dimension_point, values[i]);
+      PolarPoint<_dim> polar_point(dimension_point, values[i]);
       polar->set_point(&polar_point);
       i++;
     }

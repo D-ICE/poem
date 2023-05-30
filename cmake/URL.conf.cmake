@@ -1,4 +1,4 @@
-# viper version
+# poem version
 set(${PROJECT_NAME}-version_URL git@d-ice.gitlab.host:common/dice-tools/cmake-version.git)
 set(${PROJECT_NAME}-version_TAG v1.3)
 

@@ -49,22 +49,21 @@ namespace poem {
       generate_attributes_name_map();
     };
 
-    template<typename T, size_t _dim>
-    Polar<T, _dim> *New(const std::string &name,
-                        const std::string &unit,
-                        const std::string &description,
-                        type::POEM_TYPES type,
-                        std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+    template<size_t _dim>
+    Polar<_dim> *New(const std::string &name,
+                     const std::string &unit,
+                     const std::string &description,
+                     std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       if (!dimension_point_set->is_built()) dimension_point_set->build();
 
-      auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);
+      auto polar = std::make_unique<Polar<_dim>>(name, unit, description, dimension_point_set);
 
       m_polars_map.insert({name, std::move(polar)});
-      auto polar_ptr = static_cast<Polar<T, _dim> *>(m_polars_map[name].get());
+      auto polar_ptr = static_cast<Polar<_dim> *>(m_polars_map[name].get());
 
       // Check that the polar is compliant with the current schema
-      m_schema.check_polar<T, _dim>(polar_ptr);
+      m_schema.check_polar<_dim>(polar_ptr);
 
       // Generate map
       generate_polar_name_map(name);
@@ -78,7 +77,7 @@ namespace poem {
 
     bool is_filled() const {
       bool is_filled = true;
-      for (const auto &polar : m_polars_map) {
+      for (const auto &polar: m_polars_map) {
         if (!polar.second->is_filled()) {
           is_filled = false;
           break;
@@ -107,8 +106,8 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
-    template<typename T, size_t _dim>
-    Polar<T, _dim> *get_polar(const std::string &name) const {
+    template<size_t _dim>
+    Polar<_dim> *get_polar(const std::string &name) const {
       std::string old_name;
       try {
         old_name = m_polar_name_map.at(name);
@@ -117,13 +116,13 @@ namespace poem {
         CRITICAL_ERROR
       }
 
-      return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
+      return static_cast<Polar<_dim> *>(m_polars_map.at(old_name).get());
     }
 
-    template<typename T, size_t _dim>
-    T interp(const std::string &name,
-             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
-             bool bound_check = true) const {
+    template<size_t _dim>
+    double interp(const std::string &name,
+                  const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
+                  bool bound_check = true) const {
 
       std::string old_name;
       try {
@@ -134,12 +133,12 @@ namespace poem {
       }
 
       auto polar = m_polars_map.at(old_name).get();
-      return polar->interp<T, _dim>(dimension_point, bound_check);
+      return polar->interp<_dim>(dimension_point, bound_check);
 
     }
 
-    template<typename T, size_t _dim>
-    T nearest(const std::string &name,
+    template<size_t _dim>
+    double nearest(const std::string &name,
               const std::array<double, _dim> dimension_point,
               bool bound_check = true) const {
       std::string old_name;
@@ -151,7 +150,7 @@ namespace poem {
       }
 
       auto polar = m_polars_map.at(old_name).get();
-      return polar->nearest<T, _dim>(dimension_point, bound_check);
+      return polar->nearest<_dim>(dimension_point, bound_check);
     }
 
 

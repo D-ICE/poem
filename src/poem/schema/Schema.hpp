@@ -1,8 +1,8 @@
 
 namespace poem {
 
-  template<typename T, size_t _dim>
-  void Schema::check_polar(Polar<T, _dim> *polar) const {
+  template<size_t _dim>
+  void Schema::check_polar(Polar<_dim> *polar) const {
 
     auto polar_name = polar->name();
 
