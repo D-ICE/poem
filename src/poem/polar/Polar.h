@@ -26,7 +26,7 @@
 namespace poem {
 
   // forward declaration
-  template<size_t _dim>
+  template<typename T, size_t _dim>
   class Polar;
 
   /**
@@ -36,8 +36,9 @@ namespace poem {
    public:
     explicit PolarBase(const std::string &name,
                        const std::string &unit,
-                       const std::string &description) :
-        m_var_ID(std::make_unique<VariableID>(name, unit, description)) {
+                       const std::string &description,
+                       type::POEM_TYPES type) :
+        m_var_ID(std::make_unique<VariableID>(name, unit, description, type)) {
 
     }
 
@@ -49,6 +50,7 @@ namespace poem {
 
     const std::string &description() const { return m_var_ID->description(); }
 
+    const type::POEM_TYPES &type() const { return m_var_ID->type(); }
 
     virtual void set_point(void *polar_point) = 0;
 
@@ -61,14 +63,14 @@ namespace poem {
 
     virtual void build_nearest() = 0;
 
-    template<size_t _dim>
-    double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-      return static_cast<const Polar<_dim> *>(this)->interp(dimension_point, bound_check);
+    template<typename T, size_t _dim>
+    T interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      return static_cast<const Polar<T, _dim> *>(this)->interp(dimension_point, bound_check);
     }
 
-    template<size_t _dim>
-    double nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-      return static_cast<const Polar<_dim> *>(this)->nearest(dimension_point, bound_check);
+    template<typename T, size_t _dim>
+    T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      return static_cast<const Polar<T, _dim> *>(this)->nearest(dimension_point, bound_check);
     }
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
@@ -83,26 +85,28 @@ namespace poem {
    *
    * Should not be implemented directly but via a PolarSet
    *
+   * @tparam T datatype of the polar
    * @tparam _dim number of dimensions of the polar
    */
-  template<size_t _dim>
+  template<typename T, size_t _dim>
   class Polar : public PolarBase {
    public:
-    using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<_dim>>;
-    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
-    using NearestND = mathutils::RegularGridNearest<double, _dim, double>;
+    using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
+    using InterpolatorND = mathutils::RegularGridInterpolator<T, _dim>;
+    using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
     Polar(const std::string &name,
           const std::string &unit,
           const std::string &description,
+          type::POEM_TYPES type,
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
-        PolarBase(name, unit, description),
+        PolarBase(name, unit, description, type),
         m_interpolator_is_built(false),
         m_nearest_is_built(false),
         m_dimension_point_set(dimension_point_set) {
 
       for (const auto dimension_point: *m_dimension_point_set) {
-        PolarPoint<_dim> polar_point(dimension_point);
+        PolarPoint<T, _dim> polar_point(dimension_point);
         m_polar_points.insert({dimension_point.get(), polar_point});
       }
 
@@ -123,7 +127,7 @@ namespace poem {
 
       m_interpolator = std::make_unique<InterpolatorND>();
 
-      using NDArray = boost::multi_array<double, _dim>;
+      using NDArray = boost::multi_array<T, _dim>;
       using IndexArray = boost::array<typename NDArray::index, _dim>;
       IndexArray shape;
 
@@ -138,7 +142,7 @@ namespace poem {
         m_interpolator->AddCoord(dim_vector);
       }
 
-      std::vector<double> data;
+      std::vector<T> data;
       data.reserve(num_elements);
       for (const auto &point: m_polar_points) {
         data.push_back(point.second.value());
@@ -160,7 +164,7 @@ namespace poem {
 
       m_nearest = std::make_unique<NearestND>();
 
-      using NDArray = boost::multi_array<double, _dim>;
+      using NDArray = boost::multi_array<T, _dim>;
       using IndexArray = boost::array<typename NDArray::index, _dim>;
       IndexArray shape;
 
@@ -175,7 +179,7 @@ namespace poem {
         m_nearest->AddCoord(dim_vector);
       }
 
-      std::vector<double> data;
+      std::vector<T> data;
       data.reserve(num_elements);
       for (const auto &point: m_polar_points) {
         data.push_back(point.second.value());
@@ -189,17 +193,17 @@ namespace poem {
 
     }
 
-    double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+    T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
       if (!m_interpolator_is_built) {
-        const_cast<Polar<_dim> *>(this)->build_interpolator();
+        const_cast<Polar<T, _dim> *>(this)->build_interpolator();
       }
 
       return m_interpolator->Interp(dimension_point, bound_check);
     }
 
-    double nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+    T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       if (!m_nearest_is_built) {
-        const_cast<Polar<_dim> *>(this)->build_nearest();
+        const_cast<Polar<T, _dim> *>(this)->build_nearest();
       }
 
       // FIXME: bound_check non utilise encore dans RegularGridNearest
@@ -256,12 +260,18 @@ namespace poem {
 
       if (nc_var.isNull()) {
 
+        switch (type()) {
+          case type::DOUBLE:
             nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
+            break;
+          case type::INT:
+            nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
 
+        }
         nc_var.setCompression(true, true, 5);
 
         // Get the values as a flat vector
-        std::vector<double> values;
+        std::vector<T> values;
         for (const auto &point: m_polar_points) {
           values.push_back(point.second.value());
         }
@@ -279,7 +289,7 @@ namespace poem {
 
     void set_point(void *polar_point) override {
 
-      auto polar_point_ = static_cast<PolarPoint<_dim> *>(polar_point);
+      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
       if (!polar_point_->has_value()) spdlog::critical("Attempting to set the polar with non-initialized polar point");
 
       const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
@@ -295,7 +305,7 @@ namespace poem {
 
     bool is_filled() const override {
       return std::all_of(m_polar_points.begin(), m_polar_points.end(),
-                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<_dim>> x) {
+                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
                            return x.second.has_value();
                          }
       );

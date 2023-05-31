@@ -12,26 +12,27 @@ namespace poem {
 
   /**
  * Represents a point of a polar along with its dimension values
+ * @tparam T type of the value
  * @tparam _dim dimension of the point
  */
-  template<size_t _dim>
+  template<typename T, size_t _dim>
   class PolarPoint {
    public:
     explicit PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point) :
         m_dimension_point(dimension_point),
         m_has_value(false) {}
 
-    PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point, const double &val) :
+    PolarPoint(std::shared_ptr<DimensionPoint<_dim>> dimension_point, const T &val) :
         m_dimension_point(dimension_point),
         m_value(val),
         m_has_value(true) {}
 
-    void set_value(const double &val) {
+    void set_value(const T &val) {
       m_value = val;
       m_has_value = true;
     }
 
-    const double &value() const {
+    const T &value() const {
       return m_value;
     }
 
@@ -42,7 +43,7 @@ namespace poem {
    private:
     bool m_has_value;
     std::shared_ptr<DimensionPoint<_dim>> m_dimension_point;
-    double m_value;
+    T m_value;
   };
 
 }  // poem

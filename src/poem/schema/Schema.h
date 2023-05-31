@@ -23,7 +23,7 @@ using json = nlohmann::json;
 
 namespace poem {
 
-  template<size_t>
+  template<typename, size_t>
   class Polar;
 
   /**
@@ -170,8 +170,8 @@ namespace poem {
 
     void check_attributes(Attributes *attributes) const;
 
-    template<size_t _dim>
-    void check_polar(Polar<_dim> *polar) const;
+    template<typename T, size_t _dim>
+    void check_polar(Polar<T, _dim> *polar) const;
 
     std::string get_newest_attribute_name(const std::string &name) const;
 

@@ -15,8 +15,9 @@ namespace poem {
    public:
     VariableID(const std::string &name,
                 const std::string &unit,
-                const std::string &description) :
-        Named(name, unit, description) {
+                const std::string &description,
+                type::POEM_TYPES type) :
+        Named(name, unit, description, type) {
 
       // TODO: c'est ici qu'on veut faire le check par rapport au schema
     }

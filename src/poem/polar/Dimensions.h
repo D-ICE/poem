@@ -33,7 +33,7 @@ namespace poem {
                 const std::string &description,
                 double min,
                 double max) :
-        Named(name, unit, description), // A dimension has always the type DOUBLE (interpolation coord)
+        Named(name, unit, description, type::DOUBLE), // A dimension has always the type DOUBLE (interpolation coord)
         m_min(min),
         m_max(max) {
 

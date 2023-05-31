@@ -11,6 +11,7 @@
 set(TESTS
 #        test_polar_creation
         test_polar_compat
+        test_enable_if
         )
 
 
