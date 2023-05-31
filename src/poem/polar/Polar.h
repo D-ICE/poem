@@ -59,10 +59,6 @@ namespace poem {
     // FIXME: pas le plus elegant le void void...
     virtual std::function<void(void *)> get_set_point_function() = 0;
 
-    virtual void build_interpolator() = 0;
-
-    virtual void build_nearest() = 0;
-
     template<typename T, size_t _dim>
     T interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       return static_cast<const Polar<T, _dim> *>(this)->interp(dimension_point, bound_check);
@@ -74,6 +70,11 @@ namespace poem {
     }
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
+
+   protected:
+    virtual void build_interpolator() = 0;
+
+    virtual void build_nearest() = 0;
 
    protected:
     std::unique_ptr<VariableID> m_var_ID;
@@ -118,82 +119,11 @@ namespace poem {
       return m_dimension_point_set.get();
     }
 
-    void build_interpolator() override {
-
-      if (!is_filled()) {
-        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
-        CRITICAL_ERROR
-      }
-
-      m_interpolator = std::make_unique<InterpolatorND>();
-
-      using NDArray = boost::multi_array<T, _dim>;
-      using IndexArray = boost::array<typename NDArray::index, _dim>;
-      IndexArray shape;
-
-      size_t num_elements = 1;
-      for (size_t i = 0; i < _dim; ++i) {
-        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
-        auto dim_vector = m_dimension_point_set->dimension_vector(i);
-
-        shape[i] = dim_vector.size();
-        num_elements *= shape[i];
-
-        m_interpolator->AddCoord(dim_vector);
-      }
-
-      std::vector<T> data;
-      data.reserve(num_elements);
-      for (const auto &point: m_polar_points) {
-        data.push_back(point.second.value());
-      }
-
-      NDArray array(shape);
-      std::copy(data.begin(), data.end(), array.data());
-      m_interpolator->AddVar(array);
-
-      m_interpolator_is_built = true;
-    }
-
-    void build_nearest() override {
-
-      if (!is_filled()) {
-        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
-        CRITICAL_ERROR
-      }
-
-      m_nearest = std::make_unique<NearestND>();
-
-      using NDArray = boost::multi_array<T, _dim>;
-      using IndexArray = boost::array<typename NDArray::index, _dim>;
-      IndexArray shape;
-
-      size_t num_elements = 1;
-      for (size_t i = 0; i < _dim; ++i) {
-        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
-        auto dim_vector = m_dimension_point_set->dimension_vector(i);
-
-        shape[i] = dim_vector.size();
-        num_elements *= shape[i];
-
-        m_nearest->AddCoord(dim_vector);
-      }
-
-      std::vector<T> data;
-      data.reserve(num_elements);
-      for (const auto &point: m_polar_points) {
-        data.push_back(point.second.value());
-      }
-
-      NDArray array(shape);
-      std::copy(data.begin(), data.end(), array.data());
-      m_nearest->AddVar(array);
-
-      m_nearest_is_built = true;
-
-    }
-
     T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
+      if (!std::is_floating_point_v<T>) {
+        spdlog::critical("Cannot interpolate on non floating point numbers");
+        CRITICAL_ERROR
+      }
       if (!m_interpolator_is_built) {
         const_cast<Polar<T, _dim> *>(this)->build_interpolator();
       }
@@ -316,6 +246,82 @@ namespace poem {
       return [this](void *polar_point) {
         set_point(polar_point);
       };
+    }
+
+   private:
+    void build_interpolator() override {
+
+      if (!is_filled()) {
+        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
+        CRITICAL_ERROR
+      }
+
+      m_interpolator = std::make_unique<InterpolatorND>();
+
+      using NDArray = boost::multi_array<T, _dim>;
+      using IndexArray = boost::array<typename NDArray::index, _dim>;
+      IndexArray shape;
+
+      size_t num_elements = 1;
+      for (size_t i = 0; i < _dim; ++i) {
+        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
+        auto dim_vector = m_dimension_point_set->dimension_vector(i);
+
+        shape[i] = dim_vector.size();
+        num_elements *= shape[i];
+
+        m_interpolator->AddCoord(dim_vector);
+      }
+
+      std::vector<T> data;
+      data.reserve(num_elements);
+      for (const auto &point: m_polar_points) {
+        data.push_back(point.second.value());
+      }
+
+      NDArray array(shape);
+      std::copy(data.begin(), data.end(), array.data());
+      m_interpolator->AddVar(array);
+
+      m_interpolator_is_built = true;
+    }
+
+    void build_nearest() override {
+
+      if (!is_filled()) {
+        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
+        CRITICAL_ERROR
+      }
+
+      m_nearest = std::make_unique<NearestND>();
+
+      using NDArray = boost::multi_array<T, _dim>;
+      using IndexArray = boost::array<typename NDArray::index, _dim>;
+      IndexArray shape;
+
+      size_t num_elements = 1;
+      for (size_t i = 0; i < _dim; ++i) {
+        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
+        auto dim_vector = m_dimension_point_set->dimension_vector(i);
+
+        shape[i] = dim_vector.size();
+        num_elements *= shape[i];
+
+        m_nearest->AddCoord(dim_vector);
+      }
+
+      std::vector<T> data;
+      data.reserve(num_elements);
+      for (const auto &point: m_polar_points) {
+        data.push_back(point.second.value());
+      }
+
+      NDArray array(shape);
+      std::copy(data.begin(), data.end(), array.data());
+      m_nearest->AddVar(array);
+
+      m_nearest_is_built = true;
+
     }
 
    private:
