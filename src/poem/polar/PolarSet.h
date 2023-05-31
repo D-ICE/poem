@@ -51,10 +51,10 @@ namespace poem {
 
     template<typename T, size_t _dim>
     Polar<T, _dim> *New(const std::string &name,
-                     const std::string &unit,
-                     const std::string &description,
+                        const std::string &unit,
+                        const std::string &description,
                         type::POEM_TYPES type,
-                     std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+                        std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       if (!dimension_point_set->is_built()) dimension_point_set->build();
 
@@ -122,8 +122,8 @@ namespace poem {
 
     template<typename T, size_t _dim>
     T interp(const std::string &name,
-                  const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
-                  bool bound_check = true) const {
+             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
+             bool bound_check = true) const {
 
       std::string old_name;
       try {
