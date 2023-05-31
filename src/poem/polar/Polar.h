@@ -330,16 +330,6 @@ namespace poem {
 
   };
 
-  /**
-   *
-   */
-  class PolarView {
-   public:
-    PolarView() = default;
-
-   private:
-
-  };
 
 
 }  // poem
