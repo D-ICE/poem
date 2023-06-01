@@ -216,8 +216,8 @@ namespace poem {
       m_is_built = true;
     }
 
-    DimensionPoint<_dim> *at(size_t i) {
-      return m_dimension_points.at(i).get();
+    std::shared_ptr<DimensionPoint<_dim>> at(size_t i) {
+      return m_dimension_points.at(i);
     }
 
     std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const size_t chunk_size) const {

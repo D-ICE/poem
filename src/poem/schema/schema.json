@@ -128,102 +128,102 @@
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "OptimizerStatus": {
-        "doc": "",
+        "doc": "Optimizer status",
         "type": "int",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "Optimizer_NbIter": {
-        "doc": "",
+        "doc": "Number of iterations for the optimizer",
         "type": "int",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "GWS": {
-        "doc": "",
+        "doc": "Ground Wind Speed",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "GWD": {
-        "doc": "",
+        "doc": "Ground Wind Direction",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "CS": {
-        "doc": "",
+        "doc": "Current Speed",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "CD": {
-        "doc": "",
+        "doc": "Current Direction",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "WD": {
-        "doc": "",
+        "doc": "Waves Direction",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "Hs": {
-        "doc": "",
+        "doc": "Waves Significant Height",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "Tp": {
-        "doc": "",
+        "doc": "Waves Peak Period",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "TWS": {
-        "doc": "",
+        "doc": "True Wind Speed",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "TWA": {
-        "doc": "",
+        "doc": "True Wind Angle",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "AWS": {
-        "doc": "",
+        "doc": "Apparent Wind Speed",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "AWA": {
-        "doc": "",
+        "doc": "Apparent Wind Angle",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "WA": {
-        "doc": "",
+        "doc": "Waves Angle",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "CA": {
-        "doc": "",
+        "doc": "Current Angle",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "STW": {
-        "doc": "",
+        "doc": "Speed Through Water",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "SurgeVelocity": {
-        "doc": "",
+        "doc": "Surge Velocity",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "SwayVelocity": {
-        "doc": "",
+        "doc": "Sway Velocity",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "LEEWAY": {
-        "doc": "",
+        "doc": "Leeway Angle",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
       "HEELING": {
-        "doc": "",
+        "doc": "Heeling Angle",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
@@ -234,18 +234,80 @@
         "tags": ["required"]
       },
       "TotalFuelConsumption": {
-        "doc": "Total Brake Power of the vessel",
+        "doc": "Total fuel consumption of the vessel",
         "type": "double",
-        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
-        "tags": ["required"]
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       },
-      "_ActivePower": {
-        "doc": "Total Brake Power of the vessel",
+      "*_propeller_handle_position": {
+        "doc": "Propeller handle position",
         "type": "double",
-        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
-        "tags": ["required"]
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_propeller_rpm": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_propeller_pitch_ratio": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_propeller_efficiency": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_propeller_advance_ratio": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_propeller_delivered_power": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_rudder_deflection_angle": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_rudder_AoA": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "TotalSailsActivePower": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_ActivePower": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_X": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_Y": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_K": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "*_N": {
+        "doc": "TODO",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
       }
-
 
     }
 

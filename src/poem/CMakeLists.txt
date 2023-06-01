@@ -9,7 +9,6 @@ target_link_libraries(poem PUBLIC
         spdlog
         nlohmann_json
         dunits
-        Glob
         )
 
 set_target_properties(poem PROPERTIES

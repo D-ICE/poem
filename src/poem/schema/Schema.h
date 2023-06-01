@@ -23,6 +23,8 @@ using json = nlohmann::json;
 
 namespace poem {
 
+  bool glob_match(const char *text, const char *glob);
+
   template<typename, size_t>
   class Polar;
 
@@ -196,6 +198,8 @@ namespace poem {
 
     std::unordered_map<std::string, std::string> m_variables_attributes_map;
     std::unordered_map<std::string, SchemaVariable> m_variables_map;
+
+    std::vector<std::string> m_regexes;
 
     // TODO: faire map de dimensions et de variables aussi
 

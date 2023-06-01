@@ -13,9 +13,22 @@ namespace poem {
 
     // Check if polar_name is present in variables map
     if (m_variables_map.find(polar_name) == m_variables_map.end()) {
+
+      // Looking into regexes
+      bool is_known_regex = false;
+      for (const auto &regex: m_regexes) {
+        if (glob_match(polar_name.c_str(), regex.c_str())) {
+          is_known_regex = true;
+          continue;
+        }
+      }
+
       // The variable is not known
-      spdlog::critical(R"(Variable "{}" is not known by the given schema)", polar_name);
-      CRITICAL_ERROR
+      if (!is_known_regex) {
+        spdlog::critical(R"(Variable "{}" is not known by the given schema)", polar_name);
+        CRITICAL_ERROR
+      }
+
     }
 
     // Pas possible de check ici que les variables requises par le scheme sont toutes la

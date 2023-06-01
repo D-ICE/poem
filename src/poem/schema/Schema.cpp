@@ -8,6 +8,7 @@
 #include "poem/polar/Attributes.h"
 #include "poem/polar/Polar.h"
 
+#define PATHSEP '/'
 
 namespace poem {
 
@@ -73,7 +74,6 @@ namespace poem {
      */
     for (const auto &attribute: *attributes) {
       if (m_global_attributes_map.find(attribute.first) == m_global_attributes_map.end()) {
-        // Ici on
         spdlog::critical(R"(Global attribute "{}" is not in the writer schema)", attribute.first);
         CRITICAL_ERROR
       }
@@ -84,14 +84,12 @@ namespace poem {
       if (schema_atts.second.is_required() && !attributes->contains(schema_atts.first)) {
 
         // Ok, not found with this name... looking for the aliases
-
         spdlog::critical(R"(Required attribute "{}" not found in polar)", schema_atts.first);
         CRITICAL_ERROR
       }
     }
 
   }
-
 
   std::string Schema::get_newest_attribute_name(const std::string &name) const {
 
@@ -168,16 +166,23 @@ namespace poem {
 
     auto node_field = m_json_schema["variables"]["fields"];
     for (auto iter = node_field.begin(); iter != node_field.end(); ++iter) {
-      SchemaVariable variable(iter.key(), iter.value());
+      std::string var_name = iter.key();
+
+      if (var_name.find('*') != std::string::npos) {
+        // We have a regex
+        m_regexes.push_back(var_name);
+      }
+
+      SchemaVariable variable(var_name, iter.value());
       // TODO: voir comment on gere quand c'est deprecated
-      m_variables_map.insert({iter.key(), variable});
+      m_variables_map.insert({var_name, variable});
 
       // Here we check that variables depend on existing dimensions
       auto var_dims = variable.dimensions_names();
       for (const auto &dim_name: var_dims) {
         if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
           spdlog::critical(R"(In schema definition, variable "{}" is said to depend on dimension "
-                           ""{}" which has not been defined)", iter.key(), dim_name);
+                           ""{}" which has not been defined)", var_name, dim_name);
           CRITICAL_ERROR
         }
       }
@@ -187,6 +192,110 @@ namespace poem {
 
   Schema get_newest_schema() {
     return {schema::schema_str, true};
+  }
+
+  // https://www.codeproject.com/Articles/5163931/Fast-String-Matching-with-Wildcards-Globs-and-Giti
+  bool glob_match(const char *text, const char *glob) {
+    const char *text1_backup = NULL;
+    const char *glob1_backup = NULL;
+    const char *text2_backup = NULL;
+    const char *glob2_backup = NULL;
+    // match pathname if glob contains a / otherwise match the basename
+    if (*glob == '/') {
+      // if pathname starts with ./ then ignore these pairs
+      while (*text == '.' && text[1] == PATHSEP)
+        text += 2;
+      // if pathname starts with / then ignore it
+      if (*text == PATHSEP)
+        text++;
+      glob++;
+    } else if (strchr(glob, '/') == NULL) {
+      const char *sep = strrchr(text, PATHSEP);
+      if (sep)
+        text = sep + 1;
+    }
+    while (*text != '\0') {
+      switch (*glob) {
+        case '*':
+          if (*++glob == '*') {
+            // trailing ** match everything after /
+            if (*++glob == '\0')
+              return true;
+            // ** followed by a / match zero or more directories
+            if (*glob != '/')
+              return false;
+            // new **-loop, discard *-loop
+            text1_backup = NULL;
+            glob1_backup = NULL;
+            text2_backup = text;
+            glob2_backup = ++glob;
+            continue;
+          }
+          // trailing * matches everything except /
+          text1_backup = text;
+          glob1_backup = glob;
+          continue;
+        case '?':
+          // match any character except /
+          if (*text == PATHSEP)
+            break;
+          text++;
+          glob++;
+          continue;
+        case '[': {
+          int lastchr;
+          int matched = false;
+          int reverse = glob[1] == '^' || glob[1] == '!' ? true : false;
+          // match any character in [...] except /
+          if (*text == PATHSEP)
+            break;
+          // inverted character class
+          if (reverse)
+            glob++;
+          // match character class
+          for (lastchr = 256; *++glob != '\0' && *glob != ']'; lastchr = *glob)
+            if (lastchr < 256 && *glob == '-' && glob[1] != ']' && glob[1] != '\0' ?
+                *text <= *++glob && *text >= lastchr :
+                *text == *glob)
+              matched = true;
+          if (matched == reverse)
+            break;
+          text++;
+          if (*glob != '\0')
+            glob++;
+          continue;
+        }
+        case '\\':
+          // literal match \-escaped character
+          glob++;
+          // FALLTHROUGH
+        default:
+          // match the current non-NUL character
+          if (*glob != *text && !(*glob == '/' && *text == PATHSEP))
+            break;
+          text++;
+          glob++;
+          continue;
+      }
+      if (glob1_backup != NULL && *text1_backup != PATHSEP) {
+        // *-loop: backtrack to the last * but do not jump over /
+        text = ++text1_backup;
+        glob = glob1_backup;
+        continue;
+      }
+      if (glob2_backup != NULL) {
+        // **-loop: backtrack to the last **
+        text = ++text2_backup;
+        glob = glob2_backup;
+        continue;
+      }
+      return false;
+    }
+    // ignore trailing stars
+    while (*glob == '*')
+      glob++;
+    // at end of text means success if nothing else is left to match
+    return *glob == '\0' ? true : false;
   }
 
 }  // poem

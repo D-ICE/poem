@@ -30,12 +30,6 @@ namespace poem {
   template<typename T, size_t _dim>
   class Polar;
 
-  template<typename T>
-  using is_floating_point = std::enable_if_t<std::is_floating_point_v<T>>;
-
-//  template<size_t _dim, typename = is_floating_point<T>>
-//  class InterpolablePolar;
-
   template<size_t _dim>
   class InterpolablePolar;
 
@@ -69,12 +63,8 @@ namespace poem {
     // FIXME: pas le plus elegant le void void...
     virtual std::function<void(void *)> get_set_point_function() = 0;
 
-    template<typename T, size_t _dim, typename = std::enable_if<std::is_same_v<T, double>>>
+    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-//      if (!std::is_floating_point_v<T>) {
-//        spdlog::critical("Cannot interpolate on non floating point numbers");
-//        CRITICAL_ERROR
-//      }
       return static_cast<const InterpolablePolar<_dim> *>(this)->interp(dimension_point, bound_check);
     }
 
@@ -84,11 +74,6 @@ namespace poem {
     }
 
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
-
-//   protected:
-//    virtual void build_interpolator() = 0;
-//
-//    virtual void build_nearest() = 0;
 
    protected:
     std::unique_ptr<VariableID> m_var_ID;
@@ -105,7 +90,9 @@ namespace poem {
    */
   template<typename T, size_t _dim>
   class Polar : public PolarBase {
+
    public:
+
     using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
     using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
@@ -133,25 +120,12 @@ namespace poem {
       return m_dimension_point_set.get();
     }
 
-//    T interp(const std::array<T, _dim> &dimension_point, bool bound_check) const {
-//      if (!std::is_floating_point_v<T>) {
-//        spdlog::critical("Cannot interpolate on non floating point numbers");
-//        CRITICAL_ERROR
-//      }
-//      if (!m_interpolator_is_built) {
-//        const_cast<Polar<T, _dim> *>(this)->build_interpolator();
-//      }
-//
-//      return m_interpolator->Interp(dimension_point, bound_check);
-//    }
-
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       if (!m_nearest_is_built) {
         const_cast<Polar<T, _dim> *>(this)->build_nearest();
       }
 
       // FIXME: bound_check non utilise encore dans RegularGridNearest
-
       return m_nearest->Nearest(dimension_point).val();
     }
 
@@ -214,7 +188,7 @@ namespace poem {
         }
         nc_var.setCompression(true, true, 5);
 
-        // Get the values as a flat vector
+        // Map the values in a flat vector
         std::vector<T> values;
         for (const auto &point: m_polar_points) {
           values.push_back(point.second.value());
@@ -263,47 +237,11 @@ namespace poem {
     }
 
    private:
-//    void build_interpolator() override {
-//
-//      if (!is_filled()) {
-//        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
-//        CRITICAL_ERROR
-//      }
-//
-//      m_interpolator = std::make_unique<InterpolatorND>();
-//
-//      using NDArray = boost::multi_array<T, _dim>;
-//      using IndexArray = boost::array<typename NDArray::index, _dim>;
-//      IndexArray shape;
-//
-//      size_t num_elements = 1;
-//      for (size_t i = 0; i < _dim; ++i) {
-//        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
-//        auto dim_vector = m_dimension_point_set->dimension_vector(i);
-//
-//        shape[i] = dim_vector.size();
-//        num_elements *= shape[i];
-//
-//        m_interpolator->AddCoord(dim_vector);
-//      }
-//
-//      std::vector<T> data;
-//      data.reserve(num_elements);
-//      for (const auto &point: m_polar_points) {
-//        data.push_back(point.second.value());
-//      }
-//
-//      NDArray array(shape);
-//      std::copy(data.begin(), data.end(), array.data());
-//      m_interpolator->AddVar(array);
-//
-//      m_interpolator_is_built = true;
-//    }
 
     void build_nearest() {
 
       if (!is_filled()) {
-        spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
+        spdlog::critical("Attempting to build nearest table of a polar before it is totally filled");
         CRITICAL_ERROR
       }
 
@@ -355,10 +293,7 @@ namespace poem {
 
    public:
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-//      if (!std::is_floating_point_v<T>) {
-//        spdlog::critical("Cannot interpolate on non floating point numbers");
-//        CRITICAL_ERROR
-//      }
+
       if (!this->m_interpolator_is_built) {
         const_cast<InterpolablePolar<_dim> *>(this)->build_interpolator();
       }
@@ -405,7 +340,6 @@ namespace poem {
     }
 
   };
-
 
 }  // poem
 
