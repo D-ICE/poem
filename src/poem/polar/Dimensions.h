@@ -216,6 +216,10 @@ namespace poem {
       m_is_built = true;
     }
 
+//    size_t size() const {
+//      return m_dimension_points.size();
+//    }
+
     std::shared_ptr<DimensionPoint<_dim>> at(size_t i) {
       return m_dimension_points.at(i);
     }
@@ -297,6 +301,16 @@ namespace poem {
       }
 
       return dimension_point_set_vector;
+    }
+
+    void append(std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+      if (m_dimension_ID_set.get() != dimension_point_set->dimension_ID_set()) {
+        spdlog::critical("Attempting to concatenate polar set of different DimensionIDSet");
+        CRITICAL_ERROR
+      }
+      for (size_t i=0; i<dimension_point_set->size(); ++i) {
+        m_dimension_points.push_back(dimension_point_set->at(i));
+      }
     }
 
     Iter begin() const { return m_dimension_points.cbegin(); }
