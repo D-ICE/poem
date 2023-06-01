@@ -107,7 +107,7 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
-    template<typename T, size_t _dim>
+    template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
     Polar<T, _dim> *get_polar(const std::string &name) const {
       std::string old_name;
       try {
@@ -120,7 +120,20 @@ namespace poem {
       return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
     }
 
-    template<typename T, size_t _dim>
+    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
+    InterpolablePolar<_dim> *get_polar(const std::string &name) const {
+      std::string old_name;
+      try {
+        old_name = m_polar_name_map.at(name);
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("Polar name {} does not exist.");
+        CRITICAL_ERROR
+      }
+
+      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(old_name).get());
+    }
+
+    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     T interp(const std::string &name,
              const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
              bool bound_check = true) const {
@@ -134,8 +147,7 @@ namespace poem {
       }
 
       auto polar = m_polars_map.at(old_name).get();
-      return polar->interp<T, _dim>(dimension_point, bound_check);
-
+      return polar->interp<double, _dim>(dimension_point, bound_check);
     }
 
     template<typename T, size_t _dim>
