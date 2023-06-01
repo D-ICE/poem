@@ -117,20 +117,136 @@
     },
 
     "fields": {
+      "SolverStatus": {
+        "doc": "Status of the equilibirum solver",
+        "type": "int",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "NbIter": {
+        "doc": "Number of iterations of the equilibirum solver",
+        "type": "int",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "OptimizerStatus": {
+        "doc": "",
+        "type": "int",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "Optimizer_NbIter": {
+        "doc": "",
+        "type": "int",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "GWS": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "GWD": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "CS": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "CD": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "WD": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "Hs": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "Tp": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "TWS": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "TWA": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "AWS": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "AWA": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "WA": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "CA": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "STW": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "SurgeVelocity": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "SwayVelocity": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "LEEWAY": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
+      "HEELING": {
+        "doc": "",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"]
+      },
       "BrakePower": {
         "doc": "Total Brake Power of the vessel",
         "type": "double",
         "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
         "tags": ["required"]
       },
-
-      "var_int": {
-        "_note": "garder tant qu'on se fait pas envoyer paitre...",
-        "doc": "Here is the doc",
-        "type": "int",
-        "dimensions": ["STW_kt", "TWS_kt"],
+      "TotalFuelConsumption": {
+        "doc": "Total Brake Power of the vessel",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
+        "tags": ["required"]
+      },
+      "_ActivePower": {
+        "doc": "Total Brake Power of the vessel",
+        "type": "double",
+        "dimensions": ["STW_kt", "TWS_kt", "TWA_deg"],
         "tags": ["required"]
       }
+
+
     }
 
   }
