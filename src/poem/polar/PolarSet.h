@@ -88,21 +88,6 @@ namespace poem {
       return is_filled;
     }
 
-//    std::vector<PolarSet*> split(const size_t chunk_size) const {
-//
-////      size_t nviews = size() / chunk_size;
-////      size_t rem = size() % chunk_size;
-//
-//      // FIXME: on va preferer une fonction qui genere un vecteur de PolarSet
-//
-//
-//
-//
-//
-//
-//
-//    }
-
     /*
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
@@ -131,6 +116,14 @@ namespace poem {
       }
 
       return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(old_name).get());
+    }
+
+    std::vector<std::string> polar_names() const {
+      std::vector<std::string> polar_names;
+      for (const auto &polar: m_polars_map) {
+        polar_names.push_back(polar.first);
+      }
+      return polar_names;
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
@@ -166,7 +159,6 @@ namespace poem {
       return polar->nearest<T, _dim>(dimension_point, bound_check);
     }
 
-
     int to_netcdf(const std::string &nc_file) const {
 
       fs::path nc_file_path(nc_file);
@@ -199,6 +191,10 @@ namespace poem {
       }
 
       return 0;
+    }
+
+    PolarSet operator+=(const PolarSet &polar_set) {
+
     }
 
    private:
@@ -256,17 +252,55 @@ namespace poem {
 
     }
 
-   private:
+    PolarSet clone() const {
+      PolarSet polar_set(m_attributes, m_schema, m_newest_schema);
+      for (const auto& polar : m_polars_map) {
+        polar_set.m_polars_map.insert({polar.first, std::unique_ptr<PolarBase>(polar.second.get())});
+
+//        polar_set.m_polar_name_map.insert({polar.first, polar.first}); // FIXME: ESSAI
+//
+//        auto _polar = polar_set.get_polar<double, 5>(polar.first);
+//
+//        auto name = _polar->name();
+
+        NIY
+      }
+
+    }
+
+    friend PolarSet assemble(const std::vector<PolarSet *> &);
+
+   protected:
     Attributes m_attributes;
     NameMap m_attributes_name_map;
 
     PolarMap m_polars_map;
-    NameMap m_dimensions_name_map;
+//    NameMap m_dimensions_name_map;
     NameMap m_polar_name_map;
 
     Schema m_schema;
     Schema m_newest_schema;
   };
+
+  inline PolarSet assemble(const std::vector<PolarSet *> &polar_set_vector) {
+
+//    auto polar_set_0 = polar_set_vector.front();
+//
+//    PolarSet polar_set(polar_set_0->m_attributes, polar_set_0->m_schema, polar_set_0->m_newest_schema);
+////    for (const auto & polar : polar_set_0->polar_names()) {
+////      polar_set_0->get_polar<>()
+////    }
+//    polar_set.m_polars_map = polar_set_0->m_polars_map;
+    auto polar_set = polar_set_vector.front()->clone();
+
+    for (const auto &polar_set_i: polar_set_vector) {
+
+    }
+
+
+    return polar_set;
+  }
+
 
 }  // poem
 
