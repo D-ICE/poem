@@ -93,7 +93,7 @@ TEST(POLAR, WRITE) {
                                                         "Brake Power",
                                                         type::POEM_TYPES::DOUBLE,
                                                         dim_point_set);
-    for (const auto &dim_point : *dim_point_set) {
+    for (const auto &dim_point: *dim_point_set) {
       PolarPoint<double, 5> polar_point(dim_point, val);
       polar->set_point(&polar_point);
       val += 1.;
@@ -105,7 +105,7 @@ TEST(POLAR, WRITE) {
 
   // Concatenation of polar
   PolarSet polar_set(polar_set_vector.front());
-  for (const auto &polar_set_i : polar_set_vector) {
+  for (const auto &polar_set_i: polar_set_vector) {
 
     if (&polar_set_i == &polar_set_vector.front()) continue;
 

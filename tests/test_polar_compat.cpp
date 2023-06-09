@@ -106,10 +106,10 @@ TEST(POLAR, WRITE) {
 
   // Adding variable
   auto brake_power = polar_set->New<double, 5>("TotalBrakePower",
-                                       "kW",
-                                       "Brake Power",
+                                               "kW",
+                                               "Brake Power",
                                                type::POEM_TYPES::DOUBLE,
-                                       dimension_point_environment);
+                                               dimension_point_environment);
 
   // Populating variable
   double val = 0.;

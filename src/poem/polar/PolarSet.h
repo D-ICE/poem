@@ -50,14 +50,14 @@ namespace poem {
       generate_attributes_name_map();
     };
 
-    PolarSet(const PolarSet& other):
+    PolarSet(const PolarSet &other) :
         m_attributes(other.m_attributes),
         m_attributes_name_map(other.m_attributes_name_map),
         m_schema(other.m_schema),
         m_newest_schema(other.m_newest_schema),
         m_polar_name_map(other.m_polar_name_map) {
 
-      for (const auto& pair : other.m_polars_map) {
+      for (const auto &pair: other.m_polars_map) {
         copy_polar(pair.second.get());
       }
 
@@ -144,9 +144,9 @@ namespace poem {
       return polar_names;
     }
 
-    void append(const PolarSet& other) {
+    void append(const PolarSet &other) {
 
-      for (const auto &pair : m_polars_map) {
+      for (const auto &pair: m_polars_map) {
         auto polar = pair.second.get();
         polar->append(other.get_polar(polar->name()));
       }
@@ -226,35 +226,35 @@ namespace poem {
 
    private:
 
-    void copy_polar(PolarBase* polar) {
+    void copy_polar(PolarBase *polar) {
       switch (polar->dim()) {
         case 1:
-          return copy_polar<1>(polar);
+          return copy_polar < 1 > (polar);
         case 2:
-          return copy_polar<2>(polar);
+          return copy_polar < 2 > (polar);
         case 3:
-          return copy_polar<3>(polar);
+          return copy_polar < 3 > (polar);
         case 4:
-          return copy_polar<4>(polar);
+          return copy_polar < 4 > (polar);
         case 5:
-          return copy_polar<5>(polar);
+          return copy_polar < 5 > (polar);
         case 6:
-          return copy_polar<6>(polar);
+          return copy_polar < 6 > (polar);
         default:
           spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
           CRITICAL_ERROR
       }
     }
 
-    template <size_t _dim>
-    void copy_polar(PolarBase* polar) {
+    template<size_t _dim>
+    void copy_polar(PolarBase *polar) {
       auto type = polar->type();
-      switch(type) {
+      switch (type) {
         case type::INT:
-          copy_polar<int, _dim>(polar, type);
+          copy_polar<int, _dim>(polar);
           break;
         case type::DOUBLE:
-          copy_polar<double, _dim>(polar, type);
+          copy_polar<double, _dim>(polar);
           break;
         default:
           spdlog::critical("Type is not managed yet");
@@ -262,14 +262,14 @@ namespace poem {
       }
     }
 
-    template <typename T, size_t _dim>
-    void copy_polar(PolarBase* polar, type::POEM_TYPES type) {
-      auto polar_ = static_cast<Polar<T, _dim>*>(polar);
+    template<typename T, size_t _dim>
+    void copy_polar(PolarBase *polar) {
+      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
 
       auto polar_copy = New<T, _dim>(polar_->name(),
                                      polar_->unit(),
                                      polar_->description(),
-                                     type,
+                                     polar_->type(),
                                      polar_->dimension_point_set());
 
       // Filling with values

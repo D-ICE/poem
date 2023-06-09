@@ -288,7 +288,7 @@ namespace poem {
         spdlog::critical("Attempting to concatenate polar set of different DimensionIDSet");
         CRITICAL_ERROR
       }
-      for (size_t i=0; i<dimension_point_set->size(); ++i) {
+      for (size_t i = 0; i < dimension_point_set->size(); ++i) {
         m_dimension_points.push_back(dimension_point_set->at(i));
       }
     }
