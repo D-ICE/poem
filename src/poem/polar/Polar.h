@@ -56,6 +56,13 @@ namespace poem {
 
     const type::POEM_TYPES &type() const { return m_var_ID->type(); }
 
+//    template <size_t _dim>
+//    virtual const DimensionPointSet<_dim> *dimension_point_set() const = 0;
+
+//    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() override {
+//      return m_dimension_point_set;
+//    }
+
     virtual void set_point(void *polar_point) = 0;
 
     virtual bool is_filled() const = 0;
@@ -94,6 +101,8 @@ namespace poem {
    public:
 
     using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
+    using PolarPointsConstIter = typename PolarPoints::const_iterator;
+
     using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
@@ -118,6 +127,10 @@ namespace poem {
 
     const DimensionPointSet<_dim> *dimension_point_set() const {
       return m_dimension_point_set.get();
+    }
+
+    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() {
+      return m_dimension_point_set;
     }
 
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
@@ -234,6 +247,14 @@ namespace poem {
       return [this](void *polar_point) {
         set_point(polar_point);
       };
+    }
+
+    PolarPointsConstIter begin() const {
+      return m_polar_points.cbegin();
+    }
+
+    PolarPointsConstIter end() const {
+      return m_polar_points.cend();
     }
 
    private:

@@ -59,9 +59,6 @@ TEST(POLAR, WRITE) {
 
   std::vector<double> STW_vector = {0, 1};
   std::vector<double> TWS_vector = {1, 2};
-//  std::vector<double> TWA_vector = {2, 3};
-//  std::vector<double> WA_vector = {3, 4};
-//  std::vector<double> Hs_vector = {4, 5};
   std::vector<double> TWA_vector = {0};
   std::vector<double> WA_vector = {0};
   std::vector<double> Hs_vector = {0};
@@ -151,9 +148,6 @@ TEST(POLAR, WRITE) {
   ASSERT_DOUBLE_EQ(brake_power_polar->nearest({0.9, 1.1, 0, 0, 0}, true), 2);
   ASSERT_DOUBLE_EQ(brake_power_polar->nearest({0.9, 1.9, 0, 0, 0}, true), 3);
 
-
-//  polar_set->to_netcdf("essai.nc");
-
   /*
    * Dans le test unitaire, on veut
    *
@@ -184,10 +178,6 @@ TEST(POLAR, WRITE) {
    * Integrer poem a mship
    *
    */
-
-
-
-  int i = 0;
 
 }
 

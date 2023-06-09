@@ -226,6 +226,8 @@ namespace poem {
 
     std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const size_t chunk_size) const {
 
+//      if (!m_is_built) build();
+
       size_t nviews = size() / chunk_size;
       size_t rem = size() % chunk_size;
 

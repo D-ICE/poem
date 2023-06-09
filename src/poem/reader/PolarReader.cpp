@@ -97,7 +97,7 @@ namespace poem {
       case 6:
         return load_variable<6>(var_name);
       default:
-        spdlog::critical("Polar dimensions lower than 2 or higher than 6 are forbidden");
+        spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
         CRITICAL_ERROR
     }
 

@@ -6,6 +6,7 @@
 #define POEM_POLARSET_H
 
 #include <memory>
+#include <map>
 
 #include "Polar.h"
 #include "Attributes.h"
@@ -21,8 +22,8 @@ namespace poem {
    */
   class PolarSet {
    public:
-    using PolarMap = std::unordered_map<std::string, std::unique_ptr<PolarBase>>;
-    using NameMap = std::unordered_map<std::string, std::string>;
+    using PolarMap = std::map<std::string, std::unique_ptr<PolarBase>>;
+    using NameMap = std::map<std::string, std::string>;
 
     PolarSet(const Attributes &attributes, const Schema &schema, const Schema &newest_schema) :
         m_attributes(attributes),
@@ -48,6 +49,19 @@ namespace poem {
       // Generating map
       generate_attributes_name_map();
     };
+
+    PolarSet(const PolarSet& other):
+        m_attributes(other.m_attributes),
+        m_attributes_name_map(other.m_attributes_name_map),
+        m_schema(other.m_schema),
+        m_newest_schema(other.m_newest_schema),
+        m_polar_name_map(other.m_polar_name_map) {
+
+      for (const auto& pair : other.m_polars_map) {
+        copy_polar(pair.second.get());
+      }
+
+    }
 
     template<typename T, size_t _dim>
     Polar<T, _dim> *New(const std::string &name,
@@ -198,6 +212,66 @@ namespace poem {
     }
 
    private:
+
+    void copy_polar(PolarBase* polar) {
+      switch (polar->dim()) {
+        case 1:
+          return copy_polar<1>(polar);
+        case 2:
+          return copy_polar<2>(polar);
+        case 3:
+          return copy_polar<3>(polar);
+        case 4:
+          return copy_polar<4>(polar);
+        case 5:
+          return copy_polar<5>(polar);
+        case 6:
+          return copy_polar<6>(polar);
+        default:
+          spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
+          CRITICAL_ERROR
+      }
+    }
+
+    template <size_t _dim>
+    void copy_polar(PolarBase* polar) {
+      auto type = polar->type();
+      switch(type) {
+        case type::INT:
+          copy_polar<int, _dim>(polar, type);
+          break;
+        case type::DOUBLE:
+          copy_polar<double, _dim>(polar, type);
+          break;
+        default:
+          spdlog::critical("Type is not managed yet");
+          CRITICAL_ERROR
+      }
+    }
+
+    template <typename T, size_t _dim>
+    void copy_polar(PolarBase* polar, type::POEM_TYPES type) {
+      auto polar_ = static_cast<Polar<T, _dim>*>(polar);
+
+      auto polar_copy = New<T, _dim>(polar_->name(),
+                                     polar_->unit(),
+                                     polar_->description(),
+                                     type,
+                                     polar_->dimension_point_set());
+
+      // Filling with values
+      auto iter = polar_->begin();
+      for (; iter != polar_->end(); ++iter) {
+        PolarPoint<T, _dim> polar_point = (*iter).second;
+        polar_copy->set_point(&polar_point);
+      }
+
+      if (!polar_copy->is_filled()) { // Pourrait etre retire ?
+        spdlog::critical("Copying polar while not filled");
+        CRITICAL_ERROR
+      }
+
+    }
 
     void generate_attributes_name_map() {
       // TODO
