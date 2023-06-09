@@ -144,7 +144,7 @@ namespace poem {
       return polar_names;
     }
 
-    PolarSet append(const PolarSet& other) {
+    void append(const PolarSet& other) {
       /*
        * 1- on check les attributs
        * 2-
@@ -155,15 +155,16 @@ namespace poem {
       for (const auto &pair : m_polars_map) {
         auto polar = pair.second.get();
 
-        other.get_polar(polar->name());
+        polar->append(other.get_polar(polar->name()));
 
-        NIY
+//        NIY
 
       }
 
+//      return *this;
 
 
-      NIY
+//      NIY
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>

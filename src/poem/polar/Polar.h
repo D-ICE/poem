@@ -48,6 +48,8 @@ namespace poem {
 
     virtual const size_t dim() const = 0;
 
+    virtual size_t size() const = 0;
+
     const std::string &name() const { return m_var_ID->name(); }
 
     const std::string &unit() const { return m_var_ID->unit(); }
@@ -56,16 +58,11 @@ namespace poem {
 
     const type::POEM_TYPES &type() const { return m_var_ID->type(); }
 
-//    template <size_t _dim>
-//    virtual const DimensionPointSet<_dim> *dimension_point_set() const = 0;
-
-//    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() override {
-//      return m_dimension_point_set;
-//    }
-
     virtual void set_point(void *polar_point) = 0;
 
     virtual bool is_filled() const = 0;
+
+    virtual void append(PolarBase *polar) = 0;
 
     // FIXME: pas le plus elegant le void void...
     virtual std::function<void(void *)> get_set_point_function() = 0;
@@ -124,6 +121,8 @@ namespace poem {
     }
 
     const size_t dim() const override { return _dim; }
+
+    size_t size() const override { return m_polar_points.size(); }
 
     const DimensionPointSet<_dim> *dimension_point_set() const {
       return m_dimension_point_set.get();
@@ -240,6 +239,27 @@ namespace poem {
                            return x.second.has_value();
                          }
       );
+    }
+
+    void append(PolarBase *other) override {
+      auto other_ = static_cast<Polar<T, _dim> *>(other);
+
+      // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
+
+      /*
+       * 1 - on augmente les capacites de this en terme de polar_points avec celles the other
+       * 2 -
+       */
+      auto iter = other_->begin();
+      for (; iter != other_->end(); ++iter) {
+//        const DimensionPoint<_dim> *, PolarPoint<T, _dim>
+//        auto dim_point = iter->first;
+//        auto polar_point = iter->second;
+
+        m_polar_points.insert(*iter);
+      }
+
+//      NIY
     }
 
     // FIXME: pas le plus elegant le void void...

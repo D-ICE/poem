@@ -101,7 +101,7 @@ TEST(POLAR, WRITE) {
 
   }
 
-//  std::cout << val << std::endl;
+  std::cout << val << std::endl;
 
   // Concatenation of polar
   PolarSet polar_set(polar_set_vector.front());
@@ -114,7 +114,7 @@ TEST(POLAR, WRITE) {
   }
 
 
-
+  std::cout << polar_set.get_polar("TotalBrakePower")->size() << std::endl;
 
 
 
