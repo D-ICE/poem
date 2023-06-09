@@ -106,6 +106,10 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
+    PolarBase *get_polar(const std::string &name) const {
+      return m_polars_map.at(name).get();
+    }
+
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
     Polar<T, _dim> *get_polar(const std::string &name) const {
       std::string old_name;
@@ -138,6 +142,28 @@ namespace poem {
         polar_names.push_back(polar.first);
       }
       return polar_names;
+    }
+
+    PolarSet append(const PolarSet& other) {
+      /*
+       * 1- on check les attributs
+       * 2-
+       *
+       *
+       */
+
+      for (const auto &pair : m_polars_map) {
+        auto polar = pair.second.get();
+
+        other.get_polar(polar->name());
+
+        NIY
+
+      }
+
+
+
+      NIY
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>

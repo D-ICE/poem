@@ -105,9 +105,13 @@ TEST(POLAR, WRITE) {
 
   // Concatenation of polar
   PolarSet polar_set(polar_set_vector.front());
-//  for (const auto &polar_set_i : polar_set_vector) {
-//
-//  }
+  for (const auto &polar_set_i : polar_set_vector) {
+
+    if (&polar_set_i == &polar_set_vector.front()) continue;
+
+    polar_set.append(polar_set_i);
+
+  }
 
 
 
@@ -115,5 +119,5 @@ TEST(POLAR, WRITE) {
 
 
 
-  STOP
+//  STOP
 }
