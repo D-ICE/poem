@@ -113,11 +113,10 @@ TEST(POLAR, WRITE) {
 
   }
 
-
   std::cout << polar_set.get_polar("TotalBrakePower")->size() << std::endl;
 
+  // FIXME: verifier qu'on a bien tout...
 
+  ASSERT_TRUE(polar_set.is_filled());
 
-
-//  STOP
 }

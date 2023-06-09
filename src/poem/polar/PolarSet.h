@@ -145,26 +145,12 @@ namespace poem {
     }
 
     void append(const PolarSet& other) {
-      /*
-       * 1- on check les attributs
-       * 2-
-       *
-       *
-       */
 
       for (const auto &pair : m_polars_map) {
         auto polar = pair.second.get();
-
         polar->append(other.get_polar(polar->name()));
-
-//        NIY
-
       }
 
-//      return *this;
-
-
-//      NIY
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
@@ -234,9 +220,9 @@ namespace poem {
       return 0;
     }
 
-    PolarSet operator+=(const PolarSet &polar_set) {
-
-    }
+//    PolarSet operator+=(const PolarSet &polar_set) {
+//
+//    }
 
    private:
 
@@ -353,23 +339,23 @@ namespace poem {
 
     }
 
-    PolarSet clone() const {
-      PolarSet polar_set(m_attributes, m_schema, m_newest_schema);
-      for (const auto& polar : m_polars_map) {
-        polar_set.m_polars_map.insert({polar.first, std::unique_ptr<PolarBase>(polar.second.get())});
-
-//        polar_set.m_polar_name_map.insert({polar.first, polar.first}); // FIXME: ESSAI
+//    PolarSet clone() const {
+//      PolarSet polar_set(m_attributes, m_schema, m_newest_schema);
+//      for (const auto& polar : m_polars_map) {
+//        polar_set.m_polars_map.insert({polar.first, std::unique_ptr<PolarBase>(polar.second.get())});
 //
-//        auto _polar = polar_set.get_polar<double, 5>(polar.first);
+////        polar_set.m_polar_name_map.insert({polar.first, polar.first}); // FIXME: ESSAI
+////
+////        auto _polar = polar_set.get_polar<double, 5>(polar.first);
+////
+////        auto name = _polar->name();
 //
-//        auto name = _polar->name();
+//        NIY
+//      }
+//
+//    }
 
-        NIY
-      }
-
-    }
-
-    friend PolarSet assemble(const std::vector<PolarSet *> &);
+//    friend PolarSet assemble(const std::vector<PolarSet *> &);
 
    protected:
     Attributes m_attributes;
@@ -383,24 +369,24 @@ namespace poem {
     Schema m_newest_schema;
   };
 
-  inline PolarSet assemble(const std::vector<PolarSet *> &polar_set_vector) {
-
-//    auto polar_set_0 = polar_set_vector.front();
+//  inline PolarSet assemble(const std::vector<PolarSet *> &polar_set_vector) {
 //
-//    PolarSet polar_set(polar_set_0->m_attributes, polar_set_0->m_schema, polar_set_0->m_newest_schema);
-////    for (const auto & polar : polar_set_0->polar_names()) {
-////      polar_set_0->get_polar<>()
-////    }
-//    polar_set.m_polars_map = polar_set_0->m_polars_map;
-    auto polar_set = polar_set_vector.front()->clone();
-
-    for (const auto &polar_set_i: polar_set_vector) {
-
-    }
-
-
-    return polar_set;
-  }
+////    auto polar_set_0 = polar_set_vector.front();
+////
+////    PolarSet polar_set(polar_set_0->m_attributes, polar_set_0->m_schema, polar_set_0->m_newest_schema);
+//////    for (const auto & polar : polar_set_0->polar_names()) {
+//////      polar_set_0->get_polar<>()
+//////    }
+////    polar_set.m_polars_map = polar_set_0->m_polars_map;
+//    auto polar_set = polar_set_vector.front()->clone();
+//
+//    for (const auto &polar_set_i: polar_set_vector) {
+//
+//    }
+//
+//
+//    return polar_set;
+//  }
 
 
 }  // poem

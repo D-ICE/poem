@@ -102,24 +102,12 @@ namespace poem {
    public:
     using Components = std::array<double, _dim>;
 
-//    DimensionPoint(const DimensionIDSet<_dim> *IDArray, DimensionPointSet<_dim> *dimension_point_set) :
-//        m_ID_array(IDArray),
-//        m_values({}),
-//        m_origin_dimension_point_set(dimension_point_set) {}
-
     DimensionPoint(std::shared_ptr<DimensionIDSet<_dim>> dimensionIdSet, const Components &components) :
         m_components(components),
         m_dimensionIdSet(dimensionIdSet) {
 
       Check();
     }
-
-//    void set(const Values &values) {
-//      m_values = values;
-//      Check();
-//    }
-
-//    const DimensionPointSet<_dim> *dimension_point_set() const { return m_dimension_point_set; }
 
     const double &get(size_t i) const { return m_components.at(i); }
 
@@ -143,8 +131,6 @@ namespace poem {
 
    private:
     Components m_components;
-
-//    DimensionPointSet<_dim> *m_dimension_point_set;
     std::shared_ptr<DimensionIDSet<_dim>> m_dimensionIdSet;
 
   };
@@ -216,10 +202,6 @@ namespace poem {
       m_is_built = true;
     }
 
-//    size_t size() const {
-//      return m_dimension_points.size();
-//    }
-
     std::shared_ptr<DimensionPoint<_dim>> at(size_t i) {
       return m_dimension_points.at(i);
     }
@@ -232,7 +214,6 @@ namespace poem {
       size_t rem = size() % chunk_size;
 
       std::vector<std::shared_ptr<DimensionPointSet<_dim>>> dimension_point_set_vector;
-//      std::vector<HybridPolarView *> views;
 
       if (nviews == 0) {
         // We have only one view with rem polar points inside
@@ -244,7 +225,6 @@ namespace poem {
           dim_point_vector.push_back(m_dimension_points[i]);
         }
 
-//        m_views.push_back(std::make_unique<HybridPolarView>(m_ctrl_var_name, polar_points_view));
         auto dim_point_set = std::make_shared<DimensionPointSet<_dim>>(m_dimension_ID_set);
         dim_point_set->m_dimension_points = dim_point_vector;
         dim_point_set->m_is_built = true;
@@ -257,7 +237,6 @@ namespace poem {
         // Here we have a kind of static balancing
 
         dimension_point_set_vector.reserve(nviews);
-//        views.reserve(nviews);
 
         // Managing cases where rem > nviews. We have to balance more than one element from rem in each view
         size_t s;
@@ -285,7 +264,6 @@ namespace poem {
           }
 
           DimensionPointVector dim_point_vector;
-//          std::vector<Polar5DPoint> polar_points_view;
           dim_point_vector.reserve(size);
           for (size_t i = offset; i < offset + size; ++i) {
             dim_point_vector.push_back(m_dimension_points[i]);

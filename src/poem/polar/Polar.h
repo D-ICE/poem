@@ -46,6 +46,8 @@ namespace poem {
 
     }
 
+//    ~PolarBase() = default;
+
     virtual const size_t dim() const = 0;
 
     virtual size_t size() const = 0;
@@ -246,20 +248,11 @@ namespace poem {
 
       // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
 
-      /*
-       * 1 - on augmente les capacites de this en terme de polar_points avec celles the other
-       * 2 -
-       */
       auto iter = other_->begin();
       for (; iter != other_->end(); ++iter) {
-//        const DimensionPoint<_dim> *, PolarPoint<T, _dim>
-//        auto dim_point = iter->first;
-//        auto polar_point = iter->second;
-
         m_polar_points.insert(*iter);
       }
 
-//      NIY
     }
 
     // FIXME: pas le plus elegant le void void...
