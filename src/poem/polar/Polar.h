@@ -126,6 +126,10 @@ namespace poem {
 
     size_t size() const override { return m_polar_points.size(); }
 
+    std::shared_ptr<DimensionIDSet<_dim>> dimension_ID_set() {
+      return m_dimension_point_set->dimension_ID_set();
+    }
+
     const DimensionPointSet<_dim> *dimension_point_set() const {
       return m_dimension_point_set.get();
     }
@@ -245,13 +249,25 @@ namespace poem {
 
     void append(PolarBase *other) override {
 
+      if (other->dim() != _dim) {
+        spdlog::critical("Attempting to append a polar of dimension {} to a polar of dimension {}", other->dim(), _dim);
+        CRITICAL_ERROR
+      }
+
       auto other_ = static_cast<Polar<T, _dim> *>(other);
+
+      // Checking that we concatenate two polars with the same DimensionIDSet
+      if (*other_->dimension_ID_set() != *dimension_ID_set()) {
+        spdlog::critical("Attempting to append two polars with different coordinates");
+        CRITICAL_ERROR
+      }
+
+      // Polar has changed, interpolators cannot be initialized
+      m_nearest_is_built = false;
+      m_nearest = nullptr;
 
       m_interpolator_is_built = false;
       m_interpolator = nullptr;
-
-      m_nearest_is_built = false;
-      m_nearest = nullptr;
 
       // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
       //  il faut append aussi les dimension_points

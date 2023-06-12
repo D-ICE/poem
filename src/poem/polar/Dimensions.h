@@ -39,6 +39,21 @@ namespace poem {
 
     }
 
+    bool operator==(const DimensionID &other) const {
+      if ((m_name != other.m_name) ||
+          (m_unit != other.m_unit) ||
+          (m_description != other.m_description) ||
+          (m_min != other.m_min) ||
+          (m_max != other.m_max)) {
+        return false;
+      }
+      return true;
+    }
+
+    bool operator!=(const DimensionID &other) const {
+      return !(*this == other);
+    }
+
     const double &min() const { return m_min; }
 
     const double &max() const { return m_max; }
@@ -59,6 +74,19 @@ namespace poem {
 
     explicit DimensionIDSet(const IDSet &array) :
         m_ID_set(array) {
+    }
+
+    bool operator==(const DimensionIDSet<_dim> &other) const {
+      for (size_t i = 0; i < _dim; ++i) {
+        if (*m_ID_set[i] != *other.m_ID_set[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    bool operator!=(const DimensionIDSet<_dim> &other) const {
+      return !(*this == other);
     }
 
     DimensionID *get(size_t i) const { return m_ID_set.at(i).get(); }
@@ -166,6 +194,8 @@ namespace poem {
     bool is_built() const { return m_is_built; }
 
     const DimensionIDSet<_dim> *dimension_ID_set() const { return m_dimension_ID_set.get(); }
+
+    std::shared_ptr<DimensionIDSet<_dim>> dimension_ID_set() { return m_dimension_ID_set; }
 
     /**
      * Set vector of values for each dimension. Must be called _dim times.
