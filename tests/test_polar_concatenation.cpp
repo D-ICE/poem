@@ -101,6 +101,10 @@ TEST(POLAR, WRITE) {
 
   }
 
+  // FIXME: a la fin il faut renseigner les vecteurs de coords...
+
+
+
   std::cout << val << std::endl;
 
   // Concatenation of polar
@@ -113,10 +117,14 @@ TEST(POLAR, WRITE) {
 
   }
 
-  std::cout << polar_set.get_polar("TotalBrakePower")->size() << std::endl;
+//  auto polar_back = polar_set.get_polar<double, 5>("TotalBrakePower");
+
+  std::cout << polar_set.get_polar<double, 5>("BrakePower")->size() << std::endl;
 
   // FIXME: verifier qu'on a bien tout...
 
   ASSERT_TRUE(polar_set.is_filled());
+
+  polar_set.to_netcdf("concatenation.nc");
 
 }

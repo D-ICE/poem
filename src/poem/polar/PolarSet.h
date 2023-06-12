@@ -129,7 +129,7 @@ namespace poem {
       try {
         old_name = m_polar_name_map.at(name);
       } catch (const std::out_of_range &e) {
-        spdlog::critical("Polar name {} does not exist.");
+        spdlog::critical("Polar name {} does not exist.", name);
         CRITICAL_ERROR
       }
 

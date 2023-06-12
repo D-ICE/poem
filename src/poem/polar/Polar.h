@@ -244,13 +244,29 @@ namespace poem {
     }
 
     void append(PolarBase *other) override {
+
       auto other_ = static_cast<Polar<T, _dim> *>(other);
 
-      // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
+      m_interpolator_is_built = false;
+      m_interpolator = nullptr;
 
-      auto iter = other_->begin();
-      for (; iter != other_->end(); ++iter) {
-        m_polar_points.insert(*iter);
+      m_nearest_is_built = false;
+      m_nearest = nullptr;
+
+      // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
+      //  il faut append aussi les dimension_points
+      //  il faut invalider les interpolateurs egalement (nearest et interp si double)...
+//      NIY
+      auto dimension_point_set = other_->dimension_point_set();
+      auto dps_iter = dimension_point_set->begin();
+      for (; dps_iter != dimension_point_set->end(); ++dps_iter) {
+//        m_dimension_point_set.
+        NIY
+      }
+
+      auto ppiter = other_->begin();
+      for (; ppiter != other_->end(); ++ppiter) {
+        m_polar_points.insert(*ppiter);
       }
 
     }
