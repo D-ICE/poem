@@ -289,15 +289,8 @@ namespace poem {
       // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
       //  il faut append aussi les dimension_points
       //  il faut invalider les interpolateurs egalement (nearest et interp si double)...
-//      NIY
       m_dimension_point_set->append(*other_->dimension_point_set());
-//      auto dimension_point_set = other_->dimension_point_set();
-//      auto dps_iter = dimension_point_set->begin();
-//      for (; dps_iter != dimension_point_set->end(); ++dps_iter) {
-//        m_dimension_point_set.append(*dps_iter);
-//      }
 
-//      NIY
       auto ppiter = other_->begin();
       for (; ppiter != other_->end(); ++ppiter) {
         m_polar_points.insert(*ppiter);

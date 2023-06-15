@@ -145,7 +145,7 @@ namespace poem {
 
     bool operator<(const DimensionPoint<_dim> &other) const {
       // FIXME: ne fonctionne pas !!! Chercher une autre implementation
-//
+
 //      bool equal = true;
 //      for (size_t i = 0; i < _dim; ++i) {
 //        if (m_components[i] > other.m_components[i]) return false;
@@ -213,46 +213,9 @@ namespace poem {
         m_grid(grid),
         m_dimension_ID_set(dimension_ID_set) {}
 
-//    bool is_built() const { return m_is_built; }
-
     const DimensionIDSet<_dim> *dimension_ID_set() const { return m_dimension_ID_set.get(); }
 
     std::shared_ptr<DimensionIDSet<_dim>> dimension_ID_set() { return m_dimension_ID_set; }
-
-    /**
-     * Set vector of values for each dimension. Must be called _dim times.
-     * @param name dimension name
-     * @param values vector of values for the dimension (non-repeating increasing order)
-     */
-//    void set_dimension_values(const std::string &name, const std::vector<double> &values) {
-//      size_t i = m_dimension_ID_set->get_index(name);
-//      m_dimension_vectors.at(i) = values;
-//    }
-
-//    const std::vector<double> &dimension_vector(size_t i) const { return m_dimension_vectors.at(i); }
-
-    /**
-     * Build the dimension point vector from vector of values for each dimension. It does the cartesian product of
-     * dimensions by making the last dimension move faster (the last dimension is the most inner for loop).
-     * Can only be called if every dimension has been filled with value vector. If it is not the case, a runtime exception
-     * is thrown.
-     * @return
-     */
-//    void build() {
-//      check_is_filled();
-//
-//      // Get the necessary size
-//      size_t size = 1;
-//      for (size_t i = 0; i < _dim; ++i) {
-//        size *= m_dimension_vectors.at(i).size();
-//      }
-//      m_dimension_points.reserve(size);
-//
-//      typename DimensionPoint<_dim>::Components values;
-//      meta_for_loop<_dim>(values);
-//
-//      m_is_built = true;
-//    }
 
     std::shared_ptr<DimensionPoint<_dim>> at(size_t i) const {
       return m_dimension_points.at(i);
@@ -263,8 +226,6 @@ namespace poem {
     }
 
     std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const size_t chunk_size) const {
-
-//      if (!m_is_built) build();
 
       size_t nviews = size() / chunk_size;
       size_t rem = size() % chunk_size;
@@ -288,9 +249,7 @@ namespace poem {
         dimension_point_set_vector.push_back(dim_point_set);
 
       } else {
-        // TODO: continuer !!!
-        // Global polar is split in nviews with similar number of polar points inside (modulo rem)
-        // Here we have a kind of static balancing
+        // Static balancing of computations
 
         dimension_point_set_vector.reserve(nviews);
 
@@ -325,11 +284,8 @@ namespace poem {
             dimension_points.push_back(m_dimension_points[i]);
           }
 
-          // FIXME: creer la notion de DimensionPointSetView ?
-
           auto dim_point_set = std::make_shared<DimensionPointSet<_dim>>(m_dimension_ID_set, m_grid);
           dim_point_set->m_dimension_points = dimension_points;
-//          dim_point_set->m_is_built = true;
 
           dimension_point_set_vector.push_back(dim_point_set);
 
@@ -371,45 +327,11 @@ namespace poem {
 
     const size_t size() const { return m_dimension_points.size(); }
 
-
-   private:
     friend class DimensionPointGrid<_dim>;
 
-
-//    // Adapted from https://stackoverflow.com/questions/34535795/n-dimensionally-nested-metaloops-with-templates
-//    // We use row major convention (last dimension varies the fastest) to be directly compliant with NetCDF internal
-//    // storage convention (and it is C compliant too...)
-//    template<size_t index>
-//    constexpr void meta_for_loop(typename DimensionPoint<_dim>::Components &values) {
-//      size_t i = _dim - index; // makes the last loop iterate on last dim
-//      for (const auto &element: m_dimension_vectors[i]) {
-//        values.at(i) = element;
-//        if constexpr (index == 1) {
-//          m_dimension_points.push_back(std::make_shared<DimensionPoint<_dim>>(m_dimension_ID_set, values));
-//
-//        } else {
-//          meta_for_loop<index - 1>(values);
-//        }
-//      }
-//    }
-
-//    void check_is_filled() const {
-//      for (const auto &vector: m_dimension_vectors) {
-//        if (vector.empty()) {
-//          spdlog::critical("DimensionSampleArray is not totally filled. Cannot generate DimensionPoint vector");
-//          CRITICAL_ERROR
-//        }
-//      }
-//    }
-
    private:
-//    bool m_is_built;
-
     std::shared_ptr<DimensionIDSet<_dim>> m_dimension_ID_set;
-//    std::array<std::vector<double>, _dim> m_dimension_vectors;
-
     DimensionPointVector m_dimension_points;
-
     DimensionPointGrid<_dim> *m_grid;
 
   };

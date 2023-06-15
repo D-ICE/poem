@@ -102,36 +102,14 @@ TEST(POLAR, WRITE) {
 
   }
 
-  // FIXME: a la fin il faut renseigner les vecteurs de coords...
-
-
-
-  std::cout << val << std::endl;
-
   // Concatenation of polar
   PolarSet polar_set(attributes, schema_old, newest_schema);
-//  polar_set.append(polar_set_vector.front());
 
   for (const auto &polar_set_i : polar_set_vector) {
     polar_set.append(polar_set_i);
   }
 
-//  STOP
-
-//  PolarSet polar_set(polar_set_vector.front());
-//  for (const auto &polar_set_i: polar_set_vector) {
-//
-//    if (&polar_set_i == &polar_set_vector.front()) continue;
-//
-//    polar_set.append(polar_set_i);
-//
-//  }
-
-//  auto polar_back = polar_set.get_polar<double, 5>("TotalBrakePower");
-
-  std::cout << polar_set.get_polar<double, 5>("BrakePower")->size() << std::endl;
-
-  // FIXME: verifier qu'on a bien tout...
+//  std::cout << polar_set.get_polar<double, 5>("BrakePower")->size() << std::endl;
 
   ASSERT_TRUE(polar_set.is_filled());
 
