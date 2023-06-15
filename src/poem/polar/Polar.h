@@ -156,16 +156,25 @@ namespace poem {
         CRITICAL_ERROR
       }
 
+      if (!m_dimension_point_set->grid()) {
+        spdlog::critical(
+            "Unable to write NetCDF file as the polar's DimensionPointSet has no reference to a source grid");
+        CRITICAL_ERROR
+      }
+      auto grid = m_dimension_point_set->grid();
+
+      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
+
       // Storing dimensions
       std::vector<netCDF::NcDim> dims;
       dims.reserve(_dim);
 
       for (size_t i = 0; i < _dim; ++i) {
 
-        auto dimension_ID = m_dimension_point_set->dimension_ID_set()->get(i);
-        auto values = m_dimension_point_set->dimension_vector(i);
-
+        auto dimension_ID = dimension_ID_set->get(i);
         std::string name(dimension_ID->name());
+
+        auto values = grid->dimension_vector(i);
 
         // TODO: voir si on eut pas detecter que le nom est deja pris...
         // Declaration of a new dimension ID
@@ -226,7 +235,10 @@ namespace poem {
     void set_point(void *polar_point) override {
 
       auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
-      if (!polar_point_->has_value()) spdlog::critical("Attempting to set the polar with non-initialized polar point");
+      if (!polar_point_->has_value()) {
+        spdlog::critical("Attempting to set the polar with non-initialized polar point");
+        CRITICAL_ERROR
+      }
 
       const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
 
@@ -254,6 +266,11 @@ namespace poem {
         CRITICAL_ERROR
       }
 
+      if (other->type() != type()) {
+        spdlog::critical("Attempting to append a polars of different types");
+        CRITICAL_ERROR
+      }
+
       auto other_ = static_cast<Polar<T, _dim> *>(other);
 
       // Checking that we concatenate two polars with the same DimensionIDSet
@@ -273,13 +290,14 @@ namespace poem {
       //  il faut append aussi les dimension_points
       //  il faut invalider les interpolateurs egalement (nearest et interp si double)...
 //      NIY
-      auto dimension_point_set = other_->dimension_point_set();
-      auto dps_iter = dimension_point_set->begin();
-      for (; dps_iter != dimension_point_set->end(); ++dps_iter) {
-//        m_dimension_point_set.
-        NIY
-      }
+      m_dimension_point_set->append(*other_->dimension_point_set());
+//      auto dimension_point_set = other_->dimension_point_set();
+//      auto dps_iter = dimension_point_set->begin();
+//      for (; dps_iter != dimension_point_set->end(); ++dps_iter) {
+//        m_dimension_point_set.append(*dps_iter);
+//      }
 
+//      NIY
       auto ppiter = other_->begin();
       for (; ppiter != other_->end(); ++ppiter) {
         m_polar_points.insert(*ppiter);

@@ -70,7 +70,7 @@ namespace poem {
                         type::POEM_TYPES type,
                         std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
-      if (!dimension_point_set->is_built()) dimension_point_set->build();
+//      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
       auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);
 
@@ -146,9 +146,22 @@ namespace poem {
 
     void append(const PolarSet &other) {
 
-      for (const auto &pair: m_polars_map) {
-        auto polar = pair.second.get();
-        polar->append(other.get_polar(polar->name()));
+      // TODO: check que les attributs sont consistants entre this et other
+
+      if (m_polars_map.empty()) {
+        // Adding polars from other
+        for (const auto& pair : other.m_polars_map) {
+          auto polar = pair.second.get();
+          copy_polar(polar);
+        }
+
+      } else {
+        // Append other's polar data
+        for (const auto &pair: m_polars_map) {
+          auto polar = pair.second.get();
+          polar->append(other.get_polar(polar->name()));
+        }
+
       }
 
     }

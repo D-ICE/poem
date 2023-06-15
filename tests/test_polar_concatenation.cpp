@@ -56,14 +56,14 @@ TEST(POLAR, WRITE) {
   auto WA_vector = mathutils::arange<double>(0, 180, 15);
   auto Hs_vector = mathutils::arange<double>(0, 8, 1);
 
+  DimensionPointGrid<5> dimension_point_grid(dimension_ID_environment);
+  dimension_point_grid.set_dimension_values("STW_kt", STW_vector);
+  dimension_point_grid.set_dimension_values("TWS_kt", TWS_vector);
+  dimension_point_grid.set_dimension_values("TWA_deg", TWA_vector);
+  dimension_point_grid.set_dimension_values("WA_deg", WA_vector);
+  dimension_point_grid.set_dimension_values("Hs_m", Hs_vector);
 
-  auto dimension_point_set = std::make_shared<DimensionPointSet<5>>(dimension_ID_environment);
-  dimension_point_set->set_dimension_values("STW_kt", STW_vector);
-  dimension_point_set->set_dimension_values("TWS_kt", TWS_vector);
-  dimension_point_set->set_dimension_values("TWA_deg", TWA_vector);
-  dimension_point_set->set_dimension_values("WA_deg", WA_vector);
-  dimension_point_set->set_dimension_values("Hs_m", Hs_vector);
-  dimension_point_set->build();
+  auto dimension_point_set = dimension_point_grid.get_dimension_point_set();
 
   // TODO: il faudrait avoir le generateur de dimensionPointSet a part
   auto dim_point_set_vector = dimension_point_set->split(10);
@@ -83,6 +83,7 @@ TEST(POLAR, WRITE) {
 
   // TODO: Ici, on veut pouvoir dire au NewestSchema quel json utiliser
 
+  // FIXME: on devrait plutot partir du polar_set originel non ?
   std::vector<PolarSet> polar_set_vector;
   polar_set_vector.reserve(dim_point_set_vector.size());
   double val = 0.;
@@ -108,14 +109,23 @@ TEST(POLAR, WRITE) {
   std::cout << val << std::endl;
 
   // Concatenation of polar
-  PolarSet polar_set(polar_set_vector.front());
-  for (const auto &polar_set_i: polar_set_vector) {
+  PolarSet polar_set(attributes, schema_old, newest_schema);
+//  polar_set.append(polar_set_vector.front());
 
-    if (&polar_set_i == &polar_set_vector.front()) continue;
-
+  for (const auto &polar_set_i : polar_set_vector) {
     polar_set.append(polar_set_i);
-
   }
+
+//  STOP
+
+//  PolarSet polar_set(polar_set_vector.front());
+//  for (const auto &polar_set_i: polar_set_vector) {
+//
+//    if (&polar_set_i == &polar_set_vector.front()) continue;
+//
+//    polar_set.append(polar_set_i);
+//
+//  }
 
 //  auto polar_back = polar_set.get_polar<double, 5>("TotalBrakePower");
 

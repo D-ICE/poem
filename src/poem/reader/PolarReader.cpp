@@ -146,7 +146,8 @@ namespace poem {
       }
       auto dimension_ID_set = std::make_shared<DimensionIDSet<_dim>>(dim_ID_set);
 
-      dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_ID_set);
+//      dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_ID_set);
+      DimensionPointGrid<_dim> dimension_point_grid(dimension_ID_set);
 
       for (int i = 0; i < _dim; ++i) {
 
@@ -157,10 +158,12 @@ namespace poem {
         std::vector<double> values(dim_size);
         var.getVar(values.data());
 
-        dimension_point_set->set_dimension_values(dim_name, values);
+        dimension_point_grid.set_dimension_values(dim_name, values);
+//        dimension_point_set->set_dimension_values(dim_name, values);
       }
 
-      dimension_point_set->build();
+      auto dimension_point_set = dimension_point_grid.get_dimension_point_set();
+//      dimension_point_set->build();
 
       m_dim_ID_set_registry.insert({hash_name, dimension_point_set});
 
