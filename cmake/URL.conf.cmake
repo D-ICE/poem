@@ -46,7 +46,7 @@ set(googletest_TAG release-1.12.1)
 
 # spdlog
 set(spdlog_URL https://github.com/gabime/spdlog)
-set(spdlog_TAG v1.8.5)
+set(spdlog_TAG v1.11.0)
 
 # argparse
 set(argparse_URL https://github.com/p-ranav/argparse.git)
