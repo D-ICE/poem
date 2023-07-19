@@ -24,7 +24,7 @@ namespace poem {
     Schema schema(attributes.get("schema"), false); // This is the schema used to write the file, not the last one...
 
     // The new polar set
-    m_polar_set = std::make_shared<PolarSet>(attributes, schema, newest_schema);
+    m_polar_set = std::make_shared<PolarSet>(schema, newest_schema);
 
     // Get the dimensions
     load_dimensions();
@@ -197,7 +197,7 @@ namespace poem {
     nc_var.getAtt("description").getValues(description);
 
     size_t var_size = dimension_point_set->size();
-    auto polar = m_polar_set->New<double, _dim>(var_name, unit, description, type, dimension_point_set);
+    auto polar = m_polar_set->new_polar<double, _dim>(var_name, unit, description, type, dimension_point_set);
 
     // Get the values of the variable
     std::vector<double> values(var_size);

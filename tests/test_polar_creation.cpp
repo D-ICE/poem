@@ -47,9 +47,6 @@ int main() {
 //   * be built to generate a cartesian product of every dimension and generate internally a vector of dimension points
 //   */
 //
-//
-//
-//
 //  DimensionPointGrid<5> dimension_point_grid(dimension_ID_environment);
 //
 //  dimension_point_grid.set_dimension_values("STW_kt", STW_vector);

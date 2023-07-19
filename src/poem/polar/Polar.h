@@ -36,29 +36,25 @@ namespace poem {
   /**
    * Base class for a polar to be used for polymorphism into a PolarSet
    */
-  class PolarBase {
+  class PolarBase : public Named {
    public:
     explicit PolarBase(const std::string &name,
                        const std::string &unit,
                        const std::string &description,
                        type::POEM_TYPES type) :
-        m_var_ID(std::make_unique<VariableID>(name, unit, description, type)) {
-
-    }
-
-//    ~PolarBase() = default;
+        Named(name, unit, description, type) {}
 
     virtual const size_t dim() const = 0;
 
     virtual size_t size() const = 0;
 
-    const std::string &name() const { return m_var_ID->name(); }
-
-    const std::string &unit() const { return m_var_ID->unit(); }
-
-    const std::string &description() const { return m_var_ID->description(); }
-
-    const type::POEM_TYPES &type() const { return m_var_ID->type(); }
+//    const std::string &name() const { return m_var_ID->name(); }
+//
+//    const std::string &unit() const { return m_var_ID->unit(); }
+//
+//    const std::string &description() const { return m_var_ID->description(); }
+//
+//    const type::POEM_TYPES &type() const { return m_var_ID->type(); }
 
     virtual void set_point(void *polar_point) = 0;
 
@@ -82,7 +78,7 @@ namespace poem {
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
    protected:
-    std::unique_ptr<VariableID> m_var_ID;
+//    std::unique_ptr<VariableID> m_var_ID;
 
   };
 
@@ -99,8 +95,8 @@ namespace poem {
 
    public:
 
-    using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
-    using PolarPointsConstIter = typename PolarPoints::const_iterator;
+//    using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
+//    using PolarPointsConstIter = typename PolarPoints::const_iterator;
 
     using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
@@ -112,34 +108,39 @@ namespace poem {
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarBase(name, unit, description, type),
         m_interpolator_is_built(false),
-        m_nearest_is_built(false),
-        m_dimension_point_set(dimension_point_set) {
+        m_nearest_is_built(false) {
 
-      NIY
 //      for (const auto dimension_point: *m_dimension_point_set) {
 //        PolarPoint<T, _dim> polar_point(dimension_point);
 //        m_polar_points.insert({dimension_point.get(), polar_point});
 //      }
 
+
+
+
     }
 
     const size_t dim() const override { return _dim; }
 
-    size_t size() const override { return m_polar_points.size(); }
+    size_t size() const override {
+      NIY
+//      return m_polar_points.size();
+    }
 
 //    std::shared_ptr<DimensionSet<_dim>> dimension_ID_set() {
 //      return m_dimension_point_set->dimension_ID_set();
 //    }
 
-    const DimensionPointSet<_dim> *dimension_point_set() const {
-      return m_dimension_point_set.get();
-    }
+//    const DimensionPointSet<_dim> *dimension_point_set() const {
+////      return m_dimension_point_set.get();
+//    }
 
-    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() {
-      return m_dimension_point_set;
-    }
+//    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() {
+//      return m_dimension_point_set;
+//    }
 
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      NIY
       if (!m_nearest_is_built) {
         const_cast<Polar<T, _dim> *>(this)->build_nearest();
       }
@@ -235,33 +236,36 @@ namespace poem {
     }
 
     void set_point(void *polar_point) override {
+      NIY
 
-      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
-      if (!polar_point_->has_value()) {
-        spdlog::critical("Attempting to set the polar with non-initialized polar point");
-        CRITICAL_ERROR
-      }
-
-      const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
-
-      auto &internal_polar_point = m_polar_points.at(dimension_point);
-
-      if (internal_polar_point.has_value()) {
-        spdlog::warn("The same polar point has been set more than one time");
-      }
-      internal_polar_point.set_value(polar_point_->value());
+//      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
+//      if (!polar_point_->has_value()) {
+//        spdlog::critical("Attempting to set the polar with non-initialized polar point");
+//        CRITICAL_ERROR
+//      }
+//
+//      const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
+//
+//      auto &internal_polar_point = m_polar_points.at(dimension_point);
+//
+//      if (internal_polar_point.has_value()) {
+//        spdlog::warn("The same polar point has been set more than one time");
+//      }
+//      internal_polar_point.set_value(polar_point_->value());
 
     }
 
     bool is_filled() const override {
-      return std::all_of(m_polar_points.begin(), m_polar_points.end(),
-                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
-                           return x.second.has_value();
-                         }
-      );
+      NIY
+//      return std::all_of(m_polar_points.begin(), m_polar_points.end(),
+//                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
+//                           return x.second.has_value();
+//                         }
+//      );
     }
 
     void append(PolarBase *other) override {
+      NIY
 
 //      if (other->dim() != _dim) {
 //        spdlog::critical("Attempting to append a polar of dimension {} to a polar of dimension {}", other->dim(), _dim);
@@ -307,51 +311,52 @@ namespace poem {
       };
     }
 
-    PolarPointsConstIter begin() const {
-      return m_polar_points.cbegin();
-    }
-
-    PolarPointsConstIter end() const {
-      return m_polar_points.cend();
-    }
+//    PolarPointsConstIter begin() const {
+//      return m_polar_points.cbegin();
+//    }
+//
+//    PolarPointsConstIter end() const {
+//      return m_polar_points.cend();
+//    }
 
    private:
 
     void build_nearest() {
+      NIY
 
-      if (!is_filled()) {
-        spdlog::critical("Attempting to build nearest table of a polar before it is totally filled");
-        CRITICAL_ERROR
-      }
-
-      m_nearest = std::make_unique<NearestND>();
-
-      using NDArray = boost::multi_array<T, _dim>;
-      using IndexArray = boost::array<typename NDArray::index, _dim>;
-      IndexArray shape;
-
-      size_t num_elements = 1;
-      for (size_t i = 0; i < _dim; ++i) {
-        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
-        auto dim_vector = m_dimension_point_set->dimension_vector(i);
-
-        shape[i] = dim_vector.size();
-        num_elements *= shape[i];
-
-        m_nearest->AddCoord(dim_vector);
-      }
-
-      std::vector<T> data;
-      data.reserve(num_elements);
-      for (const auto &point: m_polar_points) {
-        data.push_back(point.second.value());
-      }
-
-      NDArray array(shape);
-      std::copy(data.begin(), data.end(), array.data());
-      m_nearest->AddVar(array);
-
-      m_nearest_is_built = true;
+//      if (!is_filled()) {
+//        spdlog::critical("Attempting to build nearest table of a polar before it is totally filled");
+//        CRITICAL_ERROR
+//      }
+//
+//      m_nearest = std::make_unique<NearestND>();
+//
+//      using NDArray = boost::multi_array<T, _dim>;
+//      using IndexArray = boost::array<typename NDArray::index, _dim>;
+//      IndexArray shape;
+//
+//      size_t num_elements = 1;
+//      for (size_t i = 0; i < _dim; ++i) {
+//        auto dim_id = m_dimension_point_set->dimension_ID_set()->get(i);
+//        auto dim_vector = m_dimension_point_set->dimension_vector(i);
+//
+//        shape[i] = dim_vector.size();
+//        num_elements *= shape[i];
+//
+//        m_nearest->AddCoord(dim_vector);
+//      }
+//
+//      std::vector<T> data;
+//      data.reserve(num_elements);
+//      for (const auto &point: m_polar_points) {
+//        data.push_back(point.second.value());
+//      }
+//
+//      NDArray array(shape);
+//      std::copy(data.begin(), data.end(), array.data());
+//      m_nearest->AddVar(array);
+//
+//      m_nearest_is_built = true;
 
     }
 
@@ -359,8 +364,8 @@ namespace poem {
     bool m_interpolator_is_built;
     bool m_nearest_is_built;
 
-    std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
-    PolarPoints m_polar_points;
+//    std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
+//    PolarPoints m_polar_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;
     std::unique_ptr<NearestND> m_nearest;

@@ -26,33 +26,36 @@ namespace poem {
     using NameMap = std::map<std::string, std::string>;
 
     // FIXME: on ne doit plus fournir Attribute a PolarSet mais on le fournira au to_netcdf !!!
-    PolarSet(const Attributes &attributes, const Schema &schema, const Schema &newest_schema) :
-        m_attributes(attributes),
+    PolarSet(const Schema &schema, const Schema &newest_schema) :
+//        m_attributes(attributes),
         m_schema(schema),
         m_newest_schema(newest_schema) {
 
       if (!m_newest_schema.is_newest()) {
-        spdlog::critical("Not the newest schema given to PolarSet");
+        spdlog::warn("Not the newest schema given to PolarSet");
       }
 
 
       // We automatically add the current schema as attribute if not found in the attributes
-      if (!m_attributes.contains("schema")) {
-        m_attributes.add_attribute("schema", schema.json_str());
-      } else {
-        // FIXME: Verify that this is the same attribute as given in the ctor!!
-//        if (!m_attributes)
-      }
+//      if (!m_attributes.contains("schema")) {
+//        m_attributes.add_attribute("schema", schema.json_str());
+//      } else {
+//        // FIXME: Verify that this is the same attribute as given in the ctor!!
+////        if (!m_attributes)
+//      }
 
       // Check that the given attributes are compliant with the current schema
-      m_schema.check_attributes(&m_attributes);
+//      m_schema.check_attributes(&m_attributes);
 
       // Generating map
-      generate_attributes_name_map();
+      // FIXME: ici on faisait les maps pour la back compatibility. Ou la faire maintenant qu'on met plus d'attributs
+      // dans polarset ???
+      // Ou alors c'est toujours PolarSet qui a les attributs mais on les ajoute quand on en a besoin seulement...
+//      generate_attributes_name_map();
     };
 
     PolarSet(const PolarSet &other) :
-        m_attributes(other.m_attributes),
+//        m_attributes(other.m_attributes),
         m_attributes_name_map(other.m_attributes_name_map),
         m_schema(other.m_schema),
         m_newest_schema(other.m_newest_schema),
@@ -65,12 +68,13 @@ namespace poem {
     }
 
     template<typename T, size_t _dim>
-    Polar<T, _dim> *New(const std::string &name,
-                        const std::string &unit,
-                        const std::string &description,
-                        type::POEM_TYPES type,
-                        std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+    Polar<T, _dim> *new_polar(const std::string &name,
+                              const std::string &unit,
+                              const std::string &description,
+                              type::POEM_TYPES type,
+                              std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
+      // TODO: tester si le nom de polaire n'est pas deja utilise !
 //      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
       auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);
@@ -89,7 +93,7 @@ namespace poem {
 
     bool is_using_newest_schema() const { return m_schema.is_newest(); }
 
-    const Attributes &attributes() const { return m_attributes; }
+//    const Attributes &attributes() const { return m_attributes; }
 
     bool is_filled() const {
       bool is_filled = true;
@@ -151,7 +155,7 @@ namespace poem {
 
       if (m_polars_map.empty()) {
         // Adding polars from other
-        for (const auto& pair : other.m_polars_map) {
+        for (const auto &pair: other.m_polars_map) {
           auto polar = pair.second.get();
           copy_polar(polar);
         }
@@ -200,7 +204,7 @@ namespace poem {
       return polar->nearest<T, _dim>(dimension_point, bound_check);
     }
 
-    int to_netcdf(const std::string &nc_file) const {
+    int to_netcdf(const std::string &nc_file, const Attributes &attributes) const {
 
       fs::path nc_file_path(nc_file);
       if (nc_file_path.is_relative()) {
@@ -218,7 +222,11 @@ namespace poem {
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
 
         // Writing attributes
-        for (const auto &attribute: m_attributes) {
+        // TODO: les attributs seront fournis en argument de la methode
+
+        NIY
+        // FIXME: il faut ajouter le schema dans les attributs ici... ?
+        for (const auto &attribute: attributes) {
           dataFile.putAtt(attribute.first, attribute.second);
         }
 
@@ -274,53 +282,55 @@ namespace poem {
 
     template<typename T, size_t _dim>
     void copy_polar(PolarBase *polar) {
-      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
-
-      auto polar_copy = New<T, _dim>(polar_->name(),
-                                     polar_->unit(),
-                                     polar_->description(),
-                                     polar_->type(),
-                                     polar_->dimension_point_set());
-
-      // Filling with values
-      auto iter = polar_->begin();
-      for (; iter != polar_->end(); ++iter) {
-        PolarPoint<T, _dim> polar_point = (*iter).second;
-        polar_copy->set_point(&polar_point);
-      }
-
-      if (!polar_copy->is_filled()) { // Pourrait etre retire ?
-        spdlog::critical("Copying polar while not filled");
-        CRITICAL_ERROR
-      }
+      NIY
+//      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
+//
+//      auto polar_copy = New<T, _dim>(polar_->name(),
+//                                     polar_->unit(),
+//                                     polar_->description(),
+//                                     polar_->type(),
+//                                     polar_->dimension_point_set());
+//
+//      // Filling with values
+//      auto iter = polar_->begin();
+//      for (; iter != polar_->end(); ++iter) {
+//        PolarPoint<T, _dim> polar_point = (*iter).second;
+//        polar_copy->set_point(&polar_point);
+//      }
+//
+//      if (!polar_copy->is_filled()) { // Pourrait etre retire ?
+//        spdlog::critical("Copying polar while not filled");
+//        CRITICAL_ERROR
+//      }
 
     }
 
     void generate_attributes_name_map() {
+      NIY
       // TODO
-      for (const auto &attribute: m_attributes) {
-        auto name = attribute.first;
-        if (name == "schema") continue;
-
-        if (m_schema.is_newest()) {
-          // The attribute has not changed
-          m_attributes_name_map.insert({name, name});
-
-        } else {
-          // The attribute may have changed
-          auto current_name = m_newest_schema.get_newest_attribute_name(name);
-
-          // Si current name est vide, on a pas trouve d'alias nulle part
-          if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
-            spdlog::critical("No schema compatibility for attribute named {}", name);
-            CRITICAL_ERROR
-          }
-
-          m_attributes_name_map.insert({current_name, name});
-
-        }
-
-      }
+//      for (const auto &attribute: m_attributes) {
+//        auto name = attribute.first;
+//        if (name == "schema") continue;
+//
+//        if (m_schema.is_newest()) {
+//          // The attribute has not changed
+//          m_attributes_name_map.insert({name, name});
+//
+//        } else {
+//          // The attribute may have changed
+//          auto current_name = m_newest_schema.get_newest_attribute_name(name);
+//
+//          // Si current name est vide, on a pas trouve d'alias nulle part
+//          if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
+//            spdlog::critical("No schema compatibility for attribute named {}", name);
+//            CRITICAL_ERROR
+//          }
+//
+//          m_attributes_name_map.insert({current_name, name});
+//
+//        }
+//
+//      }
 
     }
 
@@ -350,7 +360,6 @@ namespace poem {
     }
 
    protected:
-    Attributes m_attributes;
     NameMap m_attributes_name_map;
 
     PolarMap m_polars_map;
