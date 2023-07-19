@@ -44,6 +44,10 @@ set(dunits_TAG 1.1)  # TODO: mettre tag
 set(googletest_URL https://github.com/google/googletest.git)
 set(googletest_TAG release-1.12.1)
 
+# fmt
+set(fmt_URL https://github.com/fmtlib/fmt.git)
+set(fmt_TAG 9.1.0 CACHE STRING "fmt version")
+
 # spdlog
 set(spdlog_URL https://github.com/gabime/spdlog)
 set(spdlog_TAG v1.11.0)

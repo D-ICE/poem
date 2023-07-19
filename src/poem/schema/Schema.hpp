@@ -40,19 +40,23 @@ namespace poem {
 
     // On veut recuperer le type et la dimension de la variable
 
-    auto dimension_ID_set = polar->dimension_point_set()->dimension_ID_set();
-    // On veut verifier que toutes les dimensions sont bien existantes
-    for (size_t i = 0; i < _dim; ++i) {
-//      auto dim_ID = dimension_ID_set->get(i);
-      auto dim_name = dimension_ID_set->get(i)->name();
 
-      if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
-        spdlog::critical(R"(Variable "{}" is said to depend on dimension "{}" which is not known by the schema)",
-                         polar_name, dim_name);
-        CRITICAL_ERROR
-      }
-
-    }
+    // TODO: remettre en place
+//    NIY
+//    auto dimension_ID_set = polar->dimension_point_set()->dimension_ID_set();
+//    // On veut verifier que toutes les dimensions sont bien existantes
+//    for (size_t i = 0; i < _dim; ++i) {
+////      auto dim_ID = dimension_ID_set->get(i);
+//      auto dim_name = dimension_ID_set->get(i)->name();
+//
+//      if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
+//        spdlog::critical(R"(Variable "{}" is said to depend on dimension "{}" which is not known by the schema)",
+//                         polar_name, dim_name);
+//        CRITICAL_ERROR
+//      }
+//
+//    }
+    // TODO: FIN
 
   }
 

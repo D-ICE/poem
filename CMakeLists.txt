@@ -31,6 +31,7 @@ include(Add_version)
 
 include(Add_mathutils)
 include(Add_json)
+include(Add_fmt)
 include(Add_spdlog)
 include(Add_dunits)
 

@@ -26,11 +26,11 @@ TEST(POLAR, WRITE) {
    * Here we define 3 dimensions based on their name, unit, description and bound values
    * DimensionID are the unique identifiers of a dimension
    */
-  auto STW = std::make_shared<DimensionID>("STW_kt", "kt", "Speed Through Water", 0, 20);
-  auto TWS = std::make_shared<DimensionID>("TWS_kt", "kt", "True Wind Speed", 0, 60);
-  auto TWA = std::make_shared<DimensionID>("TWA_deg", "deg", "True Wind Angle", 0, 180);
-  auto WA = std::make_shared<DimensionID>("WA_deg", "deg", "Waves Angle", 0, 180);
-  auto Hs = std::make_shared<DimensionID>("Hs_m", "m", "Waves Significant Height", 0, 8);
+  auto STW = std::make_shared<Dimension_>("STW_kt", "kt", "Speed Through Water", 0, 20);
+  auto TWS = std::make_shared<Dimension_>("TWS_kt", "kt", "True Wind Speed", 0, 60);
+  auto TWA = std::make_shared<Dimension_>("TWA_deg", "deg", "True Wind Angle", 0, 180);
+  auto WA = std::make_shared<Dimension_>("WA_deg", "deg", "Waves Angle", 0, 180);
+  auto Hs = std::make_shared<Dimension_>("Hs_m", "m", "Waves Significant Height", 0, 8);
 
   /**
    * Create the dimension ID set
@@ -38,8 +38,8 @@ TEST(POLAR, WRITE) {
    * A shared_ptr is used as several polars are likely to share this coordinate system
    * Dimensions are ordered
    */
-  DimensionIDSet<5>::IDSet dim_ID_environment{STW, TWS, TWA, WA, Hs};
-  auto dimension_ID_environment = std::make_shared<DimensionIDSet<5>>(dim_ID_environment);
+  DimensionSet<5>::DimensionArray dim_ID_environment{STW, TWS, TWA, WA, Hs};
+  auto dimension_ID_environment = std::make_shared<DimensionSet<5>>(dim_ID_environment);
 
   /**
    * Create a dimension point set

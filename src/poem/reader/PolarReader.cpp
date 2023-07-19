@@ -59,24 +59,25 @@ namespace poem {
   }
 
   void PolarReader::load_dimensions() {
-    for (const auto &dim_: m_dataFile->getDims()) {
-      auto dim_name = dim_.first;
-
-      auto dim_var = m_dataFile->getVar(dim_name);
-
-      // TODO: on devrait plutot faire un load dynamique...
-      std::string unit, description, min_str, max_str;
-      dim_var.getAtt("unit").getValues(unit);
-      dim_var.getAtt("description").getValues(description);
-      dim_var.getAtt("min").getValues(min_str);
-      dim_var.getAtt("max").getValues(max_str);
-
-      double min = std::stod(min_str);
-      double max = std::stod(max_str);
-
-      auto dim_ID = std::make_shared<DimensionID>(dim_name, unit, description, min, max);
-      m_dimension_map.insert({dim_name, dim_ID});
-    }
+    NIY
+//    for (const auto &dim_: m_dataFile->getDims()) {
+//      auto dim_name = dim_.first;
+//
+//      auto dim_var = m_dataFile->getVar(dim_name);
+//
+//      // TODO: on devrait plutot faire un load dynamique...
+//      std::string unit, description, min_str, max_str;
+//      dim_var.getAtt("unit").getValues(unit);
+//      dim_var.getAtt("description").getValues(description);
+//      dim_var.getAtt("min").getValues(min_str);
+//      dim_var.getAtt("max").getValues(max_str);
+//
+//      double min = std::stod(min_str);
+//      double max = std::stod(max_str);
+//
+//      auto dim_ID = std::make_shared<Dimension_>(dim_name, unit, description, min, max);
+//      m_dimension_map.insert({dim_name, dim_ID});
+//    }
   }
 
   void PolarReader::load_variable(const std::string &var_name) {
@@ -123,64 +124,65 @@ namespace poem {
 
   template<typename T, size_t _dim>
   void PolarReader::load_variable(const std::string &var_name) {
-    auto nc_var = m_dataFile->getVar(var_name);
-
-    std::string hash_name;
-    for (int i = 0; i < _dim; ++i) {
-      hash_name += nc_var.getDim(i).getName();
-    }
-
-    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set;
-
-    if (m_dim_ID_set_registry.find(hash_name) != m_dim_ID_set_registry.end()) {
-      // This dimension point set is already registered, getting it from registry
-      dimension_point_set = std::dynamic_pointer_cast<DimensionPointSet<_dim>>(m_dim_ID_set_registry.at(hash_name));
-
-    } else {
-
-      typename DimensionIDSet<_dim>::IDSet dim_ID_set;
-      for (int i = 0; i < _dim; ++i) {
-        auto dim = nc_var.getDim(i);
-        auto dim_ID = m_dimension_map.at(dim.getName());
-        dim_ID_set.at(i) = dim_ID;
-      }
-      auto dimension_ID_set = std::make_shared<DimensionIDSet<_dim>>(dim_ID_set);
-
-//      dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_ID_set);
-      DimensionPointGrid<_dim> dimension_point_grid(dimension_ID_set);
-
-      for (int i = 0; i < _dim; ++i) {
-
-        auto dim = nc_var.getDim(i);
-        auto dim_size = dim.getSize();
-        auto dim_name = dim.getName();
-        auto var = m_dataFile->getVar(dim_name);
-        std::vector<double> values(dim_size);
-        var.getVar(values.data());
-
-        dimension_point_grid.set_dimension_values(dim_name, values);
-//        dimension_point_set->set_dimension_values(dim_name, values);
-      }
-
-      auto dimension_point_set = dimension_point_grid.get_dimension_point_set();
-//      dimension_point_set->build();
-
-      m_dim_ID_set_registry.insert({hash_name, dimension_point_set});
-
-    }
-
-    auto nc_type = nc_var.getType();
-
-    switch (nc_type.getId()) {
-      case netCDF::NcType::nc_DOUBLE:
-        return load_var_data<type::DOUBLE, _dim>(nc_var, dimension_point_set);
-      case netCDF::NcType::nc_INT:
-        return load_var_data<type::INT, _dim>(nc_var, dimension_point_set);
-      default:
-        // We should never get here
-        spdlog::critical("Type {} is not managed yet", nc_type.getTypeClass());
-        CRITICAL_ERROR
-    }
+    NIY
+//    auto nc_var = m_dataFile->getVar(var_name);
+//
+//    std::string hash_name;
+//    for (int i = 0; i < _dim; ++i) {
+//      hash_name += nc_var.getDim(i).getName();
+//    }
+//
+//    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set;
+//
+//    if (m_dim_ID_set_registry.find(hash_name) != m_dim_ID_set_registry.end()) {
+//      // This dimension point set is already registered, getting it from registry
+//      dimension_point_set = std::dynamic_pointer_cast<DimensionPointSet<_dim>>(m_dim_ID_set_registry.at(hash_name));
+//
+//    } else {
+//
+//      typename DimensionSet<_dim>::DimensionArray dim_ID_set;
+//      for (int i = 0; i < _dim; ++i) {
+//        auto dim = nc_var.getDim(i);
+//        auto dim_ID = m_dimension_map.at(dim.getName());
+//        dim_ID_set.at(i) = dim_ID;
+//      }
+//      auto dimension_ID_set = std::make_shared<DimensionSet<_dim>>(dim_ID_set);
+//
+////      dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_ID_set);
+//      DimensionPointGrid<_dim> dimension_point_grid(dimension_ID_set);
+//
+//      for (int i = 0; i < _dim; ++i) {
+//
+//        auto dim = nc_var.getDim(i);
+//        auto dim_size = dim.getSize();
+//        auto dim_name = dim.getName();
+//        auto var = m_dataFile->getVar(dim_name);
+//        std::vector<double> values(dim_size);
+//        var.getVar(values.data());
+//
+//        dimension_point_grid.set_dimension_values(dim_name, values);
+////        dimension_point_set->set_dimension_values(dim_name, values);
+//      }
+//
+//      auto dimension_point_set = dimension_point_grid.get_dimension_point_set();
+////      dimension_point_set->build();
+//
+//      m_dim_ID_set_registry.insert({hash_name, dimension_point_set});
+//
+//    }
+//
+//    auto nc_type = nc_var.getType();
+//
+//    switch (nc_type.getId()) {
+//      case netCDF::NcType::nc_DOUBLE:
+//        return load_var_data<type::DOUBLE, _dim>(nc_var, dimension_point_set);
+//      case netCDF::NcType::nc_INT:
+//        return load_var_data<type::INT, _dim>(nc_var, dimension_point_set);
+//      default:
+//        // We should never get here
+//        spdlog::critical("Type {} is not managed yet", nc_type.getTypeClass());
+//        CRITICAL_ERROR
+//    }
 
   }
 

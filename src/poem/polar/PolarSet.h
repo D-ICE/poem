@@ -25,6 +25,7 @@ namespace poem {
     using PolarMap = std::map<std::string, std::unique_ptr<PolarBase>>;
     using NameMap = std::map<std::string, std::string>;
 
+    // FIXME: on ne doit plus fournir Attribute a PolarSet mais on le fournira au to_netcdf !!!
     PolarSet(const Attributes &attributes, const Schema &schema, const Schema &newest_schema) :
         m_attributes(attributes),
         m_schema(schema),

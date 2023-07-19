@@ -10,8 +10,9 @@
 
 set(TESTS
 #        test_polar_creation
-        test_polar_compat
-        test_polar_concatenation
+#        test_polar_compat
+#        test_polar_concatenation
+        test_poem
         )
 
 

@@ -24,7 +24,7 @@ namespace poem {
   // Forward declaration
   class PolarSet;
 
-  class DimensionID;
+  class Dimension_;
 
   class DimensionPointSetBase;
 
@@ -57,7 +57,7 @@ namespace poem {
 
     std::shared_ptr<PolarSet> m_polar_set;
 
-    std::map<std::string, std::shared_ptr<DimensionID>> m_dimension_map;
+    std::map<std::string, std::shared_ptr<Dimension_>> m_dimension_map;
     std::map<std::string, std::shared_ptr<DimensionPointSetBase>> m_dim_ID_set_registry;
 
   };
