@@ -62,8 +62,8 @@ namespace poem {
 
     virtual void append(PolarBase *polar) = 0;
 
-    // FIXME: pas le plus elegant le void void...
-    virtual std::function<void(void *)> get_set_point_function() = 0;
+//    // FIXME: pas le plus elegant le void void...
+//    virtual std::function<void(void *)> get_set_point_function() = 0;
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
@@ -107,16 +107,16 @@ namespace poem {
           type::POEM_TYPES type,
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarBase(name, unit, description, type),
+        m_dimension_point_set(dimension_point_set),
         m_interpolator_is_built(false),
         m_nearest_is_built(false) {
+
+      m_values.reserve(dimension_point_set->size());
 
 //      for (const auto dimension_point: *m_dimension_point_set) {
 //        PolarPoint<T, _dim> polar_point(dimension_point);
 //        m_polar_points.insert({dimension_point.get(), polar_point});
 //      }
-
-
-
 
     }
 
@@ -304,12 +304,12 @@ namespace poem {
 
     }
 
-    // FIXME: pas le plus elegant le void void...
-    std::function<void(void *)> get_set_point_function() override {
-      return [this](void *polar_point) {
-        set_point(polar_point);
-      };
-    }
+//    // FIXME: pas le plus elegant le void void...
+//    std::function<void(void *)> get_set_point_function() override {
+//      return [this](void *polar_point) {
+//        set_point(polar_point);
+//      };
+//    }
 
 //    PolarPointsConstIter begin() const {
 //      return m_polar_points.cbegin();
@@ -364,7 +364,8 @@ namespace poem {
     bool m_interpolator_is_built;
     bool m_nearest_is_built;
 
-//    std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
+    std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
+    std::vector<T> m_values;
 //    PolarPoints m_polar_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;

@@ -74,7 +74,10 @@ namespace poem {
                               type::POEM_TYPES type,
                               std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
-      // TODO: tester si le nom de polaire n'est pas deja utilise !
+      if (m_polars_map.find(name) != m_polars_map.end()) {
+        spdlog::critical("Attempting to add polar with name {} twice", name);
+        CRITICAL_ERROR
+      }
 //      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
       auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);

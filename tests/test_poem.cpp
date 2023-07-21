@@ -75,10 +75,112 @@ TEST_F(DimensionPointSetTest, PolarSetTest) {
   auto polar_set = std::make_shared<poem::PolarSet>(current_schema, current_schema);
 
   polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::DOUBLE, dimension_point_set);
-  polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::DOUBLE, dimension_point_set);
+//  polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::DOUBLE, dimension_point_set);
+//  polar_set->new_polar<double, 5>("HEEL", "deg", "Heeling angle", poem::type::DOUBLE, dimension_point_set);
 
 
 }
+
+TEST(poem_splitter, splitter) {
+
+  size_t chunk_size = 5;
+
+  poem::Splitter splitter1(1, chunk_size);
+  ASSERT_EQ(splitter1.nchunks(), 1);
+  ASSERT_EQ(splitter1.chunk_offset(0), 0);
+  ASSERT_EQ(splitter1.chunk_size(0), 1);
+
+  poem::Splitter splitter4(4, chunk_size);
+  ASSERT_EQ(splitter4.nchunks(), 1);
+  ASSERT_EQ(splitter4.chunk_offset(0), 0);
+  ASSERT_EQ(splitter4.chunk_size(0), 4);
+
+  poem::Splitter splitter8(8, chunk_size);
+  ASSERT_EQ(splitter8.nchunks(), 1);
+  ASSERT_EQ(splitter8.chunk_size(0), 8);
+
+  poem::Splitter splitter10(10, chunk_size);
+  ASSERT_EQ(splitter10.nchunks(), 2);
+  ASSERT_EQ(splitter10.chunk_size(0), 5);
+  ASSERT_EQ(splitter10.chunk_offset(1), 5);
+  ASSERT_EQ(splitter10.chunk_size(1), 5);
+
+  poem::Splitter splitter11(11, chunk_size);
+  ASSERT_EQ(splitter11.nchunks(), 2);
+  ASSERT_EQ(splitter11.chunk_size(0), 6);
+  ASSERT_EQ(splitter11.chunk_offset(1), 6);
+  ASSERT_EQ(splitter11.chunk_size(1), 5);
+
+  poem::Splitter splitter12(12, chunk_size); // ok
+  ASSERT_EQ(splitter12.nchunks(), 2);
+  ASSERT_EQ(splitter12.chunk_size(0), 6);
+  ASSERT_EQ(splitter12.chunk_offset(1), 6);
+  ASSERT_EQ(splitter12.chunk_size(1), 6);
+
+  poem::Splitter splitter13(13, chunk_size);
+  ASSERT_EQ(splitter13.nchunks(), 2);
+  ASSERT_EQ(splitter13.chunk_size(0), 7);
+  ASSERT_EQ(splitter13.chunk_offset(1), 7);
+  ASSERT_EQ(splitter13.chunk_size(1), 6);
+
+  poem::Splitter splitter14(14, chunk_size); // ok
+  ASSERT_EQ(splitter14.nchunks(), 2);
+  ASSERT_EQ(splitter14.chunk_size(0), 7);
+  ASSERT_EQ(splitter14.chunk_offset(1), 7);
+  ASSERT_EQ(splitter14.chunk_size(1), 7);
+
+  poem::Splitter splitter15(15, chunk_size); // ok
+  ASSERT_EQ(splitter15.nchunks(), 3);
+  ASSERT_EQ(splitter15.chunk_size(0), 5);
+  ASSERT_EQ(splitter15.chunk_offset(1), 5);
+  ASSERT_EQ(splitter15.chunk_size(1), 5);
+  ASSERT_EQ(splitter15.chunk_offset(2), 10);
+  ASSERT_EQ(splitter15.chunk_size(2), 5);
+
+  poem::Splitter splitter19(19, chunk_size);
+  ASSERT_EQ(splitter19.nchunks(), 3);
+  ASSERT_EQ(splitter19.chunk_size(0), 7);
+  ASSERT_EQ(splitter19.chunk_offset(1), 7);
+  ASSERT_EQ(splitter19.chunk_size(1), 6);
+  ASSERT_EQ(splitter19.chunk_offset(2), 13);
+  ASSERT_EQ(splitter19.chunk_size(2), 6);
+
+  poem::Splitter splitter20(20, chunk_size);
+  ASSERT_EQ(splitter20.nchunks(), 4);
+  ASSERT_EQ(splitter20.chunk_size(0), 5);
+  ASSERT_EQ(splitter20.chunk_offset(1), 5);
+  ASSERT_EQ(splitter20.chunk_size(1), 5);
+  ASSERT_EQ(splitter20.chunk_offset(2), 10);
+  ASSERT_EQ(splitter20.chunk_size(2), 5);
+  ASSERT_EQ(splitter20.chunk_offset(3), 15);
+  ASSERT_EQ(splitter20.chunk_size(3), 5);
+
+  poem::Splitter splitter22(22, chunk_size);
+  ASSERT_EQ(splitter22.nchunks(), 4);
+  ASSERT_EQ(splitter22.chunk_size(0), 6);
+  ASSERT_EQ(splitter22.chunk_offset(1), 6);
+  ASSERT_EQ(splitter22.chunk_size(1), 6);
+  ASSERT_EQ(splitter22.chunk_offset(2), 12);
+  ASSERT_EQ(splitter22.chunk_size(2), 5);
+  ASSERT_EQ(splitter22.chunk_offset(3), 17);
+  ASSERT_EQ(splitter22.chunk_size(3), 5);
+
+  poem::Splitter splitter27(27, chunk_size);
+  ASSERT_EQ(splitter27.nchunks(), 5);
+  ASSERT_EQ(splitter27.chunk_size(0), 6);
+  ASSERT_EQ(splitter27.chunk_offset(1), 6);
+  ASSERT_EQ(splitter27.chunk_size(1), 6);
+  ASSERT_EQ(splitter27.chunk_offset(2), 12);
+  ASSERT_EQ(splitter27.chunk_size(2), 5);
+  ASSERT_EQ(splitter27.chunk_offset(3), 17);
+  ASSERT_EQ(splitter27.chunk_size(3), 5);
+  ASSERT_EQ(splitter27.chunk_offset(4), 22);
+  ASSERT_EQ(splitter27.chunk_size(4), 5);
+
+
+
+}
+
 
 TEST_F(DimensionPointSetTest, PolarSetHermesTest) {
 

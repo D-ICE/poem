@@ -150,9 +150,22 @@ namespace poem {
 
     }
 
-    DimensionPoint<_dim> dimension_point(size_t idx) const {
-      return DimensionPoint<_dim>(&m_dimension_array, &m_points_arrays[idx]);
+    size_t size() const {
+      return m_points_arrays.size();
     }
+
+    DimensionPoint<_dim> dimension_point(size_t idx) const {
+      return DimensionPoint<_dim>(&m_dimension_array, &m_points_arrays.at(idx));
+    }
+
+//    std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const size_t chunk_size) const {
+//
+//      size_t n
+//
+//
+//
+//
+//    }
 
 
    private:
