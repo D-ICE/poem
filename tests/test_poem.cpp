@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <poem/poem.h>
+#include <poem/exceptions.h>
 
 #include <MathUtils/VectorGeneration.h>
 
@@ -13,6 +14,17 @@ class DimensionPointSetTest : public testing::Test {
  protected:
   void SetUp() override {
 
+    // Create Dimensions
+    auto STW_dim = std::make_shared<poem::Dimension>("STW_kt", "kt", "Speed Through Water");
+    auto TWS_dim = std::make_shared<poem::Dimension>("TWS_kt", "kt", "True Wind Speed");
+    auto TWA_dim = std::make_shared<poem::Dimension>("TWA_deg", "deg", "True Wind Angle");
+    auto WA_dim = std::make_shared<poem::Dimension>("WA_deg", "deg", "Waves Angle");
+    auto Hs_dim = std::make_shared<poem::Dimension>("Hs_m", "m", "Waves Significant Height");
+
+    // Create a DimensionSet
+    std::array<std::shared_ptr<poem::Dimension>, 5> array{STW_dim, TWS_dim, TWA_dim, WA_dim, Hs_dim};
+    auto dimension_set = std::make_shared<poem::DimensionSet<5>>(array);
+
     // Create samples for dimensions
     STW_vector = mathutils::arange<double>(0, 20, 1);
     TWS_vector = mathutils::arange<double>(0, 60, 5);
@@ -20,17 +32,17 @@ class DimensionPointSetTest : public testing::Test {
     WA_vector = mathutils::arange<double>(0, 180, 15);
     Hs_vector = mathutils::arange<double>(0, 8, 1);
 
-    // Create Dimensions
-    auto STW_dim = std::make_shared<poem::Dimension>("STW_kt", "kt", "Speed Through Water", STW_vector);
-    auto TWS_dim = std::make_shared<poem::Dimension>("TWS_kt", "kt", "True Wind Speed", TWS_vector);
-    auto TWA_dim = std::make_shared<poem::Dimension>("TWA_deg", "deg", "True Wind Angle", TWA_vector);
-    auto WA_dim = std::make_shared<poem::Dimension>("WA_deg", "deg", "Waves Angle", WA_vector);
-    auto Hs_dim = std::make_shared<poem::Dimension>("Hs_m", "m", "Waves Significant Height", Hs_vector);
+    // Create the dimension grid
+    auto dimension_grid = poem::DimensionGrid(dimension_set);
+    dimension_grid.set_values("STW_kt", STW_vector);
+    ASSERT_FALSE(dimension_grid.is_filled());
+    dimension_grid.set_values("TWS_kt", TWS_vector);
+    dimension_grid.set_values("TWA_deg", TWA_vector);
+    dimension_grid.set_values("WA_deg", WA_vector);
+    dimension_grid.set_values("Hs_m", Hs_vector);
+    ASSERT_TRUE(dimension_grid.is_filled());
 
-    // Create a DimensionSet
-    poem::DimensionArray<5> dimension_array{{STW_dim, TWS_dim, TWA_dim, WA_dim, Hs_dim}};
-
-    dimension_point_set = std::make_shared<poem::DimensionPointSet<5>>(dimension_array);
+    dimension_point_set = dimension_grid.dimension_point_set();
   }
 
   std::vector<double> STW_vector;
@@ -178,6 +190,18 @@ TEST(poem_splitter, splitter) {
   ASSERT_EQ(splitter27.chunk_size(4), 5);
 
 
+
+  // TODO: faire le 54
+
+}
+
+TEST_F(DimensionPointSetTest, split_dimensions) {
+
+  size_t size = dimension_point_set->size();
+  poem::Splitter splitter(size, 10);
+
+  auto dimension_point_set_vector = dimension_point_set->split(splitter);
+  ASSERT_EQ(dimension_point_set_vector.size(), splitter.nchunks());
 
 }
 

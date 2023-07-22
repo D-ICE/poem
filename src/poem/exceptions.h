@@ -9,9 +9,9 @@
 #include <exception>
 
 #define STOP throw StopForDevelopment();
-#define TODO throw Todo();
-#define NIY throw NotImplementedYet();
-#define CRITICAL_ERROR throw CriticalError();
+#define TODO throw poem::Todo();
+#define NIY throw poem::NotImplementedYet();
+#define CRITICAL_ERROR throw poem::CriticalError();
 
 namespace poem {
 
