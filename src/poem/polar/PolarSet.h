@@ -72,6 +72,7 @@ namespace poem {
                               const std::string &unit,
                               const std::string &description,
                               type::POEM_TYPES type,
+                              POLAR_TYPE polar_type,
                               std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       if (m_polars_map.find(name) != m_polars_map.end()) {
@@ -80,7 +81,7 @@ namespace poem {
       }
 //      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
-      auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, dimension_point_set);
+      auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, polar_type, dimension_point_set);
 
       m_polars_map.insert({name, std::move(polar)});
       auto polar_ptr = static_cast<Polar<T, _dim> *>(m_polars_map[name].get());

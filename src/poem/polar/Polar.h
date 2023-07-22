@@ -26,6 +26,12 @@
 
 namespace poem {
 
+  enum POLAR_TYPE {
+    PPP,
+    VPP,
+    HVPP
+  };
+
   // forward declaration
   template<typename T, size_t _dim>
   class Polar;
@@ -38,11 +44,15 @@ namespace poem {
    */
   class PolarBase : public Named {
    public:
-    explicit PolarBase(const std::string &name,
-                       const std::string &unit,
-                       const std::string &description,
-                       type::POEM_TYPES type) :
-        Named(name, unit, description, type) {}
+    PolarBase(const std::string &name,
+              const std::string &unit,
+              const std::string &description,
+              type::POEM_TYPES type,
+              POLAR_TYPE polar_type) :
+        Named(name, unit, description, type),
+        m_polar_type(polar_type) {}
+
+    POLAR_TYPE polar_type() const { return m_polar_type; }
 
     virtual const size_t dim() const = 0;
 
@@ -78,6 +88,7 @@ namespace poem {
     virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
 
    protected:
+    POLAR_TYPE m_polar_type;
 //    std::unique_ptr<VariableID> m_var_ID;
 
   };
@@ -105,8 +116,9 @@ namespace poem {
           const std::string &unit,
           const std::string &description,
           type::POEM_TYPES type,
+          POLAR_TYPE polar_type,
           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
-        PolarBase(name, unit, description, type),
+        PolarBase(name, unit, description, type, polar_type),
         m_dimension_point_set(dimension_point_set),
         m_interpolator_is_built(false),
         m_nearest_is_built(false) {

@@ -48,7 +48,8 @@ class DimensionPointSetTest : public testing::Test {
 
     polar_set = std::make_shared<poem::PolarSet>(current_schema, current_schema);
 
-    polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::DOUBLE, dimension_point_set);
+    polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power",
+                                    poem::type::DOUBLE, poem::PPP, dimension_point_set);
   }
 
   std::vector<double> STW_vector;
@@ -211,7 +212,7 @@ TEST_F(DimensionPointSetTest, split_dimensions) {
 
   std::vector<std::shared_ptr<poem::PolarSet>> polar_set_vector;
   polar_set_vector.reserve(size);
-  for (const auto &dimension_point_set : dimension_point_set_vector) {
+  for (const auto &dimension_point_set: dimension_point_set_vector) {
 //    polar_set_vector.push_back(std::make_shared<poem::PolarSet>());
   }
 
