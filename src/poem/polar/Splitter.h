@@ -15,7 +15,7 @@ namespace poem {
    public:
     using SplitterConstIter = std::vector<std::pair<size_t, size_t>>::const_iterator;
 
-    Splitter(size_t size, size_t chunk_size) : m_size(size), m_chunk_size(chunk_size) {
+    Splitter(size_t size, size_t chunk_size) : m_size(size) {
 
       if (size < 2 * chunk_size) {
         // Not justified to split, return only one chunk
@@ -53,6 +53,8 @@ namespace poem {
 
     }
 
+    size_t size() const { return m_size; }
+
     size_t nchunks() const { return m_nchunks; }
 
     size_t chunk_offset(size_t ichunk) const {
@@ -73,11 +75,8 @@ namespace poem {
 
    private:
 
-
-
-
     size_t m_size;
-    size_t m_chunk_size;
+//    size_t m_chunk_size;
 
     size_t m_nchunks;
 

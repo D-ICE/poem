@@ -152,27 +152,27 @@ namespace poem {
       return polar_names;
     }
 
-    void append(const PolarSet &other) {
-
-      // TODO: check que les attributs sont consistants entre this et other
-
-      if (m_polars_map.empty()) {
-        // Adding polars from other
-        for (const auto &pair: other.m_polars_map) {
-          auto polar = pair.second.get();
-          copy_polar(polar);
-        }
-
-      } else {
-        // Append other's polar data
-        for (const auto &pair: m_polars_map) {
-          auto polar = pair.second.get();
-          polar->append(other.get_polar(polar->name()));
-        }
-
-      }
-
-    }
+//    void append(const PolarSet &other) {
+//
+//      // TODO: check que les attributs sont consistants entre this et other
+//
+//      if (m_polars_map.empty()) {
+//        // Adding polars from other
+//        for (const auto &pair: other.m_polars_map) {
+//          auto polar = pair.second.get();
+//          copy_polar(polar);
+//        }
+//
+//      } else {
+//        // Append other's polar data
+//        for (const auto &pair: m_polars_map) {
+//          auto polar = pair.second.get();
+//          polar->append(other.get_polar(polar->name()));
+//        }
+//
+//      }
+//
+//    }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     T interp(const std::string &name,
@@ -206,6 +206,17 @@ namespace poem {
       auto polar = m_polars_map.at(old_name).get();
       return polar->nearest<T, _dim>(dimension_point, bound_check);
     }
+
+//    std::vector<PolarSet> split(const Splitter &splitter) const {
+//
+//      std::vector<PolarSet> polar_set_vector;
+//      polar_set_vector.reserve(splitter.nchunks());
+//
+//
+//
+//      NIY
+//
+//    }
 
     int to_netcdf(const std::string &nc_file, const Attributes &attributes) const {
 
