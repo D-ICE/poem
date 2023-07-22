@@ -9,6 +9,7 @@ target_link_libraries(poem PUBLIC
         spdlog
         nlohmann_json
         dunits
+        hermes
         )
 
 set_target_properties(poem PROPERTIES
