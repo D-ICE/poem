@@ -8,10 +8,10 @@
 #include <string>
 #include <exception>
 
-#define STOP throw StopForDevelopment();
-#define TODO throw poem::Todo();
-#define NIY throw poem::NotImplementedYet();
-#define CRITICAL_ERROR throw poem::CriticalError();
+#define STOP_POEM throw StopForDevelopment();
+#define TODO_POEM throw poem::Todo();
+#define NIY_POEM throw poem::NotImplementedYet();
+#define CRITICAL_ERROR_POEM throw poem::CriticalError();
 
 namespace poem {
 

@@ -75,7 +75,7 @@ namespace poem {
     for (const auto &attribute: *attributes) {
       if (m_global_attributes_map.find(attribute.first) == m_global_attributes_map.end()) {
         spdlog::critical(R"(Global attribute "{}" is not in the writer schema)", attribute.first);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
     }
 
@@ -85,7 +85,7 @@ namespace poem {
 
         // Ok, not found with this name... looking for the aliases
         spdlog::critical(R"(Required attribute "{}" not found in polar)", schema_atts.first);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
     }
 
@@ -183,7 +183,7 @@ namespace poem {
         if (m_dimensions_map.find(dim_name) == m_dimensions_map.end()) {
           spdlog::critical(R"(In schema definition, variable "{}" is said to depend on dimension "
                            ""{}" which has not been defined)", var_name, dim_name);
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
         }
       }
     }

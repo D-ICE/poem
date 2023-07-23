@@ -56,7 +56,7 @@ namespace poem {
       for (const auto &field: required) {
         if (node.find(field) == node.end()) {
           spdlog::critical(R"(In "{}" schema element definition, field "{}" is required)", m_name, field);
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
         }
       }
 
@@ -84,7 +84,7 @@ namespace poem {
           m_deprecated = true;
         } else {
           spdlog::critical(R"(In "{}" schema element tags definition, tag "{}" is unknown)", m_name, tag);
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
         }
       }
 
@@ -139,7 +139,7 @@ namespace poem {
       if (node.find("dimensions") == node.end()) {
         spdlog::critical(R"("dimensions" fields must be present in variable schema definition (in variable "{}"))",
                          name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
     }

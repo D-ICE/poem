@@ -26,7 +26,7 @@ namespace poem {
       // The variable is not known
       if (!is_known_regex) {
         spdlog::critical(R"(Variable "{}" is not known by the given schema)", polar_name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
     }

@@ -10,7 +10,7 @@ namespace poem {
 
 
   PolarWriter::PolarWriter(const PolarSet *polar_set) {
-    NIY
+    NIY_POEM
   }
 
 

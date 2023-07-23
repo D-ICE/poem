@@ -108,7 +108,7 @@ namespace poem {
 
       } catch (const std::out_of_range &e) {
         spdlog::critical("{} is not a valid dimension name", name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
       m_values.at(index) = values;

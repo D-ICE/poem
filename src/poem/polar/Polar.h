@@ -135,7 +135,7 @@ namespace poem {
     const size_t dim() const override { return _dim; }
 
     size_t size() const override {
-      NIY
+      NIY_POEM
 //      return m_polar_points.size();
     }
 
@@ -152,7 +152,7 @@ namespace poem {
 //    }
 
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-      NIY
+      NIY_POEM
       if (!m_nearest_is_built) {
         const_cast<Polar<T, _dim> *>(this)->build_nearest();
       }
@@ -163,12 +163,12 @@ namespace poem {
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
 
-      NIY
+      NIY_POEM
       // Storing variable
       if (!is_filled()) {
         // FIXME: is_filled est true meme si la variable est vide...
         spdlog::critical("Attempting to write a polar to disk while it is not totally populated");
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
 //      if (!m_dimension_point_set->grid()) {
@@ -248,7 +248,7 @@ namespace poem {
     }
 
     void set_point(void *polar_point) override {
-      NIY
+      NIY_POEM
 
 //      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
 //      if (!polar_point_->has_value()) {
@@ -268,7 +268,7 @@ namespace poem {
     }
 
     bool is_filled() const override {
-      NIY
+      NIY_POEM
 //      return std::all_of(m_polar_points.begin(), m_polar_points.end(),
 //                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
 //                           return x.second.has_value();
@@ -277,7 +277,7 @@ namespace poem {
     }
 
     void append(PolarBase *other) override {
-      NIY
+      NIY_POEM
 
 //      if (other->dim() != _dim) {
 //        spdlog::critical("Attempting to append a polar of dimension {} to a polar of dimension {}", other->dim(), _dim);
@@ -334,7 +334,7 @@ namespace poem {
    private:
 
     void build_nearest() {
-      NIY
+      NIY_POEM
 
 //      if (!is_filled()) {
 //        spdlog::critical("Attempting to build nearest table of a polar before it is totally filled");
@@ -403,7 +403,7 @@ namespace poem {
 
       if (!this->is_filled()) {
         spdlog::critical("Attempting to build interpolator of a polar before it is totally filled");
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
       this->m_interpolator = std::make_unique<typename Polar<double, _dim>::InterpolatorND>();

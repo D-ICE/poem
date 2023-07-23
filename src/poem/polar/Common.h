@@ -54,7 +54,7 @@ namespace poem {
     void check_unit() {
       if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
         spdlog::critical("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
     }
 

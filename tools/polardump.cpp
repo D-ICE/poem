@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     polar_file = fs::canonical(program.get<std::string>("polar_file"));
   } catch (std::filesystem::filesystem_error &e) {
     spdlog::critical("Polar file not found: {}", std::string(polar_file));
-    CRITICAL_ERROR
+    CRITICAL_ERROR_POEM
   }
 
   PolarReader reader;

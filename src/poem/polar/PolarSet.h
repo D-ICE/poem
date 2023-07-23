@@ -77,7 +77,7 @@ namespace poem {
 
       if (m_polars_map.find(name) != m_polars_map.end()) {
         spdlog::critical("Attempting to add polar with name {} twice", name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 //      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
@@ -126,7 +126,7 @@ namespace poem {
         old_name = m_polar_name_map.at(name);
       } catch (const std::out_of_range &e) {
         spdlog::critical("Polar name {} does not exist.");
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
       return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
@@ -139,7 +139,7 @@ namespace poem {
         old_name = m_polar_name_map.at(name);
       } catch (const std::out_of_range &e) {
         spdlog::critical("Polar name {} does not exist.", name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
       return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(old_name).get());
@@ -185,7 +185,7 @@ namespace poem {
         old_name = m_polar_name_map.at(name);
       } catch (const std::out_of_range &e) {
         spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
       auto polar = m_polars_map.at(old_name).get();
@@ -201,7 +201,7 @@ namespace poem {
         old_name = m_polar_name_map.at(name);
       } catch (const std::out_of_range &e) {
         spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
       auto polar = m_polars_map.at(old_name).get();
@@ -239,7 +239,7 @@ namespace poem {
         // Writing attributes
         // TODO: les attributs seront fournis en argument de la methode
 
-        NIY
+        NIY_POEM
         // FIXME: il faut ajouter le schema dans les attributs ici... ?
         for (const auto &attribute: attributes) {
           dataFile.putAtt(attribute.first, attribute.second);
@@ -275,7 +275,7 @@ namespace poem {
           return copy_polar < 6 > (polar);
         default:
           spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
       }
     }
 
@@ -291,13 +291,13 @@ namespace poem {
           break;
         default:
           spdlog::critical("Type is not managed yet");
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
       }
     }
 
     template<typename T, size_t _dim>
     void copy_polar(PolarBase *polar) {
-      NIY
+      NIY_POEM
 //      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
 //
 //      auto polar_copy = New<T, _dim>(polar_->name(),
@@ -321,7 +321,7 @@ namespace poem {
     }
 
     void generate_attributes_name_map() {
-      NIY
+      NIY_POEM
       // TODO
 //      for (const auto &attribute: m_attributes) {
 //        auto name = attribute.first;
@@ -359,12 +359,12 @@ namespace poem {
 
         if (newest_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
           spdlog::critical("No schema compatibility for polar named {}", polar_name);
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
         }
 
         if (newest_name.empty()) {
           spdlog::critical("Variable name from old schema has no equivalent in the newest schema");
-          CRITICAL_ERROR
+          CRITICAL_ERROR_POEM
           // TODO: voir i on ne fait qu'un warning ?
         }
 

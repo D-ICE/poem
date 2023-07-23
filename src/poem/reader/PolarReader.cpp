@@ -59,7 +59,7 @@ namespace poem {
   }
 
   void PolarReader::load_dimensions() {
-    NIY
+    NIY_POEM
 //    for (const auto &dim_: m_dataFile->getDims()) {
 //      auto dim_name = dim_.first;
 //
@@ -99,7 +99,7 @@ namespace poem {
         return load_variable<6>(var_name);
       default:
         spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
     }
 
   }
@@ -118,13 +118,13 @@ namespace poem {
         return;
       default:
         spdlog::critical("Type {} is not managed yet", type.getTypeClass());
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
     }
   }
 
   template<typename T, size_t _dim>
   void PolarReader::load_variable(const std::string &var_name) {
-    NIY
+    NIY_POEM
 //    auto nc_var = m_dataFile->getVar(var_name);
 //
 //    std::string hash_name;
