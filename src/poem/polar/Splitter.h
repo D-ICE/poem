@@ -13,7 +13,8 @@ namespace poem {
 
   class Splitter {
    public:
-    using SplitterConstIter = std::vector<std::pair<size_t, size_t>>::const_iterator;
+    using OffsetSizeContainer = std::vector<std::pair<size_t, size_t>>;
+    using SplitterConstIter = OffsetSizeContainer::const_iterator;
 
     Splitter(size_t size, size_t chunk_size) : m_size(size) {
 
@@ -80,7 +81,7 @@ namespace poem {
 
     size_t m_nchunks;
 
-    std::vector<std::pair<size_t, size_t>> m_offsets_sizes;
+    OffsetSizeContainer m_offsets_sizes;
 
   };
 
