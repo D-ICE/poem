@@ -68,6 +68,8 @@ namespace poem {
 
     virtual void set_point(void *polar_point) = 0;
 
+//    virtual void set_value(void *value) = 0;
+
     virtual bool is_filled() const = 0;
 
     virtual void append(PolarBase *polar) = 0;
@@ -123,12 +125,7 @@ namespace poem {
         m_interpolator_is_built(false),
         m_nearest_is_built(false) {
 
-      m_values.reserve(dimension_point_set->size());
-
-//      for (const auto dimension_point: *m_dimension_point_set) {
-//        PolarPoint<T, _dim> polar_point(dimension_point);
-//        m_polar_points.insert({dimension_point.get(), polar_point});
-//      }
+      m_values = std::vector<T>(dimension_point_set->size());
 
     }
 
@@ -137,6 +134,10 @@ namespace poem {
     size_t size() const override {
       NIY_POEM
 //      return m_polar_points.size();
+    }
+
+    void set_value(size_t idx, const T& value) {
+      m_values.at(idx) = value;
     }
 
 //    std::shared_ptr<DimensionSet<_dim>> dimension_ID_set() {

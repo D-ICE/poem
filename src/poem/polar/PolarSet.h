@@ -118,28 +118,33 @@ namespace poem {
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
     Polar<T, _dim> *get_polar(const std::string &name) const {
-      std::string old_name;
-      try {
-        old_name = m_polar_name_map.at(name);
-      } catch (const std::out_of_range &e) {
-        spdlog::critical("Polar name {} does not exist.");
-        CRITICAL_ERROR_POEM
-      }
+//      std::string old_name;
+//      try {
+//        old_name = m_polar_name_map.at(name);
+//      } catch (const std::out_of_range &e) {
+//        spdlog::critical("Polar name {} does not exist.");
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
 
-      return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
+      return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     InterpolablePolar<_dim> *get_polar(const std::string &name) const {
-      std::string old_name;
-      try {
-        old_name = m_polar_name_map.at(name);
-      } catch (const std::out_of_range &e) {
-        spdlog::critical("Polar name {} does not exist.", name);
-        CRITICAL_ERROR_POEM
-      }
+//      std::string old_name;
+//      try {
+//        old_name = m_polar_name_map.at(name);
+//      } catch (const std::out_of_range &e) {
+//        spdlog::critical("Polar name {} does not exist.", name);
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(old_name).get());
 
-      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(old_name).get());
+      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(name).get());
+
     }
 
     std::vector<std::string> polar_names() const {
