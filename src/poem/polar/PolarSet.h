@@ -73,8 +73,9 @@ namespace poem {
                               std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       if (m_polars_map.find(name) != m_polars_map.end()) {
-        spdlog::critical("Attempting to add polar with name {} twice", name);
-        CRITICAL_ERROR_POEM
+//        spdlog::critical("Attempting to add polar with name {} twice", name);
+//        CRITICAL_ERROR_POEM
+        return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
       }
 //      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
