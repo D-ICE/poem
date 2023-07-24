@@ -26,14 +26,11 @@ namespace poem {
     using NameMap = std::map<std::string, std::string>;
 
     // FIXME: on ne doit plus fournir Attribute a PolarSet mais on le fournira au to_netcdf !!!
-    PolarSet(const Schema &schema, const Schema &newest_schema) :
-//        m_attributes(attributes),
-        m_schema(schema),
-        m_newest_schema(newest_schema) {
+    PolarSet() {
 
-      if (!m_newest_schema.is_newest()) {
-        spdlog::warn("Not the newest schema given to PolarSet");
-      }
+//      if (!m_newest_schema.is_newest()) {
+//        spdlog::warn("Not the newest schema given to PolarSet");
+//      }
 
 
       // We automatically add the current schema as attribute if not found in the attributes
@@ -57,8 +54,8 @@ namespace poem {
     PolarSet(const PolarSet &other) :
 //        m_attributes(other.m_attributes),
         m_attributes_name_map(other.m_attributes_name_map),
-        m_schema(other.m_schema),
-        m_newest_schema(other.m_newest_schema),
+//        m_schema(other.m_schema),
+//        m_newest_schema(other.m_newest_schema),
         m_polar_name_map(other.m_polar_name_map) {
 
       for (const auto &pair: other.m_polars_map) {
@@ -86,8 +83,8 @@ namespace poem {
       m_polars_map.insert({name, std::move(polar)});
       auto polar_ptr = static_cast<Polar<T, _dim> *>(m_polars_map[name].get());
 
-      // Check that the polar is compliant with the current schema
-      m_schema.check_polar<T, _dim>(polar_ptr);
+//      // Check that the polar is compliant with the current schema
+//      m_schema.check_polar<T, _dim>(polar_ptr);
 
       // Generate map
       generate_polar_name_map(name);
@@ -95,7 +92,7 @@ namespace poem {
       return polar_ptr;
     }
 
-    bool is_using_newest_schema() const { return m_schema.is_newest(); }
+//    bool is_using_newest_schema() const { return m_schema.is_newest(); }
 
 //    const Attributes &attributes() const { return m_attributes; }
 
@@ -351,26 +348,26 @@ namespace poem {
 
     void generate_polar_name_map(const std::string &polar_name) {
 
-      if (m_schema.is_newest()) {
-        m_polar_name_map.insert({polar_name, polar_name});
-
-      } else {
-        auto newest_name = m_newest_schema.get_newest_variable_name(polar_name);
-
-        if (newest_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
-          spdlog::critical("No schema compatibility for polar named {}", polar_name);
-          CRITICAL_ERROR_POEM
-        }
-
-        if (newest_name.empty()) {
-          spdlog::critical("Variable name from old schema has no equivalent in the newest schema");
-          CRITICAL_ERROR_POEM
-          // TODO: voir i on ne fait qu'un warning ?
-        }
-
-        m_polar_name_map.insert({newest_name, polar_name});
-
-      }
+//      if (m_schema.is_newest()) {
+//        m_polar_name_map.insert({polar_name, polar_name});
+//
+//      } else {
+//        auto newest_name = m_newest_schema.get_newest_variable_name(polar_name);
+//
+//        if (newest_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
+//          spdlog::critical("No schema compatibility for polar named {}", polar_name);
+//          CRITICAL_ERROR_POEM
+//        }
+//
+//        if (newest_name.empty()) {
+//          spdlog::critical("Variable name from old schema has no equivalent in the newest schema");
+//          CRITICAL_ERROR_POEM
+//          // TODO: voir i on ne fait qu'un warning ?
+//        }
+//
+//        m_polar_name_map.insert({newest_name, polar_name});
+//
+//      }
 
     }
 
@@ -381,8 +378,8 @@ namespace poem {
 //    NameMap m_dimensions_name_map;
     NameMap m_polar_name_map;
 
-    Schema m_schema;
-    Schema m_newest_schema;
+//    Schema m_schema;
+//    Schema m_newest_schema;
   };
 
 }  // poem

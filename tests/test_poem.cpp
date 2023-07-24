@@ -46,7 +46,7 @@ class DimensionPointSetTest : public testing::Test {
 
     auto current_schema = poem::get_newest_schema();
 
-    polar_set = std::make_shared<poem::PolarSet>(current_schema, current_schema);
+    polar_set = std::make_shared<poem::PolarSet>();
 
     polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power",
                                     poem::type::DOUBLE, poem::PPP, dimension_point_set);
