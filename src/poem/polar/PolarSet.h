@@ -7,6 +7,8 @@
 
 #include <memory>
 #include <map>
+#include <thread>
+#include <mutex>
 
 #include "Polar.h"
 #include "Attributes.h"
@@ -51,18 +53,18 @@ namespace poem {
 //      generate_attributes_name_map();
     };
 
-    PolarSet(const PolarSet &other) :
-//        m_attributes(other.m_attributes),
-        m_attributes_name_map(other.m_attributes_name_map),
-//        m_schema(other.m_schema),
-//        m_newest_schema(other.m_newest_schema),
-        m_polar_name_map(other.m_polar_name_map) {
-
-      for (const auto &pair: other.m_polars_map) {
-        copy_polar(pair.second.get());
-      }
-
-    }
+//    PolarSet(const PolarSet &other) :
+////        m_attributes(other.m_attributes),
+//        m_attributes_name_map(other.m_attributes_name_map),
+////        m_schema(other.m_schema),
+////        m_newest_schema(other.m_newest_schema),
+//        m_polar_name_map(other.m_polar_name_map) {
+//
+//      for (const auto &pair: other.m_polars_map) {
+//        copy_polar(pair.second.get());
+//      }
+//
+//    }
 
     template<typename T, size_t _dim>
     Polar<T, _dim> *new_polar(const std::string &name,
@@ -71,6 +73,9 @@ namespace poem {
                               type::POEM_TYPES type,
                               POLAR_TYPE polar_type,
                               std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+
+      // Thread safety
+      std::lock_guard<std::mutex> lock(m_mutex);
 
       if (m_polars_map.find(name) != m_polars_map.end()) {
 //        spdlog::critical("Attempting to add polar with name {} twice", name);
@@ -98,6 +103,7 @@ namespace poem {
 //    const Attributes &attributes() const { return m_attributes; }
 
     bool is_filled() const {
+
       bool is_filled = true;
       for (const auto &polar: m_polars_map) {
         if (!polar.second->is_filled()) {
@@ -383,6 +389,8 @@ namespace poem {
     PolarMap m_polars_map;
 //    NameMap m_dimensions_name_map;
     NameMap m_polar_name_map;
+
+    std::mutex m_mutex;
 
 //    Schema m_schema;
 //    Schema m_newest_schema;
