@@ -202,21 +202,21 @@ TEST(poem_splitter, splitter) {
 
 }
 
-TEST_F(DimensionPointSetTest, split_dimensions) {
-
-  size_t size = dimension_point_set->size();
-  poem::Splitter splitter(size, 10);
-
-  auto dimension_point_set_vector = dimension_point_set->split(splitter);
-  ASSERT_EQ(dimension_point_set_vector.size(), splitter.nchunks());
-
-  std::vector<std::shared_ptr<poem::PolarSet>> polar_set_vector;
-  polar_set_vector.reserve(size);
-  for (const auto &dimension_point_set: dimension_point_set_vector) {
-//    polar_set_vector.push_back(std::make_shared<poem::PolarSet>());
-  }
-
-}
+//TEST_F(DimensionPointSetTest, split_dimensions) {
+//
+//  size_t size = dimension_point_set->size();
+//  poem::Splitter splitter(size, 10);
+//
+//  auto dimension_point_set_vector = dimension_point_set->split(splitter);
+//  ASSERT_EQ(dimension_point_set_vector.size(), splitter.nchunks());
+//
+//  std::vector<std::shared_ptr<poem::PolarSet>> polar_set_vector;
+//  polar_set_vector.reserve(size);
+//  for (const auto &dimension_point_set: dimension_point_set_vector) {
+////    polar_set_vector.push_back(std::make_shared<poem::PolarSet>());
+//  }
+//
+//}
 
 //TEST_F(DimensionPointSetTest, split_polar_set) {
 //

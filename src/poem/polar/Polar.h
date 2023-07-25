@@ -66,7 +66,7 @@ namespace poem {
 //
 //    const type::POEM_TYPES &type() const { return m_var_ID->type(); }
 
-    virtual void set_point(void *polar_point) = 0;
+//    virtual void set_point(void *polar_point) = 0;
 
 //    virtual void set_value(void *value) = 0;
 
@@ -171,27 +171,35 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
 
-      if (!m_dimension_point_set->grid()) {
-        spdlog::critical(
-            "Unable to write NetCDF file as the polar's DimensionPointSet has no reference to a source grid");
-        CRITICAL_ERROR_POEM
-      }
-      auto grid = m_dimension_point_set->grid();
-
-      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
+//      if (!m_dimension_point_set->grid()) {
+//        spdlog::critical(
+//            "Unable to write NetCDF file as the polar's DimensionPointSet has no reference to a source grid");
+//        CRITICAL_ERROR_POEM
+//      }
+//      auto grid = m_dimension_point_set->grid();
+      auto grid = m_dimension_point_set->dimension_grid();
+      auto dimension_set = m_dimension_point_set->dimension_set();
+//      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
 
       // Storing dimensions
       std::vector<netCDF::NcDim> dims;
       dims.reserve(_dim);
 
+
+
+//      for (const auto& dimension : dimension_set) {
       for (size_t i = 0; i < _dim; ++i) {
 
-        auto dimension_ID = dimension_ID_set->get(i);
-        std::string name(dimension_ID->name());
+        auto dimension = dimension_set->at(i);
+        auto name = dimension->name();
 
-        auto values = grid->dimension_vector(i);
-
-        // TODO: voir si on eut pas detecter que le nom est deja pris...
+////        auto dimension_ID = dimension_ID_set->get(i);
+////        std::string name(dimension_ID->name());
+//
+        auto values = grid->values(i);
+//        auto values = grid->dimension_vector(i);
+//
+//        // TODO: voir si on eut pas detecter que le nom est deja pris...
         // Declaration of a new dimension ID
         auto dim = dataFile.getDim(name);
         if (dim.isNull()) {
@@ -205,10 +213,8 @@ namespace poem {
            *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
            */
 
-          nc_var.putAtt("unit", dimension_ID->unit());
-          nc_var.putAtt("description", dimension_ID->description());
-          nc_var.putAtt("min", std::to_string(dimension_ID->min()));
-          nc_var.putAtt("max", std::to_string(dimension_ID->max()));
+          nc_var.putAtt("unit", dimension->unit());
+          nc_var.putAtt("description", dimension->description());
         }
 
         dims.push_back(dim);
@@ -231,41 +237,41 @@ namespace poem {
         nc_var.setCompression(true, true, 5);
 
         // Map the values in a flat vector
-        std::vector<T> values;
-        for (const auto &point: m_polar_points) {
-          values.push_back(point.second.value());
-        }
+//        std::vector<T> values;
+//        for (const auto &point: m_polar_points) {
+//          values.push_back(point.second.value());
+//        }
 
-        nc_var.putVar(values.data());
+        nc_var.putVar(m_values.data());
         nc_var.putAtt("unit", unit());
         nc_var.putAtt("description", description());
 
       } else {
         spdlog::critical("Attempting to store more than one time a variable with the same name");
-        CRITICAL_ERROR
+        CRITICAL_ERROR_POEM
       }
 
     }
 
-    void set_point(void *polar_point) override {
-      NIY_POEM
-
-//      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
-//      if (!polar_point_->has_value()) {
-//        spdlog::critical("Attempting to set the polar with non-initialized polar point");
-//        CRITICAL_ERROR
-//      }
+//    void set_point(void *polar_point) override {
+//      NIY_POEM
 //
-//      const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
+////      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
+////      if (!polar_point_->has_value()) {
+////        spdlog::critical("Attempting to set the polar with non-initialized polar point");
+////        CRITICAL_ERROR
+////      }
+////
+////      const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
+////
+////      auto &internal_polar_point = m_polar_points.at(dimension_point);
+////
+////      if (internal_polar_point.has_value()) {
+////        spdlog::warn("The same polar point has been set more than one time");
+////      }
+////      internal_polar_point.set_value(polar_point_->value());
 //
-//      auto &internal_polar_point = m_polar_points.at(dimension_point);
-//
-//      if (internal_polar_point.has_value()) {
-//        spdlog::warn("The same polar point has been set more than one time");
-//      }
-//      internal_polar_point.set_value(polar_point_->value());
-
-    }
+//    }
 
     bool is_filled() const override {
       NIY_POEM

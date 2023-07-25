@@ -115,6 +115,10 @@ namespace poem {
 
     }
 
+    const std::vector<double> &values(size_t idx) const {
+      return m_values.at(idx);
+    }
+
     bool is_filled() const {
       for (const auto &values: m_values) {
         if (values.empty()) return false;
@@ -137,7 +141,7 @@ namespace poem {
       std::array<double, _dim> array;
       nested_for_loop<_dim>(points_arrays, array);
 
-      return std::make_shared<DimensionPointSet<_dim>>(m_dimension_array, points_arrays);
+      return std::make_shared<DimensionPointSet<_dim>>(m_dimension_array, points_arrays, this);
 
     }
 
@@ -200,9 +204,11 @@ namespace poem {
   class DimensionPointSet {
    public:
     explicit DimensionPointSet(std::shared_ptr<DimensionSet<_dim>> dimension_set,
-                               const std::vector<std::array<double, _dim>> &points_array) :
+                               const std::vector<std::array<double, _dim>> &points_array,
+                               const DimensionGrid<_dim> *dimension_grid) :
         m_dimension_set(dimension_set),
-        m_points_arrays(points_array) {
+        m_points_arrays(points_array),
+        m_dimension_grid(dimension_grid) {
 
     }
 
@@ -214,6 +220,13 @@ namespace poem {
       return DimensionPoint<_dim>(m_dimension_set.get(), &m_points_arrays.at(idx));
     }
 
+    const DimensionGrid<_dim>* dimension_grid() const {
+      return m_dimension_grid;
+    }
+
+    std::shared_ptr<DimensionSet<_dim>> dimension_set() const {
+      return m_dimension_set;
+    }
 //    std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const Splitter &splitter) const {
 //
 //      std::vector<std::shared_ptr<DimensionPointSet<_dim>>> vector;
@@ -237,6 +250,7 @@ namespace poem {
    private:
     std::shared_ptr<DimensionSet<_dim>> m_dimension_set;
     std::vector<std::array<double, _dim>> m_points_arrays;
+    const DimensionGrid<_dim> *m_dimension_grid;
 
   };
 
