@@ -164,7 +164,6 @@ namespace poem {
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
 
-      NIY_POEM
       // Storing variable
       if (!is_filled()) {
         // FIXME: is_filled est true meme si la variable est vide...
@@ -172,79 +171,79 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
 
-//      if (!m_dimension_point_set->grid()) {
-//        spdlog::critical(
-//            "Unable to write NetCDF file as the polar's DimensionPointSet has no reference to a source grid");
-//        CRITICAL_ERROR
-//      }
-//      auto grid = m_dimension_point_set->grid();
-//
-//      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
-//
-//      // Storing dimensions
-//      std::vector<netCDF::NcDim> dims;
-//      dims.reserve(_dim);
-//
-//      for (size_t i = 0; i < _dim; ++i) {
-//
-//        auto dimension_ID = dimension_ID_set->get(i);
-//        std::string name(dimension_ID->name());
-//
-//        auto values = grid->dimension_vector(i);
-//
-//        // TODO: voir si on eut pas detecter que le nom est deja pris...
-//        // Declaration of a new dimension ID
-//        auto dim = dataFile.getDim(name);
-//        if (dim.isNull()) {
-//          dim = dataFile.addDim(name, values.size());
-//
-//          // The dimension as a variable
-//          netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
-//          nc_var.putVar(values.data());
-//          /*
-//           * FIXME: les attributs ici sont completement decorreles du schema...
-//           *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
-//           */
-//
-//          nc_var.putAtt("unit", dimension_ID->unit());
-//          nc_var.putAtt("description", dimension_ID->description());
-//          nc_var.putAtt("min", std::to_string(dimension_ID->min()));
-//          nc_var.putAtt("max", std::to_string(dimension_ID->max()));
-//        }
-//
-//        dims.push_back(dim);
-//
-//      }
-//
-//      // Storing the values
-//      netCDF::NcVar nc_var = dataFile.getVar(name());
-//
-//      if (nc_var.isNull()) {
-//
-//        switch (type()) {
-//          case type::DOUBLE:
-//            nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
-//            break;
-//          case type::INT:
-//            nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
-//
-//        }
-//        nc_var.setCompression(true, true, 5);
-//
-//        // Map the values in a flat vector
-//        std::vector<T> values;
-//        for (const auto &point: m_polar_points) {
-//          values.push_back(point.second.value());
-//        }
-//
-//        nc_var.putVar(values.data());
-//        nc_var.putAtt("unit", unit());
-//        nc_var.putAtt("description", description());
-//
-//      } else {
-//        spdlog::critical("Attempting to store more than one time a variable with the same name");
-//        CRITICAL_ERROR
-//      }
+      if (!m_dimension_point_set->grid()) {
+        spdlog::critical(
+            "Unable to write NetCDF file as the polar's DimensionPointSet has no reference to a source grid");
+        CRITICAL_ERROR_POEM
+      }
+      auto grid = m_dimension_point_set->grid();
+
+      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
+
+      // Storing dimensions
+      std::vector<netCDF::NcDim> dims;
+      dims.reserve(_dim);
+
+      for (size_t i = 0; i < _dim; ++i) {
+
+        auto dimension_ID = dimension_ID_set->get(i);
+        std::string name(dimension_ID->name());
+
+        auto values = grid->dimension_vector(i);
+
+        // TODO: voir si on eut pas detecter que le nom est deja pris...
+        // Declaration of a new dimension ID
+        auto dim = dataFile.getDim(name);
+        if (dim.isNull()) {
+          dim = dataFile.addDim(name, values.size());
+
+          // The dimension as a variable
+          netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
+          nc_var.putVar(values.data());
+          /*
+           * FIXME: les attributs ici sont completement decorreles du schema...
+           *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
+           */
+
+          nc_var.putAtt("unit", dimension_ID->unit());
+          nc_var.putAtt("description", dimension_ID->description());
+          nc_var.putAtt("min", std::to_string(dimension_ID->min()));
+          nc_var.putAtt("max", std::to_string(dimension_ID->max()));
+        }
+
+        dims.push_back(dim);
+
+      }
+
+      // Storing the values
+      netCDF::NcVar nc_var = dataFile.getVar(name());
+
+      if (nc_var.isNull()) {
+
+        switch (type()) {
+          case type::DOUBLE:
+            nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
+            break;
+          case type::INT:
+            nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
+
+        }
+        nc_var.setCompression(true, true, 5);
+
+        // Map the values in a flat vector
+        std::vector<T> values;
+        for (const auto &point: m_polar_points) {
+          values.push_back(point.second.value());
+        }
+
+        nc_var.putVar(values.data());
+        nc_var.putAtt("unit", unit());
+        nc_var.putAtt("description", description());
+
+      } else {
+        spdlog::critical("Attempting to store more than one time a variable with the same name");
+        CRITICAL_ERROR
+      }
 
     }
 

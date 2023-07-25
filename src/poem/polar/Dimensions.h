@@ -214,24 +214,24 @@ namespace poem {
       return DimensionPoint<_dim>(m_dimension_set.get(), &m_points_arrays.at(idx));
     }
 
-    std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const Splitter &splitter) const {
-
-      std::vector<std::shared_ptr<DimensionPointSet<_dim>>> vector;
-      vector.reserve(splitter.nchunks());
-
-      auto iter = splitter.begin();
-      for (; iter != splitter.end(); ++iter) {
-        size_t offset = (*iter).first;
-        size_t size = (*iter).second;
-
-        std::vector<std::array<double, _dim>> points_arrays(size);
-        std::copy(m_points_arrays.begin() + offset, m_points_arrays.begin() + offset + size, points_arrays.begin());
-
-        vector.push_back(std::make_shared<DimensionPointSet<_dim>>(m_dimension_set, points_arrays));
-      }
-
-      return vector;
-    }
+//    std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const Splitter &splitter) const {
+//
+//      std::vector<std::shared_ptr<DimensionPointSet<_dim>>> vector;
+//      vector.reserve(splitter.nchunks());
+//
+//      auto iter = splitter.begin();
+//      for (; iter != splitter.end(); ++iter) {
+//        size_t offset = (*iter).first;
+//        size_t size = (*iter).second;
+//
+//        std::vector<std::array<double, _dim>> points_arrays(size);
+//        std::copy(m_points_arrays.begin() + offset, m_points_arrays.begin() + offset + size, points_arrays.begin());
+//
+//        vector.push_back(std::make_shared<DimensionPointSet<_dim>>(m_dimension_set, points_arrays));
+//      }
+//
+//      return vector;
+//    }
 
 
    private:

@@ -248,7 +248,6 @@ namespace poem {
         // Writing attributes
         // TODO: les attributs seront fournis en argument de la methode
 
-        NIY_POEM
         // FIXME: il faut ajouter le schema dans les attributs ici... ?
         for (const auto &attribute: attributes) {
           dataFile.putAtt(attribute.first, attribute.second);
