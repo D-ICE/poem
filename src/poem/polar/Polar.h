@@ -165,11 +165,11 @@ namespace poem {
     void to_netcdf(netCDF::NcFile &dataFile) const override {
 
       // Storing variable
-      if (!is_filled()) {
-        // FIXME: is_filled est true meme si la variable est vide...
-        spdlog::critical("Attempting to write a polar to disk while it is not totally populated");
-        CRITICAL_ERROR_POEM
-      }
+//      if (!is_filled()) {
+//        // FIXME: is_filled est true meme si la variable est vide...
+//        spdlog::critical("Attempting to write a polar to disk while it is not totally populated");
+//        CRITICAL_ERROR_POEM
+//      }
 
 //      if (!m_dimension_point_set->grid()) {
 //        spdlog::critical(
@@ -177,7 +177,7 @@ namespace poem {
 //        CRITICAL_ERROR_POEM
 //      }
 //      auto grid = m_dimension_point_set->grid();
-      auto grid = m_dimension_point_set->dimension_grid();
+      auto grid = m_dimension_point_set->dimension_grid(); // FIXME: dimension_grid est vide;..
       auto dimension_set = m_dimension_point_set->dimension_set();
 //      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
 

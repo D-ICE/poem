@@ -217,6 +217,10 @@ namespace poem {
       return polar->nearest<T, _dim>(dimension_point, bound_check);
     }
 
+    std::mutex *mutex() {
+      return &m_mutex;
+    }
+
 //    std::vector<PolarSet> split(const Splitter &splitter) const {
 //
 //      std::vector<PolarSet> polar_set_vector;
