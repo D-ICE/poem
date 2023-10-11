@@ -1,7 +1,10 @@
 .idea
+.vscode
 *.orig
 cmake-build-*
 tests/data
 
 docs/API/build
 docs/guide/build
+
+build
