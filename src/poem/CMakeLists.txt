@@ -1,4 +1,5 @@
-add_library(poem STATIC)
+add_library(poem STATIC
+        ../pypoem/pypoem.h)
 
 target_include_directories(poem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
