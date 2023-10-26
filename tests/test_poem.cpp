@@ -4,11 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <poem/poem.h>
-#include <poem/exceptions.h>
 
 #include <MathUtils/VectorGeneration.h>
-
-//using namespace poem;
 
 class DimensionPointSetTest : public testing::Test {
  protected:
@@ -195,10 +192,6 @@ TEST(poem_splitter, splitter) {
   ASSERT_EQ(splitter27.chunk_size(3), 5);
   ASSERT_EQ(splitter27.chunk_offset(4), 22);
   ASSERT_EQ(splitter27.chunk_size(4), 5);
-
-
-
-  // TODO: faire le 54
 
 }
 

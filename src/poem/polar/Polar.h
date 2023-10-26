@@ -20,9 +20,7 @@
 #include <MathUtils/RegularGridNearest.h>
 
 #include "Dimensions.h"
-#include "Variables.h"
 #include "PolarPoint.h"
-
 
 namespace poem {
 
