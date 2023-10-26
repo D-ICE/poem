@@ -9,6 +9,5 @@
 #include "polar/PolarSet.h"
 #include "polar/Splitter.h"
 #include "reader/PolarReader.h"
-#include "writer/PolarWriter.h"
 
 #endif //POEM_POEM_H

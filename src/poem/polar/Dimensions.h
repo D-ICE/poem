@@ -196,12 +196,17 @@ namespace poem {
     const std::array<double, _dim> *m_array;
   };
 
+  class DimensionPointSetBase {
+   public:
+    virtual ~DimensionPointSetBase() = default; // To make the class polymorphic
+  };
+
   /**
    *
    * @tparam _dim
    */
   template<size_t _dim>
-  class DimensionPointSet {
+  class DimensionPointSet :public DimensionPointSetBase {
    public:
     explicit DimensionPointSet(std::shared_ptr<DimensionSet<_dim>> dimension_set,
                                const std::vector<std::array<double, _dim>> &points_array,
