@@ -6,8 +6,8 @@
 #define POEM_POEM_H
 
 #include "exceptions.h"
-#include "polar/PolarSet.h"
-#include "polar/Splitter.h"
-#include "reader/PolarReader.h"
+#include "PolarSet.h"
+#include "Splitter.h"
+#include "PolarSetReader.h"
 
 #endif //POEM_POEM_H

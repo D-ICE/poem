@@ -21,41 +21,12 @@ namespace poem {
    * Dimension declares the IDentity of a dimension
    */
   class Dimension : public Named {
+
    public:
-    /**
-     * Constructor
-     * @param name the name of the dimension
-     * @param unit the unit used for that dimension
-     * @param description described the dimension
-     */
     Dimension(const std::string &name,
               const std::string &unit,
               const std::string &description) :
         Named(name, unit, description, type::DOUBLE) {} // A dimension has always the type DOUBLE (interpolation coord)
-
-//    size_t size() const {
-//      return m_values.size();
-//    }
-//
-//    const std::vector<double> &values() const {
-//      return m_values;
-//    }
-
-//    bool operator==(const Dimension &other) const {
-//      if ((m_name != other.m_name) ||
-//          (m_unit != other.m_unit) ||
-//          (m_description != other.m_description)) {
-//        return false;
-//      }
-//      return true;
-//    }
-//
-//    bool operator!=(const Dimension &other) const {
-//      return !(*this == other);
-//    }
-
-//   private:
-//    std::vector<double> m_values;
 
   };
 
@@ -126,16 +97,22 @@ namespace poem {
       return true;
     }
 
+    size_t size() const {
+      size_t N = 1;
+      for (size_t idim = 0; idim < _dim; ++idim) {
+        if (m_values.empty()) {
+          spdlog::critical("Value for dimension is not set");
+          CRITICAL_ERROR_POEM
+        }
+        N *= m_values[idim].size();
+      }
+      return N;
+    }
+
     std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() const {
 
-      // Number of dimension points
-      size_t size = 1;
-      for (size_t idim = 0; idim < _dim; ++idim) {
-        size *= m_values.size();
-      }
-
       std::vector<std::array<double, _dim>> points_arrays;
-      points_arrays.reserve(size);
+      points_arrays.reserve(size());
 
       // Generating the dimension points
       std::array<double, _dim> array;
@@ -171,10 +148,6 @@ namespace poem {
   };
 
 
-  /**
-   *
-   * @tparam _dim
-   */
   template<size_t _dim>
   class DimensionPoint {
    public:
@@ -196,17 +169,15 @@ namespace poem {
     const std::array<double, _dim> *m_array;
   };
 
+
   class DimensionPointSetBase {
    public:
-    virtual ~DimensionPointSetBase() = default; // To make the class polymorphic
+    virtual ~DimensionPointSetBase() = default; // To make the base class polymorphic (needed for the reader)
   };
 
-  /**
-   *
-   * @tparam _dim
-   */
+
   template<size_t _dim>
-  class DimensionPointSet :public DimensionPointSetBase {
+  class DimensionPointSet : public DimensionPointSetBase {
    public:
     explicit DimensionPointSet(std::shared_ptr<DimensionSet<_dim>> dimension_set,
                                const std::vector<std::array<double, _dim>> &points_array,
@@ -225,31 +196,13 @@ namespace poem {
       return DimensionPoint<_dim>(m_dimension_set.get(), &m_points_arrays.at(idx));
     }
 
-    const DimensionGrid<_dim>* dimension_grid() const {
+    const DimensionGrid<_dim> *dimension_grid() const {
       return m_dimension_grid;
     }
 
     std::shared_ptr<DimensionSet<_dim>> dimension_set() const {
       return m_dimension_set;
     }
-//    std::vector<std::shared_ptr<DimensionPointSet<_dim>>> split(const Splitter &splitter) const {
-//
-//      std::vector<std::shared_ptr<DimensionPointSet<_dim>>> vector;
-//      vector.reserve(splitter.nchunks());
-//
-//      auto iter = splitter.begin();
-//      for (; iter != splitter.end(); ++iter) {
-//        size_t offset = (*iter).first;
-//        size_t size = (*iter).second;
-//
-//        std::vector<std::array<double, _dim>> points_arrays(size);
-//        std::copy(m_points_arrays.begin() + offset, m_points_arrays.begin() + offset + size, points_arrays.begin());
-//
-//        vector.push_back(std::make_shared<DimensionPointSet<_dim>>(m_dimension_set, points_arrays));
-//      }
-//
-//      return vector;
-//    }
 
 
    private:

@@ -5,8 +5,8 @@
 #include "Schema.h"
 
 #include "poem/schema/schema.h"
-#include "poem/polar/Attributes.h"
-#include "poem/polar/Polar.h"
+#include "poem/Attributes.h"
+#include "poem/Polar.h"
 
 #define PATHSEP '/'
 

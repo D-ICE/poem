@@ -8,10 +8,14 @@
 #include <string>
 #include <exception>
 
-#define STOP_POEM throw StopForDevelopment();
-#define TODO_POEM throw poem::Todo();
-#define NIY_POEM throw poem::NotImplementedYet();
-#define CRITICAL_ERROR_POEM throw poem::CriticalError();
+#define CRITICAL_ERROR_POEM \
+spdlog::critical("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
+exit(0);
+
+#define NIY_POEM \
+spdlog::critical("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
+exit(0);
+
 
 namespace poem {
 

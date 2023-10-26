@@ -55,24 +55,9 @@ namespace poem {
 
     virtual size_t size() const = 0;
 
-//    const std::string &name() const { return m_var_ID->name(); }
-//
-//    const std::string &unit() const { return m_var_ID->unit(); }
-//
-//    const std::string &description() const { return m_var_ID->description(); }
-//
-//    const type::POEM_TYPES &type() const { return m_var_ID->type(); }
-
-//    virtual void set_point(void *polar_point) = 0;
-
-//    virtual void set_value(void *value) = 0;
-
     virtual bool is_filled() const = 0;
 
     virtual void append(PolarBase *polar) = 0;
-
-//    // FIXME: pas le plus elegant le void void...
-//    virtual std::function<void(void *)> get_set_point_function() = 0;
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
@@ -88,7 +73,6 @@ namespace poem {
 
    protected:
     POLAR_TYPE m_polar_type;
-//    std::unique_ptr<VariableID> m_var_ID;
 
   };
 
@@ -104,9 +88,6 @@ namespace poem {
   class Polar : public PolarBase {
 
    public:
-
-//    using PolarPoints = std::map<const DimensionPoint<_dim> *, PolarPoint<T, _dim>>;
-//    using PolarPointsConstIter = typename PolarPoints::const_iterator;
 
     using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
@@ -136,6 +117,11 @@ namespace poem {
     void set_value(size_t idx, const T& value) {
       m_values.at(idx) = value;
     }
+
+    void set_values(const std::vector<T> &values) {
+      m_values = values;
+    }
+
 
 //    std::shared_ptr<DimensionSet<_dim>> dimension_ID_set() {
 //      return m_dimension_point_set->dimension_ID_set();
