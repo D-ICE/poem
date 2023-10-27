@@ -122,19 +122,6 @@ namespace poem {
       m_values = values;
     }
 
-
-//    std::shared_ptr<DimensionSet<_dim>> dimension_ID_set() {
-//      return m_dimension_point_set->dimension_ID_set();
-//    }
-
-//    const DimensionPointSet<_dim> *dimension_point_set() const {
-////      return m_dimension_point_set.get();
-//    }
-
-//    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() {
-//      return m_dimension_point_set;
-//    }
-
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       NIY_POEM
       if (!m_nearest_is_built) {
@@ -147,42 +134,22 @@ namespace poem {
 
     void to_netcdf(netCDF::NcFile &dataFile) const override {
 
-      // Storing variable
-//      if (!is_filled()) {
-//        // FIXME: is_filled est true meme si la variable est vide...
-//        spdlog::critical("Attempting to write a polar to disk while it is not totally populated");
-//        CRITICAL_ERROR_POEM
-//      }
+      // TODO: check qu'on va ecrire une polaire qui est bien remplie
 
-//      if (!m_dimension_point_set->grid()) {
-//        spdlog::critical(
-//            "Unable to write NetCDF file as the polar's DimensionPointSet has no reference to a source grid");
-//        CRITICAL_ERROR_POEM
-//      }
-//      auto grid = m_dimension_point_set->grid();
       auto grid = m_dimension_point_set->dimension_grid(); // FIXME: dimension_grid est vide;..
       auto dimension_set = m_dimension_point_set->dimension_set();
-//      auto dimension_ID_set = m_dimension_point_set->dimension_ID_set();
 
       // Storing dimensions
       std::vector<netCDF::NcDim> dims;
       dims.reserve(_dim);
 
-
-
-//      for (const auto& dimension : dimension_set) {
       for (size_t i = 0; i < _dim; ++i) {
 
         auto dimension = dimension_set->at(i);
         auto name = dimension->name();
-
-////        auto dimension_ID = dimension_ID_set->get(i);
-////        std::string name(dimension_ID->name());
-//
         auto values = grid->values(i);
-//        auto values = grid->dimension_vector(i);
-//
-//        // TODO: voir si on eut pas detecter que le nom est deja pris...
+
+        // TODO: voir si on eut pas detecter que le nom est deja pris...
         // Declaration of a new dimension ID
         auto dim = dataFile.getDim(name);
         if (dim.isNull()) {
@@ -219,12 +186,6 @@ namespace poem {
         }
         nc_var.setCompression(true, true, 5);
 
-        // Map the values in a flat vector
-//        std::vector<T> values;
-//        for (const auto &point: m_polar_points) {
-//          values.push_back(point.second.value());
-//        }
-
         nc_var.putVar(m_values.data());
         nc_var.putAtt("unit", unit());
         nc_var.putAtt("description", description());
@@ -235,26 +196,6 @@ namespace poem {
       }
 
     }
-
-//    void set_point(void *polar_point) override {
-//      NIY_POEM
-//
-////      auto polar_point_ = static_cast<PolarPoint<T, _dim> *>(polar_point);
-////      if (!polar_point_->has_value()) {
-////        spdlog::critical("Attempting to set the polar with non-initialized polar point");
-////        CRITICAL_ERROR
-////      }
-////
-////      const DimensionPoint<_dim> *dimension_point = polar_point_->dimension_point();
-////
-////      auto &internal_polar_point = m_polar_points.at(dimension_point);
-////
-////      if (internal_polar_point.has_value()) {
-////        spdlog::warn("The same polar point has been set more than one time");
-////      }
-////      internal_polar_point.set_value(polar_point_->value());
-//
-//    }
 
     bool is_filled() const override {
       NIY_POEM
@@ -305,21 +246,6 @@ namespace poem {
 
     }
 
-//    // FIXME: pas le plus elegant le void void...
-//    std::function<void(void *)> get_set_point_function() override {
-//      return [this](void *polar_point) {
-//        set_point(polar_point);
-//      };
-//    }
-
-//    PolarPointsConstIter begin() const {
-//      return m_polar_points.cbegin();
-//    }
-//
-//    PolarPointsConstIter end() const {
-//      return m_polar_points.cend();
-//    }
-
    private:
 
     void build_nearest() {
@@ -367,7 +293,6 @@ namespace poem {
 
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     std::vector<T> m_values;
-//    PolarPoints m_polar_points;
 
     std::unique_ptr<InterpolatorND> m_interpolator;
     std::unique_ptr<NearestND> m_nearest;
