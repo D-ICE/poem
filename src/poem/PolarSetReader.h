@@ -106,11 +106,7 @@ namespace poem {
       auto vars_ = m_data_file->getVars();
       for (const auto &var_: vars_) {
         auto var_name = var_.first;
-
-        // If the variable corresponds to a dimension, we do not proceed
-        if (m_dimension_map.find(var_name) != m_dimension_map.end()) {
-          continue;
-        }
+        if (m_dimension_map.find(var_name) != m_dimension_map.end()) continue; // This is a dimension, not a polar
 
         load_polar(var_name);
 
@@ -144,16 +140,17 @@ namespace poem {
     void load_polar(const std::string &var_name);
 
     template<typename T, size_t _dim>
-    void load_variable(const std::string &var_name, type::POEM_TYPES var_type);
+    void load_polar(const std::string &var_name, type::POEM_TYPES var_type);
 
 
    private:
     std::unique_ptr<netCDF::NcFile> m_data_file;
-    std::shared_ptr<Attributes> m_attributes;
-    std::map<std::string, std::shared_ptr<Dimension>> m_dimension_map;
-    std::map<std::string, std::vector<double>> m_dimension_values_map;
-    std::map<std::string, std::shared_ptr<DimensionPointSetBase>> m_dimension_point_set_map;
 
+    std::unordered_map<std::string, std::shared_ptr<Dimension>> m_dimension_map;
+    std::unordered_map<std::string, std::vector<double>> m_dimension_values_map;
+    std::unordered_map<std::string, std::shared_ptr<DimensionPointSetBase>> m_dimension_point_set_map;
+
+    std::shared_ptr<Attributes> m_attributes;
     std::shared_ptr<PolarSet> m_polar_set;
 
   };
@@ -169,10 +166,10 @@ namespace poem {
     auto type = nc_var.getType();
     switch (type.getId()) {
       case netCDF::NcType::nc_DOUBLE:
-        load_variable<double, _dim>(var_name, poem::type::DOUBLE);
+        load_polar<double, _dim>(var_name, poem::type::DOUBLE);
         return;
       case netCDF::NcType::nc_INT:
-        load_variable<int, _dim>(var_name, poem::type::INT);
+        load_polar<int, _dim>(var_name, poem::type::INT);
         return;
       default:
         spdlog::critical("Type {} is not managed yet", type.getTypeClass());
@@ -182,7 +179,7 @@ namespace poem {
   }
 
   template<typename T, size_t _dim>
-  void PolarSetReader::load_variable(const std::string &var_name, type::POEM_TYPES var_type) {
+  void PolarSetReader::load_polar(const std::string &var_name, type::POEM_TYPES var_type) {
 
     auto nc_var = m_data_file->getVar(var_name);
 
@@ -218,14 +215,14 @@ namespace poem {
     nc_var.getAtt("description").getValues(description);
 
     // FIXME: Ou est-ce qu'on va chercher le PPP ??? Pour le moment c'est code en dur...
-//    std::cerr << "Le type de polaire (PPP, VPP, HVPP) n'est pas encode. Ici, on " << std::endl;
     auto polar_type = poem::PPP;
 
-    auto polar = m_polar_set->new_polar<T, _dim>(var_name, unit, description, var_type, polar_type,
+    // Create the polar into the polar set
+    auto polar = m_polar_set->new_polar<T, _dim>(var_name, unit, description,
+                                                 var_type, polar_type,
                                                  dimension_point_set);
 
-    // FIXME: maintenant, il faut mettre des valeurs dans la nouvelle polaire !!!
-
+    // Get values from nc_var
     auto polar_size = dimension_point_set->size();
     std::vector<T> values(polar_size);
     nc_var.getVar(values.data());

@@ -11,11 +11,9 @@ using namespace poem;
 
 TEST(poem_, reader) {
 
-  std::string nc_file("polar_dev.nc");
-
   PolarSetReader reader;
 
-  reader.Read(nc_file);
+  reader.Read("polar_dev.nc");
 
   auto polar_set = reader.polar_set();
   auto attributes = reader.attributes();
