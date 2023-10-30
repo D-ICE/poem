@@ -3,26 +3,22 @@
 //
 
 #include <string>
+#include <filesystem>
 
 #include <gtest/gtest.h>
 #include "poem/poem.h"
 
 using namespace poem;
 
-//class PolarSetFixture : public testing::Test {
-// protected:
-//  void SetUp() override {
-//
-//  }
-//
-//};
-
+namespace fs = std::filesystem;
 
 TEST(poem_, reader) {
 
   PolarSetReader reader;
 
-  reader.Read("polar_dev.nc");
+  std::string polar_file = fs::path(POEM_RESOURCE_DIR) / "polar_dev.nc";
+
+  reader.Read(polar_file);
 
   auto polar_set = reader.polar_set();
   auto attributes = reader.attributes();
