@@ -16,9 +16,9 @@ PYBIND11_MODULE(_pypoem, m) {
 
   py::class_<PyWrapper>(m, "PolarSetReader")
       .def(py::init<std::string>(), py::arg("path"))
-      .def("polar_set", &PyWrapper::get_set)
-      .def("attributes", &PyWrapper::get_attributes);
+      .def_property_readonly("polar_set", &PyWrapper::get_set)
+      .def_property_readonly("attributes", &PyWrapper::get_attributes);
 
-  py::class_<poem::PolarSet>(m, "PolarSet")
+  py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>>(m, "PolarSet")
       .def("polar_names", &poem::PolarSet::polar_names);
 }
