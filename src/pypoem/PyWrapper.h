@@ -14,7 +14,7 @@
 class PyWrapper {
 public:
     PyWrapper(const std::string &file_path);
-    std::vector<std::string> get_names() const;
+    std::shared_ptr<poem::PolarSet> get_set();
     std::map<std::string, std::string> get_attributes() const;
     double interp(const std::string &name, const std::vector<double> point);
 private:

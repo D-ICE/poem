@@ -17,7 +17,7 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_UNIT_TESTS "Build unit tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
-option(POEM_BUILD_PYBIND "Build python bindings" OFF)
+option(POEM_BUILD_PYBIND "Build python bindings" ON)
 
 
 cmake_policy(SET CMP0135 NEW)

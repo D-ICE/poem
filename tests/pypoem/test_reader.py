@@ -1,5 +1,5 @@
 import unittest
-import pypoem
+import poem
 
 list_of_names = [
     "AWA",
@@ -114,20 +114,20 @@ list_of_names = [
 
 class TestReader(unittest.TestCase):
     def test_file_exists(self):
-        with self.assertRaises(pypoem.PoemError):
-            _ = pypoem.Polar("../data/doesnt_exist.nc")
+        with self.assertRaises(poem.PoemError):
+            _ = poem.Polar("../data/doesnt_exist.nc")
         try:
-            _ = pypoem.Polar("../data/polar_dev.nc")
-        except pypoem.PoemError:
+            _ = poem.Polar("../data/polar_dev.nc")
+        except poem.PoemError:
             self.fail("Polar(path) raised NcError even though file exists.")
 
     def test_getnames(self):
-        polar = pypoem.Polar("../data/polar_dev.nc")
+        polar = poem.Polar("../data/polar_dev.nc")
         for name in polar.get_names():
             self.assertIn(name, list_of_names)
 
     def test_getattr(self):
-        polar = pypoem.Polar("../data/polar_dev.nc")
+        polar = poem.Polar("../data/polar_dev.nc")
         self.assertEqual(
             "D-ICE ENGINEERING (C)", polar.get_attributes().get("copyright")
         )
