@@ -8,3 +8,5 @@ docs/API/build
 docs/guide/build
 
 build
+dist
+*.pyc
