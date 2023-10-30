@@ -1,7 +1,6 @@
 #
 # RESOURCE FILES FOR TESTING
 #
-
 set(RESOURCE_FILES
         polar_dev.nc
 )
@@ -20,7 +19,6 @@ endforeach ()
 #
 # TESTS
 #
-
 set(TESTS
         test_poem
         test_read_netcdf
@@ -31,9 +29,6 @@ foreach (test ${TESTS})
     target_link_libraries(${test} poem MathUtils::MathUtils gtest_main)
     target_compile_definitions(${test} PUBLIC TEST_SCHEMAS_DIR="${CMAKE_CURRENT_LIST_DIR}/test_schemas")
     target_compile_definitions(${test} PUBLIC POEM_RESOURCE_DIR="${POEM_RESOURCE_DIR}")
-    set_target_properties(${test} PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
-
-    add_test(NAME ${test}
-            COMMAND ${test})
+    set_target_properties(${test} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
+    add_test(NAME ${test} COMMAND ${test})
 endforeach ()
