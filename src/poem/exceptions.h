@@ -7,46 +7,27 @@
 
 #include <string>
 #include <exception>
+#include <spdlog/spdlog.h>
 
 #define CRITICAL_ERROR_POEM \
-spdlog::critical("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
-exit(0);
+std::string msg = fmt::format("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
+throw PoemException(msg);
 
 #define NIY_POEM \
-spdlog::critical("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
-exit(0);
-
+std::string msg = fmt::format("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
+throw PoemException(msg);
 
 namespace poem {
 
-  /// For the case we want to delay implementation in the code...
-  struct NotImplementedYet : public std::exception {
-    NotImplementedYet() = default;
+  struct PoemException : public std::exception {
+    PoemException(const std::string &msg) : m_msg(msg) {};
+
     const char *what() const throw() override {
-      return "Not implemented yet";
+      spdlog::critical(m_msg);
+      return "POEM EXCEPTION";
     }
 
-  };
-
-  struct StopForDevelopment : public std::exception {
-    StopForDevelopment() = default;
-    const char *what() const throw() override {
-      return "This stop for development purpose";
-    }
-  };
-
-  struct Todo : public std::exception {
-    Todo() = default;
-    const char *what() const throw() override {
-      return "SOMETHING IS TO BE IMPLEMENTED HERE";
-    }
-  };
-
-  struct CriticalError : public std::exception {
-    CriticalError() = default;
-    const char *what() const throw() override {
-      return "Critical Error";
-    }
+    std::string m_msg;
   };
 
 }  // poem
