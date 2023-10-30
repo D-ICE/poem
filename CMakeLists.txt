@@ -14,7 +14,7 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 # Options
 #-----------------------------------------------------------------------------
 #option(POEM_BUILD_TESTS "Build tests" ON)
-option(POEM_BUILD_UNIT_TESTS "Build unit tests" ON)
+option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
 
 
@@ -48,7 +48,7 @@ include(Add_netcdf-cxx4)
 
 add_subdirectory(src/poem)
 
-if (POEM_BUILD_UNIT_TESTS)
+if (POEM_BUILD_TESTS)
     include(Add_googletest)
     enable_testing()
 
