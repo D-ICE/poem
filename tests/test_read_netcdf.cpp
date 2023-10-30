@@ -9,6 +9,15 @@
 
 using namespace poem;
 
+//class PolarSetFixture : public testing::Test {
+// protected:
+//  void SetUp() override {
+//
+//  }
+//
+//};
+
+
 TEST(poem_, reader) {
 
   PolarSetReader reader;
