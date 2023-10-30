@@ -119,7 +119,7 @@ class TestReader(unittest.TestCase):
         try:
             _ = poem.PolarSetReader("../data/polar_dev.nc")
         except poem.PoemError:
-            self.fail("PolarSetReader(path) raised NcError even though file exists.")
+            self.fail("PolarSetReader(path) raised PoemError even though file exists.")
 
     def test_getnames(self):
         polar = poem.PolarSetReader("../data/polar_dev.nc")
