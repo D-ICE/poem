@@ -115,22 +115,20 @@ list_of_names = [
 class TestReader(unittest.TestCase):
     def test_file_exists(self):
         with self.assertRaises(poem.PoemError):
-            _ = poem.Polar("../data/doesnt_exist.nc")
+            _ = poem.PolarSetReader("../data/doesnt_exist.nc")
         try:
-            _ = poem.Polar("../data/polar_dev.nc")
+            _ = poem.PolarSetReader("../data/polar_dev.nc")
         except poem.PoemError:
-            self.fail("Polar(path) raised NcError even though file exists.")
+            self.fail("PolarSetReader(path) raised NcError even though file exists.")
 
     def test_getnames(self):
-        polar = poem.Polar("../data/polar_dev.nc")
-        for name in polar.get_names():
+        polar = poem.PolarSetReader("../data/polar_dev.nc")
+        for name in polar.polar_set().get_names():
             self.assertIn(name, list_of_names)
 
     def test_getattr(self):
-        polar = poem.Polar("../data/polar_dev.nc")
-        self.assertEqual(
-            "D-ICE ENGINEERING (C)", polar.get_attributes().get("copyright")
-        )
+        polar = poem.PolarSetReader("../data/polar_dev.nc")
+        self.assertEqual("D-ICE ENGINEERING (C)", polar.attributes().get("copyright"))
 
 
 if __name__ == "__main__":
