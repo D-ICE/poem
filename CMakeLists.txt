@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 
 project(poem)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #-----------------------------------------------------------------------------
 # Prevent in-source builds
@@ -15,6 +16,7 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
+option(POEM_BUILD_PYBIND "Build python bindings" OFF)
 
 
 cmake_policy(SET CMP0135 NEW)
@@ -61,3 +63,7 @@ if (POEM_BUILD_TOOLS)
     include(Add_argparse)
     add_subdirectory(tools)
 endif ()
+
+if (POEM_BUILD_PYBIND)
+  add_subdirectory(src/pypoem)
+endif()

@@ -1,0 +1,34 @@
+[project]
+name = "pypoem"
+version = "0.0.1"
+description="Python bindings for the poem library"
+readme = "README.md"
+authors = [
+  { name = "Hippolyte Dubois", email = "hippolyte.dubois@dice-engineering.com" },
+]
+requires-python = ">=3.9"
+
+
+[build-system]
+requires = ["py-build-cmake~=0.1.8", "pybind11", "pybind11-stubgen"]
+build-backend = "py_build_cmake.build"
+
+[tool.py-build-cmake.module]
+name = "pypoem" # Import name
+directory = "python-src"
+
+[tool.py-build-cmake.sdist]
+include = ["CMakeLists.txt", "cmake", "src", "extern", ".git"]
+exclude = []
+
+[tool.py-build-cmake.cmake]
+minimum_version = "3.17"
+build_type = "Debug"
+source_path = "." # Containing CMakeLists.txt
+options = { "WITH_PY_STUBS:BOOL" = "Off", "POEM_BUILD_UNIT_TESTS" = "Off", "POEM_BUILD_TOOLS"="Off", "POEM_BUILD_PYBIND"="On"}
+args = ["-Wdev"]
+build_args = ["-j", "--target", "pypoem"]
+build_tool_args = []
+install_args = ["--verbose"]
+install_components = ["python_modules"]
+env = {}
