@@ -4,11 +4,8 @@
 
 #include <gtest/gtest.h>
 #include <poem/poem.h>
-#include <poem/exceptions.h>
 
 #include <MathUtils/VectorGeneration.h>
-
-//using namespace poem;
 
 class DimensionPointSetTest : public testing::Test {
  protected:
@@ -86,19 +83,6 @@ TEST_F(DimensionPointSetTest, NestedForLoop) {
   }
 
 }
-
-//TEST_F(DimensionPointSetTest, PolarSetTest) {
-//
-//  auto current_schema = poem::get_newest_schema();
-//
-//  auto polar_set = std::make_shared<poem::PolarSet>(current_schema, current_schema);
-//
-//  polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::DOUBLE, dimension_point_set);
-////  polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::DOUBLE, dimension_point_set);
-////  polar_set->new_polar<double, 5>("HEEL", "deg", "Heeling angle", poem::type::DOUBLE, dimension_point_set);
-//
-//
-//}
 
 TEST(poem_splitter, splitter) {
 
@@ -196,50 +180,4 @@ TEST(poem_splitter, splitter) {
   ASSERT_EQ(splitter27.chunk_offset(4), 22);
   ASSERT_EQ(splitter27.chunk_size(4), 5);
 
-
-
-  // TODO: faire le 54
-
 }
-
-//TEST_F(DimensionPointSetTest, split_dimensions) {
-//
-//  size_t size = dimension_point_set->size();
-//  poem::Splitter splitter(size, 10);
-//
-//  auto dimension_point_set_vector = dimension_point_set->split(splitter);
-//  ASSERT_EQ(dimension_point_set_vector.size(), splitter.nchunks());
-//
-//  std::vector<std::shared_ptr<poem::PolarSet>> polar_set_vector;
-//  polar_set_vector.reserve(size);
-//  for (const auto &dimension_point_set: dimension_point_set_vector) {
-////    polar_set_vector.push_back(std::make_shared<poem::PolarSet>());
-//  }
-//
-//}
-
-//TEST_F(DimensionPointSetTest, split_polar_set) {
-//
-//  size_t size = dimension_point_set->size();
-//  poem::Splitter splitter(size, 10);
-//
-////  auto polar_set_vector = polar_set->split(splitter);
-////  ASSERT_EQ(polar_set_vector.size(), splitter.nchunks());
-//
-//}
-
-
-TEST_F(DimensionPointSetTest, PolarSetHermesTest) {
-
-
-}
-
-//class PolarSetTest : public DimensionPointSetTest {
-// protected:
-//
-//  void SetUp() override {
-//    DimensionPointSetTest::SetUp();
-//  }
-//};
-
-

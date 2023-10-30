@@ -13,6 +13,7 @@ set(TESTS
 #        test_polar_compat
 #        test_polar_concatenation
         test_poem
+        test_read_netcdf
         )
 
 

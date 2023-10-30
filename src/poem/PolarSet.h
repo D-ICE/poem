@@ -17,54 +17,12 @@
 
 namespace poem {
 
-  /**
-   * Represents a set of polars.
-   *
-   * This is what we manipulate directly.
-   */
+
   class PolarSet {
    public:
     using PolarMap = std::map<std::string, std::unique_ptr<PolarBase>>;
     using NameMap = std::map<std::string, std::string>;
 
-    // FIXME: on ne doit plus fournir Attribute a PolarSet mais on le fournira au to_netcdf !!!
-    PolarSet() {
-
-//      if (!m_newest_schema.is_newest()) {
-//        spdlog::warn("Not the newest schema given to PolarSet");
-//      }
-
-
-      // We automatically add the current schema as attribute if not found in the attributes
-//      if (!m_attributes.contains("schema")) {
-//        m_attributes.add_attribute("schema", schema.json_str());
-//      } else {
-//        // FIXME: Verify that this is the same attribute as given in the ctor!!
-////        if (!m_attributes)
-//      }
-
-      // Check that the given attributes are compliant with the current schema
-//      m_schema.check_attributes(&m_attributes);
-
-      // Generating map
-      // FIXME: ici on faisait les maps pour la back compatibility. Ou la faire maintenant qu'on met plus d'attributs
-      // dans polarset ???
-      // Ou alors c'est toujours PolarSet qui a les attributs mais on les ajoute quand on en a besoin seulement...
-//      generate_attributes_name_map();
-    };
-
-//    PolarSet(const PolarSet &other) :
-////        m_attributes(other.m_attributes),
-//        m_attributes_name_map(other.m_attributes_name_map),
-////        m_schema(other.m_schema),
-////        m_newest_schema(other.m_newest_schema),
-//        m_polar_name_map(other.m_polar_name_map) {
-//
-//      for (const auto &pair: other.m_polars_map) {
-//        copy_polar(pair.second.get());
-//      }
-//
-//    }
 
     template<typename T, size_t _dim>
     Polar<T, _dim> *new_polar(const std::string &name,
@@ -98,22 +56,18 @@ namespace poem {
       return polar_ptr;
     }
 
-//    bool is_using_newest_schema() const { return m_schema.is_newest(); }
-
-//    const Attributes &attributes() const { return m_attributes; }
-
-    bool is_filled() const {
-
-      bool is_filled = true;
-      for (const auto &polar: m_polars_map) {
-        if (!polar.second->is_filled()) {
-          is_filled = false;
-          break;
-        }
-      }
-
-      return is_filled;
-    }
+//    bool is_filled() const {
+//
+//      bool is_filled = true;
+//      for (const auto &polar: m_polars_map) {
+//        if (!polar.second->is_filled()) {
+//          is_filled = false;
+//          break;
+//        }
+//      }
+//
+//      return is_filled;
+//    }
 
     /*
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
@@ -125,33 +79,12 @@ namespace poem {
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
     Polar<T, _dim> *get_polar(const std::string &name) const {
-//      std::string old_name;
-//      try {
-//        old_name = m_polar_name_map.at(name);
-//      } catch (const std::out_of_range &e) {
-//        spdlog::critical("Polar name {} does not exist.");
-//        CRITICAL_ERROR_POEM
-//      }
-//
-//      return static_cast<Polar<T, _dim> *>(m_polars_map.at(old_name).get());
-
       return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     InterpolablePolar<_dim> *get_polar(const std::string &name) const {
-//      std::string old_name;
-//      try {
-//        old_name = m_polar_name_map.at(name);
-//      } catch (const std::out_of_range &e) {
-//        spdlog::critical("Polar name {} does not exist.", name);
-//        CRITICAL_ERROR_POEM
-//      }
-//
-//      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(old_name).get());
-
       return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(name).get());
-
     }
 
     std::vector<std::string> polar_names() const {
@@ -161,28 +94,6 @@ namespace poem {
       }
       return polar_names;
     }
-
-//    void append(const PolarSet &other) {
-//
-//      // TODO: check que les attributs sont consistants entre this et other
-//
-//      if (m_polars_map.empty()) {
-//        // Adding polars from other
-//        for (const auto &pair: other.m_polars_map) {
-//          auto polar = pair.second.get();
-//          copy_polar(polar);
-//        }
-//
-//      } else {
-//        // Append other's polar data
-//        for (const auto &pair: m_polars_map) {
-//          auto polar = pair.second.get();
-//          polar->append(other.get_polar(polar->name()));
-//        }
-//
-//      }
-//
-//    }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     T interp(const std::string &name,
@@ -220,17 +131,6 @@ namespace poem {
     std::mutex *mutex() {
       return &m_mutex;
     }
-
-//    std::vector<PolarSet> split(const Splitter &splitter) const {
-//
-//      std::vector<PolarSet> polar_set_vector;
-//      polar_set_vector.reserve(splitter.nchunks());
-//
-//
-//
-//      NIY
-//
-//    }
 
     int to_netcdf(const std::string &nc_file, const Attributes &attributes) const {
 
@@ -362,6 +262,7 @@ namespace poem {
     }
 
     void generate_polar_name_map(const std::string &polar_name) {
+//      NIY_POEM
 
 //      if (m_schema.is_newest()) {
 //        m_polar_name_map.insert({polar_name, polar_name});
@@ -390,7 +291,6 @@ namespace poem {
     NameMap m_attributes_name_map;
 
     PolarMap m_polars_map;
-//    NameMap m_dimensions_name_map;
     NameMap m_polar_name_map;
 
     std::mutex m_mutex;

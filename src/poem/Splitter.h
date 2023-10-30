@@ -77,8 +77,6 @@ namespace poem {
    private:
 
     size_t m_size;
-//    size_t m_chunk_size;
-
     size_t m_nchunks;
 
     OffsetSizeContainer m_offsets_sizes;

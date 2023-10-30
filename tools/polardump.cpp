@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     CRITICAL_ERROR_POEM
   }
 
-  PolarReader reader;
+  PolarSetReader reader;
   auto polar_set = reader.Read(polar_file);
 
   std::cout << std::endl;
