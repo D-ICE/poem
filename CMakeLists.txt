@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Prevent in-source builds
 #-----------------------------------------------------------------------------
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-  message(FATAL_ERROR "In-source build is not possible and not recommended. Choose an empty directory for build output.")
+    message(FATAL_ERROR "In-source build is not possible and not recommended. Choose an empty directory for build output.")
 endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 
 #-----------------------------------------------------------------------------
@@ -49,13 +49,18 @@ include(Add_netcdf-cxx4)
 add_subdirectory(src/poem)
 
 if (POEM_BUILD_UNIT_TESTS)
+    include(Add_googletest)
+    enable_testing()
 
-  include(Add_googletest)
-  enable_testing()
-  add_subdirectory(tests)
+    # Defining a resource dir for POEM
+    set(POEM_RESOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources)
+    message(STATUS "Resources stored at ${POEM_RESOURCE_DIR}")
+    file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
+
+    add_subdirectory(tests)
 endif ()
 
 if (POEM_BUILD_TOOLS)
-  include(Add_argparse)
-  add_subdirectory(tools)
+    include(Add_argparse)
+    add_subdirectory(tools)
 endif ()
