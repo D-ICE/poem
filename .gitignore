@@ -2,12 +2,14 @@
 .vscode
 *.orig
 cmake-build-*
+.py-build*
 tests/data
+venv
+build
+dist
+*.pyc
+extern
 
 docs/API/build
 docs/guide/build
 
-build
-dist
-*.pyc
-venv

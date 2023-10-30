@@ -9,8 +9,8 @@ PyWrapper::PyWrapper(const std::string &file_path) {
     m_polar_set->Read(file_path);
 }
 
-std::vector<std::string> PyWrapper::get_names() const {
-    return m_polar_set->polar_set()->polar_names();
+std::shared_ptr<poem::PolarSet> PyWrapper::get_set() {
+    return m_polar_set->polar_set();
 }
 
 std::map<std::string, std::string> PyWrapper::get_attributes() const {
