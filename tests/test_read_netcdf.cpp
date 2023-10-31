@@ -23,6 +23,20 @@ TEST(poem_, reader) {
   auto polar_set = reader.polar_set();
   auto attributes = reader.attributes();
 
+//  auto polar_names = polar_set->polar_names();
+//  for (const auto &name : polar_names) {
+//    auto polar = polar_set->polar(name);
+//
+//    std::cout << polar->name() << std::endl;
+//  }
+
+  auto polar = polar_set->polar<double, 5>("TotalBrakePower");
+//  poem::DimensionPoint<5>()
+
+  auto res = polar->nearest({10, 10, 90, 0, 0}, true);
+
+  std::cout << res << std::endl;
+
 //  polar_set->to_netcdf("polar_dev_rewrite.nc");
 
 }

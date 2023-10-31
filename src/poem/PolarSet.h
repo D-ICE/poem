@@ -73,17 +73,17 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
-    PolarBase *get_polar(const std::string &name) const {
+    PolarBase *polar(const std::string &name) const {
       return m_polars_map.at(name).get();
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
-    Polar<T, _dim> *get_polar(const std::string &name) const {
+    Polar<T, _dim> *polar(const std::string &name) const {
       return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    InterpolablePolar<_dim> *get_polar(const std::string &name) const {
+    InterpolablePolar<_dim> *polar(const std::string &name) const {
       return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(name).get());
     }
 
@@ -95,38 +95,38 @@ namespace poem {
       return polar_names;
     }
 
-    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    T interp(const std::string &name,
-             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
-             bool bound_check = true) const {
-
-      std::string old_name;
-      try {
-        old_name = m_polar_name_map.at(name);
-      } catch (const std::out_of_range &e) {
-        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-        CRITICAL_ERROR_POEM
-      }
-
-      auto polar = m_polars_map.at(old_name).get();
-      return polar->interp<double, _dim>(dimension_point, bound_check);
-    }
-
-    template<typename T, size_t _dim>
-    T nearest(const std::string &name,
-              const std::array<double, _dim> dimension_point,
-              bool bound_check = true) const {
-      std::string old_name;
-      try {
-        old_name = m_polar_name_map.at(name);
-      } catch (const std::out_of_range &e) {
-        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-        CRITICAL_ERROR_POEM
-      }
-
-      auto polar = m_polars_map.at(old_name).get();
-      return polar->nearest<T, _dim>(dimension_point, bound_check);
-    }
+//    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
+//    T interp(const std::string &name,
+//             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
+//             bool bound_check = true) const {
+//
+//      std::string old_name;
+//      try {
+//        old_name = m_polar_name_map.at(name);
+//      } catch (const std::out_of_range &e) {
+//        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      auto polar = m_polars_map.at(old_name).get();
+//      return polar->interp<double, _dim>(dimension_point, bound_check);
+//    }
+//
+//    template<typename T, size_t _dim>
+//    T nearest(const std::string &name,
+//              const std::array<double, _dim> dimension_point,
+//              bool bound_check = true) const {
+//      std::string old_name;
+//      try {
+//        old_name = m_polar_name_map.at(name);
+//      } catch (const std::out_of_range &e) {
+//        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      auto polar = m_polars_map.at(old_name).get();
+//      return polar->nearest<T, _dim>(dimension_point, bound_check);
+//    }
 
     std::mutex *mutex() {
       return &m_mutex;

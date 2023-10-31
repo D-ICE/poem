@@ -33,11 +33,11 @@ namespace poem {
   template<size_t _dim>
   class DimensionSet {
    public:
-    explicit DimensionSet(const std::array<std::shared_ptr<Dimension>, _dim> &array) :
-        m_array(array) {
+    explicit DimensionSet(const std::array<std::shared_ptr<Dimension>, _dim> &dimension_array) :
+        m_dimension_array(dimension_array) {
 
       for (size_t idim = 0; idim < _dim; ++idim) {
-        m_map_stoi.insert({array.at(idim)->name(), idim});
+        m_map_stoi.insert({dimension_array.at(idim)->name(), idim});
       }
 
     }
@@ -47,19 +47,19 @@ namespace poem {
     }
 
     const std::string &name(size_t idim) const {
-      return m_array.at(idim)->name();
+      return m_dimension_array.at(idim)->name();
     }
 
     const std::shared_ptr<Dimension> &at(const std::string &name) const {
-      return m_array.at(m_map_stoi.at(name));
+      return m_dimension_array.at(m_map_stoi.at(name));
     }
 
     const std::shared_ptr<Dimension> &at(size_t idim) const {
-      return m_array.at(idim);
+      return m_dimension_array.at(idim);
     }
 
    private:
-    std::array<std::shared_ptr<Dimension>, _dim> m_array;
+    std::array<std::shared_ptr<Dimension>, _dim> m_dimension_array;
     std::unordered_map<std::string, size_t> m_map_stoi;
   };
 
@@ -69,13 +69,13 @@ namespace poem {
   template<size_t _dim>
   class DimensionGrid {
    public:
-    explicit DimensionGrid(std::shared_ptr<DimensionSet<_dim>> dimension_array) :
-        m_dimension_array(dimension_array) {}
+    explicit DimensionGrid(std::shared_ptr<DimensionSet<_dim>> dimension_set) :
+        m_dimension_set(dimension_set) {}
 
     void set_values(const std::string &name, const std::vector<double> &values) {
       size_t index;
       try {
-        index = m_dimension_array->index(name);
+        index = m_dimension_set->index(name);
 
       } catch (const std::out_of_range &e) {
         spdlog::critical("{} is not a valid dimension name", name);
@@ -118,7 +118,7 @@ namespace poem {
       std::array<double, _dim> array;
       nested_for_loop<_dim>(points_arrays, array);
 
-      return std::make_shared<DimensionPointSet<_dim>>(m_dimension_array, points_arrays, this);
+      return std::make_shared<DimensionPointSet<_dim>>(m_dimension_set, points_arrays, *this);
 
     }
 
@@ -142,7 +142,7 @@ namespace poem {
 
 
    private:
-    std::shared_ptr<DimensionSet<_dim>> m_dimension_array;
+    std::shared_ptr<DimensionSet<_dim>> m_dimension_set;
     std::array<std::vector<double>, _dim> m_values;
 
   };
@@ -181,7 +181,7 @@ namespace poem {
    public:
     explicit DimensionPointSet(std::shared_ptr<DimensionSet<_dim>> dimension_set,
                                const std::vector<std::array<double, _dim>> &points_array,
-                               const DimensionGrid<_dim> *dimension_grid) :
+                               const DimensionGrid<_dim> &dimension_grid) :
         m_dimension_set(dimension_set),
         m_points_arrays(points_array),
         m_dimension_grid(dimension_grid) {
@@ -196,7 +196,7 @@ namespace poem {
       return DimensionPoint<_dim>(m_dimension_set.get(), &m_points_arrays.at(idx));
     }
 
-    const DimensionGrid<_dim> *dimension_grid() const {
+    const DimensionGrid<_dim> &dimension_grid() const {
       return m_dimension_grid;
     }
 
@@ -208,7 +208,8 @@ namespace poem {
    private:
     std::shared_ptr<DimensionSet<_dim>> m_dimension_set;
     std::vector<std::array<double, _dim>> m_points_arrays;
-    const DimensionGrid<_dim> *m_dimension_grid;
+
+    DimensionGrid<_dim> m_dimension_grid;
 
   };
 
