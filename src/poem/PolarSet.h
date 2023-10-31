@@ -299,7 +299,7 @@ namespace poem {
     PolarMap m_polars_map;
     NameMap m_polar_name_map;
 
-    std::mutex m_mutex;
+    static inline std::mutex m_mutex;
 
 //    Schema m_schema;
 //    Schema m_newest_schema;
