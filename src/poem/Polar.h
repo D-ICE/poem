@@ -101,11 +101,8 @@ namespace poem {
         PolarBase(name, unit, description, type, polar_type),
         m_dimension_point_set(dimension_point_set),
         m_interpolator_is_built(false),
-        m_nearest_is_built(false) {
-
-      m_values = std::vector<T>(dimension_point_set->size());
-
-    }
+        m_nearest_is_built(false),
+        m_values(std::vector<T>(dimension_point_set->size())) {}
 
     const size_t dim() const override { return _dim; }
 
@@ -127,8 +124,6 @@ namespace poem {
       if (!m_nearest_is_built) {
         const_cast<Polar<T, _dim> *>(this)->build_nearest();
       }
-
-//      NIY_POEM
 
       // FIXME: bound_check non utilise encore dans RegularGridNearest
       return m_nearest->Nearest(dimension_point).val();
@@ -200,54 +195,9 @@ namespace poem {
     }
 
     bool is_filled() const override {
-////      NIY_POEM
-//      return std::all_of(m_polar_points.begin(), m_polar_points.end(),
-//                         [](std::pair<const DimensionPoint<_dim> *, PolarPoint<T, _dim>> x) {
-//                           return x.second.has_value();
-//                         }
-//      );
       return m_values.size() == m_dimension_point_set->size();
     }
 
-//    void append(PolarBase *other) override {
-//      NIY_POEM
-//
-////      if (other->dim() != _dim) {
-////        spdlog::critical("Attempting to append a polar of dimension {} to a polar of dimension {}", other->dim(), _dim);
-////        CRITICAL_ERROR
-////      }
-////
-////      if (other->type() != type()) {
-////        spdlog::critical("Attempting to append a polars of different types");
-////        CRITICAL_ERROR
-////      }
-////
-////      auto other_ = static_cast<Polar<T, _dim> *>(other);
-////
-////      // Checking that we concatenate two polars with the same DimensionIDSet
-////      if (*other_->dimension_ID_set() != *dimension_ID_set()) {
-////        spdlog::critical("Attempting to append two polars with different coordinates");
-////        CRITICAL_ERROR
-////      }
-////
-////      // Polar has changed, interpolators cannot be initialized
-////      m_nearest_is_built = false;
-////      m_nearest = nullptr;
-////
-////      m_interpolator_is_built = false;
-////      m_interpolator = nullptr;
-////
-////      // FIXME: il y a des check a faire sur la compatibilite des polaires qu'on concatene....
-////      //  il faut append aussi les dimension_points
-////      //  il faut invalider les interpolateurs egalement (nearest et interp si double)...
-////      m_dimension_point_set->append(*other_->dimension_point_set());
-////
-////      auto ppiter = other_->begin();
-////      for (; ppiter != other_->end(); ++ppiter) {
-////        m_polar_points.insert(*ppiter);
-////      }
-//
-//    }
 
    private:
 
@@ -318,25 +268,15 @@ namespace poem {
       using IndexArray = boost::array<typename NDArray::index, _dim>;
       IndexArray shape;
 
-      size_t num_elements = 1;
-      for (size_t i = 0; i < _dim; ++i) {
-        auto dim_id = this->m_dimension_point_set->dimension_ID_set()->get(i);
-        auto dim_vector = this->m_dimension_point_set->dimension_vector(i);
-
-        shape[i] = dim_vector.size();
-        num_elements *= shape[i];
-
-        this->m_interpolator->AddCoord(dim_vector);
-      }
-
-      std::vector<double> data;
-      data.reserve(num_elements);
-      for (const auto &point: this->m_polar_points) {
-        data.push_back(point.second.value());
+      auto grid = this->m_dimension_point_set->dimension_grid();
+      for (size_t idim = 0; idim < _dim; ++idim) {
+        auto values = grid.values(idim);
+        shape[idim] = values.size();
+        this->m_interpolator->AddCoord(values);
       }
 
       NDArray array(shape);
-      std::copy(data.begin(), data.end(), array.data());
+      std::copy(this->m_values.begin(), this->m_values.end(), array.data());
       this->m_interpolator->AddVar(array);
 
       this->m_interpolator_is_built = true;

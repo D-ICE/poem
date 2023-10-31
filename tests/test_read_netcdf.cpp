@@ -30,13 +30,22 @@ TEST(poem_, reader) {
 //    std::cout << polar->name() << std::endl;
 //  }
 
-  auto polar = polar_set->polar<double, 5>("TotalBrakePower");
+  std::array<double, 5> dimension_point{10.1, 10.1, 90.1, 0, 0};
+
+  auto polar_double = polar_set->polar<double, 5>("TotalBrakePower");
 //  poem::DimensionPoint<5>()
 
-  auto res = polar->nearest({10, 10, 90, 0, 0}, true);
-
+  auto res = polar_double->nearest(dimension_point, true);
   std::cout << res << std::endl;
 
+  auto interp = polar_double->interp(dimension_point, true);
+  std::cout << interp << std::endl;
+
 //  polar_set->to_netcdf("polar_dev_rewrite.nc");
+
+  auto polar_int = polar_set->polar<int, 5>("HasConstraintViolation");
+  std::cout << polar_int->nearest(dimension_point, true) << std::endl;
+//  std::cout << polar_nb_iter->interp(dimension_point, true) << std::endl; // Not possible
+
 
 }

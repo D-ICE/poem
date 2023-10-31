@@ -74,17 +74,23 @@ namespace poem {
      */
 
     PolarBase *polar(const std::string &name) const {
-      return m_polars_map.at(name).get();
+      try {
+        return m_polars_map.at(name).get();
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("No polar with name {}", name);
+        CRITICAL_ERROR_POEM
+      }
+
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
     Polar<T, _dim> *polar(const std::string &name) const {
-      return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
+      return static_cast<Polar<T, _dim> *>(polar(name));
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     InterpolablePolar<_dim> *polar(const std::string &name) const {
-      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(name).get());
+      return static_cast<InterpolablePolar<_dim> *>(polar(name));
     }
 
     std::vector<std::string> polar_names() const {
