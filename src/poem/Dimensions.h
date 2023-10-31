@@ -64,6 +64,27 @@ namespace poem {
   };
 
   template<size_t _dim>
+  class DimensionPoint {
+   public:
+    DimensionPoint(const DimensionSet<_dim> *dimension_set,
+                   const std::array<double, _dim> &array) :
+        m_dimension_set(dimension_set),
+        m_array(array) {}
+
+    const double &operator[](const std::string &name) const {
+      return m_array->at(m_dimension_set->index(name));
+    }
+
+    const double &operator[](size_t idim) const {
+      return m_array->at(idim);
+    }
+
+   private:
+    const DimensionSet<_dim> *m_dimension_set;
+    const std::array<double, _dim> m_array;
+  };
+
+  template<size_t _dim>
   class DimensionPointSet;
 
   template<size_t _dim>
@@ -109,17 +130,19 @@ namespace poem {
       return N;
     }
 
-    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() const {
+    std::shared_ptr<DimensionSet<_dim>> dimension_set() const {
+      return m_dimension_set;
+    }
 
-      std::vector<std::array<double, _dim>> points_arrays;
-      points_arrays.reserve(size());
+    std::vector<DimensionPoint<_dim>> dimension_points() const {
+      std::vector<DimensionPoint<_dim>> dimension_points;
+      dimension_points.reserve(size());
 
       // Generating the dimension points
       std::array<double, _dim> array;
-      nested_for_loop<_dim>(points_arrays, array);
+      nested_for_loop<_dim>(dimension_points, array);
 
-      return std::make_shared<DimensionPointSet<_dim>>(m_dimension_set, points_arrays, *this);
-
+      return dimension_points;
     }
 
    private:
@@ -127,15 +150,15 @@ namespace poem {
     // We use row major convention (last dimension varies the fastest) to be directly compliant with NetCDF internal
     // storage convention (and it is C compliant too...)
     template<size_t index>
-    constexpr void nested_for_loop(std::vector<std::array<double, _dim>> &points_arrays,
+    constexpr void nested_for_loop(std::vector<DimensionPoint<_dim>> &dimension_points,
                                    std::array<double, _dim> &array) const {
       size_t idim = _dim - index; // makes the last loop iterate on last dim
       for (const auto &value: m_values[idim]) {
         array.at(idim) = value;
         if constexpr (index == 1) {
-          points_arrays.push_back(array);
+          dimension_points.push_back(DimensionPoint<_dim>(dimension_set().get(), array));
         } else {
-          nested_for_loop<index - 1>(points_arrays, array);
+          nested_for_loop<index - 1>(dimension_points, array);
         }
       }
     }
@@ -148,28 +171,6 @@ namespace poem {
   };
 
 
-  template<size_t _dim>
-  class DimensionPoint {
-   public:
-    DimensionPoint(const DimensionSet<_dim> *dimension_set,
-                   const std::array<double, _dim> *array) :
-        m_dimension_set(dimension_set),
-        m_array(array) {}
-
-    const double &operator[](const std::string &name) const {
-      return m_array->at(m_dimension_set->index(name));
-    }
-
-    const double &operator[](size_t idim) const {
-      return m_array->at(idim);
-    }
-
-   private:
-    const DimensionSet<_dim> *m_dimension_set;
-    const std::array<double, _dim> *m_array;
-  };
-
-
   class DimensionPointSetBase {
    public:
     virtual ~DimensionPointSetBase() = default; // To make the base class polymorphic (needed for the reader)
@@ -179,21 +180,16 @@ namespace poem {
   template<size_t _dim>
   class DimensionPointSet : public DimensionPointSetBase {
    public:
-    explicit DimensionPointSet(std::shared_ptr<DimensionSet<_dim>> dimension_set,
-                               const std::vector<std::array<double, _dim>> &points_array,
-                               const DimensionGrid<_dim> &dimension_grid) :
-        m_dimension_set(dimension_set),
-        m_points_arrays(points_array),
-        m_dimension_grid(dimension_grid) {
-
-    }
+    explicit DimensionPointSet(const DimensionGrid<_dim> &dimension_grid) :
+        m_dimension_points(dimension_grid.dimension_points()),
+        m_dimension_grid(dimension_grid) {}
 
     size_t size() const {
-      return m_points_arrays.size();
+      return m_dimension_points.size();
     }
 
     DimensionPoint<_dim> dimension_point(size_t idx) const {
-      return DimensionPoint<_dim>(m_dimension_set.get(), &m_points_arrays.at(idx));
+      return m_dimension_points.at(idx);
     }
 
     const DimensionGrid<_dim> &dimension_grid() const {
@@ -201,14 +197,12 @@ namespace poem {
     }
 
     std::shared_ptr<DimensionSet<_dim>> dimension_set() const {
-      return m_dimension_set;
+      return m_dimension_grid.dimension_set();
     }
 
 
    private:
-    std::shared_ptr<DimensionSet<_dim>> m_dimension_set;
-    std::vector<std::array<double, _dim>> m_points_arrays;
-
+    std::vector<DimensionPoint<_dim>> m_dimension_points;
     DimensionGrid<_dim> m_dimension_grid;
 
   };
