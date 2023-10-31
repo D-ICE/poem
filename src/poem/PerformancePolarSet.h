@@ -22,6 +22,14 @@ namespace poem {
 
     }
 
+    void has_ppp(bool val) { m_has_ppp = val; }
+    void has_vpp(bool val) { m_has_vpp = val; }
+    void has_hvpp(bool val) { m_has_hvpp = val; }
+
+    bool has_ppp(bool val) const { return m_has_ppp; }
+    bool has_vpp(bool val) const  { return m_has_vpp; }
+    bool has_hvpp(bool val) const  { return m_has_hvpp; }
+
     std::shared_ptr<PolarSet> ppp() const { return m_ppp; }
 
     std::shared_ptr<PolarSet> vpp() const { return m_vpp; }
