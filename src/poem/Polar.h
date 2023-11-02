@@ -69,7 +69,7 @@ namespace poem {
       return static_cast<const Polar<T, _dim> *>(this)->nearest(dimension_point, bound_check);
     }
 
-    virtual void to_netcdf(netCDF::NcFile &dataFile) const = 0;
+    virtual void to_netcdf(netCDF::NcGroup &dataFile) const = 0;
 
    protected:
     POLAR_TYPE m_polar_type;
@@ -129,7 +129,7 @@ namespace poem {
       return m_nearest->Nearest(dimension_point).val();
     }
 
-    void to_netcdf(netCDF::NcFile &dataFile) const override {
+    void to_netcdf(netCDF::NcGroup &dataFile) const override {
 
       // TODO: check qu'on va ecrire une polaire qui est bien remplie
 

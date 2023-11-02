@@ -138,7 +138,17 @@ namespace poem {
       return &m_mutex;
     }
 
-    int to_netcdf(const std::string &nc_file, const Attributes &attributes) const {
+
+    int to_netcdf(netCDF::NcGroup &group) const {
+
+      for (const auto &polar: m_polars_map) {
+        polar.second->to_netcdf(group);
+      }
+
+    }
+
+
+    int to_netcdf(const std::string &nc_file) const {
 
       fs::path nc_file_path(nc_file);
       if (nc_file_path.is_relative()) {
@@ -151,21 +161,8 @@ namespace poem {
 
       try {
 
-        // Create the file. The Replace parameter tells netCDF to overwrite
-        // this file, if it already exists.
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
-
-        // Writing attributes
-        // TODO: les attributs seront fournis en argument de la methode
-
-        // FIXME: il faut ajouter le schema dans les attributs ici... ?
-        for (const auto &attribute: attributes) {
-          dataFile.putAtt(attribute.first, attribute.second);
-        }
-
-        for (const auto &polar: m_polars_map) {
-          polar.second->to_netcdf(dataFile);
-        }
+        to_netcdf(dataFile);
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
