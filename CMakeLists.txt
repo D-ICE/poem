@@ -33,7 +33,7 @@ include(Add_mathutils)
 include(Add_json)
 include(Add_fmt)
 include(Add_spdlog)
-include(Add_hermes)
+#include(Add_hermes)
 include(Add_dunits)
 
 # netcdf related dependencies
