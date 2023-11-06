@@ -13,14 +13,14 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-#option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
 
 
 cmake_policy(SET CMP0135 NEW)
-#cmake_policy(SET CMP0077 NEW)
+cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
+
 #=============================================================================
 # Dependencies
 #=============================================================================
@@ -33,7 +33,6 @@ include(Add_mathutils)
 include(Add_json)
 include(Add_fmt)
 include(Add_spdlog)
-#include(Add_hermes)
 include(Add_dunits)
 
 # netcdf related dependencies
@@ -43,8 +42,6 @@ include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
 
-#set(PYBIND11_FINDPYTHON ON CACHE BOOL "")
-#include(add_pybind11)
 
 add_subdirectory(src/poem)
 

@@ -55,7 +55,3 @@ set(spdlog_TAG v1.11.0)
 # argparse
 set(argparse_URL https://github.com/p-ranav/argparse.git)
 set(argparse_TAG v2.2 CACHE STRING "argparse version")
-
-# hermes
-set(hermes_URL git@frydom-ce.org:ce/hermes.git)
-set(hermes_TAG v2.4 CACHE STRING "hermes version")
