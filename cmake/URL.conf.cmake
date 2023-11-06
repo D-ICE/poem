@@ -58,4 +58,4 @@ set(argparse_TAG v2.2 CACHE STRING "argparse version")
 
 # hermes
 set(hermes_URL git@frydom-ce.org:ce/hermes.git)
-set(hermes_TAG v2.0 CACHE STRING "hermes version")
+set(hermes_TAG v2.4 CACHE STRING "hermes version")

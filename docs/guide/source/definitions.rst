@@ -4,17 +4,24 @@
 Definitions
 ===========
 
-Polar
-=====
-
 PolarSet
-========
 
-Dimensions
-==========
+    PolarBase
 
-DimensionID
------------
+    Polar<T, _dim> : PolarBase
 
-DimensionIDSet
---------------
+    InterpolablePolar<_dim> : Polar <double, _dim>
+
+
+DimensionPointSetBase
+
+DimensionPointSet<_dim> : DimensionPointSetBase
+
+    DimensionSet<_dim>
+
+DimensionPoint
+
+DimensionGrid<_dim>
+
+Dimension
+

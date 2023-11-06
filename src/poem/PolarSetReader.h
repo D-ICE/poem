@@ -205,7 +205,8 @@ namespace poem {
         auto dim_name = nc_var.getDim(i).getName();
         dimension_grid.set_values(dim_name, m_dimension_values_map.at(dim_name));
       }
-      dimension_point_set = dimension_grid.dimension_point_set();
+
+      dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_grid);
       m_dimension_point_set_map.insert({hash_name, dimension_point_set});
 
     }

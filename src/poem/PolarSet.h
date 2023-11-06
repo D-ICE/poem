@@ -73,18 +73,24 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
-    PolarBase *get_polar(const std::string &name) const {
-      return m_polars_map.at(name).get();
+    PolarBase *polar(const std::string &name) const {
+      try {
+        return m_polars_map.at(name).get();
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("No polar with name {}", name);
+        CRITICAL_ERROR_POEM
+      }
+
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
-    Polar<T, _dim> *get_polar(const std::string &name) const {
-      return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
+    Polar<T, _dim> *polar(const std::string &name) const {
+      return static_cast<Polar<T, _dim> *>(polar(name));
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    InterpolablePolar<_dim> *get_polar(const std::string &name) const {
-      return static_cast<InterpolablePolar<_dim> *>(m_polars_map.at(name).get());
+    InterpolablePolar<_dim> *polar(const std::string &name) const {
+      return static_cast<InterpolablePolar<_dim> *>(polar(name));
     }
 
     std::vector<std::string> polar_names() const {
@@ -95,44 +101,54 @@ namespace poem {
       return polar_names;
     }
 
-    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    T interp(const std::string &name,
-             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
-             bool bound_check = true) const {
-
-      std::string old_name;
-      try {
-        old_name = m_polar_name_map.at(name);
-      } catch (const std::out_of_range &e) {
-        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-        CRITICAL_ERROR_POEM
-      }
-
-      auto polar = m_polars_map.at(old_name).get();
-      return polar->interp<double, _dim>(dimension_point, bound_check);
-    }
-
-    template<typename T, size_t _dim>
-    T nearest(const std::string &name,
-              const std::array<double, _dim> dimension_point,
-              bool bound_check = true) const {
-      std::string old_name;
-      try {
-        old_name = m_polar_name_map.at(name);
-      } catch (const std::out_of_range &e) {
-        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-        CRITICAL_ERROR_POEM
-      }
-
-      auto polar = m_polars_map.at(old_name).get();
-      return polar->nearest<T, _dim>(dimension_point, bound_check);
-    }
+//    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
+//    T interp(const std::string &name,
+//             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
+//             bool bound_check = true) const {
+//
+//      std::string old_name;
+//      try {
+//        old_name = m_polar_name_map.at(name);
+//      } catch (const std::out_of_range &e) {
+//        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      auto polar = m_polars_map.at(old_name).get();
+//      return polar->interp<double, _dim>(dimension_point, bound_check);
+//    }
+//
+//    template<typename T, size_t _dim>
+//    T nearest(const std::string &name,
+//              const std::array<double, _dim> dimension_point,
+//              bool bound_check = true) const {
+//      std::string old_name;
+//      try {
+//        old_name = m_polar_name_map.at(name);
+//      } catch (const std::out_of_range &e) {
+//        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      auto polar = m_polars_map.at(old_name).get();
+//      return polar->nearest<T, _dim>(dimension_point, bound_check);
+//    }
 
     std::mutex *mutex() {
       return &m_mutex;
     }
 
-    int to_netcdf(const std::string &nc_file, const Attributes &attributes) const {
+
+    int to_netcdf(netCDF::NcGroup &group) const {
+
+      for (const auto &polar: m_polars_map) {
+        polar.second->to_netcdf(group);
+      }
+
+    }
+
+
+    int to_netcdf(const std::string &nc_file) const {
 
       fs::path nc_file_path(nc_file);
       if (nc_file_path.is_relative()) {
@@ -145,21 +161,8 @@ namespace poem {
 
       try {
 
-        // Create the file. The Replace parameter tells netCDF to overwrite
-        // this file, if it already exists.
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
-
-        // Writing attributes
-        // TODO: les attributs seront fournis en argument de la methode
-
-        // FIXME: il faut ajouter le schema dans les attributs ici... ?
-        for (const auto &attribute: attributes) {
-          dataFile.putAtt(attribute.first, attribute.second);
-        }
-
-        for (const auto &polar: m_polars_map) {
-          polar.second->to_netcdf(dataFile);
-        }
+        to_netcdf(dataFile);
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
@@ -293,7 +296,7 @@ namespace poem {
     PolarMap m_polars_map;
     NameMap m_polar_name_map;
 
-    std::mutex m_mutex;
+    static inline std::mutex m_mutex;
 
 //    Schema m_schema;
 //    Schema m_newest_schema;

@@ -39,7 +39,7 @@ class DimensionPointSetTest : public testing::Test {
     dimension_grid.set_values("Hs_m", Hs_vector);
     ASSERT_TRUE(dimension_grid.is_filled());
 
-    dimension_point_set = dimension_grid.dimension_point_set();
+    dimension_point_set = std::make_shared<poem::DimensionPointSet<5>>(dimension_grid);
 
     auto current_schema = poem::get_newest_schema();
 
@@ -69,12 +69,15 @@ TEST_F(DimensionPointSetTest, NestedForLoop) {
       for (const auto &TWA: TWA_vector) {
         for (const auto &WA: WA_vector) {
           for (const auto &Hs: Hs_vector) {
+
             auto dimension_point = dimension_point_set->dimension_point(idx);
+
             ASSERT_DOUBLE_EQ(dimension_point["STW_kt"], STW);
             ASSERT_DOUBLE_EQ(dimension_point["TWS_kt"], TWS);
             ASSERT_DOUBLE_EQ(dimension_point["TWA_deg"], TWA);
             ASSERT_DOUBLE_EQ(dimension_point["WA_deg"], WA);
             ASSERT_DOUBLE_EQ(dimension_point["Hs_m"], Hs);
+
             idx++;
           }
         }
