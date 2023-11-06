@@ -77,6 +77,7 @@ namespace poem {
 
         if (has_ppp()) {
           auto group = use_groups ? dataFile.addGroup("ppp") : dataFile;
+
           m_ppp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
           if (use_groups) {
             group.putAtt("polar_type", "Power Prediction");

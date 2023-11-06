@@ -145,6 +145,7 @@ namespace poem {
         polar.second->to_netcdf(group);
       }
 
+      return 0;
     }
 
 
@@ -158,18 +159,19 @@ namespace poem {
       spdlog::info("Writing NetCDF file {}", std::string(nc_file_path));
 
       constexpr int nc_err = 2;
+      int code;
 
       try {
 
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
-        to_netcdf(dataFile);
+        code = to_netcdf(dataFile);
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
-        return nc_err;
+        code = nc_err;
       }
 
-      return 0;
+      return code;
     }
 
    private:
