@@ -35,7 +35,7 @@ include(Add_mathutils)
 include(Add_json)
 include(Add_fmt)
 include(Add_spdlog)
-include(Add_hermes)
+#include(Add_hermes)
 include(Add_dunits)
 
 # netcdf related dependencies
@@ -50,10 +50,15 @@ include(Add_netcdf-cxx4)
 
 add_subdirectory(src/poem)
 
-if (POEM_BUILD_UNIT_TESTS)
-
+if (POEM_BUILD_TESTS)
   include(Add_googletest)
   enable_testing()
+
+  # Defining a resource dir for POEM
+  set(POEM_RESOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources)
+  message(STATUS "Resources stored at ${POEM_RESOURCE_DIR}")
+  file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
+
   add_subdirectory(tests)
 endif ()
 
