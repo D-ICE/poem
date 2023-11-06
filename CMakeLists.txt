@@ -48,15 +48,15 @@ include(Add_netcdf-cxx4)
 add_subdirectory(src/poem)
 
 if (POEM_BUILD_TESTS)
-    include(Add_googletest)
-    enable_testing()
+  include(Add_googletest)
+  enable_testing()
 
-    # Defining a resource dir for POEM
-    set(POEM_RESOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources)
-    message(STATUS "Resources stored at ${POEM_RESOURCE_DIR}")
-    file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
+  # Defining a resource dir for POEM
+  set(POEM_RESOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources)
+  message(STATUS "Resources stored at ${POEM_RESOURCE_DIR}")
+  file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
 
-    add_subdirectory(tests)
+  add_subdirectory(tests)
 endif ()
 
 if (POEM_BUILD_TOOLS)
