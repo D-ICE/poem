@@ -12,7 +12,6 @@ target_link_libraries(_pypoem PUBLIC
         spdlog
         nlohmann_json
         dunits
-        hermes
         zlib
         libcurl
 )
