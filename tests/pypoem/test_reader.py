@@ -123,12 +123,16 @@ class TestReader(unittest.TestCase):
 
     def test_getnames(self):
         polar = poem.PolarSetReader("../data/polar_dev.nc")
-        for name in polar.polar_set.polar_names():
+        for name in polar.polar_set.polar_names:
             self.assertIn(name, list_of_names)
 
     def test_getattr(self):
         polar = poem.PolarSetReader("../data/polar_dev.nc")
         self.assertEqual("D-ICE ENGINEERING (C)", polar.attributes.get("copyright"))
+
+    def test_get(self):
+        polar = poem.PolarSetReader("../data/polar_dev.nc")
+        print(polar.polar_set.get("AWS").interp4d())
 
 
 if __name__ == "__main__":
