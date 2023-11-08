@@ -3,19 +3,22 @@ cmake_minimum_required(VERSION 3.11)
 project(poem)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #-----------------------------------------------------------------------------
 # Prevent in-source builds
 #-----------------------------------------------------------------------------
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-    message(FATAL_ERROR "In-source build is not possible and not recommended. Choose an empty directory for build output.")
+  message(FATAL_ERROR "In-source build is not possible and not recommended. Choose an empty directory for build output.")
 endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(POEM_BUILD_TESTS "Build tests" ON)
+#option(POEM_BUILD_TESTS "Build tests" ON)
+option(POEM_BUILD_UNIT_TESTS "Build unit tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
+option(POEM_BUILD_PYBIND "Build python bindings" ON)
 option(POEM_BUILD_PYBIND "Build python bindings" ON)
 
 
@@ -60,8 +63,8 @@ if (POEM_BUILD_TESTS)
 endif ()
 
 if (POEM_BUILD_TOOLS)
-    include(Add_argparse)
-    add_subdirectory(tools)
+  include(Add_argparse)
+  add_subdirectory(tools)
 endif ()
 
 if (POEM_BUILD_PYBIND)
