@@ -40,8 +40,8 @@ PYBIND11_MODULE(_pypoem, m) {
   //    declare_interpolable_polar<5>(m);
 
   py::class_<poem::PolarBase>(m, "_Polar")
-      .def("interp4d", &poem::InterpolablePolar<4>::interp)
-      .def("interp5d", &poem::InterpolablePolar<5>::interp)
-      .def("nearest4i", &poem::Polar<int, 4>::nearest)
-      .def("nearest5i", &poem::Polar<int, 5>::nearest);
+      .def("interp4d", &poem::PolarBase::interp<double, 4>)
+      .def("interp5d", &poem::PolarBase::interp<double, 5>)
+      .def("nearest4i", &poem::PolarBase::nearest<int, 4>)
+      .def("nearest5i", &poem::PolarBase::nearest<int, 5>);
 }
