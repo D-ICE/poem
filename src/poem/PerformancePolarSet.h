@@ -73,7 +73,7 @@ namespace poem {
           dataFile.putAtt(attribute.first, attribute.second);
         }
 
-        bool use_groups = true; // Retirer a terme une fois que polarplot saura faire...
+        bool use_groups = false; // Retirer a terme une fois que polarplot saura faire...
 
         if (has_ppp()) {
           auto group = use_groups ? dataFile.addGroup("ppp") : dataFile;
