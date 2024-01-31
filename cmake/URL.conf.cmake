@@ -15,34 +15,34 @@ set(json_TAG v3.6.1 CACHE STRING "json version")
 # zlib
 set(zlib_URL https://github.com/madler/zlib/archive/refs/tags/v1.2.12.tar.gz)
 set(zlib_TAG v1.2.12)
-set(zlib_PATCH zlib_v1.2.12.patch)
+set(zlib_PATCH zlib_v1.2.12.patch CACHE STRING "zlib version")
 
 # Curl
 set(curl_URL https://github.com/curl/curl/archive/refs/tags/curl-7_84_0.tar.gz)
 set(curl_PATCH curl_7.84.0.patch)
-set(curl_TAG 7.84.0)
+set(curl_TAG 7.84.0 CACHE STRING "curl version")
 
 # hdf5
 set(hdf5_URL https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_13_1.tar.gz)
-set(hdf5_TAG 1.13.1)
+set(hdf5_TAG 1.13.1 CACHE STRING "hdf5 version")
 
 # netcdf-c
 set(netcdf-c_URL https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz)
 set(netcdf-c_TAG v4.8.1)
-set(netcdf-c_PATCH netcdf-c_v4.8.1.patch)
+set(netcdf-c_PATCH netcdf-c_v4.8.1.patch CACHE STRING "netcdf-c version")
 
 # netcdf-cxx4
 set(netcdf-cxx4_URL "https://github.com/Unidata/netcdf-cxx4/archive/refs/tags/v4.3.1.tar.gz")
 set(netcdf-cxx4_PATCH netcdf-cxx4_v4.3.1.patch)
-set(netcdf-cxx4_TAG v4.3.1)
+set(netcdf-cxx4_TAG v4.3.1 CACHE STRING "netcdf-cxx4 version")
 
 # dunits
 set(dunits_URL git@d-ice.gitlab.host:common/d-units.git)
-set(dunits_TAG 1.1)  # TODO: mettre tag
+set(dunits_TAG 1.1 CACHE STRING "d-unit version")  # TODO: mettre tag
 
 # google test
 set(googletest_URL https://github.com/google/googletest.git)
-set(googletest_TAG release-1.12.1)
+set(googletest_TAG release-1.12.1 CACHE STRING "googletest version")
 
 # fmt
 set(fmt_URL https://github.com/fmtlib/fmt.git)
@@ -50,7 +50,7 @@ set(fmt_TAG 9.1.0 CACHE STRING "fmt version")
 
 # spdlog
 set(spdlog_URL https://github.com/gabime/spdlog)
-set(spdlog_TAG v1.11.0)
+set(spdlog_TAG v1.11.0 CACHE STRING "spdlog version")
 
 # argparse
 set(argparse_URL https://github.com/p-ranav/argparse.git)
