@@ -29,6 +29,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(Add_version)
 
+include(Add_boost)
 include(Add_mathutils)
 include(Add_json)
 include(Add_fmt)

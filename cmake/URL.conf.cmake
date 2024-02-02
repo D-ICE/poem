@@ -8,6 +8,11 @@ set(mathutils_TAG v1.15 CACHE STRING "mathutils version")
 set(MATHUTILS_BUILD_TESTS OFF CACHE BOOL "")
 set(MATHUTILS_BUILD_BOOST_TESTS OFF CACHE BOOL "")
 
+# Boost
+set(boost_URL https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz) # Last current version
+set(boost_TAG 1.75 CACHE STRING "Boost version")
+set(boost_FIND_TAG 1.71 CACHE STRING "Minimal version of Boost to find on the system") # Current version on Ubuntu 20.4
+
 # nlohmann/json
 set(json_URL https://github.com/nlohmann/json.git)
 set(json_TAG v3.6.1 CACHE STRING "json version")
