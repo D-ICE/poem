@@ -17,7 +17,7 @@ namespace poem {
 
   class PerformancePolarSet {
    public:
-    PerformancePolarSet(const Attributes& attributes) :
+    PerformancePolarSet(const Attributes &attributes) :
         m_has_ppp(false),
         m_has_hppp(false),
         m_has_hvpp_pb(false),
@@ -25,47 +25,44 @@ namespace poem {
         m_has_vpp(false),
         m_attributes(attributes) {}
 
-    void has_ppp(bool val) {
-      m_has_ppp = val;
-      if (val) {
-        m_ppp = std::make_shared<PolarSet>();
-      }
+    void initialize_ppp() {
+      m_ppp = std::make_shared<PolarSet>();
     }
-    void has_hppp(bool val) {
-      m_has_hppp = val;
-      if (val) {
-        m_hppp = std::make_shared<PolarSet>();
-      }
+
+    void initialize_hppp() {
+      m_hppp = std::make_shared<PolarSet>();
     }
-    void has_hvpp_pb(bool val) {
-      m_has_hvpp_pb = val;
-      if (val) {
-        m_hvpp_pb = std::make_shared<PolarSet>();
-      }
+
+    void initialize_hvpp_pb() {
+      m_hvpp_pb = std::make_shared<PolarSet>();
     }
-    void has_hvpp_hp(bool val) {
-      m_has_hvpp_hp = val;
-      if (val) {
-        m_hvpp_hp = std::make_shared<PolarSet>();
-      }
+
+    void initialize_hvpp_hp() {
+      m_hvpp_hp = std::make_shared<PolarSet>();
     }
-    void has_vpp(bool val) {
-      m_has_vpp = val;
-      if (val) {
-        m_vpp = std::make_shared<PolarSet>();
-      }
+
+    void initialize_vpp() {
+      m_vpp = std::make_shared<PolarSet>();
     }
 
     bool has_ppp() const { return m_has_ppp; }
+
     bool has_hppp() const { return m_has_hppp; }
-    bool has_hvpp_pb() const  { return m_has_hvpp_pb; }
-    bool has_hvpp_hp() const  { return m_has_hvpp_hp; }
-    bool has_vpp() const  { return m_has_vpp; }
+
+    bool has_hvpp_pb() const { return m_has_hvpp_pb; }
+
+    bool has_hvpp_hp() const { return m_has_hvpp_hp; }
+
+    bool has_vpp() const { return m_has_vpp; }
 
     std::shared_ptr<PolarSet> ppp() const { return m_ppp; }
+
     std::shared_ptr<PolarSet> hppp() const { return m_hppp; }
+
     std::shared_ptr<PolarSet> hvpp_pb() const { return m_hvpp_pb; }
+
     std::shared_ptr<PolarSet> hvpp_hp() const { return m_hvpp_hp; }
+
     std::shared_ptr<PolarSet> vpp() const { return m_vpp; }
 
     int to_netcdf(const std::string &nc_filename) {
