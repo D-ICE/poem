@@ -65,7 +65,7 @@ namespace poem {
 
     std::shared_ptr<PolarSet> vpp() const { return m_vpp; }
 
-    int to_netcdf(const std::string &nc_filename) {
+    int to_netcdf(const std::string &nc_filename, bool use_groups) {
 
       fs::path nc_file_path(nc_filename);
       if (nc_file_path.is_relative()) {
@@ -86,7 +86,7 @@ namespace poem {
           dataFile.putAtt(attribute.first, attribute.second);
         }
 
-        bool use_groups = false; // Retirer a terme une fois que polarplot saura faire...
+//        bool use_groups = false; // Retirer a terme une fois que polarplot saura faire...
 
         if (has_ppp()) {
           auto group = use_groups ? dataFile.addGroup("ppp") : dataFile;
