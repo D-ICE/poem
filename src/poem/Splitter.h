@@ -18,7 +18,7 @@ namespace poem {
 
     Splitter(size_t size, size_t chunk_size) : m_size(size) {
 
-      if (size < 2 * chunk_size) {
+      if (size < 2 * chunk_size || chunk_size == 0) {
         // Not justified to split, return only one chunk
         m_nchunks = 1;
         m_offsets_sizes.emplace_back(0, size);
