@@ -19,8 +19,10 @@ namespace poem {
    public:
     PerformancePolarSet(const Attributes& attributes) :
         m_has_ppp(false),
+        m_has_hppp(false),
+        m_has_hvpp_pb(false),
+        m_has_hvpp_hp(false),
         m_has_vpp(false),
-        m_has_hvpp(false),
         m_attributes(attributes) {}
 
     void has_ppp(bool val) {
@@ -29,28 +31,42 @@ namespace poem {
         m_ppp = std::make_shared<PolarSet>();
       }
     }
+    void has_hppp(bool val) {
+      m_has_hppp = val;
+      if (val) {
+        m_hppp = std::make_shared<PolarSet>();
+      }
+    }
+    void has_hvpp_pb(bool val) {
+      m_has_hvpp_pb = val;
+      if (val) {
+        m_hvpp_pb = std::make_shared<PolarSet>();
+      }
+    }
+    void has_hvpp_hp(bool val) {
+      m_has_hvpp_hp = val;
+      if (val) {
+        m_hvpp_hp = std::make_shared<PolarSet>();
+      }
+    }
     void has_vpp(bool val) {
       m_has_vpp = val;
       if (val) {
         m_vpp = std::make_shared<PolarSet>();
       }
     }
-    void has_hvpp(bool val) {
-      m_has_hvpp = val;
-      if (val) {
-        m_hvpp = std::make_shared<PolarSet>();
-      }
-    }
 
     bool has_ppp() const { return m_has_ppp; }
+    bool has_hppp() const { return m_has_hppp; }
+    bool has_hvpp_pb() const  { return m_has_hvpp_pb; }
+    bool has_hvpp_hp() const  { return m_has_hvpp_hp; }
     bool has_vpp() const  { return m_has_vpp; }
-    bool has_hvpp() const  { return m_has_hvpp; }
 
     std::shared_ptr<PolarSet> ppp() const { return m_ppp; }
-
+    std::shared_ptr<PolarSet> hppp() const { return m_hppp; }
+    std::shared_ptr<PolarSet> hvpp_pb() const { return m_hvpp_pb; }
+    std::shared_ptr<PolarSet> hvpp_hp() const { return m_hvpp_hp; }
     std::shared_ptr<PolarSet> vpp() const { return m_vpp; }
-
-    std::shared_ptr<PolarSet> hvpp() const { return m_hvpp; }
 
     int to_netcdf(const std::string &nc_filename) {
 
@@ -80,24 +96,42 @@ namespace poem {
 
           m_ppp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
           if (use_groups) {
-            group.putAtt("polar_type", "Power Prediction");
+            group.putAtt("polar_type", "Power Prediction (no sails)");
           }
         }
+
+        if (has_hppp()) {
+          auto group = use_groups ? dataFile.addGroup("hppp") : dataFile;
+
+          m_hppp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
+          if (use_groups) {
+            group.putAtt("polar_type", "Hybrid Power Prediction (motor and sails)");
+          }
+        }
+
+        if (has_hvpp_pb()) {
+          auto group = use_groups ? dataFile.addGroup("hvpp-pb") : dataFile;
+          m_hvpp_pb->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
+          if (use_groups) {
+            group.putAtt("polar_type", "Hybrid Velocity Prediction (motor and sails) -- Brake Power control");
+          }
+        }
+
+        if (has_hvpp_hp()) {
+          auto group = use_groups ? dataFile.addGroup("hvpp-hp") : dataFile;
+          m_hvpp_hp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
+          if (use_groups) {
+            group.putAtt("polar_type", "Hybrid Velocity Prediction (motor and sails) -- Handle Position control");
+          }
+        }
+
         if (has_vpp()) {
           auto group = use_groups ? dataFile.addGroup("vpp") : dataFile;
           m_vpp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
           if (use_groups) {
-            group.putAtt("polar_type", "Velocity Prediction");
+            group.putAtt("polar_type", "Velocity Prediction (no motor)");
           }
         }
-        if (has_hvpp()) {
-          auto group = use_groups ? dataFile.addGroup("hvpp") : dataFile;
-          m_hvpp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
-          if (use_groups) {
-            group.putAtt("polar_type", "Hybrid Velocity Prediction");
-          }
-        }
-
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
@@ -109,12 +143,21 @@ namespace poem {
 
 
    private:
+
     bool m_has_ppp;
     std::shared_ptr<PolarSet> m_ppp;
+
+    bool m_has_hppp;
+    std::shared_ptr<PolarSet> m_hppp;
+
+    bool m_has_hvpp_pb;
+    std::shared_ptr<PolarSet> m_hvpp_pb;
+
+    bool m_has_hvpp_hp;
+    std::shared_ptr<PolarSet> m_hvpp_hp;
+
     bool m_has_vpp;
     std::shared_ptr<PolarSet> m_vpp;
-    bool m_has_hvpp;
-    std::shared_ptr<PolarSet> m_hvpp;
 
     Attributes m_attributes;
 
