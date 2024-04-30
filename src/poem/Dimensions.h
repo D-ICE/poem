@@ -72,11 +72,21 @@ namespace poem {
         m_array(array) {}
 
     const double &operator[](const std::string &name) const {
-      return m_array.at(m_dimension_set->index(name));
+      try {
+        return m_array.at(m_dimension_set->index(name));
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("[POEM] No dimension named {} in DimensionPoint", name);
+        CRITICAL_ERROR_POEM
+      }
     }
 
     const double &operator[](size_t idim) const {
-      return m_array.at(idim);
+      try {
+        return m_array.at(idim);
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("[POEM] index {} is out of range of DimensionPoint", idim);
+        CRITICAL_ERROR_POEM
+      }
     }
 
    private:

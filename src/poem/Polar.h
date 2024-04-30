@@ -190,7 +190,7 @@ namespace poem {
         nc_var.putAtt("description", description());
 
       } else {
-        spdlog::critical("Attempting to store more than one time a variable with the same name");
+        spdlog::critical("Attempting to store more than one time a variable with the same name {}", name());
         CRITICAL_ERROR_POEM
       }
 

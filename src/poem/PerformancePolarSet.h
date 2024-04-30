@@ -27,22 +27,27 @@ namespace poem {
 
     void initialize_ppp() {
       m_ppp = std::make_shared<PolarSet>();
+      m_has_ppp = true;
     }
 
     void initialize_hppp() {
       m_hppp = std::make_shared<PolarSet>();
+      m_has_hppp = true;
     }
 
     void initialize_hvpp_pb() {
       m_hvpp_pb = std::make_shared<PolarSet>();
+      m_has_hvpp_pb = true;
     }
 
     void initialize_hvpp_hp() {
       m_hvpp_hp = std::make_shared<PolarSet>();
+      m_has_hvpp_hp = true;
     }
 
     void initialize_vpp() {
       m_vpp = std::make_shared<PolarSet>();
+      m_has_vpp = true;
     }
 
     bool has_ppp() const { return m_has_ppp; }
