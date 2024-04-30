@@ -25,8 +25,10 @@ namespace poem {
 
   enum POLAR_TYPE {
     PPP,
+    HPPP,
+    HVPP_PB,
+    HVPP_HP,
     VPP,
-    HVPP
   };
 
   // forward declaration
