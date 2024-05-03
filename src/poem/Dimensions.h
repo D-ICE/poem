@@ -114,11 +114,23 @@ namespace poem {
       }
 
       m_values.at(index) = values;
-
     }
 
     const std::vector<double> &values(size_t idx) const {
       return m_values.at(idx);
+    }
+
+    const std::vector<double> &values(const std::string &name) const {
+      size_t index;
+      try {
+        index = m_dimension_set->index(name);
+
+      } catch (const std::out_of_range &e) {
+        spdlog::critical("{} is not a valid dimension name", name);
+        CRITICAL_ERROR_POEM
+      }
+
+      return m_values.at(index);
     }
 
     bool is_filled() const {

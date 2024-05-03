@@ -200,6 +200,20 @@ namespace poem {
       return m_values.size() == m_dimension_point_set->size();
     }
 
+    void bounds(std::array<T, _dim> &min_bounds, std::array<T, _dim> &max_bounds) const {
+      for (size_t idx = 0; idx < _dim; ++idx) {
+        auto dim_values = m_dimension_point_set->dimension_grid().values(idx);
+        min_bounds[idx] = dim_values[0];
+        max_bounds[idx] = dim_values[dim_values.size() - 1];
+      }
+    }
+
+    void bounds(const std::string &name, double &min, double &max) const {
+      auto dim_values = m_dimension_point_set->dimension_grid().values(name);
+      min = dim_values[0];
+      max = dim_values[dim_values.size() - 1];
+    }
+
 
    private:
 
