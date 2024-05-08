@@ -109,8 +109,7 @@ namespace poem {
     const size_t dim() const override { return _dim; }
 
     size_t size() const override {
-      NIY_POEM
-//      return m_polar_points.size();
+      return m_dimension_point_set->size();
     }
 
     void set_value(size_t idx, const T &value) {
