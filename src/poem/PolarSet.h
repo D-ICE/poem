@@ -20,17 +20,17 @@ namespace poem {
 
   class PolarSet {
    public:
-    using PolarMap = std::map<std::string, std::unique_ptr<PolarBase>>;
+    using PolarMap = std::map<std::string, std::shared_ptr<PolarBase>>;
     using NameMap = std::map<std::string, std::string>;
 
 
     template<typename T, size_t _dim>
-    Polar<T, _dim> *new_polar(const std::string &name,
-                              const std::string &unit,
-                              const std::string &description,
-                              type::POEM_TYPES type,
-                              POLAR_TYPE polar_type,
-                              std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+    std::shared_ptr<Polar<T, _dim>> new_polar(const std::string &name,
+                                              const std::string &unit,
+                                              const std::string &description,
+                                              type::POEM_TYPES type,
+                                              POLAR_TYPE polar_type,
+                                              std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       // Thread safety
       std::lock_guard<std::mutex> lock(m_mutex);
@@ -38,14 +38,14 @@ namespace poem {
       if (m_polars_map.find(name) != m_polars_map.end()) {
 //        spdlog::critical("Attempting to add polar with name {} twice", name);
 //        CRITICAL_ERROR_POEM
-        return static_cast<Polar<T, _dim> *>(m_polars_map.at(name).get());
+        return std::reinterpret_pointer_cast<Polar<T, _dim>>(m_polars_map.at(name));
       }
 //      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
-      auto polar = std::make_unique<Polar<T, _dim>>(name, unit, description, type, polar_type, dimension_point_set);
+      auto polar = std::make_shared<Polar<T, _dim>>(name, unit, description, type, polar_type, dimension_point_set);
 
-      m_polars_map.insert({name, std::move(polar)});
-      auto polar_ptr = static_cast<Polar<T, _dim> *>(m_polars_map[name].get());
+      m_polars_map.insert({name, polar});
+//      auto polar_ptr = std::dynamic_pointer_cast<Polar<T, _dim>>(m_polars_map[name]);
 
 //      // Check that the polar is compliant with the current schema
 //      m_schema.check_polar<T, _dim>(polar_ptr);
@@ -53,7 +53,7 @@ namespace poem {
       // Generate map
       generate_polar_name_map(name);
 
-      return polar_ptr;
+      return polar;
     }
 
 //    bool is_filled() const {
@@ -73,24 +73,23 @@ namespace poem {
      * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
      */
 
-    PolarBase *polar(const std::string &name) const {
+    std::shared_ptr<PolarBase> polar(const std::string &name) const {
       try {
-        return m_polars_map.at(name).get();
+        return m_polars_map.at(name);
       } catch (const std::out_of_range &e) {
         spdlog::critical("No polar with name {}", name);
         CRITICAL_ERROR_POEM
       }
-
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
-    Polar<T, _dim> *polar(const std::string &name) const {
-      return static_cast<Polar<T, _dim> *>(polar(name));
+    std::shared_ptr<Polar<T, _dim>> polar(const std::string &name) const {
+      return std::reinterpret_pointer_cast<Polar<T, _dim>>(polar(name));
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    InterpolablePolar<_dim> *polar(const std::string &name) const {
-      return static_cast<InterpolablePolar<_dim> *>(polar(name));
+    std::shared_ptr<InterpolablePolar<_dim>> polar(const std::string &name) const {
+      return std::reinterpret_pointer_cast<InterpolablePolar<_dim>>(polar(name));
     }
 
     std::vector<std::string> polar_names() const {
@@ -176,7 +175,7 @@ namespace poem {
 
    private:
 
-    void copy_polar(PolarBase *polar) {
+    void copy_polar(std::shared_ptr<PolarBase> polar) {
       switch (polar->dim()) {
         case 1:
           return copy_polar < 1 > (polar);
@@ -197,7 +196,7 @@ namespace poem {
     }
 
     template<size_t _dim>
-    void copy_polar(PolarBase *polar) {
+    void copy_polar(std::shared_ptr<PolarBase> polar) {
       auto type = polar->type();
       switch (type) {
         case type::INT:
@@ -213,7 +212,7 @@ namespace poem {
     }
 
     template<typename T, size_t _dim>
-    void copy_polar(PolarBase *polar) {
+    void copy_polar(std::shared_ptr<PolarBase> polar) {
       NIY_POEM
 //      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
 //

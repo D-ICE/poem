@@ -16,6 +16,7 @@ namespace fs = std::filesystem;
 namespace poem {
 
   class PerformancePolarSet {
+
    public:
     PerformancePolarSet(const Attributes &attributes) :
         m_has_ppp(false),
@@ -70,28 +71,26 @@ namespace poem {
 
     std::shared_ptr<PolarSet> vpp() const { return m_vpp; }
 
-    int to_netcdf(const std::string &nc_filename, bool use_groups) {
+    int to_netcdf(const std::string &nc_filename, bool use_groups, bool verbose=false) {
 
       fs::path nc_file_path(nc_filename);
       if (nc_file_path.is_relative()) {
         nc_file_path = fs::current_path() / nc_file_path;
       }
 
-      spdlog::info("Writing NetCDF file {}", std::string(nc_file_path));
+      if (verbose) spdlog::info("Writing NetCDF file {}", std::string(nc_file_path));
 
       constexpr int nc_err = 2;
 
       try {
 
-        // Create the file. The Replace parameter tells netCDF to overwrite
+        // Create the file. The replace parameter tells netCDF to overwrite
         // this file, if it already exists.
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
 
         for (const auto &attribute: m_attributes) {
           dataFile.putAtt(attribute.first, attribute.second);
         }
-
-//        bool use_groups = false; // Retirer a terme une fois que polarplot saura faire...
 
         if (has_ppp()) {
           auto group = use_groups ? dataFile.addGroup("ppp") : dataFile;

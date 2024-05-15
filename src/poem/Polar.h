@@ -75,6 +75,7 @@ namespace poem {
 
    protected:
     POLAR_TYPE m_polar_type;
+    mutable std::mutex m_mutex;
 
   };
 
@@ -121,9 +122,10 @@ namespace poem {
     }
 
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      std::lock_guard<std::mutex> lock(this->m_mutex);
 
       if (!m_nearest_is_built) {
-        const_cast<Polar<T, _dim> *>(this)->build_nearest();
+        const_cast<Polar<T, _dim> *>(this)->build_nearest(); // necessary as the method is const
       }
 
       // FIXME: bound_check non utilise encore dans RegularGridNearest
@@ -261,9 +263,10 @@ namespace poem {
 
    public:
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+      std::lock_guard<std::mutex> lock(this->m_mutex);
 
       if (!this->m_interpolator_is_built) {
-        const_cast<InterpolablePolar<_dim> *>(this)->build_interpolator();
+        const_cast<InterpolablePolar<_dim> *>(this)->build_interpolator(); // necessary as the method is const
       }
 
       return this->m_interpolator->Interp(dimension_point, bound_check);
