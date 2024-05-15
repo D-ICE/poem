@@ -112,7 +112,7 @@ namespace poem {
 
         if (has_hvpp_pb()) {
           auto group = use_groups ? dataFile.addGroup("hvpp-pb") : dataFile;
-          m_hvpp_pb->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
+          m_hvpp_pb->to_netcdf(group);
           if (use_groups) {
             group.putAtt("polar_type", "Hybrid Velocity Prediction (motor and sails) -- Brake Power control");
           }
@@ -120,7 +120,7 @@ namespace poem {
 
         if (has_hvpp_hp()) {
           auto group = use_groups ? dataFile.addGroup("hvpp-hp") : dataFile;
-          m_hvpp_hp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
+          m_hvpp_hp->to_netcdf(group);
           if (use_groups) {
             group.putAtt("polar_type", "Hybrid Velocity Prediction (motor and sails) -- Handle Position control");
           }
