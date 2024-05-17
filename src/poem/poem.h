@@ -9,6 +9,7 @@
 #include "PerformancePolarSet.h"
 #include "PolarSet.h"
 #include "Splitter.h"
+#include "PerformancePolarSetReader.h"
 #include "PolarSetReader.h"
 
 #endif //POEM_POEM_H
