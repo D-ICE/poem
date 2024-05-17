@@ -43,7 +43,7 @@ set(netcdf-cxx4_TAG v4.3.1 CACHE STRING "netcdf-cxx4 version")
 
 # dunits
 set(dunits_URL git@d-ice.gitlab.host:common/d-units.git)
-set(dunits_TAG 1.1 CACHE STRING "d-unit version")  # TODO: mettre tag
+set(dunits_TAG 1.2 CACHE STRING "d-unit version")  # TODO: mettre tag
 
 # google test
 set(googletest_URL https://github.com/google/googletest.git)
