@@ -10,7 +10,6 @@
 #include <spdlog/spdlog.h>
 #include <netcdf>
 
-#include "PolarSetReader.h"
 #include "exceptions.h"
 
 namespace fs = std::filesystem;
@@ -23,7 +22,6 @@ namespace poem {
                          const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
                          std::shared_ptr<PolarSet> polar_set,
                          type::POEM_TYPES var_type) {
-//    auto nc_var = m_data_file->getVar(var_name);
 
     std::string hash_name;
     for (int i = 0; i < _dim; ++i) {
@@ -79,7 +77,6 @@ namespace poem {
                          const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
                          const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
                          std::shared_ptr<PolarSet> polar_set) {
-//    auto nc_var = m_data_file->getVar(var_name);
 
     auto type = nc_var.getType();
     switch (type.getId()) {
@@ -100,7 +97,6 @@ namespace poem {
                          const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
                          std::shared_ptr<PolarSet> polar_set) {
 
-//    auto nc_var = group.getVar(var_name);
     size_t nbdim = nc_var.getDimCount();
 
     switch (nbdim) {
@@ -178,11 +174,8 @@ namespace poem {
       std::string att_val;
       att.second.getValues(att_val);
       attributes.add_attribute(att.first, att_val);
-//      std::cout << att.first << std::endl;
     }
 
-//    auto group_name = group.getName();
-//    group.isRootGroup();
     auto performance_polar_set = std::make_shared<PerformancePolarSet>(attributes);
 
     bool has_groups = true;
