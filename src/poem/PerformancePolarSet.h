@@ -109,51 +109,6 @@ namespace poem {
           polar_set.second->to_netcdf(group);
         }
 
-        NIY_POEM
-
-
-//        if (has_ppp()) {
-//          auto group = use_groups ? dataFile.addGroup("ppp") : dataFile;
-//
-//          m_ppp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
-//          if (use_groups) {
-//            group.putAtt("polar_type", "Power Prediction (no sails)");
-//          }
-//        }
-//
-//        if (has_hppp()) {
-//          auto group = use_groups ? dataFile.addGroup("hppp") : dataFile;
-//
-//          m_hppp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
-//          if (use_groups) {
-//            group.putAtt("polar_type", "Hybrid Power Prediction (motor and sails)");
-//          }
-//        }
-//
-//        if (has_hvpp_pb()) {
-//          auto group = use_groups ? dataFile.addGroup("hvpp-pb") : dataFile;
-//          m_hvpp_pb->to_netcdf(group);
-//          if (use_groups) {
-//            group.putAtt("polar_type", "Hybrid Velocity Prediction (motor and sails) -- Brake Power control");
-//          }
-//        }
-//
-//        if (has_hvpp_hp()) {
-//          auto group = use_groups ? dataFile.addGroup("hvpp-hp") : dataFile;
-//          m_hvpp_hp->to_netcdf(group);
-//          if (use_groups) {
-//            group.putAtt("polar_type", "Hybrid Velocity Prediction (motor and sails) -- Handle Position control");
-//          }
-//        }
-//
-//        if (has_vpp()) {
-//          auto group = use_groups ? dataFile.addGroup("vpp") : dataFile;
-//          m_vpp->to_netcdf(group); // Remplacer par dataFile pour ne pas avoir de group
-//          if (use_groups) {
-//            group.putAtt("polar_type", "Velocity Prediction (no motor)");
-//          }
-//        }
-
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
         return nc_err;
