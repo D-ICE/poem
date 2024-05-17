@@ -22,6 +22,12 @@ namespace poem {
       m_attributes.insert({name, val});
     }
 
+    void add_attributes(const Attributes& other) {
+      for (const auto& att : other) {
+        m_attributes.insert(att);
+      }
+    }
+
     bool contains(const std::string &name) const {
       return m_attributes.find(name) != m_attributes.end();
     }
