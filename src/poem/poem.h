@@ -7,6 +7,7 @@
 
 #include "exceptions.h"
 #include "PerformancePolarSet.h"
+#include "PolarType.h"
 #include "PolarSet.h"
 #include "Splitter.h"
 #include "PerformancePolarSetReader.h"
