@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <memory>
+#include <netcdf>
 
 #include <spdlog/spdlog.h>
 
@@ -18,27 +19,54 @@
 
 namespace fs = std::filesystem;
 
-namespace netCDF {
-  class NcFile;
-}
+//namespace netCDF {
+//  class NcFile;
+//}
 
 namespace poem {
 
-  // Forward declarations
-  class PolarSet;
-
-  class Attributes;
-
-  class Dimension;
-
-  class DimensionPointSetBase;
+//  // Forward declarations
+//  class PolarSet;
+//
+//  class Attributes;
+//
+//  class Dimension;
+//
+//  class DimensionPointSetBase;
 
 
   class PolarSetReader {
    public:
+    PolarSetReader(const std::string &nc_polar) {
+      // Does the file exist
+      if (!fs::exists(nc_polar)) {
+        spdlog::critical("Polar file {} NOT FOUND", nc_polar);
+        CRITICAL_ERROR_POEM
+      }
+      netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
+//      PolarSetReader::PolarSetReader(ncfile, ncfile.getGroup("/"));
+
+    }
+
+    PolarSetReader(const netCDF::NcFile& ncfile, const netCDF::NcGroup &group) {
+
+      Attributes attributes;
+      for (const auto att : group.getAtts()) {
+        std::string att_val;
+        att.second.getValues(att_val);
+        attributes.add_attribute(att.first, att_val);
+        std::cout << att.first << std::endl;
+      }
+
+
+
+
+
+    }
 
     void Read(const std::string &nc_polar) {
-      m_polar_set = std::make_shared<PolarSet>();
+//      Attributes attributes;
+//      m_polar_set = std::make_shared<PolarSet>("", attributes);
 
       // Does the file exist
       if (!fs::exists(nc_polar)) {
@@ -46,12 +74,12 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
 
-      spdlog::info("Reading polar file {}", nc_polar);
-      m_data_file = std::make_unique<netCDF::NcFile>(nc_polar, netCDF::NcFile::read);
-
-      load_attributes();
-      load_dimensions();
-      load_polars();
+//      spdlog::info("Reading polar file {}", nc_polar);
+//      m_data_file = std::make_unique<netCDF::NcFile>(nc_polar, netCDF::NcFile::read);
+//
+//      load_attributes();
+//      load_dimensions();
+//      load_polars();
     }
 
     std::shared_ptr<PolarSet> polar_set() const {
@@ -144,6 +172,9 @@ namespace poem {
 
 
    private:
+    std::shared_ptr<PolarSet> m_polar_set;
+
+
     std::unique_ptr<netCDF::NcFile> m_data_file;
 
     std::unordered_map<std::string, std::shared_ptr<Dimension>> m_dimension_map;
@@ -151,7 +182,6 @@ namespace poem {
     std::unordered_map<std::string, std::shared_ptr<DimensionPointSetBase>> m_dimension_point_set_map;
 
     std::shared_ptr<Attributes> m_attributes;
-    std::shared_ptr<PolarSet> m_polar_set;
 
   };
 

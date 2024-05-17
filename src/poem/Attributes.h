@@ -26,6 +26,8 @@ namespace poem {
       return m_attributes.find(name) != m_attributes.end();
     }
 
+    const std::string &operator[](const std::string &name) const { return m_attributes.at(name); }
+
     const std::string &get(const std::string &name) const { return m_attributes.at(name); }
 
     void set(const std::string &name, const std::string &val) { m_attributes.at(name) = val; }

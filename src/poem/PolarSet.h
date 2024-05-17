@@ -9,20 +9,28 @@
 #include <map>
 #include <thread>
 #include <mutex>
+#include <filesystem>
 
 #include "Polar.h"
 #include "Attributes.h"
+#include "PolarType.h"
 
-#include "poem/schema/Schema.h"
+namespace fs = std::filesystem;
 
 namespace poem {
 
-
   class PolarSet {
    public:
-    using PolarMap = std::map<std::string, std::shared_ptr<PolarBase>>;
-    using NameMap = std::map<std::string, std::string>;
+    using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
+    explicit PolarSet(const Attributes &attributes) : m_attributes(attributes) {}
+
+
+    const std::string &name() const { return m_attributes["name"]; }
+
+    POLAR_TYPE polar_type() const {
+      return polar_type_s2enum(m_attributes["polar_type"]);
+    }
 
     template<typename T, size_t _dim>
     std::shared_ptr<Polar<T, _dim>> new_polar(const std::string &name,
@@ -36,42 +44,15 @@ namespace poem {
       std::lock_guard<std::mutex> lock(m_mutex);
 
       if (m_polars_map.find(name) != m_polars_map.end()) {
-//        spdlog::critical("Attempting to add polar with name {} twice", name);
-//        CRITICAL_ERROR_POEM
         return std::reinterpret_pointer_cast<Polar<T, _dim>>(m_polars_map.at(name));
       }
-//      if (!dimension_point_set->is_built()) dimension_point_set->build();
 
       auto polar = std::make_shared<Polar<T, _dim>>(name, unit, description, type, polar_type, dimension_point_set);
 
       m_polars_map.insert({name, polar});
-//      auto polar_ptr = std::dynamic_pointer_cast<Polar<T, _dim>>(m_polars_map[name]);
-
-//      // Check that the polar is compliant with the current schema
-//      m_schema.check_polar<T, _dim>(polar_ptr);
-
-      // Generate map
-      generate_polar_name_map(name);
 
       return polar;
     }
-
-//    bool is_filled() const {
-//
-//      bool is_filled = true;
-//      for (const auto &polar: m_polars_map) {
-//        if (!polar.second->is_filled()) {
-//          is_filled = false;
-//          break;
-//        }
-//      }
-//
-//      return is_filled;
-//    }
-
-    /*
-     * TODO: ajouter tout ce qu'il faut pour acceder aux polaires, avec interpolation ND et mise en cache...
-     */
 
     std::shared_ptr<PolarBase> polar(const std::string &name) const {
       try {
@@ -100,39 +81,6 @@ namespace poem {
       return polar_names;
     }
 
-//    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-//    T interp(const std::string &name,
-//             const std::array<double, _dim> dimension_point, // FIXME: pas T mais double pour les dimensions
-//             bool bound_check = true) const {
-//
-//      std::string old_name;
-//      try {
-//        old_name = m_polar_name_map.at(name);
-//      } catch (const std::out_of_range &e) {
-//        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-//        CRITICAL_ERROR_POEM
-//      }
-//
-//      auto polar = m_polars_map.at(old_name).get();
-//      return polar->interp<double, _dim>(dimension_point, bound_check);
-//    }
-//
-//    template<typename T, size_t _dim>
-//    T nearest(const std::string &name,
-//              const std::array<double, _dim> dimension_point,
-//              bool bound_check = true) const {
-//      std::string old_name;
-//      try {
-//        old_name = m_polar_name_map.at(name);
-//      } catch (const std::out_of_range &e) {
-//        spdlog::critical(R"(Polar name "{}" does not exist in the newest schema. Please upgrade your code)", name);
-//        CRITICAL_ERROR_POEM
-//      }
-//
-//      auto polar = m_polars_map.at(old_name).get();
-//      return polar->nearest<T, _dim>(dimension_point, bound_check);
-//    }
-
     std::mutex *mutex() {
       return &m_mutex;
     }
@@ -142,6 +90,10 @@ namespace poem {
 
       for (const auto &polar: m_polars_map) {
         polar.second->to_netcdf(group);
+      }
+
+      for (const auto &attribute: m_attributes) {
+        group.putAtt(attribute.first, attribute.second);
       }
 
       return 0;
@@ -173,129 +125,130 @@ namespace poem {
       return code;
     }
 
-   private:
-
-    void copy_polar(std::shared_ptr<PolarBase> polar) {
-      switch (polar->dim()) {
-        case 1:
-          return copy_polar < 1 > (polar);
-        case 2:
-          return copy_polar < 2 > (polar);
-        case 3:
-          return copy_polar < 3 > (polar);
-        case 4:
-          return copy_polar < 4 > (polar);
-        case 5:
-          return copy_polar < 5 > (polar);
-        case 6:
-          return copy_polar < 6 > (polar);
-        default:
-          spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
-          CRITICAL_ERROR_POEM
-      }
-    }
-
-    template<size_t _dim>
-    void copy_polar(std::shared_ptr<PolarBase> polar) {
-      auto type = polar->type();
-      switch (type) {
-        case type::INT:
-          copy_polar<int, _dim>(polar);
-          break;
-        case type::DOUBLE:
-          copy_polar<double, _dim>(polar);
-          break;
-        default:
-          spdlog::critical("Type is not managed yet");
-          CRITICAL_ERROR_POEM
-      }
-    }
-
-    template<typename T, size_t _dim>
-    void copy_polar(std::shared_ptr<PolarBase> polar) {
-      NIY_POEM
-//      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
+//   private:
 //
-//      auto polar_copy = New<T, _dim>(polar_->name(),
-//                                     polar_->unit(),
-//                                     polar_->description(),
-//                                     polar_->type(),
-//                                     polar_->dimension_point_set());
-//
-//      // Filling with values
-//      auto iter = polar_->begin();
-//      for (; iter != polar_->end(); ++iter) {
-//        PolarPoint<T, _dim> polar_point = (*iter).second;
-//        polar_copy->set_point(&polar_point);
+//    void copy_polar(std::shared_ptr<PolarBase> polar) {
+//      switch (polar->dim()) {
+//        case 1:
+//          return copy_polar < 1 > (polar);
+//        case 2:
+//          return copy_polar < 2 > (polar);
+//        case 3:
+//          return copy_polar < 3 > (polar);
+//        case 4:
+//          return copy_polar < 4 > (polar);
+//        case 5:
+//          return copy_polar < 5 > (polar);
+//        case 6:
+//          return copy_polar < 6 > (polar);
+//        default:
+//          spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
+//          CRITICAL_ERROR_POEM
 //      }
-//
-//      if (!polar_copy->is_filled()) { // Pourrait etre retire ?
-//        spdlog::critical("Copying polar while not filled");
-//        CRITICAL_ERROR
+//    }
+
+//    template<size_t _dim>
+//    void copy_polar(std::shared_ptr<PolarBase> polar) {
+//      auto type = polar->type();
+//      switch (type) {
+//        case type::INT:
+//          copy_polar<int, _dim>(polar);
+//          break;
+//        case type::DOUBLE:
+//          copy_polar<double, _dim>(polar);
+//          break;
+//        default:
+//          spdlog::critical("Type is not managed yet");
+//          CRITICAL_ERROR_POEM
 //      }
+//    }
 
-    }
-
-    void generate_attributes_name_map() {
-      NIY_POEM
-      // TODO
-//      for (const auto &attribute: m_attributes) {
-//        auto name = attribute.first;
-//        if (name == "schema") continue;
-//
-//        if (m_schema.is_newest()) {
-//          // The attribute has not changed
-//          m_attributes_name_map.insert({name, name});
-//
-//        } else {
-//          // The attribute may have changed
-//          auto current_name = m_newest_schema.get_newest_attribute_name(name);
-//
-//          // Si current name est vide, on a pas trouve d'alias nulle part
-//          if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
-//            spdlog::critical("No schema compatibility for attribute named {}", name);
-//            CRITICAL_ERROR
-//          }
-//
-//          m_attributes_name_map.insert({current_name, name});
-//
-//        }
-//
-//      }
-
-    }
-
-    void generate_polar_name_map(const std::string &polar_name) {
+//    template<typename T, size_t _dim>
+//    void copy_polar(std::shared_ptr<PolarBase> polar) {
 //      NIY_POEM
+////      auto polar_ = static_cast<Polar<T, _dim> *>(polar);
+////
+////      auto polar_copy = New<T, _dim>(polar_->name(),
+////                                     polar_->unit(),
+////                                     polar_->description(),
+////                                     polar_->type(),
+////                                     polar_->dimension_point_set());
+////
+////      // Filling with values
+////      auto iter = polar_->begin();
+////      for (; iter != polar_->end(); ++iter) {
+////        PolarPoint<T, _dim> polar_point = (*iter).second;
+////        polar_copy->set_point(&polar_point);
+////      }
+////
+////      if (!polar_copy->is_filled()) { // Pourrait etre retire ?
+////        spdlog::critical("Copying polar while not filled");
+////        CRITICAL_ERROR
+////      }
+//
+//    }
 
-//      if (m_schema.is_newest()) {
-//        m_polar_name_map.insert({polar_name, polar_name});
+//    void generate_attributes_name_map() {
+//      NIY_POEM
+//      // TODO
+////      for (const auto &attribute: m_attributes) {
+////        auto name = attribute.first;
+////        if (name == "schema") continue;
+////
+////        if (m_schema.is_newest()) {
+////          // The attribute has not changed
+////          m_attributes_name_map.insert({name, name});
+////
+////        } else {
+////          // The attribute may have changed
+////          auto current_name = m_newest_schema.get_newest_attribute_name(name);
+////
+////          // Si current name est vide, on a pas trouve d'alias nulle part
+////          if (current_name.empty() && m_schema.get_attribute_schema(name).is_required()) {
+////            spdlog::critical("No schema compatibility for attribute named {}", name);
+////            CRITICAL_ERROR
+////          }
+////
+////          m_attributes_name_map.insert({current_name, name});
+////
+////        }
+////
+////      }
 //
-//      } else {
-//        auto newest_name = m_newest_schema.get_newest_variable_name(polar_name);
-//
-//        if (newest_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
-//          spdlog::critical("No schema compatibility for polar named {}", polar_name);
-//          CRITICAL_ERROR_POEM
-//        }
-//
-//        if (newest_name.empty()) {
-//          spdlog::critical("Variable name from old schema has no equivalent in the newest schema");
-//          CRITICAL_ERROR_POEM
-//          // TODO: voir i on ne fait qu'un warning ?
-//        }
-//
-//        m_polar_name_map.insert({newest_name, polar_name});
-//
-//      }
+//    }
 
-    }
+//    void generate_polar_name_map(const std::string &polar_name) {
+////      NIY_POEM
+//
+////      if (m_schema.is_newest()) {
+////        m_polar_name_map.insert({polar_name, polar_name});
+////
+////      } else {
+////        auto newest_name = m_newest_schema.get_newest_variable_name(polar_name);
+////
+////        if (newest_name.empty() && m_schema.get_variable_schema(polar_name).is_required()) {
+////          spdlog::critical("No schema compatibility for polar named {}", polar_name);
+////          CRITICAL_ERROR_POEM
+////        }
+////
+////        if (newest_name.empty()) {
+////          spdlog::critical("Variable name from old schema has no equivalent in the newest schema");
+////          CRITICAL_ERROR_POEM
+////          // TODO: voir i on ne fait qu'un warning ?
+////        }
+////
+////        m_polar_name_map.insert({newest_name, polar_name});
+////
+////      }
+//
+//    }
 
    protected:
-    NameMap m_attributes_name_map;
+    Attributes m_attributes;
+//    NameMap m_attributes_name_map;
 
     PolarMap m_polars_map;
-    NameMap m_polar_name_map;
+//    NameMap m_polar_name_map;
 
     static inline std::mutex m_mutex;
 

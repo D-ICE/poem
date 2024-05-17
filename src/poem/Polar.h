@@ -20,16 +20,9 @@
 #include <MathUtils/RegularGridNearest.h>
 
 #include "Dimensions.h"
+#include "PolarType.h"
 
 namespace poem {
-
-  enum POLAR_TYPE {
-    PPP,
-    HPPP,
-    HVPP_PB,
-    HVPP_HP,
-    VPP,
-  };
 
   // forward declaration
   template<typename T, size_t _dim>
