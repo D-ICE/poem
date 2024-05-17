@@ -24,13 +24,13 @@ namespace poem {
     explicit PerformancePolarSet(const Attributes &attributes) :
         m_attributes(attributes) {}
 
-    std::shared_ptr<PolarSet> new_polar_set(const std::string &name, const Attributes &attributes) {
-      if (exist(name)) {
-        spdlog::critical("Attempting to create a PolarSet with name {} twice", name);
+    std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes) {
+      if (exist(attributes["name"])) {
+        spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
         CRITICAL_ERROR_POEM
       }
       auto polar_set = std::make_shared<PolarSet>(attributes);
-      m_polar_set_map.insert({name, polar_set});
+      m_polar_set_map.insert({attributes["name"], polar_set});
       return polar_set;
     }
 
