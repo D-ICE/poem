@@ -22,7 +22,7 @@ namespace poem {
       m_attributes.insert({name, val});
     }
 
-    bool contains(const std::string &name) {
+    bool contains(const std::string &name) const {
       return m_attributes.find(name) != m_attributes.end();
     }
 

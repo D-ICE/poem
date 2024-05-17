@@ -23,8 +23,18 @@ namespace poem {
    public:
     using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
-    explicit PolarSet(const Attributes &attributes) : m_attributes(attributes) {}
+    explicit PolarSet(const Attributes &attributes) : m_attributes(attributes) {
+      if (!attributes.contains("name")) {
+        spdlog::critical("name attribute is mandatory");
+        CRITICAL_ERROR_POEM
+      }
+      if (!attributes.contains("polar_type")) {
+        spdlog::critical("polar_type attribute is mandatory");
+        CRITICAL_ERROR_POEM
+      }
+      polar_type_s2enum(attributes["polar_type"]); // Throw exception is polar_type is not known
 
+    }
 
     const std::string &name() const { return m_attributes["name"]; }
 
