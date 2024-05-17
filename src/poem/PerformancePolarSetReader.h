@@ -18,11 +18,11 @@ namespace fs = std::filesystem;
 namespace poem {
 
   template<typename T, size_t _dim>
-  void load_polar(const netCDF::NcVar &nc_var,
-                  const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
-                  const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
-                  std::shared_ptr<PolarSet> polar_set,
-                  type::POEM_TYPES var_type) {
+  inline void load_polar(const netCDF::NcVar &nc_var,
+                         const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
+                         const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
+                         std::shared_ptr<PolarSet> polar_set,
+                         type::POEM_TYPES var_type) {
 //    auto nc_var = m_data_file->getVar(var_name);
 
     std::string hash_name;
@@ -76,10 +76,10 @@ namespace poem {
   }
 
   template<size_t _dim>
-  void load_polar(const netCDF::NcVar &nc_var,
-                  const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
-                  const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
-                  std::shared_ptr<PolarSet> polar_set) {
+  inline void load_polar(const netCDF::NcVar &nc_var,
+                         const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
+                         const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
+                         std::shared_ptr<PolarSet> polar_set) {
 //    auto nc_var = m_data_file->getVar(var_name);
 
     auto type = nc_var.getType();
@@ -96,10 +96,10 @@ namespace poem {
     }
   }
 
-  void load_polar(const netCDF::NcVar &nc_var,
-                  const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
-                  const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
-                  std::shared_ptr<PolarSet> polar_set) {
+  inline void load_polar(const netCDF::NcVar &nc_var,
+                         const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
+                         const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
+                         std::shared_ptr<PolarSet> polar_set) {
 
 //    auto nc_var = group.getVar(var_name);
     size_t nbdim = nc_var.getDimCount();
@@ -124,7 +124,7 @@ namespace poem {
   }
 
 
-  std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group) {
+  inline std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group) {
 
     Attributes attributes;
     for (const auto &att: group.getAtts()) {
@@ -172,7 +172,7 @@ namespace poem {
   }
 
 
-  std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const netCDF::NcGroup &group) {
+  inline std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const netCDF::NcGroup &group) {
     // Get attributes from the group
     Attributes attributes;
     for (const auto &att: group.getAtts()) {
@@ -198,7 +198,7 @@ namespace poem {
     return performance_polar_set;
   }
 
-  std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const std::string &nc_polar) {
+  inline std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const std::string &nc_polar) {
     // Does the file exist
     if (!fs::exists(nc_polar)) {
       spdlog::critical("Polar file {} NOT FOUND", nc_polar);
