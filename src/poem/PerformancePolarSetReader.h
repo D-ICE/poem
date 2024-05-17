@@ -63,7 +63,6 @@ namespace poem {
                                                unit,
                                                description,
                                                var_type,
-                                               polar_set->polar_type(),
                                                dimension_point_set);
 
     // Get values from nc_var

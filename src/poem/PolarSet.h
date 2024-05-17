@@ -23,17 +23,14 @@ namespace poem {
    public:
     using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
-    explicit PolarSet(const Attributes &attributes) : m_attributes(attributes) {
-      if (!attributes.contains("name")) {
-        spdlog::critical("name attribute is mandatory");
-        CRITICAL_ERROR_POEM
-      }
-      if (!attributes.contains("polar_type")) {
-        spdlog::critical("polar_type attribute is mandatory");
-        CRITICAL_ERROR_POEM
-      }
-      polar_type_s2enum(attributes["polar_type"]); // Throw exception is polar_type is not known
+    explicit PolarSet(const Attributes &attributes) :
+        m_attributes(attributes),
+        m_polar_type(polar_type_s2enum(attributes["polar_type"])) {
 
+      if (!attributes.contains("name")) {
+        spdlog::critical("name attribute is mandatory for PolarSet");
+        CRITICAL_ERROR_POEM
+      }
     }
 
     const std::string &name() const { return m_attributes["name"]; }
@@ -51,7 +48,6 @@ namespace poem {
                                               const std::string &unit,
                                               const std::string &description,
                                               type::POEM_TYPES type,
-                                              POLAR_TYPE polar_type,
                                               std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       // Thread safety
@@ -61,7 +57,7 @@ namespace poem {
         return std::reinterpret_pointer_cast<Polar<T, _dim>>(m_polars_map.at(name));
       }
 
-      auto polar = std::make_shared<Polar<T, _dim>>(name, unit, description, type, polar_type, dimension_point_set);
+      auto polar = std::make_shared<Polar<T, _dim>>(name, unit, description, type, m_polar_type, dimension_point_set);
 
       m_polars_map.insert({name, polar});
 
@@ -259,6 +255,7 @@ namespace poem {
 
    protected:
     Attributes m_attributes;
+    POLAR_TYPE m_polar_type;
 //    NameMap m_attributes_name_map;
 
     PolarMap m_polars_map;

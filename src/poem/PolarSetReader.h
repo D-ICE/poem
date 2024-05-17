@@ -249,9 +249,7 @@ namespace poem {
     auto polar_type = poem::PPP;
 
     // Create the polar into the polar set
-    auto polar = m_polar_set->new_polar<T, _dim>(var_name, unit, description,
-                                                 var_type, polar_type,
-                                                 dimension_point_set);
+    auto polar = m_polar_set->new_polar<T, _dim>(var_name, unit, description, var_type, dimension_point_set);
 
     // Get values from nc_var
     auto polar_size = dimension_point_set->size();

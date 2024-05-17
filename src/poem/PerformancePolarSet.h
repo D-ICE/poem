@@ -21,16 +21,15 @@ namespace poem {
     using PolarSetConstIter = PolarSetMap::const_iterator;
 
    public:
-    explicit PerformancePolarSet(const Attributes &attributes) :
-        m_attributes(attributes) {}
+    explicit PerformancePolarSet(const Attributes &attributes) : m_attributes(attributes) {}
 
     std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes) {
-      if (exist(attributes["name"])) {
+      if (exist(attributes["polar_type"])) {
         spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
         CRITICAL_ERROR_POEM
       }
       auto polar_set = std::make_shared<PolarSet>(attributes);
-      m_polar_set_map.insert({attributes["name"], polar_set});
+      m_polar_set_map.insert({attributes["polar_type"], polar_set});
       return polar_set;
     }
 
@@ -38,8 +37,12 @@ namespace poem {
       return m_attributes["name"];
     }
 
+    POLAR_TYPE polar_type() const {
+      return polar_type_s2enum(m_attributes["polar_type"]);
+    }
+
     void AddPolarSet(std::shared_ptr<PolarSet> polar_set) {
-      if (exist(polar_set->name())) {
+      if (exist(polar_set->polar_type_str())) {
         spdlog::critical("Attempting to add a PolarSet with name {} that is already present", polar_set->name());
         CRITICAL_ERROR_POEM
       }
