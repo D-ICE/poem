@@ -42,6 +42,10 @@ namespace poem {
       return polar_type_s2enum(m_attributes["polar_type"]);
     }
 
+    const std::string &polar_type_str() const {
+      return m_attributes["polar_type"];
+    }
+
     template<typename T, size_t _dim>
     std::shared_ptr<Polar<T, _dim>> new_polar(const std::string &name,
                                               const std::string &unit,

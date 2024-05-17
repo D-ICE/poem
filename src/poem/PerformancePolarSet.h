@@ -105,7 +105,7 @@ namespace poem {
         }
 
         for (const auto &polar_set: *this) {
-          auto group = dataFile.addGroup(polar_set.first);
+          auto group = dataFile.addGroup(polar_set.second->polar_type_str());
           polar_set.second->to_netcdf(group);
         }
 
