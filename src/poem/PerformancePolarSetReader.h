@@ -10,6 +10,10 @@
 #include <spdlog/spdlog.h>
 #include <netcdf>
 
+#include "Dimensions.h"
+#include "PolarSet.h"
+#include "PerformancePolarSet.h"
+
 #include "exceptions.h"
 
 namespace fs = std::filesystem;
