@@ -12,5 +12,6 @@
 #include "Splitter.h"
 #include "PerformancePolarSetReader.h"
 #include "PolarSetReader.h"
+#include "poem/version.h"
 
 #endif //POEM_POEM_H

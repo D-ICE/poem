@@ -33,6 +33,9 @@ namespace poem {
       polar_type = MVPP;
     } else if (polar_type_ == "VPP") {
       polar_type = VPP;
+    } else if (polar_type_ == "ND") {
+      // This is the v0 version of POEM specs...
+      polar_type = HPPP;
     } else {
       spdlog::critical("Polar type \"{}\" unknown", polar_type);
       CRITICAL_ERROR_POEM

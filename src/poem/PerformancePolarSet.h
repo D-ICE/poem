@@ -2,6 +2,7 @@
 // Created by frongere on 31/10/23.
 //
 
+
 #ifndef POEM_PERFORMANCEPOLARSET_H
 #define POEM_PERFORMANCEPOLARSET_H
 
@@ -11,9 +12,13 @@
 #include "PolarSet.h"
 #include "Attributes.h"
 
+
 namespace fs = std::filesystem;
 
 namespace poem {
+
+  // Forward declaration
+  class SpecChecker;
 
   class PerformancePolarSet {
     using PolarSetMap = std::unordered_map<std::string, std::shared_ptr<PolarSet>>;

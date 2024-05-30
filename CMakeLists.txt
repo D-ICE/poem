@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.11)
 
 project(poem)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #-----------------------------------------------------------------------------
 # Prevent in-source builds
@@ -15,6 +17,7 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
+option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " OFF)
 
 
 cmake_policy(SET CMP0135 NEW)
@@ -42,6 +45,7 @@ include(Add_curl)
 include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
+include(Add_semver)
 
 
 add_subdirectory(src/poem)

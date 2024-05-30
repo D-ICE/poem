@@ -10,6 +10,7 @@
 #include <dunits/dunits.h>
 
 #include "poem/exceptions.h"
+#include "poem/version.h"
 
 namespace poem {
 
@@ -40,6 +41,14 @@ namespace poem {
         m_type(type) {
 
       check_unit();
+
+      #ifndef ALLOW_DIRTY
+      if (version::AnyUncommittedChanges()) {
+        spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
+                         version::GetNormalizedVersionString());
+        CRITICAL_ERROR_POEM
+      }
+      #endif
     }
 
     const std::string &name() const { return m_name; }

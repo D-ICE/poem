@@ -27,9 +27,11 @@ namespace poem {
         m_attributes(attributes),
         m_polar_type(polar_type_s2enum(attributes["polar_type"])) {
 
-      if (!attributes.contains("name")) {
-        spdlog::critical("name attribute is mandatory for PolarSet");
-        CRITICAL_ERROR_POEM
+      if (attributes["polar_type"] != "ND") {  // ND is for v0 that do not contain groups...
+        if (!attributes.contains("name")) {
+          spdlog::critical("name attribute is mandatory for PolarSet");
+          CRITICAL_ERROR_POEM
+        }
       }
     }
 
@@ -256,15 +258,10 @@ namespace poem {
    protected:
     Attributes m_attributes;
     POLAR_TYPE m_polar_type;
-//    NameMap m_attributes_name_map;
 
     PolarMap m_polars_map;
-//    NameMap m_polar_name_map;
 
     static inline std::mutex m_mutex;
-
-//    Schema m_schema;
-//    Schema m_newest_schema;
   };
 
 }  // poem

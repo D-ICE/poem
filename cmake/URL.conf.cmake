@@ -60,3 +60,7 @@ set(spdlog_TAG v1.11.0 CACHE STRING "spdlog version")
 # argparse
 set(argparse_URL https://github.com/p-ranav/argparse.git)
 set(argparse_TAG v2.2 CACHE STRING "argparse version")
+
+# semver
+set(semver_URL https://github.com/z4kn4fein/cpp-semver.git)
+set(semver_TAG v0.3.3 CACHE STRING "semantic versioning parsing")
