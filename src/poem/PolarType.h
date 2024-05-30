@@ -8,6 +8,8 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
+#include "exceptions.h"
+
 namespace poem {
 
   enum POLAR_TYPE {
