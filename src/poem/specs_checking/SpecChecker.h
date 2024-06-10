@@ -19,78 +19,6 @@
 
 namespace poem {
 
-  namespace internal {
-    struct RuleBase {
-      virtual bool check(const netCDF::NcGroup &group) const = 0;
-    };
-  }  // poem::internal
-
-
-  /**
-   * Main DataSet MUST have an attribute named polar_type with the value "ND"
-   * This is used to identify that a NetCDF file is a POEM File
-   */
-  class Rule_1 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-  /**
-   * Each Dataset must define specific dimensions
-   */
-  class Rule_2 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-  /**
-   * Coordinate Variables from R2 must be of type double and be a strictly increasing list of positive numbers
-   */
-  class Rule_3 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-  /**
-   * Angular Coordinate Variables from R2 must be numbers between 0 and 180 deg
-   */
-  class Rule_4 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-  /**
-   * Mandatory Variables
-   */
-  class Rule_5 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-  /**
-   * Variables from R5 must depend on a strict order of dimensions
-   */
-  class Rule_6 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-  /**
-   * Every Coordinate Variables and Variables must have unit and description attributes
-   */
-  class Rule_7 : public internal::RuleBase {
-    bool check(const netCDF::NcGroup &group) const override {
-      NIY_POEM
-    }
-  };
-
-
   class SpecChecker {
    public:
     explicit SpecChecker(const std::string &nc_polar) : m_polar_file(nc_polar) {
@@ -151,10 +79,31 @@ namespace poem {
       return compliant;
     }
 
+    [[nodiscard]] std::vector<std::string> mandatory_variables() const {
+      switch (m_poem_file_version.major()) {
+        case 0:
+          return v0::mandatory_variables();
+        default:
+          spdlog::critical("No specification rules available for POEM File format version {}",
+                           m_poem_file_version.str());
+          CRITICAL_ERROR_POEM
+      }
+    }
+
+    [[nodiscard]] std::vector<std::string> understood_variables() const {
+      switch (m_poem_file_version.major()) {
+        case 0:
+          return v0::understood_variables();
+        default:
+          spdlog::critical("No specification rules available for POEM File format version {}",
+                           m_poem_file_version.str());
+          CRITICAL_ERROR_POEM
+      }
+    }
+
    private:
     std::string m_polar_file;
     semver::version m_poem_file_version;
-//    std::vector<std::unique_ptr<internal::RuleBase>> m_rules;
 
   };
 

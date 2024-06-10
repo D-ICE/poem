@@ -21,10 +21,8 @@ namespace poem {
 
     template<typename T, size_t _dim>
     inline void read_polar(const netCDF::NcVar &nc_var,
-                           const std::unordered_map<std::string,
-                           std::shared_ptr<Dimension>> &dimension_map,
-                           const std::unordered_map<std::string,
-                           std::vector<double>> &dimension_values_map,
+                           const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
+                           const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
                            std::shared_ptr<PolarSet> polar_set,
                            type::POEM_TYPES var_type) {
 
@@ -79,10 +77,8 @@ namespace poem {
 
     template<size_t _dim>
     inline void read_polar(const netCDF::NcVar &nc_var,
-                           const std::unordered_map<std::string,
-                           std::shared_ptr<Dimension>> &dimension_map,
-                           const std::unordered_map<std::string,
-                           std::vector<double>> &dimension_values_map,
+                           const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
+                           const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
                            std::shared_ptr<PolarSet> polar_set) {
 
       auto type = nc_var.getType();
@@ -102,10 +98,8 @@ namespace poem {
   } // details
 
   inline void read_polar(const netCDF::NcVar &nc_var,
-                         const std::unordered_map<std::string,
-                         std::shared_ptr<Dimension>> &dimension_map,
-                         const std::unordered_map<std::string,
-                         std::vector<double>> &dimension_values_map,
+                         const std::unordered_map<std::string, std::shared_ptr<Dimension>> &dimension_map,
+                         const std::unordered_map<std::string, std::vector<double>> &dimension_values_map,
                          std::shared_ptr<PolarSet> polar_set) {
 
     size_t nbdim = nc_var.getDimCount();
@@ -221,7 +215,7 @@ namespace poem {
     }
 
     return performance_polar_set;
-}
+  }
 
   inline std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const std::string &nc_polar) {
 

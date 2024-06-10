@@ -8,6 +8,8 @@
 #include <spdlog/spdlog.h>
 #include <poem/poem.h>
 
+#include "nc_file_manipulation.h"
+
 namespace fs = std::filesystem;
 using namespace poem;
 
@@ -18,6 +20,26 @@ int main(int argc, char *argv[]) {
 
   program.add_argument("polar_file")
       .help("input polar file in NetCDF-4 format that follows the POEM file format specifications");
+
+  program.add_argument("--info", "-i")
+      .help("Get informations on the file")
+      .implicit_value(true)
+      .default_value(false);
+
+  program.add_argument("--description-file", "-df")
+      .help("Get an ASCII file with every coordinates")
+      .implicit_value(true)
+      .default_value(false);
+
+  program.add_argument("--rename-variable", "-rv")
+      .help("Rename a variable")
+      .nargs(2);
+
+  program.add_argument("--reduce")
+      .help(
+          "Takes a json file produced by the --description-file option and delete any variables that are commented in "
+          "the variable vector field")
+      .nargs(1);
 
   // Parsing command line arguments
   try {
@@ -37,12 +59,25 @@ int main(int argc, char *argv[]) {
 
   spdlog::info("Reading polar file {}", polar_file.string());
 
-  SpecChecker spec_checker(polar_file);
-  spec_checker.check();
-//  auto performance_polar_set = read_performance_polar_set(polar_file);
+  // Check poem file format
+  SpecChecker checker(polar_file);
+  checker.check();
+
+  if (program["--info"] == true) {
+    NIY_POEM
+  }
 
 
-  // Mettre en place la possibilite de changer le nom d'une variable
+  if (program.is_used("--rename-variable")) {
+    auto var_names = program.get<std::vector<std::string>>("--rename-variable");
+    rename_variable(polar_file, var_names.at(0), var_names.at(1));
+  }
+
+  if (program["--description-file"] == true) {
+    std::string description_file = polar_file.parent_path() / (polar_file.stem().string() + ".json");
+    get_variable_file(polar_file, description_file, checker.mandatory_variables(), checker.understood_variables());
+  }
+
 
 
 
@@ -58,15 +93,11 @@ int main(int argc, char *argv[]) {
    *
    *
    * avoir des infos sur une polaire
-   * check si une polaire est au bon format poem
-   * lister les PolarSet disponibles dans un fichier netCDF
-   * pour un PolarSet présent, lister les variables (et les cracher dans un fichier utilisable par mship)
+   * check si une polaire est au bon format poem -> OK
+   * lister les PolarSet disponibles dans un fichier netCDF -> TODO
+   * pour un PolarSet présent, lister les variables (et les cracher dans un fichier utilisable par mship) -> OK
    *
    */
 
 
-
-
-
 }
-

@@ -12,6 +12,14 @@
 
 namespace poem::v0 {
 
+  std::vector<std::string> mandatory_variables() {
+    return {"BrakePower", "LEEWAY"};
+  }
+
+  std::vector<std::string> understood_variables() {
+    return {"conso_t_h", "HEELING"};
+  }
+
   bool check_attribute(const netCDF::NcVar &var,
                        const std::string &att_name,
                        bool verbose,
@@ -116,7 +124,6 @@ namespace poem::v0 {
     if (group.getDims().contains(coord_name)) {
       dim = group.getDim(coord_name);
       dim_size = dim.getSize();
-      values.reserve(dim_size);
     } else {
       if (verbose) spdlog::warn("In {}, no dimension named {}", group.getName(), coord_name);
       return false;
@@ -124,6 +131,7 @@ namespace poem::v0 {
 
     // Get the variable
     netCDF::NcVar var;
+    std::vector<double> values_(dim_size);
     if (group.getCoordVars().contains(coord_name)) {
       var = group.getVar(coord_name);
       if (var.getDims().size() != 1) {
@@ -134,7 +142,7 @@ namespace poem::v0 {
         if (verbose) spdlog::warn("Coordinate Variable {} must have dimension of the same name", var.getName());
         return false;
       }
-      var.getVar(values.data());
+      var.getVar(values_.data());
 
     } else {
       if (verbose) spdlog::warn("No dimension named {}", coord_name);
@@ -148,6 +156,8 @@ namespace poem::v0 {
     if (!check_attribute(var, "description", verbose)) {
       return false;
     }
+
+    values = values_;
 
     return true;
   }
@@ -218,7 +228,7 @@ namespace poem::v0 {
 
     /// Rule 5: Mandatory variables
     compliant = true;
-    compliant = check_mandatory_variable(ncfile, "TotalBrakePower", "kW", verbose) & compliant;
+    compliant = check_mandatory_variable(ncfile, "BrakePower", "kW", verbose) & compliant;
     compliant = check_mandatory_variable(ncfile, "LEEWAY", "deg", verbose) & compliant;
 
     if (!compliant) {
@@ -236,7 +246,7 @@ namespace poem::v0 {
     dims.push_back(ncfile.getDim("WA_deg"));
     dims.push_back(ncfile.getDim("Hs_m"));
 
-    compliant = check_mandatory_variable_dimensions(ncfile.getVar("TotalBrakePower"), dims, verbose) & compliant;
+    compliant = check_mandatory_variable_dimensions(ncfile.getVar("BrakePower"), dims, verbose) & compliant;
     compliant = check_mandatory_variable_dimensions(ncfile.getVar("LEEWAY"), dims, verbose) & compliant;
 
     if (!compliant) {
@@ -248,6 +258,7 @@ namespace poem::v0 {
 
     ncfile.close();
 
+    return true;
   }
 
 }  // poem::v0
