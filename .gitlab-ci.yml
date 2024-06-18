@@ -1,0 +1,36 @@
+include:
+  - project: 'common/ci-utils'
+    file:
+      - '/templates/.add-ssh-key.yml'
+      - '/templates/.add-aws-key.yml'
+
+.build:
+
+  before_script:
+    - !reference [ .add-ssh-key, before_script ]
+    - !reference [ .add-aws-key, before_script ]
+    - apt update
+    - apt remove cmake
+    - apt install -y python3 python3-pip git build-essential libboost-dev
+    - pip install cmake
+
+  script:
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TOOLS=ON -DPOEM_BUILD_TESTS=OFF -DESPERADO_BUILD_TOOLS=ON -DESPERADO_GET_WAPITI=OFF -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd) ..
+    - make poem -j6
+
+
+build-testing-ubuntu20.04:
+
+  image: ubuntu:20.04
+
+  except:
+    - tags
+    - master
+
+  before_script:
+    - !reference [ .build, before_script ]
+
+  script:
+    - !reference [ .build, script ]
+
