@@ -6,5 +6,6 @@
 #define POEM_RULES_H
 
 #include "rules_v0.h"
+// Include one header file per poem file version
 
 #endif //POEM_RULES_H

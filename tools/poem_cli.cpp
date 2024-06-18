@@ -7,7 +7,6 @@
 #include <argparse/argparse.hpp>
 #include <spdlog/spdlog.h>
 #include <poem/poem.h>
-#include <nlohmann/json.hpp>
 
 #include "nc_file_manipulation.h"
 
@@ -46,10 +45,15 @@ int main(int argc, char *argv[]) {
       .append()
       .nargs(2);
 
-  program.add_argument("--clean")
-      .help(
-          "Takes a json file produced by the --description-file option and delete any variables that are commented in "
-          "the variable vector field")
+  program.add_argument("--clean-explicit", "-ce")
+      .help("Takes a json file produced by the --description-file option and delete any variables that are "
+            "explicitly commented in the optional_variables section. If a variable does not appear in the list, "
+            "it is kept.")
+      .nargs(1);
+
+  program.add_argument("--clean-all-except", "-ca")
+      .help("Takes a json file produced by the --description-file option and delete any variables that are "
+            "not explicitly marked as kept. If a variable does not appear in the list, it is deleted")
       .nargs(1);
 
   // Parsing command line arguments
@@ -73,49 +77,17 @@ int main(int argc, char *argv[]) {
   // Check poem file format
   spdlog::info("Checking POEM file format version compliance");
   SpecRulesChecker checker(polar_file, true);
-  checker.check(true);
+  if (checker.check(true)) {
+    spdlog::info("File is compliant wit POEM specification version: {}", checker.version().major());
+  }
 
   if (program["--info"] == true) {
     get_info(polar_file);
   }
 
   bool force_overwrite = (program["--force"] == true);
-
-  /**
-   * Output file
-   */
-  fs::path output_file;
-
-  if (program.is_used("--output")) {
-    // Does this file exist?
-    output_file = program.get<std::string>("--output");
-    if (fs::exists(output_file) && !force_overwrite) {
-//      if (!force_overwrite) {
-      spdlog::critical("Cannot overwrite file {}", output_file.string());
-      spdlog::critical("Please use --force (-f) option to overwrite (use with caution!)");
-      CRITICAL_ERROR_POEM
-//      }
-    }
-
-    // First make a copy of polar_file
-    if (output_file.is_relative()) {
-      output_file = fs::weakly_canonical(fs::current_path() / output_file);
-//      std::cout << output_file << std::endl;
-    }
-
-//    spdlog::info("Copying {} to {}", polar_file.string(), output_file.string());
-//    if (force_overwrite) {
-//      fs::copy_file(polar_file, output_file, fs::copy_options::overwrite_existing);
-//    }
-
-  } else {
-    // No output file given, directly
-    if (!force_overwrite) {
-      spdlog::critical("Cannot overwrite file {}", polar_file.string());
-      spdlog::critical("Please use --force (-f) option or specify other file name with --output (-o) option");
-      CRITICAL_ERROR_POEM
-    }
-    output_file = polar_file;
+  if (force_overwrite) {
+    spdlog::warn("--force option is used. If a file exists, it will be overwritten");
   }
 
   /**
@@ -127,7 +99,6 @@ int main(int argc, char *argv[]) {
     build_description_file(polar_file, description_file);
     spdlog::info("Description file written: {}", description_file.string());
   }
-
 
   bool rewrite_file = false;
   /**
@@ -147,28 +118,71 @@ int main(int argc, char *argv[]) {
   /**
    * Cleaning
    */
-  std::vector<std::string> kept_variables_names= {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m", "TotalBrakePower"};
-  if (program.is_used("--clean")) {
-    fs::path description_file = program.get<std::string>("--clean");
+  VariablesCleaner cleaner;
+  if (program.is_used("--clean-explicit") || program.is_used("--clean-all-except")) {
+    fs::path description_file;
+    VariablesCleaner::MODE mode;
+    if (program.is_used("--clean-explicit")) {
+      description_file = program.get<std::string>("--clean-explicit");
+      mode = VariablesCleaner::MODE::REMOVE_EXPLICIT;
+    } else {
+      description_file = program.get<std::string>("--clean-all-except");
+      mode = VariablesCleaner::MODE::REMOVE_ALL_EXCEPT;
+    }
+
     if (!fs::exists(description_file)) {
       spdlog::critical("Description file not found: {}", description_file.string());
       CRITICAL_ERROR_POEM
     }
-    spdlog::info("Cleaning file using description file {}", description_file.string());
+    spdlog::info("Using the following file for cleaning: {}", description_file.string());
     description_file = fs::canonical(description_file);
 
-
-
-    // TODO: on change le fichier...
-    // QUESTION: est-ce qu'on copie le fichier puis on le modifie ou bien on itere sur le contenu et si on ne garde pas
-    //  un variable on la copie pas ?
+    cleaner = VariablesCleaner(description_file, mode);
     rewrite_file = true;
+  }
+
+  /**
+   * Output file
+   */
+  fs::path output_file;
+  if (rewrite_file) {
+
+    if (program.is_used("--output")) {
+      // Does this file exist?
+      output_file = program.get<std::string>("--output");
+      if (fs::exists(output_file)) {
+        if (force_overwrite) {
+          spdlog::warn("This file is going to be overwritten: {}", output_file.string());
+        } else {
+          spdlog::critical("Cannot overwrite file {}", output_file.string());
+          spdlog::critical("Please use --force (-f) option to overwrite (use with caution!)");
+          CRITICAL_ERROR_POEM
+        }
+      }
+
+      // First make a copy of polar_file
+      if (output_file.is_relative()) {
+        output_file = fs::weakly_canonical(fs::current_path() / output_file);
+      }
+
+    } else {
+      // No output file given
+      if (force_overwrite) {
+        spdlog::warn("This file is going to be overwritten: {}", polar_file.string());
+      } else {
+        spdlog::critical("Cannot overwrite file {}", polar_file.string());
+        spdlog::critical("Please use --force (-f) option or specify other file name with --output (-o) option");
+        CRITICAL_ERROR_POEM
+      }
+      output_file = polar_file;
+    }
   }
 
 
   if (rewrite_file) {
+    // We re-write the file by applying renaming and cleaning variables
     fs::path tmp_file = polar_file.string() + ".tmp";
-    nc_duplicate(polar_file, tmp_file, new_varnames_map, kept_variables_names);
+    nc_duplicate(polar_file, tmp_file, new_varnames_map, cleaner);
     fs::rename(tmp_file, output_file);
     spdlog::info("File written: {}", output_file.string());
   }

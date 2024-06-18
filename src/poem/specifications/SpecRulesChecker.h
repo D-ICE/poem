@@ -19,9 +19,70 @@
 
 namespace poem {
 
+  static int max_poem_file_version = 0;
+
+  class SpecRules {
+   public:
+    explicit SpecRules(int version_major) : m_version_major(version_major) {
+      if (version_major > max_poem_file_version) {
+        spdlog::critical("Could not invoque Specification Rules for version {} (max version is currently {})",
+                         version_major, max_poem_file_version);
+        CRITICAL_ERROR_POEM
+      }
+    }
+
+    bool check_rules(const std::string &nc_polar_file, bool verbose) const {
+      bool compliant;
+      switch (m_version_major) {
+        case 0:
+          compliant = poem::v0::check_rules(nc_polar_file, verbose);
+          break;
+          // Add here new cases when new specification version is released
+      }
+      return compliant;
+    }
+
+    [[nodiscard]] std::vector<std::string> coordinate_variables() const {
+      std::vector<std::string> vars;
+      switch (m_version_major) {
+        case 0:
+          vars = poem::v0::coordinate_variables();
+          break;
+          // Add here new cases when new specification version is released
+      }
+      return vars;
+    }
+
+    [[nodiscard]] std::vector<std::string> mandatory_variables() const {
+      std::vector<std::string> vars;
+      switch (m_version_major) {
+        case 0:
+          vars = poem::v0::mandatory_variables();
+          break;
+          // Add here new cases when new specification version is released
+      }
+      return vars;
+    }
+
+    [[nodiscard]] std::vector<std::string> understood_variables() const {
+      std::vector<std::string> vars;
+      switch (m_version_major) {
+        case 0:
+          vars = poem::v0::understood_variables();
+          break;
+          // Add here new cases when new specification version is released
+      }
+      return vars;
+    }
+
+   private:
+    int m_version_major;
+  };
+
+
   class SpecRulesChecker {
    public:
-    explicit SpecRulesChecker(const std::string &nc_polar, bool verbose) : m_polar_file(nc_polar) {
+    explicit SpecRulesChecker(const std::string &nc_polar, bool verbose) : m_polar_file(nc_polar), m_rules(0) {
 
       // Does the file exist
       if (!fs::exists(nc_polar)) {
@@ -60,6 +121,8 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
 
+      m_rules = SpecRules(m_poem_file_version.major());
+
     }
 
     const semver::version &version() const {
@@ -67,47 +130,25 @@ namespace poem {
     }
 
     bool check(bool verbose) const {
+      return m_rules.check_rules(m_polar_file, verbose);
+    }
 
-      bool compliant = false;
-
-      switch (m_poem_file_version.major()) {
-        case 0:
-          compliant = v0::check_rules(m_polar_file, verbose);
-          break;
-        default:
-          spdlog::critical("No specification rules available for POEM File format version {}",
-                           m_poem_file_version.str());
-          CRITICAL_ERROR_POEM
-      }
-
-      return compliant;
+    [[nodiscard]] std::vector<std::string> coordinate_variables() const {
+      return m_rules.coordinate_variables();
     }
 
     [[nodiscard]] std::vector<std::string> mandatory_variables() const {
-      switch (m_poem_file_version.major()) {
-        case 0:
-          return v0::mandatory_variables();
-        default:
-          spdlog::critical("No specification rules available for POEM File format version {}",
-                           m_poem_file_version.str());
-          CRITICAL_ERROR_POEM
-      }
+      return m_rules.mandatory_variables();
     }
 
     [[nodiscard]] std::vector<std::string> understood_variables() const {
-      switch (m_poem_file_version.major()) {
-        case 0:
-          return v0::understood_variables();
-        default:
-          spdlog::critical("No specification rules available for POEM File format version {}",
-                           m_poem_file_version.str());
-          CRITICAL_ERROR_POEM
-      }
+      return m_rules.understood_variables();
     }
 
    private:
     std::string m_polar_file;
     semver::version m_poem_file_version;
+    SpecRules m_rules;
 
   };
 

@@ -24,11 +24,17 @@
 
 namespace poem::v0 {
 
+  std::vector<std::string> coordinate_variables() {
+    return {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"};
+  }
+
   std::vector<std::string> mandatory_variables() {
+    // Coordinate variables are also mandatory
     return {"BrakePower", "LEEWAY"};
   }
 
   std::vector<std::string> understood_variables() {
+    // Those are special variables that can have a special treatment if present but are not mandatory
     return {"conso_t_h", "HEELING"};
   }
 
@@ -180,7 +186,9 @@ namespace poem::v0 {
 
     netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
 
-    /// Rule 1: polar_type attribute
+    /**
+     * Rule 1: polar_type attribute
+     */
     compliant = true;
     if (ncfile.getAtts().contains("polar_type")) {
       std::string polar_type;
@@ -198,7 +206,9 @@ namespace poem::v0 {
       return false;
     }
 
-    /// Rule 2: Mandatory dimensions
+    /**
+     * Rule 2: Mandatory dimensions
+     */
     compliant = true;
     std::vector<double> STW_kt, TWS_kt, TWA_deg, WA_deg, Hs_m;
     compliant = check_coord_var(ncfile, "STW_kt", "kt", STW_kt, verbose) & compliant;
@@ -212,7 +222,9 @@ namespace poem::v0 {
       return false;
     }
 
-    /// Rule 3: strictly increasing list of positive numbers
+    /**
+     * Rule 3: strictly increasing list of positive numbers
+     */
     compliant = true;
     compliant = check_coord_var_values(STW_kt, verbose) & compliant;
     compliant = check_coord_var_values(TWS_kt, verbose) & compliant;
@@ -225,7 +237,9 @@ namespace poem::v0 {
       return false;
     }
 
-    /// Rule 4: Angular Coordinate Variables between 0 and 180 deg
+    /**
+     * Rule 4: Angular Coordinate Variables between 0 and 180 deg
+     */
     compliant = true;
     compliant = check_coord_var_values_bounds(STW_kt, verbose) & compliant;
     compliant = check_coord_var_values_bounds(TWS_kt, verbose) & compliant;
@@ -238,7 +252,9 @@ namespace poem::v0 {
       return false;
     }
 
-    /// Rule 5: Mandatory variables
+    /**
+     * Rule 5: Mandatory variables
+     */
     compliant = true;
     compliant = check_mandatory_variable(ncfile, "BrakePower", "kW", verbose) & compliant;
     compliant = check_mandatory_variable(ncfile, "LEEWAY", "deg", verbose) & compliant;
@@ -248,7 +264,9 @@ namespace poem::v0 {
       return false;
     }
 
-    /// Rule 6: Variables dimensions
+    /**
+     * Rule 6: Variables dimensions
+     */
     compliant = true;
     std::vector<netCDF::NcDim> dims;
     dims.reserve(5);
@@ -266,7 +284,25 @@ namespace poem::v0 {
       return false;
     }
 
-    /// Rule 7:
+    /**
+     * Rule 7: Coordinate Variables and Variables must define Attributes unit and description
+     */
+    compliant = true;
+    for (const auto& var : ncfile.getVars()) {
+      if (!check_attribute(var.second, "unit", verbose)) {
+        compliant = false;
+        break;
+      }
+      if (!check_attribute(var.second, "description", verbose)) {
+        compliant = false;
+        break;
+      }
+    }
+
+    if (!compliant) {
+      if (verbose) spdlog::critical("Not compliant with v0/R7");
+      return false;
+    }
 
     ncfile.close();
 

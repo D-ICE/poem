@@ -150,6 +150,7 @@ namespace poem {
 
           // The dimension as a variable
           netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
+          nc_var.setCompression(true, true, 5);
           nc_var.putVar(values.data());
           /*
            * FIXME: les attributs ici sont completement decorreles du schema...
