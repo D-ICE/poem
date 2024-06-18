@@ -92,10 +92,10 @@ namespace poem {
 
       semver::version current_poem_version;
       try {
-        current_poem_version = semver::version::parse(version::LastTag(), false);
+        current_poem_version = semver::version::parse(git::LastTag(), false);
       } catch (const semver::semver_exception &e) {
         spdlog::critical("Current POEM version {} is not a valid version (does not follow semantic versioning)",
-                         version::LastTag());
+                         git::LastTag());
         CRITICAL_ERROR_POEM
       }
       if (verbose) spdlog::info("Current POEM version is v{}", current_poem_version.str());

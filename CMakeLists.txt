@@ -25,12 +25,23 @@ cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
 
 #=============================================================================
+# Retrieving the current Git revision
+#=============================================================================
+set(PRE_CONFIGURE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/poem/version.h.in CACHE FILEPATH "" FORCE)
+set(POST_CONFIGURE_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/poem/version.h CACHE FILEPATH "" FORCE)
+set(GIT_WORKING_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE FILEPATH "" FORCE)
+set(GIT_STATE_FILE ${CMAKE_CURRENT_BINARY_DIR}/git-state-hash CACHE FILEPATH "" FORCE)
+include(cmake/git_watcher.cmake)
+
+if (NOT EXISTS ${POST_CONFIGURE_FILE})
+    configure_file(${PRE_CONFIGURE_FILE} ${POST_CONFIGURE_FILE})
+endif ()
+
+#=============================================================================
 # Dependencies
 #=============================================================================
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/URL.conf.cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-include(Add_version)
 
 include(Add_boost)
 include(Add_mathutils)
@@ -46,7 +57,6 @@ include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
 include(Add_semver)
-
 
 add_subdirectory(src/poem)
 

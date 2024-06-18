@@ -1,2 +1,0 @@
-
-On pourrait quand meme mettre la version de poem dans les attributs

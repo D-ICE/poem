@@ -16,7 +16,7 @@ using namespace poem;
 
 int main(int argc, char *argv[]) {
 
-  argparse::ArgumentParser program("poem", version::GetNormalizedVersionString());
+  argparse::ArgumentParser program("poem", git::GetNormalizedVersionString());
 
   program.add_argument("polar_file")
       .help("input polar file in NetCDF-4 format that follows the POEM file format specifications");
@@ -95,6 +95,7 @@ int main(int argc, char *argv[]) {
    */
 
   if (program["--description-file"] == true) {
+    // TODO: le force_overwrite devrait egalement etre utilise ici...
     auto description_file = polar_file.parent_path() / (polar_file.stem().string() + ".json");
     build_description_file(polar_file, description_file);
     spdlog::info("Description file written: {}", description_file.string());
