@@ -2,8 +2,8 @@
 // Created by frongere on 27/05/24.
 //
 
-#ifndef POEM_SPECCHECKER_H
-#define POEM_SPECCHECKER_H
+#ifndef POEM_SPECRULESCHECKER_H
+#define POEM_SPECRULESCHECKER_H
 
 #include <vector>
 #include <netcdf>
@@ -19,9 +19,9 @@
 
 namespace poem {
 
-  class SpecChecker {
+  class SpecRulesChecker {
    public:
-    explicit SpecChecker(const std::string &nc_polar) : m_polar_file(nc_polar) {
+    explicit SpecRulesChecker(const std::string &nc_polar, bool verbose) : m_polar_file(nc_polar) {
 
       // Does the file exist
       if (!fs::exists(nc_polar)) {
@@ -37,7 +37,7 @@ namespace poem {
                          version::LastTag());
         CRITICAL_ERROR_POEM
       }
-      spdlog::info("Current POEM version is v{}", current_poem_version.str());
+      if (verbose) spdlog::info("Current POEM version is v{}", current_poem_version.str());
 
       // Get the version of the file
       netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
@@ -62,13 +62,17 @@ namespace poem {
 
     }
 
-    bool check() const {
+    const semver::version &version() const {
+      return m_poem_file_version;
+    }
+
+    bool check(bool verbose) const {
 
       bool compliant = false;
 
       switch (m_poem_file_version.major()) {
         case 0:
-          compliant = v0::check_rules(m_polar_file);
+          compliant = v0::check_rules(m_polar_file, verbose);
           break;
         default:
           spdlog::critical("No specification rules available for POEM File format version {}",
@@ -110,4 +114,4 @@ namespace poem {
 
 }  // poem
 
-#endif //POEM_SPECCHECKER_H
+#endif //POEM_SPECRULESCHECKER_H

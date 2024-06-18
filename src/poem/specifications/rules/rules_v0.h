@@ -10,6 +10,18 @@
 
 #include "poem/exceptions.h"
 
+/**
+ * =====================================================================================================================
+ * POEM Specification rules v0
+ * =====================================================================================================================
+ *
+ * >>>>>>>>>>>>>>>   PLEASE DO NOT MODIFY THIS FILE   <<<<<<<<<<<<<<<<
+ *
+ * As this file describes a specification, any modification MUST give rise to a new specification number.
+ * The only modification allowed to this file MIGHT be to fix bugs, not to modify rules
+ *
+ */
+
 namespace poem::v0 {
 
   std::vector<std::string> mandatory_variables() {
@@ -31,7 +43,7 @@ namespace poem::v0 {
         var.getAtt(att_name).getValues(att_value_);
         if (att_value_ != att_value) {
           if (verbose) {
-            spdlog::warn("In Coordinate Variable {}, Attribute {} value must be {} but {} found instead",
+            spdlog::critical("In Coordinate Variable {}, Attribute {} value must be {} but {} found instead",
                          var.getName(), att_name, att_value, att_value_);
           }
           return false;
@@ -39,7 +51,7 @@ namespace poem::v0 {
       }
     } else {
       if (verbose) {
-        spdlog::warn("No attribute named {} on Coordinate Variable {}", var.getName());
+        spdlog::critical("No attribute named {} on Coordinate Variable {}", var.getName());
       }
       return false;
     }
@@ -52,7 +64,7 @@ namespace poem::v0 {
                                            bool verbose) {
     if (var.getDimCount() != dims.size()) {
       if (verbose)
-        spdlog::warn("Variable {} must have {} dimensions. Found {}",
+        spdlog::critical("Variable {} must have {} dimensions. Found {}",
                      var.getName(), dims.size(), var.getDimCount());
       return false;
     }
@@ -60,7 +72,7 @@ namespace poem::v0 {
     for (int i = 0; i < dims.size(); ++i) {
       if (var.getDim(i) != dims.at(i)) {
         if (verbose)
-          spdlog::warn("In Variable {}, expected dimension {} at position {} but found {} instead",
+          spdlog::critical("In Variable {}, expected dimension {} at position {} but found {} instead",
                        var.getName(), dims.at(i).getName(), i, var.getDim(i).getName());
         return false;
       }
@@ -80,7 +92,7 @@ namespace poem::v0 {
       if (!check_attribute(var, "description", verbose)) return false;
 
     } else {
-      if (verbose) spdlog::warn("Mandatory Variable {} not found", coord_name);
+      if (verbose) spdlog::critical("Mandatory Variable {} not found", coord_name);
       return false;
     }
 
@@ -89,7 +101,7 @@ namespace poem::v0 {
 
   bool check_coord_var_values_bounds(const std::vector<double> &values, bool verbose) {
     if (values.back() > 180.) {
-      if (verbose) spdlog::warn("Angular Coordinate variables must be numbers between 0 and 180");
+      if (verbose) spdlog::critical("Angular Coordinate variables must be numbers between 0 and 180");
       return false;
     }
     return true;
@@ -98,13 +110,13 @@ namespace poem::v0 {
   bool check_coord_var_values(const std::vector<double> &values, bool verbose) {
     double val_ref = values.front();
     if (val_ref < 0.) {
-      if (verbose) spdlog::warn("Coordinate Variables must be list of positive numbers");
+      if (verbose) spdlog::critical("Coordinate Variables must be list of positive numbers");
       return false;
     }
     for (size_t i = 1; i < values.size(); ++i) {
       double val = values.at(i);
       if (val <= val_ref) {
-        if (verbose) spdlog::warn("Coordinate Variables must be list of strictly increasing numbers");
+        if (verbose) spdlog::critical("Coordinate Variables must be list of strictly increasing numbers");
         return false;
       }
       val_ref = val;
@@ -125,7 +137,7 @@ namespace poem::v0 {
       dim = group.getDim(coord_name);
       dim_size = dim.getSize();
     } else {
-      if (verbose) spdlog::warn("In {}, no dimension named {}", group.getName(), coord_name);
+      if (verbose) spdlog::critical("In {}, no dimension named {}", group.getName(), coord_name);
       return false;
     }
 
@@ -135,17 +147,17 @@ namespace poem::v0 {
     if (group.getCoordVars().contains(coord_name)) {
       var = group.getVar(coord_name);
       if (var.getDims().size() != 1) {
-        if (verbose) spdlog::warn("Coordinate Variable {} must have only one dimension", var.getName());
+        if (verbose) spdlog::critical("Coordinate Variable {} must have only one dimension", var.getName());
         return false;
       }
       if (var.getDim(0) != dim) {
-        if (verbose) spdlog::warn("Coordinate Variable {} must have dimension of the same name", var.getName());
+        if (verbose) spdlog::critical("Coordinate Variable {} must have dimension of the same name", var.getName());
         return false;
       }
       var.getVar(values_.data());
 
     } else {
-      if (verbose) spdlog::warn("No dimension named {}", coord_name);
+      if (verbose) spdlog::critical("No dimension named {}", coord_name);
       return false;
     }
 
@@ -174,15 +186,15 @@ namespace poem::v0 {
       std::string polar_type;
       ncfile.getAtt("polar_type").getValues(polar_type);
       if (polar_type != "ND") {
-        if (verbose) spdlog::warn("Attribute polar_type value must be ND but {} found instead", polar_type);
+        if (verbose) spdlog::critical("Attribute polar_type value must be ND but {} found instead", polar_type);
         compliant = false;
       }
     } else {
-      if (verbose) spdlog::warn("No attribute named polar_type");
+      if (verbose) spdlog::critical("No attribute named polar_type");
       compliant = false;
     }
     if (!compliant) {
-      if (verbose) spdlog::warn("Not compliant with v0/R1");
+      if (verbose) spdlog::critical("Not compliant with v0/R1");
       return false;
     }
 
@@ -196,7 +208,7 @@ namespace poem::v0 {
     compliant = check_coord_var(ncfile, "Hs_m", "m", Hs_m, verbose) & compliant;
 
     if (!compliant) {
-      if (verbose) spdlog::warn("Not compliant with v0/R2");
+      if (verbose) spdlog::critical("Not compliant with v0/R2");
       return false;
     }
 
@@ -209,7 +221,7 @@ namespace poem::v0 {
     compliant = check_coord_var_values(Hs_m, verbose) & compliant;
 
     if (!compliant) {
-      if (verbose) spdlog::warn("Not compliant with v0/R3");
+      if (verbose) spdlog::critical("Not compliant with v0/R3");
       return false;
     }
 
@@ -222,7 +234,7 @@ namespace poem::v0 {
     compliant = check_coord_var_values_bounds(Hs_m, verbose) & compliant;
 
     if (!compliant) {
-      if (verbose) spdlog::warn("Not compliant with v0/R4");
+      if (verbose) spdlog::critical("Not compliant with v0/R4");
       return false;
     }
 
@@ -232,7 +244,7 @@ namespace poem::v0 {
     compliant = check_mandatory_variable(ncfile, "LEEWAY", "deg", verbose) & compliant;
 
     if (!compliant) {
-      if (verbose) spdlog::warn("Not compliant with v0/R5");
+      if (verbose) spdlog::critical("Not compliant with v0/R5");
       return false;
     }
 
@@ -250,7 +262,7 @@ namespace poem::v0 {
     compliant = check_mandatory_variable_dimensions(ncfile.getVar("LEEWAY"), dims, verbose) & compliant;
 
     if (!compliant) {
-      if (verbose) spdlog::warn("Not compliant with v0/R6");
+      if (verbose) spdlog::critical("Not compliant with v0/R6");
       return false;
     }
 

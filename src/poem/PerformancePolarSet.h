@@ -18,7 +18,7 @@ namespace fs = std::filesystem;
 namespace poem {
 
   // Forward declaration
-  class SpecChecker;
+  class SpecRulesChecker;
 
   class PerformancePolarSet {
     using PolarSetMap = std::unordered_map<std::string, std::shared_ptr<PolarSet>>;
@@ -116,6 +116,8 @@ namespace poem {
           auto group = dataFile.addGroup(polar_set.second->polar_type_str());
           polar_set.second->to_netcdf(group);
         }
+
+        dataFile.close();
 
       } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;

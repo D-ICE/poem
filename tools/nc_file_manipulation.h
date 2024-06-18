@@ -6,6 +6,8 @@
 #define POEM_NC_FILE_MANIPULATION_H
 
 #include <fstream>
+#include <filesystem>
+
 #include <netcdf>
 #include <spdlog/spdlog.h>
 #include <semver/semver.hpp>
@@ -13,65 +15,172 @@
 
 #include "poem/exceptions.h"
 
+namespace fs = std::filesystem;
 using namespace poem;
 
-void rename_variable(const std::string &nc_file,
-                     const std::string &old_var_name,
-                     const std::string &new_var_name) {
 
-  netCDF::NcFile ncfile(nc_file, netCDF::NcFile::write);
+template<typename T>
+void duplicate_var(const netCDF::NcVar &varin,
+                   netCDF::NcGroup &groupout,
+                   const std::unordered_map<std::string, std::string> &new_varnames_map) {
 
-  ncfile.redef();
+  size_t size = 1;
+  std::vector<netCDF::NcDim> dims;
+  dims.reserve(varin.getDimCount());
+  for (const auto &dim: varin.getDims()) {
 
-  spdlog::info("Renaming variable {} into {}", old_var_name, new_var_name);
+    size *= dim.getSize();
 
-  if (!ncfile.getVars().contains(old_var_name)) {
-    spdlog::critical("Variable {} not found", old_var_name);
-    CRITICAL_ERROR_POEM
+    auto dim_name = dim.getName();
+    if (new_varnames_map.contains(dim_name)) {
+      dim_name = new_varnames_map.at(dim_name);
+    }
+
+    auto dimout = groupout.getDim(dim_name);
+    if (dimout.isNull()) {
+      dimout = groupout.addDim(dim_name, dim.getSize());
+    }
+    dims.push_back(dimout);
   }
 
-  if (ncfile.getCoordVars().contains(old_var_name)) {
-    // We must also change the name of the corresponding dimension
-    spdlog::critical("Variable to be changed is a coordinate variable. Renaming is forbidden.");
-
-  } else {
-    auto var = ncfile.getVar(old_var_name);
-    var.rename(new_var_name);
+  auto var_name = varin.getName();
+  if (new_varnames_map.contains(var_name)) {
+    spdlog::info("RENAME {} -> {}", var_name, new_varnames_map.at(var_name));
+    var_name = new_varnames_map.at(var_name);
   }
 
-  ncfile.close();
+  std::vector<T> values(size);
+  varin.getVar(values.data());
+  auto varout = groupout.addVar(var_name, varin.getType(), dims);
+  varout.putVar(values.data());
+
+  for (const auto &att: varin.getAtts()) {
+    // Only supporting string as attributes
+    std::string att_val;
+    att.second.getValues(att_val);
+    varout.putAtt(att.first, att_val);
+  }
 
 }
 
-void get_variable_file(const std::string &nc_file,
-                       const std::string &var_file,
-                       const std::vector<std::string> &mandatory_variables,
-                       const std::vector<std::string> &understood_variables) {
+
+void duplicate_group(const netCDF::NcGroup &groupin, netCDF::NcGroup &groupout,
+                     const std::unordered_map<std::string, std::string> &new_varnames_map,
+                     const std::vector<std::string> &kept_variables_names) {
+
+  for (const auto &att: groupin.getAtts()) {
+    // Only supporting string as attributes
+    std::string att_val;
+    att.second.getValues(att_val);
+    groupout.putAtt(att.first, att_val);
+  }
+
+
+  std::vector<netCDF::NcVar> kept_variables;
+  kept_variables.reserve(kept_variables_names.size());
+  for (const auto &kept_varname: kept_variables_names) {
+    if (groupin.getVars().contains(kept_varname)) {
+      kept_variables.push_back(groupin.getVar(kept_varname));
+    } else {
+      spdlog::warn("Variable {} not found in group {}", kept_varname, groupin.getName());
+    }
+  }
+
+  for (const auto& var : groupin.getVars()) {
+    if (std::find(kept_variables_names.begin(), kept_variables_names.end(), var.first) == kept_variables_names.end()) {
+      spdlog::info("DELETE {}", var.first);
+//    } else {
+//      spdlog::info("KEEP {}", var.first);
+    }
+  }
+
+  for (const auto &varin: kept_variables) {
+
+    netCDF::NcType::ncType type = varin.getType().getTypeClass();
+    switch (type) {
+      case netCDF::NcType::nc_DOUBLE: {
+        duplicate_var<double>(varin, groupout, new_varnames_map);
+        break;
+      }
+
+      case netCDF::NcType::nc_INT: {
+        duplicate_var<int>(varin, groupout, new_varnames_map);
+        break;
+      }
+
+      default:
+        spdlog::critical("Only double or int");
+        CRITICAL_ERROR_POEM
+    }
+
+  }
+
+
+}
+
+
+int nc_duplicate(const std::string &nc_file_in,
+                 const std::string &nc_file_out,
+                 const std::unordered_map<std::string, std::string> &new_varnames_map,
+                 const std::vector<std::string> &kept_variables_names) {
+
+  // nc_file_in must exist
+  if (!fs::exists(nc_file_in)) {
+    spdlog::critical("File not found: {}", nc_file_in);
+    CRITICAL_ERROR_POEM
+  }
+
+  netCDF::NcFile ncfilein(nc_file_in, netCDF::NcFile::read);
+
+  constexpr int nc_err = 2;
+
+  try {
+    netCDF::NcFile ncfileout(nc_file_out, netCDF::NcFile::replace);
+
+
+    duplicate_group(ncfilein, ncfileout, new_varnames_map, kept_variables_names);
+
+    for (const auto &groupin: ncfilein.getGroups()) {
+      auto groupout = ncfileout.addGroup(groupin.first);
+      duplicate_group(groupin.second, groupout, new_varnames_map, kept_variables_names);
+    }
+
+    ncfileout.close();
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+    return nc_err;
+  }
+
+  ncfilein.close();
+
+  return 0;
+}
+
+void build_description_file(const std::string &nc_file,
+                            const std::string &var_file) {
+
+  // FIXME: les mandatory variables doivent etre recuperees de la norme POEM...
+
+  SpecRulesChecker checker(nc_file, false);
+  auto mandatory_variables = checker.mandatory_variables();
+  auto understood_variables = checker.understood_variables();
 
   spdlog::info("Generating description file");
 
   netCDF::NcFile ncfile(nc_file, netCDF::NcFile::read);
 
-  // Get the file version
-  std::string file_poem_version_str;
-  if (ncfile.getAtts().contains("poem_file_format_version")) {
-    ncfile.getAtt("poem_file_format_version").getValues(file_poem_version_str);
-  } else {
-    // poem_file_format_version was not a mandatory attribute
-    file_poem_version_str = "v0";
-  }
-  auto file_version = semver::version::parse(file_poem_version_str, false);
+  auto file_version = checker.version();
 
   nlohmann::json json;
 
-  json["_note1"] = "Do not modify other fields than optional_variables";
+  json["_note1"] = "Do not modify fields other than optional_variables";
   json["_note2"] = "In optional_variables uncomment the variable of interest by removing the leading _";
 
 
   json["poem_file_description"]["poem_file"] = fs::path(nc_file).filename().string();
-  json["poem_file_description"]["poem_file_version"] = file_version.major();
+  json["poem_file_description"]["poem_file_specification_version"] = file_version.major();
 
-  for (const auto& mvar : mandatory_variables) {
+  for (const auto &mvar: mandatory_variables) {
     if (!ncfile.getVars().contains(mvar)) {
       spdlog::critical("Mandatory variable {} not found", mvar);
       CRITICAL_ERROR_POEM
@@ -86,7 +195,7 @@ void get_variable_file(const std::string &nc_file,
   json["poem_file_description"]["coordinate_variables"] = coordinate_variables;
 
   std::vector<std::string> u_variables;
-  for (const auto& uvar : understood_variables) {
+  for (const auto &uvar: understood_variables) {
     if (ncfile.getVars().contains(uvar)) {
       u_variables.push_back(uvar);
     }
@@ -116,9 +225,12 @@ void get_info(const std::string &nc_file) {
 
   netCDF::NcFile ncfile(nc_file, netCDF::NcFile::read);
 
+  SpecRulesChecker checker(nc_file, false);
+
+  std::cout << "POEM " << std::endl;
+
   for (const auto &coord: ncfile.getCoordVars()) {
     std::cout << coord.first << std::endl;
-
   }
 
   ncfile.close();
