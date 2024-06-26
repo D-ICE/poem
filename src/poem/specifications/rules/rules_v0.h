@@ -9,6 +9,8 @@
 #include <netcdf>
 
 #include "poem/exceptions.h"
+#include "poem/specifications/SpecRules.h"
+#include "poem/specifications/SpecRulesBase.h"
 
 /**
  * =====================================================================================================================
@@ -23,20 +25,6 @@
  */
 
 namespace poem::v0 {
-
-  std::vector<std::string> coordinate_variables() {
-    return {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"};
-  }
-
-  std::vector<std::string> mandatory_variables() {
-    // Coordinate variables are also mandatory
-    return {"BrakePower", "LEEWAY"};
-  }
-
-  std::vector<std::string> understood_variables() {
-    // Those are special variables that can have a special treatment if present but are not mandatory
-    return {"conso_t_h", "HEELING"};
-  }
 
   bool check_attribute(const netCDF::NcVar &var,
                        const std::string &att_name,
@@ -308,6 +296,27 @@ namespace poem::v0 {
 
     return true;
   }
+
+
+  class SpecRules : public SpecRulesBase {
+   public:
+    explicit SpecRules(int version_major) : SpecRulesBase(version_major) {}
+
+    std::vector<std::string> coordinate_variables() const override {
+      return {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"};
+    }
+    std::vector<std::string> mandatory_variables() const override {
+      return {"BrakePower", "LEEWAY"};
+    }
+    std::vector<std::string> understood_variables() const override {
+      return {"conso_t_h", "HEELING"};
+    }
+
+    bool check(const std::string &nc_polar_file, bool verbose) const override {
+      return check_rules(nc_polar_file, verbose);
+    }
+
+  };
 
 }  // poem::v0
 

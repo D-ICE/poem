@@ -121,6 +121,19 @@ class VariablesCleaner {
 
 };
 
+int get_spec_version_from_file(const std::string &nc_file) {
+  netCDF::NcFile ncfile(nc_file, netCDF::NcFile::read);
+  std::string file_poem_version_str;
+  if (ncfile.getAtts().contains("poem_file_format_version")) {
+    ncfile.getAtt("poem_file_format_version").getValues(file_poem_version_str);
+  } else {
+    // poem_file_format_version was first introduced in v1
+    file_poem_version_str = "v0";
+  }
+  ncfile.close();
+  auto poem_file_version = semver::version::parse(file_poem_version_str, false);
+  return poem_file_version.major();
+}
 
 template<typename T>
 void duplicate_var(const netCDF::NcVar &varin,
@@ -261,16 +274,18 @@ void build_description_file(const std::string &nc_file,
 
   // FIXME: les mandatory variables doivent etre recuperees de la norme POEM...
 
-  SpecRulesChecker checker(nc_file, false);
+//  SpecRulesChecker checker(nc_file, false);
+  SpecRules spec_rules(get_spec_version_from_file(nc_file));
+//  NIY_POEM
 
-  auto mandatory_variables = checker.mandatory_variables();
-  auto understood_variables = checker.understood_variables();
+  auto mandatory_variables = spec_rules.mandatory_variables();
+  auto understood_variables = spec_rules.understood_variables();
 
   spdlog::info("Generating description file");
 
   netCDF::NcFile ncfile(nc_file, netCDF::NcFile::read);
 
-  auto file_version = checker.version();
+  auto file_version = spec_rules.version();
 
   nlohmann::json json;
 
@@ -279,7 +294,7 @@ void build_description_file(const std::string &nc_file,
 
 
   json["poem_file_description"]["poem_file"] = fs::path(nc_file).filename().string();
-  json["poem_file_description"]["poem_file_specification_version"] = file_version.major();
+  json["poem_file_description"]["poem_file_specification_version"] = file_version;
 
   for (const auto &mvar: mandatory_variables) {
     if (!ncfile.getVars().contains(mvar)) {
@@ -327,9 +342,10 @@ void get_info(const std::string &nc_file) {
   spdlog::info("Get global information on the polar file: {}", nc_file);
   netCDF::NcFile ncfile(nc_file, netCDF::NcFile::read);
 
-  SpecRulesChecker checker(nc_file, false);
+//  SpecRulesChecker checker(nc_file, false);
+  SpecRules spec_rules(get_spec_version_from_file(nc_file));
 
-  auto one_var = ncfile.getVar(checker.mandatory_variables().back());
+  auto one_var = ncfile.getVar(spec_rules.mandatory_variables().back());
   std::cout << "Dimensions [" << one_var.getDims().size() << "]" << std::endl;
   size_t n = 1;
   for (const auto &dim: one_var.getDims()) {

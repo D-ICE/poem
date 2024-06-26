@@ -8,6 +8,7 @@
 #include <spdlog/spdlog.h>
 #include <poem/poem.h>
 
+#include <poem/thirdparty/picosha2/picosha2.h>
 #include "nc_file_manipulation.h"
 
 namespace fs = std::filesystem;
@@ -23,6 +24,11 @@ int main(int argc, char *argv[]) {
 
   program.add_argument("--info", "-i")
       .help("Get informations on the file")
+      .implicit_value(true)
+      .default_value(false);
+
+  program.add_argument("--sha")
+      .help("Get hash for the file (SHA256)")
       .implicit_value(true)
       .default_value(false);
 
@@ -74,11 +80,22 @@ int main(int argc, char *argv[]) {
 
   spdlog::info("Reading polar file {}", polar_file.string());
 
+  if (program["--sha"] == true) {
+    spdlog::info("Computing SHA256 hash for file: {}", polar_file.string());
+    std::ifstream f(polar_file, std::ios::binary);
+    std::vector<unsigned char> s(picosha2::k_digest_size);
+    picosha2::hash256(f, s.begin(), s.end());
+    std::string hex_str = picosha2::bytes_to_hex_string(s);
+    spdlog::info("SHA256: {}", hex_str);
+    return 0;
+  }
+
+
   // Check poem file format
   spdlog::info("Checking POEM file format version compliance");
-  SpecRulesChecker checker(polar_file, true);
-  if (checker.check(true)) {
-    spdlog::info("File is compliant wit POEM specification version: {}", checker.version().major());
+  SpecRules spec_rules(get_spec_version_from_file(polar_file));
+  if (spec_rules.check(polar_file, true)) {
+    spdlog::info("File is compliant wit POEM specification version: {}", spec_rules.version());
   }
 
   if (program["--info"] == true) {
@@ -206,6 +223,6 @@ int main(int argc, char *argv[]) {
    * pour un PolarSet présent, lister les variables (et les cracher dans un fichier utilisable par mship) -> OK
    *
    */
-
+  // d50893c80a02ecf22aa00fa144ab3746c506eb4557e307fe790a86c28e76e2d1
 
 }

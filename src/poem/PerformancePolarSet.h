@@ -17,8 +17,8 @@ namespace fs = std::filesystem;
 
 namespace poem {
 
-  // Forward declaration
-  class SpecRulesChecker;
+//  // Forward declaration
+//  class SpecRulesChecker;
 
   class PerformancePolarSet {
     using PolarSetMap = std::unordered_map<std::string, std::shared_ptr<PolarSet>>;

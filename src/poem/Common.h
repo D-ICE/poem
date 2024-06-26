@@ -6,6 +6,7 @@
 #define POEM_COMMON_H
 
 #include <string>
+#include <utility>
 
 #include <dunits/dunits.h>
 
@@ -31,13 +32,13 @@ namespace poem {
      * @param description described the dimension
      * @param type the type of the enclosed data
      */
-    Named(const std::string &name,
-          const std::string &unit,
-          const std::string &description,
+    Named(std::string name,
+          std::string unit,
+          std::string description,
           type::POEM_TYPES type) :
-        m_name(name),
-        m_unit(unit),
-        m_description(description),
+        m_name(std::move(name)),
+        m_unit(std::move(unit)),
+        m_description(std::move(description)),
         m_type(type) {
 
       check_unit();

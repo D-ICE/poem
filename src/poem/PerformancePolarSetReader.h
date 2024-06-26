@@ -10,7 +10,7 @@
 #include <spdlog/spdlog.h>
 #include <netcdf>
 
-#include "specifications/SpecRulesChecker.h"
+#include "specifications/SpecRules.h"
 #include "exceptions.h"
 
 namespace fs = std::filesystem;

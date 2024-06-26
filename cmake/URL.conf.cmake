@@ -1,12 +1,6 @@
-# poem version
-set(${PROJECT_NAME}-version_URL git@d-ice.gitlab.host:common/dice-tools/cmake-version.git)
-set(${PROJECT_NAME}-version_TAG v1.3)
-
 # mathutils
 set(mathutils_URL git@frydom-ce.org:ce/mathutils.git)
 set(mathutils_TAG v1.15 CACHE STRING "mathutils version")
-set(MATHUTILS_BUILD_TESTS OFF CACHE BOOL "")
-set(MATHUTILS_BUILD_BOOST_TESTS OFF CACHE BOOL "")
 
 # Boost
 set(boost_URL https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz) # Last current version
