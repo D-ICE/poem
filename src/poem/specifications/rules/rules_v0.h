@@ -300,7 +300,7 @@ namespace poem::v0 {
 
   class SpecRules : public SpecRulesBase {
    public:
-    explicit SpecRules(int version_major) : SpecRulesBase(version_major) {}
+    explicit SpecRules() : SpecRulesBase(0) {}
 
     std::vector<std::string> coordinate_variables() const override {
       return {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"};

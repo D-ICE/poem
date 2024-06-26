@@ -15,7 +15,7 @@
 
 namespace poem {
 
-  static int max_poem_file_version = 0;
+  static int max_poem_file_version = 1;
 
   class SpecRules : public SpecRulesBase {
    public:
@@ -27,9 +27,17 @@ namespace poem {
       }
       switch (version_major) {
         case 0:
-          m_spec_rules = std::make_unique<v0::SpecRules>(version_major);
+          m_spec_rules = std::make_unique<v0::SpecRules>();
           break;
+        case 1:
+          m_spec_rules = std::make_unique<v1::SpecRules>();
+          break;
+
         /// Add a case for each new major version
+
+        default:
+          spdlog::critical("POEM File Format Version {} does not exist", version_major);
+          CRITICAL_ERROR_POEM
       }
     }
 
