@@ -98,8 +98,6 @@ namespace poem::v1 {
       compliant = false;
     }
 
-
-
     if (!compliant) {
       if (verbose) spdlog::critical("Not compliant with v1/R2");
       return false;
