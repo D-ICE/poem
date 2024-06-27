@@ -350,99 +350,12 @@ namespace poem::v1 {
     }
     if (!compliant) {
       if (verbose) spdlog::critical("Not compliant with v0/R8");
-      return false;
+      compliant = false;
     }
-
-//    compliant = true;
-//    std::vector<double> STW_kt, TWS_kt, TWA_deg, WA_deg, Hs_m;
-//    compliant = check_coord_var(ncfile, "STW_kt", "kt", STW_kt, verbose) & compliant;
-//    compliant = check_coord_var(ncfile, "TWS_kt", "kt", TWS_kt, verbose) & compliant;
-//    compliant = check_coord_var(ncfile, "TWA_deg", "deg", TWA_deg, verbose) & compliant;
-//    compliant = check_coord_var(ncfile, "WA_deg", "deg", WA_deg, verbose) & compliant;
-//    compliant = check_coord_var(ncfile, "Hs_m", "m", Hs_m, verbose) & compliant;
-//
-//    if (!compliant) {
-//      if (verbose) spdlog::critical("Not compliant with v0/R2");
-//      return false;
-//    }
-
-//    /**
-//     * Rule 3: strictly increasing list of positive numbers
-//     */
-
-//
-//    /**
-//     * Rule 4: Angular Coordinate Variables between 0 and 180 deg
-//     */
-//    compliant = true;
-//    compliant = check_coord_var_values_bounds(STW_kt, verbose) & compliant;
-//    compliant = check_coord_var_values_bounds(TWS_kt, verbose) & compliant;
-//    compliant = check_coord_var_values_bounds(TWA_deg, verbose) & compliant;
-//    compliant = check_coord_var_values_bounds(WA_deg, verbose) & compliant;
-//    compliant = check_coord_var_values_bounds(Hs_m, verbose) & compliant;
-//
-//    if (!compliant) {
-//      if (verbose) spdlog::critical("Not compliant with v0/R4");
-//      return false;
-//    }
-//
-//    /**
-//     * Rule 5: Mandatory variables
-//     */
-//    compliant = true;
-//    compliant = check_mandatory_variable(ncfile, "BrakePower", "kW", verbose) & compliant;
-//    compliant = check_mandatory_variable(ncfile, "LEEWAY", "deg", verbose) & compliant;
-//
-//    if (!compliant) {
-//      if (verbose) spdlog::critical("Not compliant with v0/R5");
-//      return false;
-//    }
-//
-//    /**
-//     * Rule 6: Variables dimensions
-//     */
-//    compliant = true;
-//    std::vector<netCDF::NcDim> dims;
-//    dims.reserve(5);
-//    dims.push_back(ncfile.getDim("STW_kt"));
-//    dims.push_back(ncfile.getDim("TWS_kt"));
-//    dims.push_back(ncfile.getDim("TWA_deg"));
-//    dims.push_back(ncfile.getDim("WA_deg"));
-//    dims.push_back(ncfile.getDim("Hs_m"));
-//
-//    compliant = check_mandatory_variable_dimensions(ncfile.getVar("BrakePower"), dims, verbose) & compliant;
-//    compliant = check_mandatory_variable_dimensions(ncfile.getVar("LEEWAY"), dims, verbose) & compliant;
-//
-//    if (!compliant) {
-//      if (verbose) spdlog::critical("Not compliant with v0/R6");
-//      return false;
-//    }
-//
-//    /**
-//     * Rule 7: Coordinate Variables and Variables must define Attributes unit and description
-//     */
-//    compliant = true;
-//    for (const auto& var : ncfile.getVars()) {
-//      if (!check_attribute(var.second, "unit", verbose)) {
-//        compliant = false;
-//        break;
-//      }
-//      if (!check_attribute(var.second, "description", verbose)) {
-//        compliant = false;
-//        break;
-//      }
-//    }
-//
-//    if (!compliant) {
-//      if (verbose) spdlog::critical("Not compliant with v0/R7");
-//      return false;
-//    }
 
     ncfile.close();
 
-//    NIY_POEM
-
-    return true;
+    return compliant;
   }
 
 
