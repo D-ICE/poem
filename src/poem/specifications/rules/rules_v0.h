@@ -26,7 +26,7 @@
 
 namespace poem::v0 {
 
-  bool check_attribute(const netCDF::NcVar &var,
+  inline bool check_attribute(const netCDF::NcVar &var,
                        const std::string &att_name,
                        bool verbose,
                        const std::string &att_value = "") {
@@ -53,7 +53,7 @@ namespace poem::v0 {
     return true;
   }
 
-  bool check_mandatory_variable_dimensions(const netCDF::NcVar &var,
+  inline bool check_mandatory_variable_dimensions(const netCDF::NcVar &var,
                                            const std::vector<netCDF::NcDim> &dims,
                                            bool verbose) {
     if (var.getDimCount() != dims.size()) {
@@ -75,7 +75,7 @@ namespace poem::v0 {
     return true;
   }
 
-  bool check_mandatory_variable(const netCDF::NcGroup &group,
+  inline bool check_mandatory_variable(const netCDF::NcGroup &group,
                                 const std::string &coord_name,
                                 const std::string &unit,
                                 bool verbose) {
@@ -93,7 +93,7 @@ namespace poem::v0 {
     return true;
   }
 
-  bool check_coord_var_values_bounds(const std::vector<double> &values, bool verbose) {
+  inline bool check_coord_var_values_bounds(const std::vector<double> &values, bool verbose) {
     if (values.back() > 180.) {
       if (verbose) spdlog::critical("Angular Coordinate variables must be numbers between 0 and 180");
       return false;
@@ -101,7 +101,7 @@ namespace poem::v0 {
     return true;
   }
 
-  bool check_coord_var_values(const std::vector<double> &values, bool verbose) {
+  inline bool check_coord_var_values(const std::vector<double> &values, bool verbose) {
     double val_ref = values.front();
     if (val_ref < 0.) {
       if (verbose) spdlog::critical("Coordinate Variables must be list of positive numbers");
@@ -118,7 +118,7 @@ namespace poem::v0 {
     return true;
   }
 
-  bool check_coord_var(const netCDF::NcGroup &group,
+  inline bool check_coord_var(const netCDF::NcGroup &group,
                        const std::string &coord_name,
                        const std::string &unit,
                        std::vector<double> &values,
@@ -168,7 +168,7 @@ namespace poem::v0 {
     return true;
   }
 
-  bool check_rules(const std::string &nc_polar, bool verbose = true) {
+  inline bool check_rules(const std::string &nc_polar, bool verbose = true) {
 
     bool compliant;
 

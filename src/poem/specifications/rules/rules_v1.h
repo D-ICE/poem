@@ -26,7 +26,7 @@
 
 namespace poem::v1 {
 
-  bool check_attribute(const netCDF::NcVar &var,
+  inline bool check_attribute(const netCDF::NcVar &var,
                        const std::string &att_name,
                        bool verbose,
                        const std::string &att_value = "") {
@@ -54,7 +54,7 @@ namespace poem::v1 {
     return compliant;
   }
 
-  bool check_R8(const netCDF::NcGroup &group, bool verbose) {
+  inline bool check_R8(const netCDF::NcGroup &group, bool verbose) {
     bool compliant = true;
 
     for (const auto& var : group.getVars()) {
@@ -66,7 +66,7 @@ namespace poem::v1 {
   }
 
 
-  bool check_dim(const netCDF::NcVar &var, const std::vector<std::string> &expected_dims, bool verbose) {
+  inline bool check_dim(const netCDF::NcVar &var, const std::vector<std::string> &expected_dims, bool verbose) {
     bool compliant = true;
 
     auto group_name = var.getParentGroup().getName();
@@ -91,7 +91,7 @@ namespace poem::v1 {
     return compliant;
   }
 
-  bool check_R7(const netCDF::NcGroup &group, bool verbose) {
+  inline bool check_R7(const netCDF::NcGroup &group, bool verbose) {
     bool compliant = true;
 
     auto group_name = group.getName();
@@ -113,7 +113,7 @@ namespace poem::v1 {
   }
 
 
-  bool check_R6(const netCDF::NcGroup &group, bool verbose) {
+  inline bool check_R6(const netCDF::NcGroup &group, bool verbose) {
     bool compliant = true;
     auto group_name = group.getName();
 
@@ -140,7 +140,7 @@ namespace poem::v1 {
     return compliant;
   }
 
-  bool check_R4_R5(const netCDF::NcGroup &group, bool verbose) {
+  inline bool check_R4_R5(const netCDF::NcGroup &group, bool verbose) {
 
     bool compliant = true;
 
@@ -180,7 +180,7 @@ namespace poem::v1 {
   }
 
 
-  bool check_dim_existence(const netCDF::NcGroup &group,
+  inline bool check_dim_existence(const netCDF::NcGroup &group,
                            const std::vector<std::string> &expected_dims,
                            bool verbose) {
     bool compliant = true;
@@ -193,7 +193,7 @@ namespace poem::v1 {
     return compliant;
   }
 
-  bool check_rules(const std::string &nc_polar, bool verbose = true) {
+  inline bool check_rules(const std::string &nc_polar, bool verbose = true) {
 
     bool compliant;
 
