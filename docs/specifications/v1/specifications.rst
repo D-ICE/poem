@@ -21,7 +21,7 @@ RULE 0 (R0)
 * Any other *Attributes* for *Groups*, *Dimension*, *Coordinate Variables* or *Variables* that are not part of the
   following **RULES-v1** may be added for convenience
 * Any other *Variables* may be added to the *Groups* defined in :ref:`(R2)<v1_r2>`.
-  provided they follow **RULES** :ref:`(R8)<v1_r7>` & :ref:`(R9)<v1_r8>`
+  provided they follow **RULES** :ref:`(R7)<v1_r7>` & :ref:`(R8)<v1_r8>`
 
 RULE 1 (R1)
 -----------
@@ -130,7 +130,7 @@ RULE 5 (R5)
 -----------
 .. _v1_r5:
 
-Angular *Coordinate Variables* (i.e. TWA_deg and WA_deg) defined in :ref:`(R3)<v1_r3>` MUST be numbers between 0 and 180 deg.
+Angular *Coordinate Variables* (i.e. TWA_Coord and WA_Coord) defined in :ref:`(R3)<v1_r3>` MUST be numbers between 0 and 180 deg.
 Only symmetric polars are currently envisaged in current the specifications.
 
 RULE 6 (R6)
