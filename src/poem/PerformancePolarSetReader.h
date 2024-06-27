@@ -10,6 +10,8 @@
 #include <spdlog/spdlog.h>
 #include <netcdf>
 
+#include "PolarSet.h"
+#include "PerformancePolarSet.h"
 #include "specifications/SpecRules.h"
 #include "exceptions.h"
 
