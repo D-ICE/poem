@@ -134,7 +134,9 @@ namespace poem {
       attributes.add_attribute(att.first, att_val);
     }
 
-    auto polar_set = std::make_shared<PolarSet>(attributes);
+    POLAR_TYPE polar_type = polar_type_s2enum(group.getName());
+
+    auto polar_set = std::make_shared<PolarSet>(attributes, polar_type);
 
     // Get dimensions
     std::unordered_map<std::string, std::shared_ptr<Dimension>> dimension_map;

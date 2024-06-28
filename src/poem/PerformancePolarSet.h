@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <filesystem>
+#include <utility>
 
 #include "PolarSet.h"
 #include "Attributes.h"
@@ -26,14 +27,14 @@ namespace poem {
     using PolarSetConstIter = PolarSetMap::const_iterator;
 
    public:
-    explicit PerformancePolarSet(const Attributes &attributes) : m_attributes(attributes) {}
+    explicit PerformancePolarSet(Attributes attributes) : m_attributes(std::move(attributes)) {}
 
-    std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes) {
-      if (exist(attributes["polar_type"])) {
-        spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
-        CRITICAL_ERROR_POEM
-      }
-      auto polar_set = std::make_shared<PolarSet>(attributes);
+    std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes, POLAR_TYPE polar_type) {
+//      if (exist(attributes["polar_type"])) {
+//        spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
+//        CRITICAL_ERROR_POEM
+//      }
+      auto polar_set = std::make_shared<PolarSet>(attributes, polar_type);
       m_polar_set_map.insert({attributes["polar_type"], polar_set});
       return polar_set;
     }

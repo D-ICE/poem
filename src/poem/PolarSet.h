@@ -23,9 +23,9 @@ namespace poem {
    public:
     using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
-    explicit PolarSet(const Attributes &attributes) :
+    explicit PolarSet(const Attributes &attributes, POLAR_TYPE polar_type) :
         m_attributes(attributes),
-        m_polar_type(polar_type_s2enum(attributes["polar_type"])) {
+        m_polar_type(polar_type) {
 
       if (attributes["polar_type"] != "ND") {  // ND is for v0 that do not contain groups...
         if (!attributes.contains("name")) {
