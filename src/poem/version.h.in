@@ -9,48 +9,48 @@ namespace poem {
     // Is the metadata populated? We may not have metadata if
     // there wasn't a .git directory (e.g. downloaded source
     // code without revision history).
-    bool IsPopulated() {
+    inline bool IsPopulated() {
       return @GIT_RETRIEVED_STATE@;
     }
 
     // Were there any uncommitted changes that won't be reflected
     // in the CommitID?
-    bool AnyUncommittedChanges() {
+    inline bool AnyUncommittedChanges() {
       return @GIT_IS_DIRTY@;
     }
 
     // The commit author's name.
-    std::string AuthorName() {
+    inline std::string AuthorName() {
       return "@GIT_AUTHOR_NAME@";
     }
 
     // The commit author's email.
-    std::string AuthorEmail() {
+    inline std::string AuthorEmail() {
       return "@GIT_AUTHOR_EMAIL@";
     }
 
     // The commit SHA1.
-    std::string CommitSHA1() {
+    inline std::string CommitSHA1() {
       return "@GIT_HEAD_SHA1@";
     }
 
     // The ISO8601 commit date.
-    std::string CommitDate() {
+    inline std::string CommitDate() {
       return "@GIT_COMMIT_DATE_ISO8601@";
     }
 
     // The last tag past this commit
-    std::string LastTag() {
+    inline std::string LastTag() {
       return "@GIT_LAST_TAG@";
     }
 
     // The current branch where the current commit lies
-    std::string CurrentBranch() {
+    inline std::string CurrentBranch() {
       return "@GIT_CURRENT_BRANCH@";
     }
 
     // Get the normalized version string
-    std::string GetNormalizedVersionString() {
+    inline std::string GetNormalizedVersionString() {
       std::string version("@GIT_LAST_TAG@");
 
       auto cur_branch = CurrentBranch();
@@ -71,7 +71,7 @@ namespace poem {
     }
 
     // The project name as seen by CMake
-    std::string ProjectName() {
+    inline std::string ProjectName() {
       return "@PROJECT_NAME@";
     }
 
