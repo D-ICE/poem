@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <spdlog/spdlog.h>
 #include <netcdf>
+#include <semver/semver.hpp>
 
 #include "PolarSet.h"
 #include "PerformancePolarSet.h"
