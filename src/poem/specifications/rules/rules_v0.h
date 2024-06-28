@@ -14,10 +14,10 @@
 
 /**
  * =====================================================================================================================
- * POEM Specification rules v0
+ *                                         POEM Specification rules v0
  * =====================================================================================================================
  *
- * >>>>>>>>>>>>>>>   PLEASE DO NOT MODIFY THIS FILE   <<<<<<<<<<<<<<<<
+ *                      >>>>>>>>>>>>>>>   PLEASE DO NOT MODIFY THIS FILE   <<<<<<<<<<<<<<<<
  *
  * As this file describes a specification, any modification MUST give rise to a new specification number.
  * The only modification allowed to this file MIGHT be to fix bugs, not to modify rules
