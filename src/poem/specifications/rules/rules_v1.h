@@ -27,9 +27,9 @@
 namespace poem::v1 {
 
   inline bool check_attribute(const netCDF::NcVar &var,
-                       const std::string &att_name,
-                       bool verbose,
-                       const std::string &att_value = "") {
+                              const std::string &att_name,
+                              bool verbose,
+                              const std::string &att_value = "") {
     bool compliant = true;
 
     if (var.getAtts().contains(att_name)) {
@@ -57,7 +57,7 @@ namespace poem::v1 {
   inline bool check_R8(const netCDF::NcGroup &group, bool verbose) {
     bool compliant = true;
 
-    for (const auto& var : group.getVars()) {
+    for (const auto &var: group.getVars()) {
       compliant = check_attribute(var.second, "unit", verbose) & compliant;
       compliant = check_attribute(var.second, "description", verbose) & compliant;
     }
@@ -181,8 +181,8 @@ namespace poem::v1 {
 
 
   inline bool check_dim_existence(const netCDF::NcGroup &group,
-                           const std::vector<std::string> &expected_dims,
-                           bool verbose) {
+                                  const std::vector<std::string> &expected_dims,
+                                  bool verbose) {
     bool compliant = true;
     for (const auto &dim: expected_dims) {
       if (!group.getDims().contains(dim)) {
