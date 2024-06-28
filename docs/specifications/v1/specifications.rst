@@ -37,13 +37,24 @@ RULE 2 (R2)
 -----------
 .. _v1_r2:
 
-Recognized *Group* names are: PPP, HPPP, HVPP-PB, VPP-PB, VPP.
+Recognized *Group* names are:
+    * PPP
+    * HPPP
+    * HVPP-PB
+    * VPP-PB
+    * VPP
+
 See :ref:`polar types<polar_types_v1>` for groups names definitions.
 
 The *POEM File* must only contains groups with the preceding names.
 
 * If **HPPP** is defined, **PPP** MUST be defined too
 * If **HVPP-PB** is defined, **VPP-PB** MUST be defined too
+
+.. note::
+    * Ajouter HVPP_HP
+    * Mettre à jour le fichier PolarTypes.h
+    * Ajouter l'attribut obligatoire polar_type dans les groupes
 
 
 RULE 3 (R3)

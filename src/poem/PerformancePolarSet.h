@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <filesystem>
+#include <utility>
 
 #include "PolarSet.h"
 #include "Attributes.h"
@@ -26,7 +27,7 @@ namespace poem {
     using PolarSetConstIter = PolarSetMap::const_iterator;
 
    public:
-    explicit PerformancePolarSet(const Attributes &attributes) : m_attributes(attributes) {}
+    explicit PerformancePolarSet(Attributes attributes) : m_attributes(std::move(attributes)) {}
 
     std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes) {
       if (exist(attributes["polar_type"])) {
@@ -46,7 +47,7 @@ namespace poem {
       return polar_type_s2enum(m_attributes["polar_type"]);
     }
 
-    void AddPolarSet(std::shared_ptr<PolarSet> polar_set) {
+    void AddPolarSet(const std::shared_ptr<PolarSet>& polar_set) {
       if (exist(polar_set->polar_type_str())) {
         spdlog::critical("Attempting to add a PolarSet with name {} that is already present", polar_set->name());
         CRITICAL_ERROR_POEM
