@@ -131,8 +131,8 @@ int get_spec_version_from_file(const std::string &nc_file) {
     file_poem_version_str = "v0";
   }
   ncfile.close();
-  auto poem_file_version = semver::version::parse(file_poem_version_str, false);
-  return poem_file_version.major();
+  auto poem_spec_version = semver::version::parse(file_poem_version_str, false);
+  return poem_spec_version.major();
 }
 
 template<typename T>

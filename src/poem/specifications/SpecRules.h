@@ -7,9 +7,8 @@
 
 #include <vector>
 #include <netcdf>
-#include <semver/semver.hpp>
-#include "poem/version.h"
 
+#include "poem/version.h"
 #include "SpecRulesBase.h"
 #include "rules/rules.h"
 
