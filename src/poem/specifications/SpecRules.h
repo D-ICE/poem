@@ -53,7 +53,7 @@ namespace poem {
       return m_spec_rules->understood_variables();
     }
 
-    bool check(const std::string &nc_polar_file, bool verbose) const override {
+    [[nodiscard]] bool check(const std::string &nc_polar_file, bool verbose) const override {
       return m_spec_rules->check(nc_polar_file, verbose);
     }
 

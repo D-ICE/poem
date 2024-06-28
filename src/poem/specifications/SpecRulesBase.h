@@ -14,15 +14,15 @@ namespace poem {
    public:
     explicit SpecRulesBase(int version_major) : m_version_major(version_major) {}
 
-    int version() const { return m_version_major; }
+    [[nodiscard]] int version() const { return m_version_major; }
 
-    virtual std::vector<std::string> coordinate_variables() const = 0;
+    [[nodiscard]] virtual std::vector<std::string> coordinate_variables() const = 0;
 
-    virtual std::vector<std::string> mandatory_variables() const = 0;
+    [[nodiscard]] virtual std::vector<std::string> mandatory_variables() const = 0;
 
-    virtual std::vector<std::string> understood_variables() const = 0;
+    [[nodiscard]] virtual std::vector<std::string> understood_variables() const = 0;
 
-    virtual bool check(const std::string &nc_polar_file, bool verbose) const = 0;
+    [[nodiscard]] virtual bool check(const std::string &nc_polar_file, bool verbose) const = 0;
 
    protected:
     int m_version_major;

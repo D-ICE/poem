@@ -189,14 +189,20 @@ namespace poem {
      * Si on trouve, on prend la version qui se trouve dans l'attribut poem_file_format_specification_version
      */
 
+    int poem_spec_version;
+
     bool has_groups;
     if (attributes.contains("poem_file_format_version")) {
       has_groups = true;
-//      NIY_POEM
+      poem_spec_version = (int)semver::version::parse(attributes.get("poem_file_format_version"), false).major();
+
     } else {
-      spdlog::info("POEM file format version v0");
       has_groups = false;
+      poem_spec_version = 0;
     }
+
+    spdlog::info("Polar File follows the POEM specifications version v{}", poem_spec_version);
+
 
     auto performance_polar_set = std::make_shared<PerformancePolarSet>(attributes);
 
