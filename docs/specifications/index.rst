@@ -38,3 +38,12 @@ POEM File Format Specification versions (last version is 1)
 
    v1/index.rst
    v0/index.rst
+
+
+POEM is made Open Source with the support of the French Agency for Ecological Transition (OPERVENT project, 2024)
+
+.. image:: _static/logo_ademe.png
+   :width: 200px
+   :align: left
+
+
