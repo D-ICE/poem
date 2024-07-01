@@ -46,4 +46,3 @@ POEM is made Open Source with the support of the French Agency for Ecological Tr
    :width: 200px
    :align: left
 
-
