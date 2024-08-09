@@ -266,6 +266,60 @@ namespace poem {
       return this->m_interpolator->Interp(dimension_point, bound_check);
     }
 
+    // FIXME: est-ce que possible faire auto sur l'output de maniere a laisser au runtime la determination de _newdim ?
+    template<size_t _newdim>
+    InterpolablePolar<_newdim> slice(const std::unordered_map<std::string, double> &prescribed_values) const {
+
+      // Question: Est-ce qu'on veut renvoyer une polaire avec les meme dimensions mais avec des dimensions de la
+      // dimension grid singleton ou bien une nouvelle polaire avec des dimensions reduites ?
+      // On peut faire le seconde option et se doter d'une methode qui permet de squeeze les singletons...
+
+
+      auto dimension_set = this->m_dimension_point_set->dimension_set();
+
+      auto new_dimension_grid = DimensionGrid<_dim>(dimension_set);
+
+
+      for (size_t i = 0; i < dimension_set.size(); ++i) {
+        auto dim_name = dimension_set->name(i);
+        if (prescribed_values.contains(dim_name)) {
+          
+
+        } else {
+
+
+        }
+
+      }
+
+
+
+
+      NIY_POEM
+
+//      // Checking that the keys of prescribed values are valid dimensions of current polar
+//      auto dimension_set = this->m_dimension_point_set->dimension_set();
+//      for (const auto &val: prescribed_values) {
+//        if (!dimension_set->is_dim(val.first)) {
+//          spdlog::critical("Attempting to slice polar {} with non-existent dimension name {}", this->m_name, val.first);
+//          CRITICAL_ERROR_POEM
+//        }
+//      }
+//
+//      // Checking that _newdim is correct
+//      if (_dim - prescribed_values.size() != _newdim) {
+//        spdlog::critical("Inconsistent dimension in slicing");
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//      // Building a new dimension grid
+//      auto dimension_grid = this->m_dimension_point_set->dimension_grid();
+
+
+
+
+    }
+
    private:
     void build_interpolator() {
 

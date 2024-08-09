@@ -39,7 +39,6 @@ namespace poem {
       for (size_t idim = 0; idim < _dim; ++idim) {
         m_map_stoi.insert({dimension_array.at(idim)->name(), idim});
       }
-
     }
 
     size_t index(const std::string &name) const {
@@ -48,6 +47,10 @@ namespace poem {
 
     const std::string &name(size_t idim) const {
       return m_dimension_array.at(idim)->name();
+    }
+
+    bool is_dim(const std::string& name) const {
+      return m_map_stoi.find(name) != m_map_stoi.end(); // TODO: check...
     }
 
     const std::shared_ptr<Dimension> &at(const std::string &name) const {
