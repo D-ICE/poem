@@ -45,7 +45,7 @@ namespace poem::v0 {
       }
     } else {
       if (verbose) {
-        spdlog::critical("No attribute named {} on Coordinate Variable {}", var.getName());
+        spdlog::critical("No attribute named {} on Coordinate Variable {}", att_name, var.getName());
       }
       return false;
     }
