@@ -2,8 +2,8 @@
 # RESOURCE FILES FOR TESTING
 #
 set(RESOURCE_FILES
-        polar_dev.nc
-        multigroup_polar.nc
+        poem_v0_example.nc
+        poem_v1_example.nc
 )
 
 foreach (FILE ${RESOURCE_FILES})
