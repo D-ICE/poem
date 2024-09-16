@@ -13,12 +13,11 @@
 namespace poem {
 
   enum POLAR_TYPE {
-    PPP,
-    HPPP,
-    HVPP_PB,
-    HVPP_HP,
-    MVPP,
-    VPP,
+    PPP,  // STW Control, motor only
+    HPPP, // STW Control, hybrid motor and wind propulsion
+    HVPP, // BrakePower Control, hybrid motor and wind propulsion
+    MVPP, // BrakePower Control, motor only
+    VPP,  // No Control, wind propulsion only
   };
 
   inline POLAR_TYPE polar_type_s2enum(const std::string& polar_type_) {
@@ -28,9 +27,7 @@ namespace poem {
     } else if (polar_type_ == "HPPP") {
       polar_type = HPPP;
     } else if (polar_type_ == "HVPP_PB") {
-      polar_type = HVPP_PB;
-    } else if (polar_type_ == "HVPP_HP") {
-      polar_type = HVPP_HP;
+      polar_type = HVPP;
     } else if (polar_type_ == "MVPP") {
       polar_type = MVPP;
     } else if (polar_type_ == "VPP") {
