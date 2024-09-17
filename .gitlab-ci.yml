@@ -54,6 +54,7 @@ test:
   script:
     # c++ tests
     - make -j6
+    - ls resources/
     - ./bin/tests/test_read_poem
     # - cd ..
     # - pip install -r requirements-dev.txt
