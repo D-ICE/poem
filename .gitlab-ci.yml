@@ -24,12 +24,12 @@
     - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
     - make -j6
 
-  # awscli:
-  #   - pip install awscli
-  #   - mkdir -p $HOME/.aws
-  #   - echo "[default]" > $HOME/.aws/credentials
-  #   - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
-  #   - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
+  awscli:
+    - pip install awscli
+    - mkdir -p $HOME/.aws
+    - echo "[default]" > $HOME/.aws/credentials
+    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
+    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
   
   # upload:
   #   - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
@@ -49,10 +49,10 @@ test:
   before_script:
     - !reference [.scripts, sshconfig]
     - !reference [.scripts, deps]
-    # - !reference [.scripts, awscli]
+    - !reference [.scripts, cmake]
+    - !reference [.scripts, awscli]
   script:
     # c++ tests
-    - !reference [.scripts, cmake]
     - make -j6
     - ctest
     # - cd ..
