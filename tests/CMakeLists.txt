@@ -14,8 +14,10 @@ foreach (FILE ${RESOURCE_FILES})
                 aws s3 cp s3://dice-test-data/poem/${FILE} ${POEM_RESOURCE_DIR}/${FILE}
         )
     endif ()
+    if (NOT EXISTS ${POEM_RESOURCE_DIR}/${FILE})
+        message(STATUS "The Download of ${FILE} did not work properly")
+    endif ()
 endforeach ()
-
 
 #
 # TESTS # smichel: all has to be fixed, for now: commented, only test_read_poem is valid

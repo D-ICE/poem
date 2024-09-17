@@ -19,17 +19,18 @@
     - apt install -y python3 python3-pip git build-essential libboost-dev
     - pip install cmake
 
-  cmake:
-    - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
-    - make -j6
-
   awscli:
     - pip install awscli
     - mkdir -p $HOME/.aws
     - echo "[default]" > $HOME/.aws/credentials
     - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
     - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
+    
+  cmake:
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
+    - make -j6
+
   
   # upload:
   #   - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
@@ -49,8 +50,8 @@ test:
   before_script:
     - !reference [.scripts, sshconfig]
     - !reference [.scripts, deps]
-    - !reference [.scripts, cmake]
     - !reference [.scripts, awscli]
+    - !reference [.scripts, cmake]
   script:
     # c++ tests
     - make -j6
