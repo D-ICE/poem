@@ -22,7 +22,7 @@
   cmake:
     - mkdir build && cd build
     - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
-    - make poem -j6
+    - make -j6
 
   # awscli:
   #   - pip install awscli
