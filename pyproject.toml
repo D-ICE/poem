@@ -1,0 +1,11 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "cmake>=3.25",
+    "setuptools_scm[toml]>=6.2",
+    "boto3"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]

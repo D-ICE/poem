@@ -14,11 +14,11 @@ namespace fs = std::filesystem;
 
 TEST(poem_, reader) {
 
-  PolarSetReader reader;
+  // PolarSetReader reader;
 
-  std::string polar_file = fs::path(POEM_RESOURCE_DIR) / "polar_dev.nc";
+  std::string polar_file = fs::path(POEM_RESOURCE_DIR) / "poem_v1_example.nc";
 
-  reader.Read(polar_file);
+  PolarSetReader reader(polar_file);
 
   auto polar_set = reader.polar_set();
   auto attributes = reader.attributes();

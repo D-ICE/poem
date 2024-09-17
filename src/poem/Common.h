@@ -43,13 +43,13 @@ namespace poem {
 
       check_unit();
 
-      #ifndef ALLOW_DIRTY
-      if (git::AnyUncommittedChanges()) {
-        spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
-                         git::GetNormalizedVersionString());
-        CRITICAL_ERROR_POEM
-      }
-      #endif
+      // #ifndef ALLOW_DIRTY
+      // if (git::AnyUncommittedChanges()) {
+      //   spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
+      //                    git::GetNormalizedVersionString());
+      //   CRITICAL_ERROR_POEM
+      // }
+      // #endif
     }
 
     const std::string &name() const { return m_name; }

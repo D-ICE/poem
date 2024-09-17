@@ -61,6 +61,15 @@ namespace poem {
       return m_dimension_array.at(idim);
     }
 
+    const std::vector<std::string> get_names() const {
+      std::vector<std::string> list;
+      list.reserve(m_map_stoi.size());
+      for (const auto &name: m_map_stoi) {
+        list.push_back(name.first);
+      }
+      return list;
+    }
+
    private:
     std::array<std::shared_ptr<Dimension>, _dim> m_dimension_array;
     std::unordered_map<std::string, size_t> m_map_stoi;

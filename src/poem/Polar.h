@@ -114,6 +114,10 @@ namespace poem {
       m_values = values;
     }
 
+    std::shared_ptr<DimensionSet<_dim>> get_dimension_set(){
+      return m_dimension_point_set->dimension_set();
+    }
+
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       std::lock_guard<std::mutex> lock(this->m_mutex);
 
@@ -195,20 +199,35 @@ namespace poem {
       return m_values.size() == m_dimension_point_set->size();
     }
 
-    void bounds(std::array<T, _dim> &min_bounds, std::array<T, _dim> &max_bounds) const {
-      for (size_t idx = 0; idx < _dim; ++idx) {
-        auto dim_values = m_dimension_point_set->dimension_grid().values(idx);
-        min_bounds[idx] = dim_values[0];
-        max_bounds[idx] = dim_values[dim_values.size() - 1];
-      }
-    }
+    // smichel no info returned
+    // void bounds(std::array<T, _dim> &min_bounds, std::array<T, _dim> &max_bounds) const {
+    //   for (size_t idx = 0; idx < _dim; ++idx) {
+    //     auto dim_values = m_dimension_point_set->dimension_grid().values(idx);
+    //     min_bounds[idx] = dim_values[0];
+    //     max_bounds[idx] = dim_values[dim_values.size() - 1];
+    //   }
+    // }
 
-    void bounds(const std::string &name, double &min, double &max) const {
+    // void bounds(const std::string &name, double &min, double &max) const {
+    //   auto dim_values = m_dimension_point_set->dimension_grid().values(name);
+    //   min = dim_values[0];
+    //   max = dim_values[dim_values.size() - 1];
+    // } 
+
+    double min_bounds(const std::string &name){
       auto dim_values = m_dimension_point_set->dimension_grid().values(name);
-      min = dim_values[0];
-      max = dim_values[dim_values.size() - 1];
+      return dim_values[0];
+    }
+    
+    double max_bounds(const std::string &name){
+      auto dim_values = m_dimension_point_set->dimension_grid().values(name);
+      return dim_values[dim_values.size() - 1];
     }
 
+    // std::vector<std::string> dimension_point_list() const {
+
+    //   return m_dimension_point_set->values_list();
+    // }
 
    private:
 

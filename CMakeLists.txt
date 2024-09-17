@@ -72,7 +72,8 @@ if (POEM_BUILD_TESTS)
     add_subdirectory(tests)
 endif ()
 
-if (POEM_BUILD_TOOLS)
-    include(Add_argparse)
-    add_subdirectory(tools)
-endif ()
+# smichel: has to be fixed, for now: commented
+# if (POEM_BUILD_TOOLS)
+#     include(Add_argparse)
+#     add_subdirectory(tools)
+# endif ()
