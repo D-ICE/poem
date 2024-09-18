@@ -34,7 +34,7 @@ namespace poem {
 //
 //  class DimensionPointSetBase;
 
-
+// smichel this class has to be debug ! the Reader does not do the job
   class PolarSetReader {
    public:
     PolarSetReader(const std::string &nc_polar) {
@@ -57,10 +57,6 @@ namespace poem {
         attributes.add_attribute(att.first, att_val);
         std::cout << att.first << std::endl;
       }
-
-
-
-
 
     }
 

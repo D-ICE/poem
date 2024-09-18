@@ -118,6 +118,11 @@ namespace poem {
       return m_dimension_point_set->dimension_set();
     }
 
+    std::vector<std::string> get_dimension_set_names(){
+      auto dim_set = m_dimension_point_set->dimension_set();
+      return dim_set->get_names();
+    }
+
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       std::lock_guard<std::mutex> lock(this->m_mutex);
 

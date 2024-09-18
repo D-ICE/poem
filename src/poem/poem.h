@@ -9,6 +9,7 @@
 #include "PerformancePolarSet.h"
 #include "PolarType.h"
 #include "PolarSet.h"
+#include "Polar.h"
 #include "Splitter.h"
 #include "PerformancePolarSetReader.h"
 #include "PolarSetReader.h"
