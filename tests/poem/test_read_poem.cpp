@@ -42,10 +42,6 @@ TEST(poem_, reader)
   {
     std::cout << r << ", ";
   }
-  // Attributes* Attr = &pps_ptr->m_attributes;
-  // for (auto att=*Attr->begin(); att != *Attr->end(); att++){
-  //   std::cout << att << std::endl;
-  // }
 
   std::cout << std::endl
             << std::endl
@@ -83,7 +79,7 @@ TEST(poem_, reader)
       std::cout << "  Polar dim: " << polar->dim() << std::endl;     
       std::cout << "  Polar size: " << polar->size() << std::endl;     
       std::cout << "  Polar is filled ?: " << polar->is_filled() << std::endl;     
-      auto dim_name = polar->get_dimension_set()->get_names();
+      auto dim_name = polar->get_dimension_set_names();
       for (auto n: dim_name){
         std::cout << "    Dimension " << n;
         std::cout << " - min: " << polar->min_bounds(n);
@@ -99,14 +95,20 @@ TEST(poem_, reader)
       std::cout << "  Nearest: " << nr << std::endl;
       auto interp = polar->interp(dimension_point, true);
       std::cout << "  Interpolation: " << interp << std::endl;
-      std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_InterpolableTable.nc";
+      std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_InterpolableTable_";
+      new_polar_file.append(ps_ptr->polar_type_str());
+      new_polar_file.append("_");
+      new_polar_file.append(p);
+      new_polar_file.append(".nc");
       std::cout << "I like this InterpolableTable, I save it in " << new_polar_file << std::endl;
-      ps_ptr->to_netcdf(new_polar_file);
+      // ps_ptr->to_netcdf(new_polar_file);
 
     }  
-    std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet.nc";
+    std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet_";
+    new_polar_file.append(ps_ptr->polar_type_str());
+    new_polar_file.append(".nc");
     std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
-    ps_ptr->to_netcdf(new_polar_file);
+    // ps_ptr->to_netcdf(new_polar_file);
   }
 
   std::cout << std::endl
@@ -131,5 +133,5 @@ TEST(poem_, reader)
   }
   std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PerfPolarSet.nc";
   std::cout << "I like this PerformancePolarSet, I save it in " << new_polar_file << std::endl;
-  pps_ptr->to_netcdf(new_polar_file);
+  // pps_ptr->to_netcdf(new_polar_file);
 }
