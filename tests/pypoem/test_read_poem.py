@@ -1,6 +1,7 @@
 # import poem
 import os
 import logging
+# import numpy as np
 
 import pypoem
 # logging.basicConfig(level=logging.info)
@@ -12,12 +13,12 @@ def test_poem():
 POEM_RESOURCE_DIR= '/home/smichel/softwares/poem_gitlab/build/resources'
 polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example.nc")
 
-pps_ptr = pypoem.read_performance_polar_set(polar_file)
+PerfPolarSet = pypoem.read_performance_polar_set(polar_file)
 
 print("====================== LET'S START test_read_poem.cpp")
 print("Hola, this unit test load and read everything it can from {}:".format(polar_file))
 
-print("Attribute name: {}".format(pps_ptr.name()))
+print("Attribute name: {}".format(PerfPolarSet.name()))
 
 #   // smichel: pb, need to be fixed
 #   std::vector<POLAR_TYPE> all_polar_type_list{PPP, HPPP, HVPP, MVPP, VPP};
@@ -28,41 +29,27 @@ print("Attribute name: {}".format(pps_ptr.name()))
 #     std::cout << pps_ptr->exist(pl) << std::endl;
 #   }
 
-#   std::vector<std::string> res = pps_ptr->polar_set_list();
-#   std::cout << "Polar set list (names): ";
-#   for (auto r : res)
-#   {
-#     std::cout << r << ", ";
-#   }
+polar_set_list = PerfPolarSet.polar_set_list()
+print( "Polar set list (names): {}".format(polar_set_list))
 
-#   std::cout << std::endl
-#             << std::endl
-#             << "======================" << std::endl;
-#   std::cout << "For each PolarSet, return info " << std::endl;
-#   std::cout << "======================" << std::endl;
+print("\n\n======================")
+print("For each PolarSet, return info ")
+print("======================")
 
-#   std::cout << "Construction of PolarSet from the polar_set function" << std::endl;
-#   // construct polars
-#   for (auto polar_name : res)
-#   {
-#     std::shared_ptr<PolarSet> ps_ptr = pps_ptr->polar_set(polar_name);
+print("Construction of PolarSet from the polar_set function")
+for p in polar_set_list:
+    print("Setting of {} as a PolarSet".format(p))
+    PolarSet = PerfPolarSet.get_polar_set(p)
+    print("Setting of {} as a PolarSet - DONE".format(p))
 
-#     std::cout << "- PolarSet name: " << ps_ptr->name() << std::endl;
-#     std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
-#     std::cout << "  PolarSet contains: ";
-#     auto polar_names = ps_ptr->polar_names();
-#     for (auto p : polar_names){
-#       std::cout << p <<", ";
-#     } 
-#     std::cout << std::endl;
-#     std::string pn = ps_ptr->polar_type_str();
-#     std::array<double, 5> dimension_point{10.1, 10.1, 90.1, 0, 0};
-#     std::cout << "  Dimension point: (";
-#     for (auto i : dimension_point)
-#     {
-#       std::cout << i << ",";
-#     }
-#     std::cout << ")" << std::endl;
+    print("- PolarSet name: {}".format(PolarSet.name()))
+    print("  PolarSet type: {}".format(PolarSet.polar_type_str()))
+    polar_names=PolarSet.polar_names()
+    print("  PolarSet contains: {}".format(polar_names))
+    dimension_point = [10.1, 10.1, 90.1, 0, 0]
+    print("Dimension point: {}".format(dimension_point))
+
+    
 #     for (auto p : polar_names){
 #       std::shared_ptr<InterpolablePolar<5>> polar = ps_ptr->polar<double, 5>(p);
 #       std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;

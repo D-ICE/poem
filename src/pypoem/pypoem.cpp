@@ -25,16 +25,16 @@ PYBIND11_MODULE(pypoem, m) {
       //   return PerformancePolarSet::exist(ne);
       //   })
       .def("polar_set_list", &PerformancePolarSet::polar_set_list)
-      .def("polar_set", &PerformancePolarSet::polar_set);
+      .def("get_polar_set", &PerformancePolarSet::get_polar_set);      
 
   py::class_<PolarSet>(m, "PolarSet")
     //   .def(py::init<>())
       .def("name", &PolarSet::name)
-      .def("polar_type", &PolarSet::polar_type)
+      // .def("polar_type", &PolarSet::polar_type)
       .def("polar_type_str", &PolarSet::polar_type_str)
       .def("polar_names", &PolarSet::polar_names)
-      .def("set_5D_polar", &PolarSet::polar<double, 5>)
-      .def("set_3D_polar", &PolarSet::polar<double, 3>); 
+      .def("get_5D_polar", &PolarSet::polar<double, 5>)
+      .def("get_3D_polar", &PolarSet::polar<double, 3>); 
 
   using My5DPolar = InterpolablePolar<5>;
   py::class_<My5DPolar>(m, "InterpolablePolar5D") // Daughter class from Polar, PolarBase, Named
