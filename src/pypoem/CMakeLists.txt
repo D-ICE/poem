@@ -1,10 +1,8 @@
-# add_library(pypoem MODULE
-#   pypoem.cpp
-# )
 pybind11_add_module(pypoem
   pypoem.cpp
 )
-target_link_libraries(pypoem PUBLIC poem)
+
+target_link_libraries(pypoem PRIVATE poem)
 
 # target_link_libraries(pypoem #PUBLIC poem)
 #   pybind11::module
@@ -19,6 +17,7 @@ if (${poem_enable_tests})
   )
 endif()
 
-# install(TARGETS pypoem
-#   LIBRARY DESTINATION .
-# )
+install(TARGETS pypoem
+  LIBRARY DESTINATION .
+)
+

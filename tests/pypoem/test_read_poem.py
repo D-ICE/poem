@@ -1,22 +1,23 @@
 # import poem
-import poem 
 import os
 import logging
 
+import pypoem
+# logging.basicConfig(level=logging.info)
 
-
+""" FOR TOMORROW => MAKE THE FIX FOR SHARED_PTR OBJECT , shall be direct with *"""
 def test_poem():
     pass
 # "src/pypoem/poem.cpython-310-x86_64-linux-gnu.so"
 POEM_RESOURCE_DIR= '/home/smichel/softwares/poem_gitlab/build/resources'
-polar_file = POEM_RESOURCE_DIR / "poem_v1_example.nc"
+polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example.nc")
 
 pps_ptr = pypoem.read_performance_polar_set(polar_file)
 
-logging.info("====================== LET'S START test_read_poem.cpp")
-logging.info("Hola, this unit test load and read everything it can :".format(polar_file))
+print("====================== LET'S START test_read_poem.cpp")
+print("Hola, this unit test load and read everything it can from {}:".format(polar_file))
 
-logging.info("Attribute name: {}".format(pps_ptr.name()))
+print("Attribute name: {}".format(pps_ptr.name()))
 
 #   // smichel: pb, need to be fixed
 #   std::vector<POLAR_TYPE> all_polar_type_list{PPP, HPPP, HVPP, MVPP, VPP};

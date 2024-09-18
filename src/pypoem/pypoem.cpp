@@ -15,7 +15,7 @@ PYBIND11_MODULE(pypoem, m) {
   // m.doc() = "pybind11 example plugin"; // optional module docstring
 
   m.def("read_performance_polar_set", [](const std::string &nc_polar){
-    return read_performance_polar_set(nc_polar);
+    return *read_performance_polar_set(nc_polar);
     });
 
   py::class_<PerformancePolarSet>(m, "PerformancePolarSet")
@@ -36,21 +36,21 @@ PYBIND11_MODULE(pypoem, m) {
       .def("set_5D_polar", &PolarSet::polar<double, 5>)
       .def("set_3D_polar", &PolarSet::polar<double, 3>); 
 
-  using MyPolar5D = InterpolablePolar<5>;
-  py::class_<MyPolar5D>(m, "InterpolablePolar5D") // Daughter class from Polar, PolarBase, Named
+  using My5DPolar = InterpolablePolar<5>;
+  py::class_<My5DPolar>(m, "InterpolablePolar5D") // Daughter class from Polar, PolarBase, Named
     //   .def(py::init<>())
-      .def("dim", &MyPolar5D::dim)
-      .def("size", &MyPolar5D::size)
-      .def("polar_type", &MyPolar5D::polar_type)
-      .def("is_filled", &MyPolar5D::is_filled)
-      .def("get_dimension_set", &MyPolar5D::get_dimension_set)     
-      .def("get_dimension_set_names", &MyPolar5D::get_dimension_set_names) 
-      .def("min_bounds", &MyPolar5D::min_bounds)
-      .def("max_bounds", &MyPolar5D::max_bounds)     
-      .def("nearest", &MyPolar5D::nearest) 
-      .def("interp", &MyPolar5D::interp);
+      .def("dim", &My5DPolar::dim)
+      .def("size", &My5DPolar::size)
+      .def("polar_type", &My5DPolar::polar_type)
+      .def("is_filled", &My5DPolar::is_filled)
+      .def("get_dimension_set", &My5DPolar::get_dimension_set)     
+      .def("get_dimension_set_names", &My5DPolar::get_dimension_set_names) 
+      .def("min_bounds", &My5DPolar::min_bounds)
+      .def("max_bounds", &My5DPolar::max_bounds)     
+      .def("nearest", &My5DPolar::nearest) 
+      .def("interp", &My5DPolar::interp);
       
-  using My3DPolar = InterpolablePolar<5>;
+  using My3DPolar = InterpolablePolar<3>;
   py::class_<My3DPolar>(m, "InterpolablePolar3D") // Daughter class from Polar, PolarBase, Named
     //   .def(py::init<>())
       .def("dim", &My3DPolar::dim)
