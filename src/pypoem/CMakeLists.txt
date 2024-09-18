@@ -1,14 +1,15 @@
-add_library(pypoem MODULE
-  pypoem.cpp
-)
-# pybind11_add_module(pypoem
+# add_library(pypoem MODULE
 #   pypoem.cpp
 # )
-
-target_link_libraries(pypoem #PUBLIC poem)
-  pybind11::module
-  poem
+pybind11_add_module(pypoem
+  pypoem.cpp
 )
+target_link_libraries(pypoem PUBLIC poem)
+
+# target_link_libraries(pypoem #PUBLIC poem)
+#   pybind11::module
+#   poem
+# )
 
 # Force output directory to test folder if tests are enabled
 if (${poem_enable_tests})

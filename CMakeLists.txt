@@ -15,10 +15,10 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(POEM_BUILD_TESTS "Build tests" ON)
-option(POEM_BUILD_TOOLS "Build tools" ON)
-option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " OFF)
-
+option(poem_enable_tests "Build tests" ON)
+option(poem_build_tools "Build tools" ON)
+option(poem_allow_dirty "When OFF, poem tool usage with uncommitted changes will be " OFF)
+#
 
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
@@ -43,6 +43,9 @@ endif ()
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/URL.conf.cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+find_package(PythonInterp 3 REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
+
 include(Add_boost)
 include(Add_mathutils)
 include(Add_json)
@@ -58,9 +61,18 @@ include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
 include(Add_semver)
 
-add_subdirectory(src/poem)
+set(PYBIND11_FINDPYTHON ON CACHE BOOL "")
+# set pybind11 dir
+set(pybind11_DIR /Users/Caleb/Softwares/pybind11)
+find_package(pybind11 REQUIRED)
+# include(add_pybind11)
 
-if (POEM_BUILD_TESTS)
+#=============================================================================
+# Targets
+#=============================================================================
+add_subdirectory(src)
+
+if (poem_enable_tests)
     include(Add_googletest)
     enable_testing()
 
@@ -69,6 +81,7 @@ if (POEM_BUILD_TESTS)
     message(STATUS "Resources stored at ${POEM_RESOURCE_DIR}")
     file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
 
+    # include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/add_googletest.cmake)
     add_subdirectory(tests)
 endif ()
 
