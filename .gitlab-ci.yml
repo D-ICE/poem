@@ -30,7 +30,7 @@
     
   cmake:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
+    - cmake -DCMAKE_BUILD_TYPE=Release -Dpoem_enable_tests=$ENABLE_TEST -Dpoem_build_tools=OFF -Dpoem_allow_dirty=OFF ..
     - make -j6
 
   upload:
@@ -56,7 +56,6 @@ test:
   script:
     # c++ tests
     - make -j6
-    - ls resources/
     - ./bin/tests/test_read_poem
     # - cd ..
     # - pip install -r requirements-dev.txt
@@ -70,10 +69,10 @@ test:
 
   before_script:
     - !reference [.scripts, sshconfig]
-    - !reference [.scripts, awscli]
     - !reference [.scripts, deps]
-  script:
+    - !reference [.scripts, awscli]
     - !reference [.scripts, cmake]
+  script:
     - make pypoem
     - !reference [.scripts, upload]
 

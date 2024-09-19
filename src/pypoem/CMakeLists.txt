@@ -4,10 +4,12 @@ pybind11_add_module(pypoem
 
 target_link_libraries(pypoem PRIVATE poem)
 
-# target_link_libraries(pypoem #PUBLIC poem)
-#   pybind11::module
-#   poem
-# )
+set_target_properties(pypoem
+  PROPERTIES
+  OUTPUT_NAME pypoem
+  PREFIX "${PYTHON_MODULE_PREFIX}"
+  SUFFIX "${PYTHON_MODULE_EXTENSION}"
+)
 
 # Force output directory to test folder if tests are enabled
 if (${poem_enable_tests})

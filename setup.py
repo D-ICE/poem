@@ -60,9 +60,9 @@ class CMakeBuild(build_ext):
         # from Python.
         cmake_args = [
             "-DCMAKE_BUILD_TYPE=Release",
-            "-DPOEM_BUILD_TESTS=OFF",
-            "-DPOEM_BUILD_TOOLS=ON",
-            "-DPOEM_ALLOW_DIRTY=OFF",
+            "-Dpoem_enable_tests=OFF",
+            "-Dpoem_build_tools=OFF",
+            "-Dpoem_allow_dirty=OFF",
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir)
         ]
         build_args = []
