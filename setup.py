@@ -14,6 +14,8 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools_scm import get_version
 
+module_name = "pypoem"
+
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
@@ -97,8 +99,8 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name="poem",
-    ext_modules=[CMakeExtension("poem")],
+    name=module_name,
+    ext_modules=[CMakeExtension(module_name)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )

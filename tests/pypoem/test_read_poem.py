@@ -39,7 +39,7 @@ print("======================")
 print("Construction of PolarSet from the polar_set function")
 for p in polar_set_list:
     print("Setting of {} as a PolarSet".format(p))
-    PolarSet = PerfPolarSet.get_polar_set(p)
+    PolarSet = PerfPolarSet.polar_set(p)
     print("Setting of {} as a PolarSet - DONE".format(p))
 
     print("- PolarSet name: {}".format(PolarSet.name()))
@@ -47,33 +47,30 @@ for p in polar_set_list:
     polar_names=PolarSet.polar_names()
     print("  PolarSet contains: {}".format(polar_names))
     dimension_point = [10.1, 10.1, 90.1, 0, 0]
-    print("Dimension point: {}".format(dimension_point))
+    print("  Dimension point: {}".format(dimension_point))
+    #
+    for pln in polar_names:
+        print("\n  Creation of the InterpolableTable ({}) ".format(pln))
+        my5dpolar = PolarSet.get_5D_polar(pln)
+        print("  Creation of the InterpolableTable ({}) - DONE ".format(pln))
+        print("  Polar dim: {}".format(my5dpolar.dim()))
+        # print("  Polar type: {}".format(my5dpolar.polar_type())) // polar type object needed > but useless, the info is already in the PolarSet
+        print("  Polar size: {}".format(my5dpolar.size()))
+        print("  Polar is filled: {}".format(my5dpolar.is_filled()))
+        dim_names = my5dpolar.get_dimension_set_names()
+        for dn in dim_names:
+            print("  Dimension {}: min={}, max={}".format(dn,my5dpolar.min_bounds(dn), my5dpolar.max_bounds(dn)))
 
-    
-#     for (auto p : polar_names){
-#       std::shared_ptr<InterpolablePolar<5>> polar = ps_ptr->polar<double, 5>(p);
-#       std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;
-#       const int dim = polar->dim();
-#       std::cout << "  Polar type: " << polar->polar_type() << std::endl;
-#       std::cout << "  Polar dim: " << polar->dim() << std::endl;     
-#       std::cout << "  Polar size: " << polar->size() << std::endl;     
-#       std::cout << "  Polar is filled ?: " << polar->is_filled() << std::endl;     
-#       auto dim_name = polar->get_dimension_set_names();
-#       for (auto n: dim_name){
-#         std::cout << "    Dimension " << n;
-#         std::cout << " - min: " << polar->min_bounds(n);
-#         std::cout << " - max: " << polar->max_bounds(n) << std::endl;
-#       }
       
 #       // auto dpl = polar->dimension_point_list();
 #       // for (auto dp: dim_set){
 #       //   std::cout << dp << std::endl;
 #       // }
-
-#       auto nr = polar->nearest(dimension_point, true);
-#       std::cout << "  Nearest: " << nr << std::endl;
-#       auto interp = polar->interp(dimension_point, true);
-#       std::cout << "  Interpolation: " << interp << std::endl;
+        nr = my5dpolar.nearest(dimension_point,True)
+        print("  Nearest: {}".format(nr))
+        interp = my5dpolar.interp(dimension_point,True)
+        print("  Interpolation: {}".format(interp))
+        
 #       std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_InterpolableTable_";
 #       new_polar_file.append(ps_ptr->polar_type_str());
 #       new_polar_file.append("_");
@@ -89,27 +86,4 @@ for p in polar_set_list:
 #     std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
 #     // ps_ptr->to_netcdf(new_polar_file);
 #   }
-
-#   std::cout << std::endl
-#             << "======================" << std::endl;
-
-#   std::cout << "Construction of PolarSet from the iteraton" << std::endl;
-#   // construct polars
-#   for (auto mps = pps_ptr->begin(); mps != pps_ptr->end(); mps++)
-#   {
-#     // std::shared_ptr<PolarSet> ps_ptr = pps_ptr->polar_set(polar_name);
-#     auto ps_ptr = (*mps).second;
-#     std::cout << "- PolarSet name: " << ps_ptr->name() << std::endl;
-#     std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
-#     std::string pn = ps_ptr->polar_type_str();
-#     std::array<double, 5> dimension_point{10.1, 10.1, 90.1, 0, 0};
-#     std::cout << "  Dimension point: (";
-#     for (auto i : dimension_point)
-#     {
-#       std::cout << i << ",";
-#     }
-#     std::cout << ")" << std::endl;
-#   }
-#   std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PerfPolarSet.nc";
-#   std::cout << "I like this PerformancePolarSet, I save it in " << new_polar_file << std::endl;
-#   // pps_ptr->to_netcdf(new_polar_file);
+print("\n====================== END OF THE TEST")

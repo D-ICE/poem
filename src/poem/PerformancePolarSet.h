@@ -77,14 +77,6 @@ namespace poem {
       return m_polar_set_map.at(name);
     }
 
-    PolarSet get_polar_set(const std::string &name) const {
-      if (!exist(name)) {
-        spdlog::critical("Not PolarSet found with name {}", name);
-        CRITICAL_ERROR_POEM
-      }
-      return *m_polar_set_map.at(name);
-    }
-
     PolarSetIter begin() {
       return m_polar_set_map.begin();
     }

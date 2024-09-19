@@ -18,6 +18,8 @@
     - apt remove cmake
     - apt install -y python3 python3-pip git build-essential libboost-dev
     - pip install cmake
+    - pip install pybind11[global]
+    # - apt-get install libz-dev
 
   awscli:
     - pip install awscli
@@ -31,11 +33,10 @@
     - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
     - make -j6
 
-  
-  # upload:
-  #   - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
-  #   - echo "Uploading $OUTPUT to s3"
-  #   - aws s3 cp $OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_TAG/
+  upload:
+    - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
+    - echo "Uploading $OUTPUT to s3"
+    - aws s3 cp $OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_TAG/
 
 
 
@@ -69,12 +70,12 @@ test:
 
   before_script:
     - !reference [.scripts, sshconfig]
+    - !reference [.scripts, awscli]
     - !reference [.scripts, deps]
-    # - !reference [.scripts, awscli]
   script:
     - !reference [.scripts, cmake]
-    # - make pypoem
-    # - !reference [.scripts, upload]
+    - make pypoem
+    - !reference [.scripts, upload]
 
 python312:
   variables:
