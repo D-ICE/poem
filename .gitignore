@@ -3,7 +3,7 @@
 *.orig
 cmake-build-*
 tests/data
-
+tests/*/*.so
 docs/API/build
 docs/guide/build
 

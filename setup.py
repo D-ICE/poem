@@ -12,6 +12,7 @@ import boto3
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+from setuptools.command.egg_info import egg_info
 from setuptools_scm import get_version
 
 module_name = "pypoem"
@@ -85,7 +86,7 @@ class CMakeBuild(build_ext):
             raise Exception("Pre-build are only available on linux")
 
         version = sys.version_info
-        lib_name = "poem.cpython-{}{}-x86_64-{}.so".format(
+        lib_name = "{}.cpython-{}{}-x86_64-{}.so".format(module_name,
             version.major, version.minor, platform_sufix)
 
         package_version = get_version()
@@ -98,9 +99,23 @@ class CMakeBuild(build_ext):
             'dice-code', file_key, os.path.join(destination, lib_name))
 
 
+class egg_info_ex(egg_info):
+    """Includes license file into `.egg-info` folder."""
+
+    def run(self):
+        # don't duplicate license into `.egg-info` when building a distribution
+        if not self.distribution.have_run.get('install', True):
+            # `install` command is in progress, copy license
+            self.mkpath(self.egg_info)
+            self.copy_file('LICENSE.txt', self.egg_info)
+
+        egg_info.run(self)
+
 setup(
     name=module_name,
     ext_modules=[CMakeExtension(module_name)],
-    cmdclass={"build_ext": CMakeBuild},
+    cmdclass={"build_ext": CMakeBuild,
+              'egg_info': egg_info_ex},
     zip_safe=False,
+    license_files = ('LICENSE.txt',),
 )
