@@ -36,7 +36,7 @@
   upload:
     - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
     - echo "Uploading $OUTPUT to s3"
-    - aws s3 cp src/pypoem/$OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_TAG/
+    - aws s3 cp src/pypoem/$OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_BRANCH/ #$CI_COMMIT_TAG/
 
 
 
@@ -63,8 +63,11 @@ test:
     # - pytest --log-level=INFO test/
 
 .build:
-  only:
-    - tags
+  rules:
+    - if: $CI_COMMIT_BRANCH == "dvlp/pywrapper"
+      when: always
+  # only:
+  #   - tags
   image: "python:$PYTHON_VERSION-bullseye"
 
   before_script:

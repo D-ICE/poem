@@ -17,6 +17,8 @@ from setuptools_scm import get_version
 
 module_name = "pypoem"
 
+branch_name = os.environ.get("CI_COMMIT_BRANCH", "dvlp/pywrapper")
+
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=""):
@@ -89,8 +91,8 @@ class CMakeBuild(build_ext):
         lib_name = "{}.cpython-{}{}-x86_64-{}.so".format(module_name,
             version.major, version.minor, platform_sufix)
 
-        package_version = get_version()
-
+        package_version = branch_name # get_version() # smichel for testing 
+        
         # Download from s3
         file_key = os.path.join('poem', package_version, lib_name)
         logging.info("Downloading {} from s3".format(file_key))
