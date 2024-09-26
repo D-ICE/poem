@@ -6,12 +6,12 @@
 #define POEM_POEM_H
 
 #include "exceptions.h"
-#include "PerformancePolarSet.h"
-#include "PolarType.h"
-#include "PolarSet.h"
-#include "Polar.h"
-#include "Splitter.h"
-#include "PerformancePolarSetReader.h"
+#include "performance_polar_set.h"
+#include "polar_type.h"
+#include "polar_set.h"
+#include "polar.h"
+#include "splitter.h"
+#include "performance_polar_set_reader.h"
 #include "poem/version.h"
 
 #endif //POEM_POEM_H

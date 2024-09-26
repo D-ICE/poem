@@ -11,9 +11,9 @@
 #include <mutex>
 #include <filesystem>
 
-#include "Polar.h"
-#include "Attributes.h"
-#include "PolarType.h"
+#include "polar.h"
+#include "attributes.h"
+#include "polar_type.h"
 
 namespace fs = std::filesystem;
 

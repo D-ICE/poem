@@ -19,8 +19,8 @@
 #include <MathUtils/RegularGridInterpolator.h>
 #include <MathUtils/RegularGridNearest.h>
 
-#include "Dimensions.h"
-#include "PolarType.h"
+#include "dimensions.h"
+#include "polar_type.h"
 
 namespace poem {
 

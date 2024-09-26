@@ -9,8 +9,8 @@
 #include <netcdf>
 
 #include "poem/exceptions.h"
-#include "poem/specifications/SpecRules.h"
-#include "poem/specifications/SpecRulesBase.h"
+#include "poem/specifications/spec_rules.h"
+#include "poem/specifications/spec_rules_base.h"
 
 /**
  * =====================================================================================================================

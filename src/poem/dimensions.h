@@ -11,9 +11,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Common.h"
+#include "common.h"
 #include "poem/exceptions.h"
-#include "Splitter.h"
+#include "splitter.h"
 
 namespace poem {
 

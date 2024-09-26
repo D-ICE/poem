@@ -10,8 +10,8 @@
 #include <filesystem>
 #include <utility>
 
-#include "PolarSet.h"
-#include "Attributes.h"
+#include "polar_set.h"
+#include "attributes.h"
 
 
 namespace fs = std::filesystem;

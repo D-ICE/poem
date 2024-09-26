@@ -9,7 +9,7 @@
 #include <netcdf>
 
 #include "poem/version.h"
-#include "SpecRulesBase.h"
+#include "spec_rules_base.h"
 #include "rules/rules.h"
 
 namespace poem {

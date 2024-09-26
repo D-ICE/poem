@@ -11,9 +11,9 @@
 #include <netcdf>
 #include <semver/semver.hpp>
 
-#include "PolarSet.h"
-#include "PerformancePolarSet.h"
-#include "specifications/SpecRules.h"
+#include "polar_set.h"
+#include "performance_polar_set.h"
+#include "specifications/spec_rules.h"
 #include "exceptions.h"
 
 namespace fs = std::filesystem;
