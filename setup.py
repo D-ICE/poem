@@ -17,7 +17,8 @@ from setuptools_scm import get_version
 
 module_name = "pypoem"
 
-branch_name = os.environ.get("CI_COMMIT_BRANCH", "dvlp/pywrapper")
+# branch_name = os.environ.get("CI_COMMIT_BRANCH", "dvlp/pywrapper")
+branch_name = "dvlp/pywrapper"
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
