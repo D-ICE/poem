@@ -21,7 +21,7 @@ print("Hola, this unit test load and read everything it can from {}:".format(pol
 print("Attribute name: {}".format(PerfPolarSet.name()))
 
 #   // smichel: pb, need to be fixed
-#   std::vector<POLAR_TYPE> all_polar_type_list{PPP, HPPP, HVPP, MVPP, VPP};
+#   all_polar_type_list = {PPP, HPPP, HVPP, MVPP, VPP};
 #   for (auto pl : all_polar_type_list)
 #   {
 #     auto name = polar_type_enum2s(pl);
@@ -62,6 +62,7 @@ for p in polar_set_list:
             print("  Dimension {}: min={}, max={}".format(dn,my5dpolar.min_bounds(dn), my5dpolar.max_bounds(dn)))
 
       
+        print("    Min & max values of {}: min={}, max={}".format(p,my5dpolar.min_value(),my5dpolar.max_value()))
 #       // auto dpl = polar->dimension_point_list();
 #       // for (auto dp: dim_set){
 #       //   std::cout << dp << std::endl;

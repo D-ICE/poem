@@ -229,6 +229,18 @@ namespace poem {
       return dim_values[dim_values.size() - 1];
     }
 
+    double min_value(){
+      int minElementIndex = std::min_element(m_values.begin(),m_values.end()) - m_values.begin();
+      double minElement = *std::min_element(m_values.begin(), m_values.end());
+      return minElement;
+    }
+    
+    double max_value(){
+      int maxElementIndex = std::max_element(m_values.begin(),m_values.end()) - m_values.begin();
+      double maxElement = *std::max_element(m_values.begin(), m_values.end());
+      return maxElement;
+    }
+
     // std::vector<std::string> dimension_point_list() const {
 
     //   return m_dimension_point_set->values_list();

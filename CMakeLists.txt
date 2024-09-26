@@ -72,7 +72,7 @@ find_package(pybind11 REQUIRED)
 #=============================================================================
 add_subdirectory(src)
 
-if (poem_enable_tests)
+if (${poem_enable_tests})
     include(Add_googletest)
     enable_testing()
 

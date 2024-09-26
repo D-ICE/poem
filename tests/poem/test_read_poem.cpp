@@ -85,6 +85,9 @@ TEST(poem_, reader)
         std::cout << " - min: " << polar->min_bounds(n);
         std::cout << " - max: " << polar->max_bounds(n) << std::endl;
       }
+      std::cout << "    Min & max values of " << p;
+      std::cout << " - min: " << polar->min_value();
+      std::cout << " - max: " << polar->max_value() << std::endl;
       
       // auto dpl = polar->dimension_point_list();
       // for (auto dp: dim_set){
@@ -95,19 +98,19 @@ TEST(poem_, reader)
       std::cout << "  Nearest: " << nr << std::endl;
       auto interp = polar->interp(dimension_point, true);
       std::cout << "  Interpolation: " << interp << std::endl;
-      std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_InterpolableTable_";
-      new_polar_file.append(ps_ptr->polar_type_str());
-      new_polar_file.append("_");
-      new_polar_file.append(p);
-      new_polar_file.append(".nc");
-      std::cout << "I like this InterpolableTable, I save it in " << new_polar_file << std::endl;
+      // std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_InterpolableTable_";
+      // new_polar_file.append(ps_ptr->polar_type_str());
+      // new_polar_file.append("_");
+      // new_polar_file.append(p);
+      // new_polar_file.append(".nc");
+      // std::cout << "I like this InterpolableTable, I save it in " << new_polar_file << std::endl;
       // ps_ptr->to_netcdf(new_polar_file);
 
     }  
-    std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet_";
-    new_polar_file.append(ps_ptr->polar_type_str());
-    new_polar_file.append(".nc");
-    std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
+    // std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet_";
+    // new_polar_file.append(ps_ptr->polar_type_str());
+    // new_polar_file.append(".nc");
+    // std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
     // ps_ptr->to_netcdf(new_polar_file);
   }
 

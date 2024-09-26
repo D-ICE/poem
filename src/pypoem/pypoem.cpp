@@ -42,7 +42,9 @@ PYBIND11_MODULE(pypoem, m) {
       // .def("get_dimension_set", &My5DPolar::get_dimension_set) // smichel commented for now, not needed in python    
       .def("get_dimension_set_names", &My5DPolar::get_dimension_set_names) 
       .def("min_bounds", &My5DPolar::min_bounds)
-      .def("max_bounds", &My5DPolar::max_bounds)     
+      .def("max_bounds", &My5DPolar::max_bounds)    
+      .def("min_value", &My5DPolar::min_value) 
+      .def("max_value", &My5DPolar::max_value) 
       .def("nearest", &My5DPolar::nearest) 
       .def("interp", &My5DPolar::interp);
       
@@ -56,7 +58,9 @@ PYBIND11_MODULE(pypoem, m) {
       // .def("get_dimension_set", &My3DPolar::get_dimension_set) // smichel commented for now, not needed in python    
       .def("get_dimension_set_names", &My3DPolar::get_dimension_set_names) 
       .def("min_bounds", &My3DPolar::min_bounds)
-      .def("max_bounds", &My3DPolar::max_bounds)     
+      .def("max_bounds", &My3DPolar::max_bounds)  
+      .def("min_value", &My3DPolar::min_value) 
+      .def("max_value", &My3DPolar::max_value)    
       .def("nearest", &My3DPolar::nearest) 
       .def("interp", &My3DPolar::interp);
 }

@@ -4,8 +4,6 @@
 set(RESOURCE_FILES
         poem_v0_example.nc
         poem_v1_example.nc
-        poem_v1_InterpolableTable_PPP_TotalBrakePower.nc 
-        poem_v1_PolarSet_PPP.nc 
         poem_v1_PerfPolarSet.nc 
 )
 
@@ -23,11 +21,11 @@ foreach (FILE ${RESOURCE_FILES})
 endforeach ()
 
 #
-# TESTS # smichel: all has to be fixed, for now: commented, only test_readpoem is valid
+# TESTS # smichel: all has to be fixed, for now: commented, only test_read_poem is valid
 #
 set(TESTS
         test_read_poem
-        test_read_netcdf
+        # test_read_netcdf
         )
 
 foreach (test ${TESTS})

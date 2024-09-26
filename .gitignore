@@ -1,10 +1,14 @@
 .idea
 .vscode
 *.orig
-cmake-build-*
-tests/data
-tests/*/*.so
+
 docs/API/build
 docs/guide/build
 
 build
+cmake-build-*
+poem.egg*
+pypoem.egg*
+*.egg
+*.pyc
+tests/*/*.so
