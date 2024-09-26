@@ -9,20 +9,23 @@
 #include <exception>
 #include <spdlog/spdlog.h>
 
-#define CRITICAL_ERROR_POEM \
-std::string msg = fmt::format("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
-throw PoemException(msg);
+#define CRITICAL_ERROR_POEM                                                  \
+  std::string msg = fmt::format("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
+  throw PoemException(msg);
 
-#define NIY_POEM \
-std::string msg = fmt::format("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
-throw PoemException(msg);
+#define NIY_POEM                                                                  \
+  std::string msg = fmt::format("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
+  throw PoemException(msg);
 
-namespace poem {
+namespace poem
+{
 
-  struct PoemException : public std::exception {
+  struct PoemException : public std::exception
+  {
     PoemException(const std::string &msg) : m_msg(msg) {};
 
-    const char *what() const throw() override {
+    const char *what() const throw() override
+    {
       spdlog::critical(m_msg);
       return "POEM EXCEPTION";
     }
@@ -30,6 +33,6 @@ namespace poem {
     std::string m_msg;
   };
 
-}  // poem
+} // poem
 
-#endif //POEM_EXCEPTIONS_H
+#endif // POEM_EXCEPTIONS_H

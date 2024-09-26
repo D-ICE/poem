@@ -17,18 +17,22 @@
 
 namespace fs = std::filesystem;
 
-namespace poem {
+namespace poem
+{
 
-  class PolarSet {
-   public:
+  class PolarSet
+  {
+  public:
     using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
-    explicit PolarSet(const Attributes &attributes, POLAR_TYPE polar_type) :
-        m_attributes(attributes),
-        m_polar_type(polar_type) {
+    explicit PolarSet(const Attributes &attributes, POLAR_TYPE polar_type) : m_attributes(attributes),
+                                                                             m_polar_type(polar_type)
+    {
 
-      if (attributes["polar_type"] != "ND") {  // ND is for v0 that do not contain groups...
-        if (!attributes.contains("name")) {
+      if (attributes["polar_type"] != "ND")
+      { // ND is for v0 that do not contain groups...
+        if (!attributes.contains("name"))
+        {
           spdlog::critical("name attribute is mandatory for PolarSet");
           CRITICAL_ERROR_POEM
         }
@@ -37,25 +41,29 @@ namespace poem {
 
     const std::string &name() const { return m_attributes["name"]; }
 
-    POLAR_TYPE polar_type() const {
+    POLAR_TYPE polar_type() const
+    {
       return polar_type_s2enum(m_attributes["polar_type"]);
     }
 
-    const std::string &polar_type_str() const {
+    const std::string &polar_type_str() const
+    {
       return m_attributes["polar_type"];
     }
 
-    template<typename T, size_t _dim>
+    template <typename T, size_t _dim>
     std::shared_ptr<Polar<T, _dim>> new_polar(const std::string &name,
                                               const std::string &unit,
                                               const std::string &description,
                                               type::POEM_TYPES type,
-                                              std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+                                              std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set)
+    {
 
       // Thread safety
       std::lock_guard<std::mutex> lock(m_mutex);
 
-      if (m_polars_map.find(name) != m_polars_map.end()) {
+      if (m_polars_map.find(name) != m_polars_map.end())
+      {
         return std::reinterpret_pointer_cast<Polar<T, _dim>>(m_polars_map.at(name));
       }
 
@@ -66,54 +74,68 @@ namespace poem {
       return polar;
     }
 
-    std::shared_ptr<PolarBase> polar(const std::string &name) const {
-      try {
+    std::shared_ptr<PolarBase> polar(const std::string &name) const
+    {
+      try
+      {
         return m_polars_map.at(name);
-      } catch (const std::out_of_range &e) {
+      }
+      catch (const std::out_of_range &e)
+      {
         spdlog::critical("No polar with name {}", name);
         CRITICAL_ERROR_POEM
       }
     }
 
-    template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
-    std::shared_ptr<Polar<T, _dim>> polar(const std::string &name) const {
+    template <typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
+    std::shared_ptr<Polar<T, _dim>> polar(const std::string &name) const
+    {
       return std::reinterpret_pointer_cast<Polar<T, _dim>>(polar(name));
     }
 
-    template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    std::shared_ptr<InterpolablePolar<_dim>> polar(const std::string &name) const {
+    template <typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
+    std::shared_ptr<InterpolablePolar<_dim>> polar(const std::string &name) const
+    {
       return std::reinterpret_pointer_cast<InterpolablePolar<_dim>>(polar(name));
     }
 
-    std::vector<std::string> polar_names() const {
+    std::vector<std::string> polar_names() const
+    {
       std::vector<std::string> polar_names;
-      for (const auto &polar: m_polars_map) {
+      for (const auto &polar : m_polars_map)
+      {
         polar_names.push_back(polar.first);
       }
       return polar_names;
     }
 
-    std::mutex *mutex() {
+    std::mutex *mutex()
+    {
       return &m_mutex;
     }
 
-    int to_netcdf(netCDF::NcGroup &group) const {
+    int to_netcdf(netCDF::NcGroup &group) const
+    {
 
-      for (const auto &polar: m_polars_map) {
+      for (const auto &polar : m_polars_map)
+      {
         polar.second->to_netcdf(group);
       }
 
-      for (const auto &attribute: m_attributes) {
+      for (const auto &attribute : m_attributes)
+      {
         group.putAtt(attribute.first, attribute.second);
       }
 
       return 0;
     }
 
-    int to_netcdf(const std::string &nc_file) const {
+    int to_netcdf(const std::string &nc_file) const
+    {
 
       fs::path nc_file_path(nc_file);
-      if (nc_file_path.is_relative()) {
+      if (nc_file_path.is_relative())
+      {
         nc_file_path = fs::current_path() / nc_file_path;
       }
 
@@ -122,12 +144,14 @@ namespace poem {
       constexpr int nc_err = 2;
       int code;
 
-      try {
+      try
+      {
 
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
         code = to_netcdf(dataFile);
-
-      } catch (netCDF::exceptions::NcException &e) {
+      }
+      catch (netCDF::exceptions::NcException &e)
+      {
         std::cerr << e.what() << std::endl;
         code = nc_err;
       }
@@ -135,7 +159,7 @@ namespace poem {
       return code;
     }
 
-   protected:
+  protected:
     Attributes m_attributes;
     POLAR_TYPE m_polar_type;
 
@@ -144,6 +168,6 @@ namespace poem {
     static inline std::mutex m_mutex;
   };
 
-}  // poem
+} // poem
 
-#endif //POEM_POLARSET_H
+#endif // POEM_POLARSET_H

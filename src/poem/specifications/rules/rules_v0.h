@@ -24,27 +24,36 @@
  *
  */
 
-namespace poem::v0 {
+namespace poem::v0
+{
 
   inline bool check_attribute(const netCDF::NcVar &var,
-                       const std::string &att_name,
-                       bool verbose,
-                       const std::string &att_value = "") {
+                              const std::string &att_name,
+                              bool verbose,
+                              const std::string &att_value = "")
+  {
 
-    if (var.getAtts().contains(att_name)) {
-      if (!att_value.empty()) {
+    if (var.getAtts().contains(att_name))
+    {
+      if (!att_value.empty())
+      {
         std::string att_value_;
         var.getAtt(att_name).getValues(att_value_);
-        if (att_value_ != att_value) {
-          if (verbose) {
+        if (att_value_ != att_value)
+        {
+          if (verbose)
+          {
             spdlog::critical("In Coordinate Variable {}, Attribute {} value must be {} but {} found instead",
-                         var.getName(), att_name, att_value, att_value_);
+                             var.getName(), att_name, att_value, att_value_);
           }
           return false;
         }
       }
-    } else {
-      if (verbose) {
+    }
+    else
+    {
+      if (verbose)
+      {
         spdlog::critical("No attribute named {} on Coordinate Variable {}", att_name, var.getName());
       }
       return false;
@@ -54,20 +63,24 @@ namespace poem::v0 {
   }
 
   inline bool check_mandatory_variable_dimensions(const netCDF::NcVar &var,
-                                           const std::vector<netCDF::NcDim> &dims,
-                                           bool verbose) {
-    if (var.getDimCount() != dims.size()) {
+                                                  const std::vector<netCDF::NcDim> &dims,
+                                                  bool verbose)
+  {
+    if (var.getDimCount() != dims.size())
+    {
       if (verbose)
         spdlog::critical("Variable {} must have {} dimensions. Found {}",
-                     var.getName(), dims.size(), var.getDimCount());
+                         var.getName(), dims.size(), var.getDimCount());
       return false;
     }
 
-    for (int i = 0; i < dims.size(); ++i) {
-      if (var.getDim(i) != dims.at(i)) {
+    for (int i = 0; i < dims.size(); ++i)
+    {
+      if (var.getDim(i) != dims.at(i))
+      {
         if (verbose)
           spdlog::critical("In Variable {}, expected dimension {} at position {} but found {} instead",
-                       var.getName(), dims.at(i).getName(), i, var.getDim(i).getName());
+                           var.getName(), dims.at(i).getName(), i, var.getDim(i).getName());
         return false;
       }
     }
@@ -76,41 +89,56 @@ namespace poem::v0 {
   }
 
   inline bool check_mandatory_variable(const netCDF::NcGroup &group,
-                                const std::string &coord_name,
-                                const std::string &unit,
-                                bool verbose) {
+                                       const std::string &coord_name,
+                                       const std::string &unit,
+                                       bool verbose)
+  {
 
-    if (group.getVars().contains(coord_name)) {
+    if (group.getVars().contains(coord_name))
+    {
       auto var = group.getVar(coord_name);
-      if (!check_attribute(var, "unit", verbose, unit)) return false;
-      if (!check_attribute(var, "description", verbose)) return false;
-
-    } else {
-      if (verbose) spdlog::critical("Mandatory Variable {} not found", coord_name);
+      if (!check_attribute(var, "unit", verbose, unit))
+        return false;
+      if (!check_attribute(var, "description", verbose))
+        return false;
+    }
+    else
+    {
+      if (verbose)
+        spdlog::critical("Mandatory Variable {} not found", coord_name);
       return false;
     }
 
     return true;
   }
 
-  inline bool check_coord_var_values_bounds(const std::vector<double> &values, bool verbose) {
-    if (values.back() > 180.) {
-      if (verbose) spdlog::critical("Angular Coordinate variables must be numbers between 0 and 180");
+  inline bool check_coord_var_values_bounds(const std::vector<double> &values, bool verbose)
+  {
+    if (values.back() > 180.)
+    {
+      if (verbose)
+        spdlog::critical("Angular Coordinate variables must be numbers between 0 and 180");
       return false;
     }
     return true;
   }
 
-  inline bool check_coord_var_values(const std::vector<double> &values, bool verbose) {
+  inline bool check_coord_var_values(const std::vector<double> &values, bool verbose)
+  {
     double val_ref = values.front();
-    if (val_ref < 0.) {
-      if (verbose) spdlog::critical("Coordinate Variables must be list of positive numbers");
+    if (val_ref < 0.)
+    {
+      if (verbose)
+        spdlog::critical("Coordinate Variables must be list of positive numbers");
       return false;
     }
-    for (size_t i = 1; i < values.size(); ++i) {
+    for (size_t i = 1; i < values.size(); ++i)
+    {
       double val = values.at(i);
-      if (val <= val_ref) {
-        if (verbose) spdlog::critical("Coordinate Variables must be list of strictly increasing numbers");
+      if (val <= val_ref)
+      {
+        if (verbose)
+          spdlog::critical("Coordinate Variables must be list of strictly increasing numbers");
         return false;
       }
       val_ref = val;
@@ -119,47 +147,61 @@ namespace poem::v0 {
   }
 
   inline bool check_coord_var(const netCDF::NcGroup &group,
-                       const std::string &coord_name,
-                       const std::string &unit,
-                       std::vector<double> &values,
-                       bool verbose) {
+                              const std::string &coord_name,
+                              const std::string &unit,
+                              std::vector<double> &values,
+                              bool verbose)
+  {
 
     // Get the dimension
     netCDF::NcDim dim;
     size_t dim_size;
-    if (group.getDims().contains(coord_name)) {
+    if (group.getDims().contains(coord_name))
+    {
       dim = group.getDim(coord_name);
       dim_size = dim.getSize();
-    } else {
-      if (verbose) spdlog::critical("In {}, no dimension named {}", group.getName(), coord_name);
+    }
+    else
+    {
+      if (verbose)
+        spdlog::critical("In {}, no dimension named {}", group.getName(), coord_name);
       return false;
     }
 
     // Get the variable
     netCDF::NcVar var;
     std::vector<double> values_(dim_size);
-    if (group.getCoordVars().contains(coord_name)) {
+    if (group.getCoordVars().contains(coord_name))
+    {
       var = group.getVar(coord_name);
-      if (var.getDims().size() != 1) {
-        if (verbose) spdlog::critical("Coordinate Variable {} must have only one dimension", var.getName());
+      if (var.getDims().size() != 1)
+      {
+        if (verbose)
+          spdlog::critical("Coordinate Variable {} must have only one dimension", var.getName());
         return false;
       }
-      if (var.getDim(0) != dim) {
-        if (verbose) spdlog::critical("Coordinate Variable {} must have dimension of the same name", var.getName());
+      if (var.getDim(0) != dim)
+      {
+        if (verbose)
+          spdlog::critical("Coordinate Variable {} must have dimension of the same name", var.getName());
         return false;
       }
       var.getVar(values_.data());
-
-    } else {
-      if (verbose) spdlog::critical("No dimension named {}", coord_name);
+    }
+    else
+    {
+      if (verbose)
+        spdlog::critical("No dimension named {}", coord_name);
       return false;
     }
 
     // Check attributes
-    if (!check_attribute(var, "unit", verbose, unit)) {
+    if (!check_attribute(var, "unit", verbose, unit))
+    {
       return false;
     }
-    if (!check_attribute(var, "description", verbose)) {
+    if (!check_attribute(var, "description", verbose))
+    {
       return false;
     }
 
@@ -168,7 +210,8 @@ namespace poem::v0 {
     return true;
   }
 
-  inline bool check_rules(const std::string &nc_polar, bool verbose = true) {
+  inline bool check_rules(const std::string &nc_polar, bool verbose = true)
+  {
 
     bool compliant;
 
@@ -178,19 +221,27 @@ namespace poem::v0 {
      * Rule 1: polar_type attribute
      */
     compliant = true;
-    if (ncfile.getAtts().contains("polar_type")) {
+    if (ncfile.getAtts().contains("polar_type"))
+    {
       std::string polar_type;
       ncfile.getAtt("polar_type").getValues(polar_type);
-      if (polar_type != "ND") {
-        if (verbose) spdlog::critical("Attribute polar_type value must be ND but {} found instead", polar_type);
+      if (polar_type != "ND")
+      {
+        if (verbose)
+          spdlog::critical("Attribute polar_type value must be ND but {} found instead", polar_type);
         compliant = false;
       }
-    } else {
-      if (verbose) spdlog::critical("No attribute named polar_type");
+    }
+    else
+    {
+      if (verbose)
+        spdlog::critical("No attribute named polar_type");
       compliant = false;
     }
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R1");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R1");
       return false;
     }
 
@@ -205,8 +256,10 @@ namespace poem::v0 {
     compliant = check_coord_var(ncfile, "WA_deg", "deg", WA_deg, verbose) & compliant;
     compliant = check_coord_var(ncfile, "Hs_m", "m", Hs_m, verbose) & compliant;
 
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R2");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R2");
       return false;
     }
 
@@ -220,8 +273,10 @@ namespace poem::v0 {
     compliant = check_coord_var_values(WA_deg, verbose) & compliant;
     compliant = check_coord_var_values(Hs_m, verbose) & compliant;
 
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R3");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R3");
       return false;
     }
 
@@ -235,8 +290,10 @@ namespace poem::v0 {
     compliant = check_coord_var_values_bounds(WA_deg, verbose) & compliant;
     compliant = check_coord_var_values_bounds(Hs_m, verbose) & compliant;
 
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R4");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R4");
       return false;
     }
 
@@ -247,8 +304,10 @@ namespace poem::v0 {
     compliant = check_mandatory_variable(ncfile, "BrakePower", "kW", verbose) & compliant;
     compliant = check_mandatory_variable(ncfile, "LEEWAY", "deg", verbose) & compliant;
 
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R5");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R5");
       return false;
     }
 
@@ -267,8 +326,10 @@ namespace poem::v0 {
     compliant = check_mandatory_variable_dimensions(ncfile.getVar("BrakePower"), dims, verbose) & compliant;
     compliant = check_mandatory_variable_dimensions(ncfile.getVar("LEEWAY"), dims, verbose) & compliant;
 
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R6");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R6");
       return false;
     }
 
@@ -276,19 +337,24 @@ namespace poem::v0 {
      * Rule 7: Coordinate Variables and Variables must define Attributes unit and description
      */
     compliant = true;
-    for (const auto& var : ncfile.getVars()) {
-      if (!check_attribute(var.second, "unit", verbose)) {
+    for (const auto &var : ncfile.getVars())
+    {
+      if (!check_attribute(var.second, "unit", verbose))
+      {
         compliant = false;
         break;
       }
-      if (!check_attribute(var.second, "description", verbose)) {
+      if (!check_attribute(var.second, "description", verbose))
+      {
         compliant = false;
         break;
       }
     }
 
-    if (!compliant) {
-      if (verbose) spdlog::critical("Not compliant with v0/R7");
+    if (!compliant)
+    {
+      if (verbose)
+        spdlog::critical("Not compliant with v0/R7");
       return false;
     }
 
@@ -297,27 +363,30 @@ namespace poem::v0 {
     return true;
   }
 
-
-  class SpecRules : public SpecRulesBase {
-   public:
+  class SpecRules : public SpecRulesBase
+  {
+  public:
     explicit SpecRules() : SpecRulesBase(0) {}
 
-    std::vector<std::string> coordinate_variables() const override {
+    std::vector<std::string> coordinate_variables() const override
+    {
       return {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"};
     }
-    std::vector<std::string> mandatory_variables() const override {
+    std::vector<std::string> mandatory_variables() const override
+    {
       return {"BrakePower", "LEEWAY"};
     }
-    std::vector<std::string> understood_variables() const override {
+    std::vector<std::string> understood_variables() const override
+    {
       return {"conso_t_h", "HEELING"};
     }
 
-    bool check(const std::string &nc_polar_file, bool verbose) const override {
+    bool check(const std::string &nc_polar_file, bool verbose) const override
+    {
       return check_rules(nc_polar_file, verbose);
     }
-
   };
 
-}  // poem::v0
+} // poem::v0
 
-#endif //POEM_RULES_V0_H
+#endif // POEM_RULES_V0_H

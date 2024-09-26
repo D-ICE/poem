@@ -9,4 +9,4 @@
 #include "rules_v1.h"
 // Include one header file per poem file version
 
-#endif //POEM_RULES_H
+#endif // POEM_RULES_H

@@ -59,9 +59,10 @@ TEST(poem_, reader)
     std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
     std::cout << "  PolarSet contains: ";
     auto polar_names = ps_ptr->polar_names();
-    for (auto p : polar_names){
-      std::cout << p <<", ";
-    } 
+    for (auto p : polar_names)
+    {
+      std::cout << p << ", ";
+    }
     std::cout << std::endl;
     std::string pn = ps_ptr->polar_type_str();
     std::array<double, 5> dimension_point{10.1, 10.1, 90.1, 0, 0};
@@ -71,16 +72,18 @@ TEST(poem_, reader)
       std::cout << i << ",";
     }
     std::cout << ")" << std::endl;
-    for (auto p : polar_names){
-      std::shared_ptr<InterpolablePolar<5>> polar = ps_ptr->polar<double, 5>(p);
+    for (auto p : polar_names)
+    {
+      std::shared_ptr<InterpolablePolar<5> > polar = ps_ptr->polar<double, 5>(p);
       std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;
       const int dim = polar->dim();
       std::cout << "  Polar type: " << polar->polar_type() << std::endl;
-      std::cout << "  Polar dim: " << polar->dim() << std::endl;     
-      std::cout << "  Polar size: " << polar->size() << std::endl;     
-      std::cout << "  Polar is filled ?: " << polar->is_filled() << std::endl;     
-      auto dim_name = polar->get_dimension_set_names();
-      for (auto n: dim_name){
+      std::cout << "  Polar dim: " << polar->dim() << std::endl;
+      std::cout << "  Polar size: " << polar->size() << std::endl;
+      std::cout << "  Polar is filled ?: " << polar->is_filled() << std::endl;
+      auto dim_name = polar->dimension_set_names();
+      for (auto n : dim_name)
+      {
         std::cout << "    Dimension " << n;
         std::cout << " - min: " << polar->min_bounds(n);
         std::cout << " - max: " << polar->max_bounds(n) << std::endl;
@@ -88,7 +91,7 @@ TEST(poem_, reader)
       std::cout << "    Min & max values of " << p;
       std::cout << " - min: " << polar->min_value();
       std::cout << " - max: " << polar->max_value() << std::endl;
-      
+
       // auto dpl = polar->dimension_point_list();
       // for (auto dp: dim_set){
       //   std::cout << dp << std::endl;
@@ -105,8 +108,7 @@ TEST(poem_, reader)
       // new_polar_file.append(".nc");
       // std::cout << "I like this InterpolableTable, I save it in " << new_polar_file << std::endl;
       // ps_ptr->to_netcdf(new_polar_file);
-
-    }  
+    }
     // std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet_";
     // new_polar_file.append(ps_ptr->polar_type_str());
     // new_polar_file.append(".nc");

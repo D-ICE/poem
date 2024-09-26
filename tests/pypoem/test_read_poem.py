@@ -57,7 +57,7 @@ for p in polar_set_list:
         # print("  Polar type: {}".format(my5dpolar.polar_type())) // polar type object needed > but useless, the info is already in the PolarSet
         print("  Polar size: {}".format(my5dpolar.size()))
         print("  Polar is filled: {}".format(my5dpolar.is_filled()))
-        dim_names = my5dpolar.get_dimension_set_names()
+        dim_names = my5dpolar.dimension_set_names()
         for dn in dim_names:
             print("  Dimension {}: min={}, max={}".format(dn,my5dpolar.min_bounds(dn), my5dpolar.max_bounds(dn)))
 

@@ -14,4 +14,4 @@
 #include "performance_polar_set_reader.h"
 #include "poem/version.h"
 
-#endif //POEM_POEM_H
+#endif // POEM_POEM_H
