@@ -1,7 +1,11 @@
 .. _specifications_v1:
 
-POEM File Format Specifications (v1)
-====================================
+POEM File Format Specifications (v1) [EXPERIMENTAL]
+===================================================
+
+.. warning::
+    These rules are still a **work in progress**!
+    Please do not use in production.
 
 A *NetCDF-4 file* is a valid *POEM File* with version 1 if it complies with the following set of **RULES-v1**:
 
@@ -40,8 +44,8 @@ RULE 2 (R2)
 Recognized *Group* names are:
     * PPP
     * HPPP
-    * HVPP-PB
-    * VPP-PB
+    * HVPP
+    * MVPP
     * VPP
 
 See :ref:`polar types<polar_types_v1>` for groups names definitions.
