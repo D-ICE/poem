@@ -43,9 +43,6 @@ namespace poem {
       return m_attributes["name"];
     }
 
-    POLAR_TYPE polar_type() const {
-      return polar_type_s2enum(m_attributes["polar_type"]);
-    }
 
     void AddPolarSet(std::shared_ptr<PolarSet> polar_set) {
       if (exist(polar_set->polar_type_str())) {
@@ -66,6 +63,10 @@ namespace poem {
 
     inline bool exist(const std::string &name) const {
       return m_polar_set_map.contains(name); // C++20
+    }
+
+    inline bool exist(POLAR_TYPE polar_type) const {
+      return exist(polar_type_enum2s(polar_type));
     }
 
     std::shared_ptr<PolarSet> polar_set(const std::string &name) const {

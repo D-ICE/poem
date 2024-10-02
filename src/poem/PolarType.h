@@ -13,12 +13,11 @@
 namespace poem {
 
   enum POLAR_TYPE {
-    PPP,
-    HPPP,
-    HVPP_PB,
-    HVPP_HP,
-    MVPP,
-    VPP,
+    PPP,  // STW Control, motor only
+    HPPP, // STW Control, hybrid motor and wind propulsion
+    HVPP, // BrakePower Control, hybrid motor and wind propulsion
+    MVPP, // BrakePower Control, motor only
+    VPP,  // No Control, wind propulsion only
   };
 
   inline POLAR_TYPE polar_type_s2enum(const std::string& polar_type_) {
@@ -27,10 +26,8 @@ namespace poem {
       polar_type = PPP;
     } else if (polar_type_ == "HPPP") {
       polar_type = HPPP;
-    } else if (polar_type_ == "HVPP_PB") {
-      polar_type = HVPP_PB;
-    } else if (polar_type_ == "HVPP_HP") {
-      polar_type = HVPP_HP;
+    } else if (polar_type_ == "HVPP") {
+      polar_type = HVPP;
     } else if (polar_type_ == "MVPP") {
       polar_type = MVPP;
     } else if (polar_type_ == "VPP") {
@@ -41,6 +38,28 @@ namespace poem {
     } else {
       spdlog::critical("Polar type \"{}\" unknown", polar_type);
       CRITICAL_ERROR_POEM
+    }
+    return polar_type;
+  }
+
+  inline std::string polar_type_enum2s(const POLAR_TYPE &polar_type_) {
+    std::string polar_type;
+    switch (polar_type_) {
+      case PPP:
+        polar_type = "PPP";
+        break;
+      case HPPP:
+        polar_type = "HPPP";
+        break;
+      case HVPP:
+        polar_type = "HVPP";
+        break;
+      case MVPP:
+        polar_type = "MVPP";
+        break;
+      case VPP:
+        polar_type = "VPP";
+        break;
     }
     return polar_type;
   }
