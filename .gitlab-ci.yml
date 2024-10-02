@@ -38,8 +38,6 @@
     - echo "Uploading $OUTPUT to s3"
     - aws s3 cp src/pypoem/$OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_BRANCH/ #$CI_COMMIT_TAG/
 
-
-
 test:
   except:
     - tags  # don't run the tests on tags
@@ -57,6 +55,9 @@ test:
     # c++ tests
     - make -j6
     - ./bin/tests/test_read_poem
+    - ./bin/tests/test_dimension_point_set
+    - ./bin/tests/test_performance_polar_set
+    - ./bin/tests/test_polar_set
     # - cd ..
     # - pip install -r requirements-dev.txt
     # - pip install .

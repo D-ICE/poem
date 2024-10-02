@@ -7,68 +7,62 @@
 
 #include <MathUtils/VectorGeneration.h>
 
-class DimensionPointSetTest : public testing::Test {
- protected:
-  void SetUp() override {
+using namespace poem;
 
-    // Create Dimensions
-    auto STW_dim = std::make_shared<poem::Dimension>("STW_kt", "kt", "Speed Through Water");
-    auto TWS_dim = std::make_shared<poem::Dimension>("TWS_kt", "kt", "True Wind Speed");
-    auto TWA_dim = std::make_shared<poem::Dimension>("TWA_deg", "deg", "True Wind Angle");
-    auto WA_dim = std::make_shared<poem::Dimension>("WA_deg", "deg", "Waves Angle");
-    auto Hs_dim = std::make_shared<poem::Dimension>("Hs_m", "m", "Waves Significant Height");
+TEST(poem_dimension_point, NestedForLoop)
+{
 
-    // Create a DimensionSet
-    std::array<std::shared_ptr<poem::Dimension>, 5> array{STW_dim, TWS_dim, TWA_dim, WA_dim, Hs_dim};
-    auto dimension_set = std::make_shared<poem::DimensionSet<5>>(array);
+  std::cout << "==== Setup started " << std::endl;
+  // Create Dimensions
+  std::cout << "     Dimension creation " << std::endl;
+  auto STW_dim = std::make_shared<poem::Dimension>("STW_kt", "kt", "Speed Through Water");
+  auto TWS_dim = std::make_shared<poem::Dimension>("TWS_kt", "kt", "True Wind Speed");
+  auto TWA_dim = std::make_shared<poem::Dimension>("TWA_deg", "deg", "True Wind Angle");
+  auto WA_dim = std::make_shared<poem::Dimension>("WA_deg", "deg", "Waves Angle");
+  auto Hs_dim = std::make_shared<poem::Dimension>("Hs_m", "m", "Waves Significant Height");
 
-    // Create samples for dimensions
-    STW_vector = mathutils::arange<double>(0, 20, 1);
-    TWS_vector = mathutils::arange<double>(0, 60, 5);
-    TWA_vector = mathutils::arange<double>(0, 180, 15);
-    WA_vector = mathutils::arange<double>(0, 180, 15);
-    Hs_vector = mathutils::arange<double>(0, 8, 1);
+  // Create a DimensionSet
+  std::cout << "     DimensionSet creation " << std::endl;
+  std::array<std::shared_ptr<poem::Dimension>, 5> array{STW_dim, TWS_dim, TWA_dim, WA_dim, Hs_dim};
+  auto dimension_set = std::make_shared<poem::DimensionSet<5>>(array);
 
-    // Create the dimension grid
-    auto dimension_grid = poem::DimensionGrid(dimension_set);
-    dimension_grid.set_values("STW_kt", STW_vector);
-    ASSERT_FALSE(dimension_grid.is_filled());
-    dimension_grid.set_values("TWS_kt", TWS_vector);
-    dimension_grid.set_values("TWA_deg", TWA_vector);
-    dimension_grid.set_values("WA_deg", WA_vector);
-    dimension_grid.set_values("Hs_m", Hs_vector);
-    ASSERT_TRUE(dimension_grid.is_filled());
+  // Create samples for dimensions
+  std::cout << "     Dimension samples creation " << std::endl;
+  auto STW_vector = mathutils::arange<double>(0, 20, 1);
+  auto TWS_vector = mathutils::arange<double>(0, 60, 5);
+  auto TWA_vector = mathutils::arange<double>(0, 180, 15);
+  auto WA_vector = mathutils::arange<double>(0, 180, 15);
+  auto Hs_vector = mathutils::arange<double>(0, 8, 1);
 
-    dimension_point_set = std::make_shared<poem::DimensionPointSet<5>>(dimension_grid);
+  // Create the dimension grid
+  std::cout << "     DimensionGrid creation " << std::endl;
+  auto dimension_grid = poem::DimensionGrid(dimension_set);
+  dimension_grid.set_values("STW_kt", STW_vector);
+  ASSERT_FALSE(dimension_grid.is_filled());
+  dimension_grid.set_values("TWS_kt", TWS_vector);
+  dimension_grid.set_values("TWA_deg", TWA_vector);
+  dimension_grid.set_values("WA_deg", WA_vector);
+  dimension_grid.set_values("Hs_m", Hs_vector);
+  ASSERT_TRUE(dimension_grid.is_filled());
 
-    auto current_schema = poem::get_newest_schema();
+  std::cout << "     DimensionPointSet creation " << std::endl;
+  auto dimension_point_set = std::make_shared<poem::DimensionPointSet<5>>(dimension_grid);
 
-    polar_set = std::make_shared<poem::PolarSet>();
-
-    polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power",
-                                    poem::type::DOUBLE, poem::PPP, dimension_point_set);
-  }
-
-  std::vector<double> STW_vector;
-  std::vector<double> TWS_vector;
-  std::vector<double> TWA_vector;
-  std::vector<double> WA_vector;
-  std::vector<double> Hs_vector;
-  std::shared_ptr<poem::DimensionPointSet<5>> dimension_point_set;
-  std::shared_ptr<poem::PolarSet> polar_set;
-
-};
-
-
-TEST_F(DimensionPointSetTest, NestedForLoop) {
-
+  std::cout << std::endl
+            << "====================== LET'S START test_read.cpp >> DimensionPointSetTest" << std::endl;
+  std::cout << "Hola, this unit test load DimensionGrid and loop over it to create DimensionPoint" << std::endl;
   // Testing the nested for loop
   size_t idx = 0;
-  for (const auto &STW: STW_vector) {
-    for (const auto &TWS: TWS_vector) {
-      for (const auto &TWA: TWA_vector) {
-        for (const auto &WA: WA_vector) {
-          for (const auto &Hs: Hs_vector) {
+  for (const auto &STW : STW_vector)
+  {
+    for (const auto &TWS : TWS_vector)
+    {
+      for (const auto &TWA : TWA_vector)
+      {
+        for (const auto &WA : WA_vector)
+        {
+          for (const auto &Hs : Hs_vector)
+          {
 
             auto dimension_point = dimension_point_set->dimension_point(idx);
 
@@ -84,11 +78,14 @@ TEST_F(DimensionPointSetTest, NestedForLoop) {
       }
     }
   }
-
+  std::cout << "Well done, DimensionPointSetTest ended " << std::endl;
 }
 
-TEST(poem_splitter, splitter) {
+TEST(poem_splitter, splitter)
+{
 
+  std::cout << std::endl
+            << "====================== LET'S START test_read.cpp >> poem_splitter" << std::endl;
   size_t chunk_size = 5;
 
   poem::Splitter splitter1(1, chunk_size);
@@ -182,5 +179,5 @@ TEST(poem_splitter, splitter) {
   ASSERT_EQ(splitter27.chunk_size(3), 5);
   ASSERT_EQ(splitter27.chunk_offset(4), 22);
   ASSERT_EQ(splitter27.chunk_size(4), 5);
-
+  std::cout << "Well done, poem_splitter ended " << std::endl;
 }

@@ -25,7 +25,9 @@ endforeach ()
 #
 set(TESTS
         test_read_poem
-        # test_read_netcdf
+        test_dimension_point_set
+        test_polar_set
+        test_performance_polar_set
         )
 
 foreach (test ${TESTS})
