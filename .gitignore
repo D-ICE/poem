@@ -8,3 +8,9 @@ docs/API/build
 docs/guide/build
 
 build
+
+docs/specifications/_build
+docs/specifications/python_examples
+
+*.nc
+*.nc.*
