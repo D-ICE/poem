@@ -62,3 +62,31 @@ Le code de lecture devrait etre capable de gerer ces codes
 Les outils de check devraient tourner à chaque lecture de polaire
     -> TODO
 
+
+===========================
+SLICING
+===========================
+
+La classe Polar devrait mettre à disposition une méthode de slice.
+
+Exemple:
+    Polar<5> avec un DimensionPointSet<5> qui est [STW, TWS, TWA, WA, Hs]
+
+    polar.slice({STW: 10, TWS: 20}) -> Polar<3> avec un DimensionPointSet<3> qui est [TWA, WA, Hs]
+
+    ou alors on peut aussi le faire par étape
+
+    polar.slice({STW: 10, TWS: 2°}) -> polar<5> qui conserve le même DimensionPointSet mais avec du singleton pour STW et TWS
+        et possibilite d'obtenir la polaire  Polar<3> en appelant un polar.squeeze
+
+    On peut certainement finalement proposer les 3
+    * slice
+    * squeeze
+    * sslice (slice & squeeze)
+
+    1 - On fournit un dictionnaire std::map<std::string, std::vector<double>> à slice.
+    2 -
+
+
+
+
