@@ -15,10 +15,9 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(poem_enable_tests "Build tests" ON)
-option(poem_build_tools "Build tools" ON)
-option(poem_allow_dirty "When OFF, poem tool usage with uncommitted changes will be " OFF)
-#
+option(POEM_BUILD_TESTS "Build tests" ON)
+option(POEM_BUILD_TOOLS "Build tools" ON)
+option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " OFF)
 
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
