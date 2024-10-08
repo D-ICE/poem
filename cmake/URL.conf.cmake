@@ -58,3 +58,7 @@ set(argparse_TAG v2.2 CACHE STRING "argparse version")
 # semver
 set(semver_URL https://github.com/z4kn4fein/cpp-semver.git)
 set(semver_TAG v0.3.3 CACHE STRING "semantic versioning parsing")
+
+# pybind11
+set(pybind11_URL "https://github.com/pybind/pybind11.git")
+set(pybind11_TAG v2.9.0 CACHE STRING "pybind11 version")

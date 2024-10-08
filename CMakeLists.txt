@@ -60,12 +60,7 @@ include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
 include(Add_semver)
-
-set(PYBIND11_FINDPYTHON TRUE)#ON CACHE BOOL "")
-# set pybind11 dir
-set(pybind11_DIR /Users/Caleb/Softwares/pybind11)
-find_package(pybind11 REQUIRED)
-# include(add_pybind11)
+include(Add_pybind11)
 
 #=============================================================================
 # Targets
