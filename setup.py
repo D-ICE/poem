@@ -2,7 +2,7 @@
 # smichel: test setup following weval as a 'template'
 
 import os
-import subprocess
+import subprocess  
 import sys
 import platform
 import logging

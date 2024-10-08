@@ -5,6 +5,7 @@ set(RESOURCE_FILES
         poem_v0_example.nc
         poem_v1_example.nc
         poem_v1_PerfPolarSet.nc 
+        poem_v1_example_5_polars.nc
 )
 
 foreach (FILE ${RESOURCE_FILES})

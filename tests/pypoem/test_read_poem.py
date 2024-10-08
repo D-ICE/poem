@@ -11,7 +11,7 @@ def test_poem():
     pass
 # "src/pypoem/poem.cpython-310-x86_64-linux-gnu.so"
 POEM_RESOURCE_DIR= '/home/smichel/softwares/poem_gitlab/build/resources'
-polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example.nc")
+polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example_5_polars.nc")
 
 PerfPolarSet = pypoem.read_performance_polar_set(polar_file)
 
