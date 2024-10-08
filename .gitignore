@@ -1,12 +1,19 @@
 .idea
 .vscode
 *.orig
+cmake-build-*
+tests/data
 
 docs/API/build
 docs/guide/build
+docs/specifications/_build
+docs/specifications/python_examples
 
 build
-cmake-build-*
+
+*.nc
+*.nc.*
+
 poem.egg*
 pypoem.egg*
 *.egg

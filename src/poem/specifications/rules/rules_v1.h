@@ -241,7 +241,7 @@ namespace poem::v1 {
     /**
      * Rule 2: Groups
      */
-    std::vector<std::string> known_groups = {"PPP", "HPPP", "HVPP-PB", "VPP-PB", "VPP"};
+    std::vector<std::string> known_groups = {"PPP", "HPPP", "HVPP", "MVPP", "VPP"};
     compliant = true;
     if (ncfile.getGroups().empty()) {
       spdlog::critical("POEM File format Specification v1 only works with groups. No groups found.");

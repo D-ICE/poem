@@ -1,0 +1,58 @@
+
+* R0: liberté d'ajouter des données (free user defined data)
+    On peut ajouter tout ce qu'on veut dans le fichier tant que les autres règles sont respectées
+    On peut ajouter autant de variables aux groupes définis en ?? tant qu'elles vérifient les règles ??
+    On peut ajouter autant de groupes de nom différents que ceux définis en R2 mais ils ne sont pas reconnus par le standard
+
+* R1: attributs principaux obligatoires
+    le groupe root DOIT avoir les deux attributs suivants:
+        file_type qui doit avoir la valeur "poem"
+        poem_file_format_version qui doit être "v1"
+
+* R2: groupes reconnus
+    Les groupes / types de polaires reconnus par le standard sont PPP, HPPP, HVPP, MVPP, VPP
+    Autre proposition de noms:
+        MPPP, HPPP, HVPP, MVPP, VPP
+
+* R3: coordonnées des groupes reconnus
+    Chaque groupe doit définir ses propres coordonnées et ne les partage pas avec les autres groupes
+
+    Suivant le type de polaire reconnu par le standard comme spécifié en R2, le nom des coordonnées doit être:
+
+    PPP (5D): STW_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord
+    HPPP (5D): STW_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord
+    HVPP (5D): PB_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord
+    MVPP (5D): PB_Coord_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord
+    VPP (4D): TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord
+
+    L'ordre fait partie du standard
+
+* R4: Coordonnées angulaires
+    Les coordonnées angulaires TWA_Coord et WA_Coord définies en R3 doivent être des listes croissantes de nombres positifs
+    Les valeurs doivent être comprises entre 0 et 180 degrés. Seules des polaires symmétriques sont acceptées par le standard
+
+* R5: Variables obligatoires et reconnues
+    Pour chaque type de polaire, on définit des variables qu'il est obligatoire de faire appaitre. Ces variables sont
+    nécessaire pour les logiciels de routage.
+    Pour chaque type de polaire, on peut définir d'autres variables qui peuvent...
+
+    FIXME: est ce qu'on met dans la norme les variable reconnues ???
+
+
+    doit avoir au moins les variables suivantes de définies (nécessaire pour les logiciels de routage)
+
+    PPP: TotalBrakePower (kW), compléter
+    HPPP: TotalBrakePower (kW), compléter
+    HVPP: TotalBrakePower (kW), compléter
+    MVPP: TotalBrakePower (kW), compléter
+    VPP: TotalBrakePower (kW), compléter
+
+* R6: Attributs de coordonnée et variables
+
+    Toutes coordonnés et toute variable doit avoir les attributs suivants:
+        unit
+        description
+
+    unit doit être une chaine qui se trouve dans ??? (mettre une page spécifique dunits)
+    TODO: dunits rentre dans la norme POEM
+
