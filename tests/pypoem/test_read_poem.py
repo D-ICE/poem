@@ -11,7 +11,8 @@ def test_poem():
     pass
 # "src/pypoem/poem.cpython-310-x86_64-linux-gnu.so"
 POEM_RESOURCE_DIR= '/home/smichel/softwares/poem_gitlab/build/resources'
-polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example_5_polars.nc")
+# polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example_5_polars.nc")
+polar_file = os.path.join(POEM_RESOURCE_DIR, "poem_v1_example.nc")
 
 PerfPolarSet = pypoem.read_performance_polar_set(polar_file)
 
@@ -59,8 +60,8 @@ for p in polar_set_list:
         print("  Polar is filled: {}".format(my5dpolar.is_filled()))
         dim_names = my5dpolar.dimension_set_names()
         for dn in dim_names:
-            print("  Dimension {}: min={}, max={}".format(dn,my5dpolar.min_bounds(dn), my5dpolar.max_bounds(dn)))
-
+            print("  Dimension {}: min={}, max={}".format(dn, my5dpolar.min_bounds(dn), my5dpolar.max_bounds(dn)))
+            print("  {}".format(my5dpolar.coordinates(dn)))
       
         print("    Min & max values of {}: min={}, max={}".format(p,my5dpolar.min_value(),my5dpolar.max_value()))
 #       // auto dpl = polar->dimension_point_list();

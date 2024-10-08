@@ -198,6 +198,11 @@ namespace poem {
       return m_values.size() == m_dimension_point_set->size();
     }
 
+    std::vector<double> coordinates(const std::string &name) const {
+      auto dim_values = m_dimension_point_set->dimension_grid().values(name);
+      return dim_values;
+    }
+
     double min_bounds(const std::string &name) const {
       auto dim_values = m_dimension_point_set->dimension_grid().values(name);
       return dim_values[0];

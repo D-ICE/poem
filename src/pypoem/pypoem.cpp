@@ -41,6 +41,7 @@ PYBIND11_MODULE(pypoem, m) {
       .def("is_filled", &Interp5DPolar::is_filled)
       // .def("dimension_set", &Interp5DPolar::dimension_set) // smichel commented for now, not needed in python    
       .def("dimension_set_names", &Interp5DPolar::dimension_set_names) 
+      .def("coordinates", &Interp5DPolar::coordinates)
       .def("min_bounds", &Interp5DPolar::min_bounds)
       .def("max_bounds", &Interp5DPolar::max_bounds)    
       .def("min_value", &Interp5DPolar::min_value) 
@@ -57,6 +58,7 @@ PYBIND11_MODULE(pypoem, m) {
       .def("is_filled", &Interp3DPolar::is_filled)
       // .def("dimension_set", &Interp3DPolar::dimension_set) // smichel commented for now, not needed in python    
       .def("dimension_set_names", &Interp3DPolar::dimension_set_names) 
+      .def("coordinates", &Interp3DPolar::coordinates)
       .def("min_bounds", &Interp3DPolar::min_bounds)
       .def("max_bounds", &Interp3DPolar::max_bounds)  
       .def("min_value", &Interp3DPolar::min_value) 

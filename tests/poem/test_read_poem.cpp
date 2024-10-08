@@ -85,6 +85,13 @@ TEST(poem_, readerInterp)
       for (auto n : dim_name)
       {
         std::cout << "    Dimension " << n;
+        auto coord = polar->coordinates(n);
+        std::cout << "  List: (";
+        for (auto i : coord)
+        {
+          std::cout << i << ",";
+        }
+        std::cout << ")" << std::endl;
         std::cout << " - min: " << polar->min_bounds(n);
         std::cout << " - max: " << polar->max_bounds(n) << std::endl;
       }
