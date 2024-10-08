@@ -40,6 +40,7 @@ namespace poem {
       if (dimension_point_set_map.find(hash_name) != dimension_point_set_map.end()) {
         // This dimension point set is already registered, getting it from registry
         dimension_point_set = std::dynamic_pointer_cast<DimensionPointSet<_dim>>(dimension_point_set_map.at(hash_name));
+
       } else {
 
         std::array<std::shared_ptr<Dimension>, _dim> array;
@@ -54,6 +55,7 @@ namespace poem {
 
         dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(dimension_grid);
         dimension_point_set_map.insert({hash_name, dimension_point_set});
+
       }
 
       std::string unit, description;
@@ -73,6 +75,7 @@ namespace poem {
       nc_var.getVar(values.data());
 
       polar->set_values(values);
+
     }
 
     template<size_t _dim>
@@ -163,14 +166,15 @@ namespace poem {
     // Get polars
     for (const auto &var_: group.getVars()) {
       std::string var_name = var_.first;
-      if (dimension_map.find(var_name) != dimension_map.end())
-        continue;
+      if (dimension_map.find(var_name) != dimension_map.end()) continue;
 
       read_polar(group.getVar(var_name), dimension_map, dimension_values_map, polar_set);
+
     }
 
     return polar_set;
   }
+
 
   inline std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const netCDF::NcGroup &group) {
     // Get attributes from the group
@@ -192,12 +196,14 @@ namespace poem {
     if (attributes.contains("poem_file_format_version")) {
       has_groups = true;
       poem_spec_version = (int) semver::version::parse(attributes.get("poem_file_format_version"), false).major();
+
     } else {
       has_groups = false;
       poem_spec_version = 0;
     }
 
     spdlog::info("Polar File follows the POEM specifications version v{}", poem_spec_version);
+
 
     auto performance_polar_set = std::make_shared<PerformancePolarSet>(attributes);
 
@@ -208,7 +214,9 @@ namespace poem {
       // No groups in the NetCDF-4 file, only one DataSet, this is the root group
       performance_polar_set->AddPolarSet(read_polar_set(group));
       NIY_POEM
+
     } else {
+
 
       // TODO: voir si on fixe pas en dur les groupes qu'il est possible d'aller chercher sur la base de PolarType
       for (const auto &group_: group.getGroups()) {

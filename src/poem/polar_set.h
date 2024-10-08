@@ -23,7 +23,8 @@ namespace poem {
    public:
     using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
-    explicit PolarSet(const Attributes &attributes, POLAR_TYPE polar_type) : m_attributes(attributes),
+    explicit PolarSet(const Attributes &attributes, POLAR_TYPE polar_type) :
+        m_attributes(attributes),
                                                                              m_polar_type(polar_type) {
 
       if (attributes["polar_type"] != "ND") { // ND is for v0 that do not contain groups...
@@ -68,8 +69,7 @@ namespace poem {
     std::shared_ptr<PolarBase> polar(const std::string &name) const {
       try {
         return m_polars_map.at(name);
-      }
-      catch (const std::out_of_range &e) {
+      } catch (const std::out_of_range &e) {
         spdlog::critical("No polar with name {}", name);
         CRITICAL_ERROR_POEM
       }
@@ -126,8 +126,8 @@ namespace poem {
 
         netCDF::NcFile dataFile(std::string(nc_file_path), netCDF::NcFile::replace);
         code = to_netcdf(dataFile);
-      }
-      catch (netCDF::exceptions::NcException &e) {
+
+      } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
         code = nc_err;
       }

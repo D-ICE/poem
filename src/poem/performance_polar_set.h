@@ -16,9 +16,6 @@ namespace fs = std::filesystem;
 
 namespace poem {
 
-  //  // Forward declaration
-  //  class SpecRulesChecker;
-
   class PerformancePolarSet {
     using PolarSetMap = std::unordered_map<std::string, std::shared_ptr<PolarSet>>;
     using PolarSetIter = PolarSetMap::iterator;
@@ -97,8 +94,7 @@ namespace poem {
         nc_file_path = fs::current_path() / nc_file_path;
       }
 
-      if (verbose)
-        spdlog::info("Writing NetCDF file {}", std::string(nc_file_path));
+      if (verbose) spdlog::info("Writing NetCDF file {}", std::string(nc_file_path));
 
       constexpr int nc_err = 2;
 
@@ -118,8 +114,8 @@ namespace poem {
         }
 
         dataFile.close();
-      }
-      catch (netCDF::exceptions::NcException &e) {
+
+      } catch (netCDF::exceptions::NcException &e) {
         std::cerr << e.what() << std::endl;
         return nc_err;
       }
@@ -130,6 +126,7 @@ namespace poem {
    private:
     std::unordered_map<std::string, std::shared_ptr<PolarSet>> m_polar_set_map;
     Attributes m_attributes;
+
   };
 
 } // poem

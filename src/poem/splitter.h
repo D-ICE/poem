@@ -56,6 +56,7 @@ namespace poem {
 
         offset_i += size_i;
       }
+
     }
 
     size_t size() const { return m_size; }
@@ -79,12 +80,15 @@ namespace poem {
     }
 
    private:
+
     size_t m_size;
     size_t m_nchunks;
 
     OffsetSizeContainer m_offsets_sizes;
+
   };
 
 } // poem
+
 
 #endif // POEM_SPLITTER_H

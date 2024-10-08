@@ -35,20 +35,21 @@ namespace poem {
     Named(std::string name,
           std::string unit,
           std::string description,
-          type::POEM_TYPES type) : m_name(std::move(name)),
+          type::POEM_TYPES type) :
+        m_name(std::move(name)),
                                    m_unit(std::move(unit)),
                                    m_description(std::move(description)),
                                    m_type(type) {
 
       check_unit();
 
-      // #ifndef ALLOW_DIRTY
-      // if (git::AnyUncommittedChanges()) {
-      //   spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
-      //                    git::GetNormalizedVersionString());
-      //   CRITICAL_ERROR_POEM
-      // }
-      // #endif
+      #ifndef ALLOW_DIRTY
+      if (git::AnyUncommittedChanges()) {
+        spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
+                         git::GetNormalizedVersionString());
+        CRITICAL_ERROR_POEM
+      }
+      #endif
     }
 
     const std::string &name() const { return m_name; }
@@ -72,6 +73,7 @@ namespace poem {
     std::string m_unit;
     std::string m_description;
     type::POEM_TYPES m_type;
+
   };
 
 }

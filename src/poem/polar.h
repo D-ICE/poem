@@ -40,7 +40,8 @@ namespace poem {
               const std::string &unit,
               const std::string &description,
               type::POEM_TYPES type,
-              POLAR_TYPE polar_type) : Named(name, unit, description, type),
+              POLAR_TYPE polar_type) :
+        Named(name, unit, description, type),
                                        m_polar_type(polar_type) {}
 
     POLAR_TYPE polar_type() const { return m_polar_type; }
@@ -68,6 +69,7 @@ namespace poem {
    protected:
     POLAR_TYPE m_polar_type;
     mutable std::mutex m_mutex;
+
   };
 
   /**
@@ -82,6 +84,7 @@ namespace poem {
   class Polar : public PolarBase {
 
    public:
+
     using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
@@ -90,13 +93,12 @@ namespace poem {
           const std::string &description,
           type::POEM_TYPES type,
           POLAR_TYPE polar_type,
-          std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) : PolarBase(name, unit, description, type,
-                                                                                    polar_type),
+          std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
+        PolarBase(name, unit, description, type, polar_type),
                                                                           m_dimension_point_set(dimension_point_set),
                                                                           m_interpolator_is_built(false),
                                                                           m_nearest_is_built(false),
-                                                                          m_values(std::vector<T>(
-                                                                              dimension_point_set->size())) {}
+        m_values(std::vector<T>(dimension_point_set->size())) {}
 
     const size_t dim() const override { return _dim; }
 
@@ -169,6 +171,7 @@ namespace poem {
         }
 
         dims.push_back(dim);
+
       }
 
       // Storing the values
@@ -182,16 +185,19 @@ namespace poem {
             break;
           case type::INT:
             nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
+
         }
         nc_var.setCompression(true, true, 5);
 
         nc_var.putVar(m_values.data());
         nc_var.putAtt("unit", unit());
         nc_var.putAtt("description", description());
+
       } else {
         spdlog::critical("Attempting to store more than one time a variable with the same name {}", name());
         CRITICAL_ERROR_POEM
       }
+
     }
 
     bool is_filled() const override {
@@ -201,6 +207,20 @@ namespace poem {
     std::vector<double> coordinates(const std::string &name) const {
       auto dim_values = m_dimension_point_set->dimension_grid().values(name);
       return dim_values;
+    }
+
+    void bounds(std::array<T, _dim> &min_bounds, std::array<T, _dim> &max_bounds) const {
+      for (size_t idx = 0; idx < _dim; ++idx) {
+        auto dim_values = m_dimension_point_set->dimension_grid().values(idx);
+        min_bounds[idx] = dim_values[0];
+        max_bounds[idx] = dim_values[dim_values.size() - 1];
+      }
+    }
+
+    void bounds(const std::string &name, double &min, double &max) const {
+      auto dim_values = m_dimension_point_set->dimension_grid().values(name);
+      min = dim_values[0];
+      max = dim_values[dim_values.size() - 1];
     }
 
     double min_bounds(const std::string &name) const {
@@ -256,6 +276,7 @@ namespace poem {
       m_nearest->AddVar(array);
 
       m_nearest_is_built = true;
+
     }
 
    protected:
@@ -267,6 +288,7 @@ namespace poem {
 
     std::unique_ptr<InterpolatorND> m_interpolator;
     std::unique_ptr<NearestND> m_nearest;
+
   };
 
   template<size_t _dim>
@@ -291,16 +313,26 @@ namespace poem {
       // dimension grid singleton ou bien une nouvelle polaire avec des dimensions reduites ?
       // On peut faire le seconde option et se doter d'une methode qui permet de squeeze les singletons...
 
+
       auto dimension_set = this->m_dimension_point_set->dimension_set();
 
       auto new_dimension_grid = DimensionGrid<_dim>(dimension_set);
 
+
       for (size_t i = 0; i < dimension_set.size(); ++i) {
         auto dim_name = dimension_set->name(i);
         if (prescribed_values.contains(dim_name)) {
+          
+
         } else {
+
+
         }
+
       }
+
+
+
 
       NIY_POEM
 
@@ -321,6 +353,10 @@ namespace poem {
       //
       //      // Building a new dimension grid
       //      auto dimension_grid = this->m_dimension_point_set->dimension_grid();
+
+
+
+
     }
 
    private:
@@ -350,6 +386,7 @@ namespace poem {
 
       this->m_interpolator_is_built = true;
     }
+
   };
 
 } // poem
