@@ -2,7 +2,7 @@ pybind11_add_module(pypoem
   pypoem.cpp
 )
 
-target_link_libraries(pypoem PRIVATE poem)
+target_link_libraries(pypoem PRIVATE _poem)
 
 set_target_properties(pypoem
   PROPERTIES
@@ -12,7 +12,7 @@ set_target_properties(pypoem
 )
 
 # Force output directory to test folder if tests are enabled
-if (${poem_enable_tests})
+if (${POEM_BUILD_TESTS})
   set_target_properties(pypoem
     PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/tests/pypoem

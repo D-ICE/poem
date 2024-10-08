@@ -66,7 +66,7 @@ include(Add_pybind11)
 #=============================================================================
 add_subdirectory(src)
 
-if (${poem_enable_tests})
+if (${POEM_BUILD_TESTS})
     include(Add_googletest)
     enable_testing()
 
