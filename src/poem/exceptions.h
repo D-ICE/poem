@@ -17,15 +17,12 @@
   std::string msg = fmt::format("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
   throw PoemException(msg);
 
-namespace poem
-{
+namespace poem {
 
-  struct PoemException : public std::exception
-  {
+  struct PoemException : public std::exception {
     PoemException(const std::string &msg) : m_msg(msg) {};
 
-    const char *what() const throw() override
-    {
+    const char *what() const throw() override {
       spdlog::critical(m_msg);
       return "POEM EXCEPTION";
     }

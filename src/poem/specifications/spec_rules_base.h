@@ -8,12 +8,10 @@
 #include <string>
 #include <vector>
 
-namespace poem
-{
+namespace poem {
 
-  class SpecRulesBase
-  {
-  public:
+  class SpecRulesBase {
+   public:
     explicit SpecRulesBase(int version_major) : m_version_major(version_major) {}
 
     [[nodiscard]] int version() const { return m_version_major; }
@@ -26,7 +24,7 @@ namespace poem
 
     [[nodiscard]] virtual bool check(const std::string &nc_polar_file, bool verbose) const = 0;
 
-  protected:
+   protected:
     int m_version_major;
   };
 

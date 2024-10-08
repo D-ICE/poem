@@ -13,22 +13,18 @@
 #include "poem/exceptions.h"
 #include "poem/version.h"
 
-namespace poem
-{
+namespace poem {
 
-  namespace type
-  {
-    enum POEM_TYPES
-    {
+  namespace type {
+    enum POEM_TYPES {
       DOUBLE,
       INT
     };
 
   } // poem::type
 
-  class Named
-  {
-  public:
+  class Named {
+   public:
     /**
      * Constructor
      * @param name the name of the dimension
@@ -42,8 +38,7 @@ namespace poem
           type::POEM_TYPES type) : m_name(std::move(name)),
                                    m_unit(std::move(unit)),
                                    m_description(std::move(description)),
-                                   m_type(type)
-    {
+                                   m_type(type) {
 
       check_unit();
 
@@ -64,17 +59,15 @@ namespace poem
 
     const type::POEM_TYPES &type() const { return m_type; }
 
-  private:
-    void check_unit()
-    {
-      if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true))
-      {
+   private:
+    void check_unit() {
+      if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
         spdlog::critical("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
         CRITICAL_ERROR_POEM
       }
     }
 
-  protected:
+   protected:
     std::string m_name;
     std::string m_unit;
     std::string m_description;

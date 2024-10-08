@@ -8,33 +8,27 @@
 #include <string>
 #include <map>
 
-namespace poem
-{
+namespace poem {
 
   /**
    * Represents different attributes (metadata) to be added to a PolarSet
    */
-  class Attributes
-  {
-  public:
+  class Attributes {
+   public:
     using Map = std::map<std::string, std::string>;
     using Iter = Map::const_iterator;
 
-    void add_attribute(const std::string &name, const std::string &val)
-    {
+    void add_attribute(const std::string &name, const std::string &val) {
       m_attributes.insert({name, val});
     }
 
-    void add_attributes(const Attributes &other)
-    {
-      for (const auto &att : other)
-      {
+    void add_attributes(const Attributes &other) {
+      for (const auto &att: other) {
         m_attributes.insert(att);
       }
     }
 
-    bool contains(const std::string &name) const
-    {
+    bool contains(const std::string &name) const {
       return m_attributes.find(name) != m_attributes.end();
     }
 
@@ -48,7 +42,7 @@ namespace poem
 
     Iter end() const { return m_attributes.cend(); }
 
-  private:
+   private:
     Map m_attributes;
   };
 
