@@ -30,12 +30,13 @@
     
   cmake:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Release -Dpoem_enable_tests=$ENABLE_TEST -Dpoem_build_tools=OFF -Dpoem_allow_dirty=OFF ..
+    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
     - make -j6
 
   upload:
     - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
     - echo "Uploading $OUTPUT to s3"
+    - ls src/pypoem
     - aws s3 cp src/pypoem/$OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_BRANCH/ #$CI_COMMIT_TAG/
 
 test:
