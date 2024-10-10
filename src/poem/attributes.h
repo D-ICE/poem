@@ -44,6 +44,7 @@ namespace poem {
 
    private:
     Map m_attributes;
+
   };
 
 } // poem
