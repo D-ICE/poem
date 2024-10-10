@@ -80,7 +80,7 @@ if (${POEM_BUILD_TESTS})
 endif ()
 
 # smichel: has to be fixed, for now: commented
- if (POEM_BUILD_TOOLS)
-     include(Add_argparse)
-     add_subdirectory(tools)
- endif ()
+# if (POEM_BUILD_TOOLS)
+#     include(Add_argparse)
+#     add_subdirectory(tools)
+# endif ()
