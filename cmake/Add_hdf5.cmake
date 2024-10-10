@@ -29,12 +29,15 @@ set (ZLIB_STATIC_LIBRARY zlibstatic)
 set (ZLIB_LIBRARIES zlibstatic)
 #set (ZLIB_FOUND 1)
 
+
 message(STATUS "******* FETCHING hdf5 dependency from ${PROJECT_NAME} (requested version: ${hdf5_TAG}) *******")
 FetchContent_MakeAvailable(hdf5)
 
 #unset(CMAKE_ARCHIVE_OUTPUT_DIRECTORY CACHE)
 #unset(CMAKE_LIBRARY_OUTPUT_DIRECTORY CACHE)
 #unset(CMAKE_RUNTIME_OUTPUT_DIRECTORY CACHE)
+
+set(HDF5_LIBRARIES )
 
 set(HDF5_C_LIBRARY hdf5-static)
 set(HDF5_HL_LIBRARY hdf5_hl-static)
