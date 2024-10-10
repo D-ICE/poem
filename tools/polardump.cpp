@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
   spdlog::set_level(spdlog::level::level_enum::critical);
 
-  argparse::ArgumentParser program("polardump", poem::version::GetNormalizedVersionString());
+  argparse::ArgumentParser program("polardump", poem::git::GetNormalizedVersionString());
   program.add_argument("polar_file").help("NetCDF polar file");
 
   // Parsing command line arguments
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   std::cout << std::endl;
   if (polar_set->is_using_newest_schema()) {
     std::cout << "Polar is using the newest schema for poem version "
-              << poem::version::GetNormalizedVersionString() << std::endl;
+              << poem::git::GetNormalizedVersionString() << std::endl;
   } else {
     std::cout << "Polar is using an older schema version " << std::endl;
   }
