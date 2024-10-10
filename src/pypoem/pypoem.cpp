@@ -30,6 +30,7 @@ PYBIND11_MODULE(pypoem, m) {
       .def("polar_type_str", &PolarSet::polar_type_str)
       .def("polar_names", &PolarSet::polar_names)
       .def("get_5D_polar", &PolarSet::polar<double, 5>)
+      .def("get_4D_polar", &PolarSet::polar<double, 4>)
       .def("get_3D_polar", &PolarSet::polar<double, 3>); 
 
   using Interp5DPolar = InterpolablePolar<5>;
@@ -37,9 +38,7 @@ PYBIND11_MODULE(pypoem, m) {
   py::class_<Interp5DPolar, Shared5DPolar>(m, "InterpolablePolar5D") // Daughter class from Polar, PolarBase, Named
       .def("dim", &Interp5DPolar::dim)
       .def("size", &Interp5DPolar::size)
-      // .def("polar_type", &Interp3DPolar::polar_type) // smichel commented for now, need to know POLAR_TYPE class
       .def("is_filled", &Interp5DPolar::is_filled)
-      // .def("dimension_set", &Interp5DPolar::dimension_set) // smichel commented for now, not needed in python    
       .def("dimension_set_names", &Interp5DPolar::dimension_set_names) 
       .def("coordinates", &Interp5DPolar::coordinates)
       .def("min_bounds", &Interp5DPolar::min_bounds)
@@ -49,14 +48,27 @@ PYBIND11_MODULE(pypoem, m) {
       .def("nearest", &Interp5DPolar::nearest) 
       .def("interp", &Interp5DPolar::interp);
       
+  using Interp4DPolar = InterpolablePolar<4>;
+  using Shared4DPolar = std::shared_ptr<InterpolablePolar<4>>;
+  py::class_<Interp4DPolar, Shared4DPolar>(m, "InterpolablePolar4D") // Daughter class from Polar, PolarBase, Named
+      .def("dim", &Interp4DPolar::dim)
+      .def("size", &Interp4DPolar::size)
+      .def("is_filled", &Interp4DPolar::is_filled)
+      .def("dimension_set_names", &Interp4DPolar::dimension_set_names) 
+      .def("coordinates", &Interp4DPolar::coordinates)
+      .def("min_bounds", &Interp4DPolar::min_bounds)
+      .def("max_bounds", &Interp4DPolar::max_bounds)    
+      .def("min_value", &Interp4DPolar::min_value) 
+      .def("max_value", &Interp4DPolar::max_value) 
+      .def("nearest", &Interp4DPolar::nearest) 
+      .def("interp", &Interp4DPolar::interp);
+      
   using Interp3DPolar = InterpolablePolar<3>;
   using Shared3DPolar = std::shared_ptr<InterpolablePolar<3>>;
   py::class_<Interp3DPolar, Shared3DPolar>(m, "InterpolablePolar3D") // Daughter class from Polar, PolarBase, Named
       .def("dim", &Interp3DPolar::dim)
       .def("size", &Interp3DPolar::size)
-      // .def("polar_type", &Interp3DPolar::polar_type) // smichel commented for now, need to know POLAR_TYPE class
       .def("is_filled", &Interp3DPolar::is_filled)
-      // .def("dimension_set", &Interp3DPolar::dimension_set) // smichel commented for now, not needed in python    
       .def("dimension_set_names", &Interp3DPolar::dimension_set_names) 
       .def("coordinates", &Interp3DPolar::coordinates)
       .def("min_bounds", &Interp3DPolar::min_bounds)
