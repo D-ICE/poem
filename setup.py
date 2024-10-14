@@ -67,6 +67,7 @@ class CMakeBuild(build_ext):
             "-DPOEM_BUILD_TESTS=OFF",
             "-DPOEM_BUILD_TOOLS=OFF",
             "-DPOEM_ALLOW_DIRTY=OFF",
+            "-DPOEM_BUILD_PYTHON=ON",
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir)
         ]
         build_args = []
