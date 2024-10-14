@@ -18,10 +18,12 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
 option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " OFF)
+option(POEM_BUILD_PYTHON "Build pypoem, the python interface" OFF)
 
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
+#cmake_policy(SET CMP0148 NEW) # FindPython3 policy
 
 #=============================================================================
 # Retrieving the current Git revision
@@ -42,9 +44,6 @@ endif ()
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/URL.conf.cmake)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-find_package(PythonInterp 3 REQUIRED)
-find_package(PythonLibs 3 REQUIRED)
-
 include(Add_boost)
 include(Add_mathutils)
 include(Add_json)
@@ -54,17 +53,22 @@ include(Add_dunits)
 
 # netcdf related dependencies
 include(Add_zlib)
-include(Add_curl)
+#include(Add_curl)
 include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
 include(Add_semver)
-include(Add_pybind11)
 
 #=============================================================================
 # Targets
 #=============================================================================
-add_subdirectory(src)
+add_subdirectory(src/poem)
+if (POEM_BUILD_PYTHON)
+    find_package(Python3 COMPONENTS Interpreter Development)
+    include(Add_pybind11)
+
+    add_subdirectory(src/pypoem)
+endif ()
 
 if (${POEM_BUILD_TESTS})
     include(Add_googletest)
@@ -80,7 +84,7 @@ if (${POEM_BUILD_TESTS})
 endif ()
 
 # smichel: has to be fixed, for now: commented
-# if (POEM_BUILD_TOOLS)
-#     include(Add_argparse)
-#     add_subdirectory(tools)
-# endif ()
+ if (POEM_BUILD_TOOLS)
+     include(Add_argparse)
+     add_subdirectory(tools)
+ endif ()

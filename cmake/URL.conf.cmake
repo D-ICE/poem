@@ -12,9 +12,8 @@ set(json_URL https://github.com/nlohmann/json.git)
 set(json_TAG v3.6.1 CACHE STRING "json version")
 
 # zlib
-set(zlib_URL https://github.com/madler/zlib/archive/refs/tags/v1.2.12.tar.gz)
-set(zlib_TAG v1.2.12)
-set(zlib_PATCH zlib_v1.2.12.patch CACHE STRING "zlib version")
+set(zlib_URL https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz)
+set(zlib_TAG v1.3.1)
 
 # Curl
 set(curl_URL https://github.com/curl/curl/archive/refs/tags/curl-7_84_0.tar.gz)
