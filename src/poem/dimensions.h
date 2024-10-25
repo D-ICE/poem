@@ -63,8 +63,8 @@ namespace poem {
 
     std::vector<std::string> names() const {
       std::vector<std::string> list;
-      for (const auto &name: m_map_stoi) {
-        list.push_back(name.first);
+      for (const auto dim : m_dimension_array) {
+        list.push_back(dim->name());
       }
       return list;
     }
