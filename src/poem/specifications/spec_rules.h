@@ -14,16 +14,18 @@
 
 namespace poem {
 
-  static int max_poem_file_version = 1;
+//  static int max_poem_file_version = 1;
 
   class SpecRules : public SpecRulesBase {
    public:
     explicit SpecRules(int version_major) : SpecRulesBase(version_major) {
-      if (version_major > max_poem_file_version) {
+
+      if (version_major > POEM_MAX_FILE_VERSION) {
         spdlog::critical("Could not invoque Specification Rules for version {} (max version is currently {})",
-                         version_major, max_poem_file_version);
+                         version_major, POEM_MAX_FILE_VERSION);
         CRITICAL_ERROR_POEM
       }
+
       switch (version_major) {
         case 0:
           m_spec_rules = std::make_unique<v0::SpecRules>();

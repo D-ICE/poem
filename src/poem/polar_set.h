@@ -23,19 +23,32 @@ namespace poem {
    public:
     using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
 
-    explicit PolarSet(const Attributes &attributes, POLAR_TYPE polar_type) :
+    PolarSet(const std::string &name, const Attributes &attributes, POLAR_TYPE polar_type) :
+        m_name(name),
         m_attributes(attributes),
-                                                                             m_polar_type(polar_type) {
+        m_polar_type(polar_type) {
 
-      if (attributes["polar_type"] != "ND") { // ND is for v0 that do not contain groups...
-        if (!attributes.contains("name")) {
-          spdlog::critical("name attribute is mandatory for PolarSet");
-          CRITICAL_ERROR_POEM
+//      if (attributes["polar_type"] != "ND") { // ND is for v0 that do not contain groups...
+//        if (!attributes.contains("name")) {
+//          spdlog::critical("name attribute is mandatory for PolarSet");
+//          CRITICAL_ERROR_POEM
+//        }
+//      }
+
+      if (!attributes.contains(name)) {
+        m_attributes.add_attribute("name", name);
+      } else {
+        if (name != m_attributes["name"]) {
+          spdlog::warn("PolarSet name {} does not correspond to name attribute {}. Attribute set to {}",
+                       name, attributes["name"], name);
+          m_attributes.set("name", name);
         }
+
       }
+
     }
 
-    const std::string &name() const { return m_attributes["name"]; }
+    const std::string &name() const { return m_name; }
 
     POLAR_TYPE polar_type() const {
       return polar_type_s2enum(m_attributes["polar_type"]);
@@ -93,6 +106,8 @@ namespace poem {
       return polar_names;
     }
 
+    Attributes attributes() const { return m_attributes; }
+
     std::mutex *mutex() {
       return &m_mutex;
     }
@@ -136,6 +151,8 @@ namespace poem {
     }
 
    protected:
+    std::string m_name;
+
     Attributes m_attributes;
     POLAR_TYPE m_polar_type;
 

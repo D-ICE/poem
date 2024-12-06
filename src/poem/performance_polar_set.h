@@ -29,7 +29,7 @@ namespace poem {
         spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
         CRITICAL_ERROR_POEM
       }
-      auto polar_set = std::make_shared<PolarSet>(attributes, polar_type);
+      auto polar_set = std::make_shared<PolarSet>("", attributes, polar_type);
       m_polar_set_map.insert({attributes["polar_type"], polar_set});
       return polar_set;
     }

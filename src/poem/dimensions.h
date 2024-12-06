@@ -63,8 +63,8 @@ namespace poem {
 
     std::vector<std::string> names() const {
       std::vector<std::string> list;
-      for (const auto &name: m_map_stoi) {
-        list.push_back(name.first);
+      for (const auto dim: m_dimension_array) {
+        list.push_back(dim->name());
       }
       return list;
     }
@@ -80,7 +80,7 @@ namespace poem {
     DimensionPoint(const DimensionSet<_dim> *dimension_set,
                    const std::array<double, _dim> &array) :
         m_dimension_set(dimension_set),
-                                                            m_array(array) {}
+        m_array(array) {}
 
     const double &operator[](const std::string &name) const {
       try {
@@ -215,7 +215,7 @@ namespace poem {
    public:
     explicit DimensionPointSet(const DimensionGrid<_dim> &dimension_grid) :
         m_dimension_points(dimension_grid.dimension_points()),
-                                                                            m_dimension_grid(dimension_grid) {}
+        m_dimension_grid(dimension_grid) {}
 
     size_t size() const {
       return m_dimension_points.size();

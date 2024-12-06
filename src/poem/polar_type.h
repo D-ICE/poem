@@ -35,6 +35,9 @@ namespace poem {
     } else if (polar_type_ == "ND") {
       // This is the v0 version of POEM specs...
       polar_type = HPPP;
+    } else if (polar_type_ == "/") {
+      // This is the root group and might be a v0 version of POEM specs...
+      polar_type = HPPP;
     } else {
       spdlog::critical("Polar type \"{}\" unknown", polar_type);
       CRITICAL_ERROR_POEM
