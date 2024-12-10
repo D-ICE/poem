@@ -50,16 +50,25 @@ namespace poem {
 
     const std::string &name() const { return m_name; }
 
+    void rename(std::string name) {m_name=name;}
+
     POLAR_TYPE polar_type() const {
       return polar_type_s2enum(m_attributes["polar_type"]);
     }
 
     void polar_type(const std::string &type) {
       m_attributes["polar_type"] = type;
+      m_polar_type = polar_type_s2enum(type);
     }
 
     const std::string &polar_type_str() const {
       return m_attributes["polar_type"];
+    }
+
+    void rename_variables(std::unordered_map<std::string, std::string> varnames_map) {
+      for (const auto& var: varnames_map){
+        polar(var.first)->rename(var.second);
+      }
     }
 
     template<typename T, size_t _dim>
@@ -158,6 +167,7 @@ namespace poem {
     std::string m_name;
 
     Attributes m_attributes;
+    // FIXME: redondant with type defined in m_attributes
     POLAR_TYPE m_polar_type;
 
     PolarMap m_polars_map;

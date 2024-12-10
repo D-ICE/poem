@@ -63,9 +63,15 @@ namespace poem {
       return exist(polar_type_enum2s(polar_type));
     }
 
+    void rename_variables(const std::unordered_map<std::string, std::string> varnames_map){
+      for (auto it = begin(); it!=end(); it++){
+        it->second->rename_variables(varnames_map);
+      }
+    }
+
     std::shared_ptr<PolarSet> polar_set(const std::string &name) const {
       if (!exist(name)) {
-        spdlog::critical("Not PolarSet found with name {}", name);
+        spdlog::critical("No PolarSet found with name {}", name);
         CRITICAL_ERROR_POEM
       }
       return m_polar_set_map.at(name);
