@@ -220,7 +220,7 @@ TEST(poemfull_, reader) {
 
 TEST(poem_, reader_writer) {
 
-  for (int iversion = POEM_MIN_READ_FILE_VERSION; iversion < POEM_MAX_FILE_VERSION; ++iversion) {
+  for (int iversion = POEM_MIN_READ_FILE_VERSION; iversion < POEM_MAX_FILE_VERSION+1; ++iversion) {
 
     std::string filename = std::string("poem_v") + std::to_string(iversion) + "_example.nc";
     std::string polar_file = fs::path(POEM_RESOURCE_DIR) / filename;
@@ -238,8 +238,8 @@ TEST(poem_, reader_writer) {
     perf_polar_set->to_netcdf("new.nc", true);
 
     // check that the files are compliant with last version
-    auto spec_rules = SpecRules(POEM_MAX_FILE_VERSION);
-    ASSERT_TRUE(spec_rules.check("new.nc", true));
+    auto last_spec_rules = SpecRules(POEM_MAX_FILE_VERSION);
+    ASSERT_TRUE(last_spec_rules.check("new.nc", true));
 
   }
 

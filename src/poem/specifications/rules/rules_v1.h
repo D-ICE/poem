@@ -205,11 +205,11 @@ namespace poem::v1 {
      */
     compliant = true;
     if (ncfile.getAtts().contains("file_type")) {
-      std::string polar_type;
-      ncfile.getAtt("file_type").getValues(polar_type);
-      if (polar_type != "poem") {
+      std::string file_type;
+      ncfile.getAtt("file_type").getValues(file_type);
+      if (file_type != "poem") {
         if (verbose)
-          spdlog::critical("Attribute polar_type value must be poem but {} found instead", polar_type);
+          spdlog::critical("Attribute file_type value must be poem but {} found instead", file_type);
         compliant = false;
       }
     } else {
@@ -258,12 +258,12 @@ namespace poem::v1 {
     }
 
     // if HPPP exists, PPP must exist too
-    if (ncfile.getGroups().contains("HPPP") && !ncfile.getGroups().contains("PPP")) {
-      spdlog::critical("When HPPP group exists, PPP group must also exist");
-      compliant = false;
-    }
+//    if (ncfile.getGroups().contains("HPPP") && !ncfile.getGroups().contains("PPP")) {
+//      spdlog::critical("When HPPP group exists, PPP group must also exist");
+//      compliant = false;
+//    }
 
-    // if HPPP exists, PPP must exist too
+    // if HVPP-PB exists, VPP-PB must exist too
     if (ncfile.getGroups().contains("HVPP-PB") && !ncfile.getGroups().contains("VPP-PB")) {
       spdlog::critical("When HVPP-PB group exists, VPP-PB group must also exist");
       compliant = false;
@@ -325,7 +325,7 @@ namespace poem::v1 {
     }
     if (!compliant) {
       if (verbose)
-        spdlog::critical("Not compliant with v0/R4 or v0/R5");
+        spdlog::critical("Not compliant with v1/R4 or v1/R5");
       return false;
     }
 
@@ -338,7 +338,7 @@ namespace poem::v1 {
     }
     if (!compliant) {
       if (verbose)
-        spdlog::critical("Not compliant with v0/R6");
+        spdlog::critical("Not compliant with v1/R6");
       return false;
     }
 
@@ -351,7 +351,7 @@ namespace poem::v1 {
     }
     if (!compliant) {
       if (verbose)
-        spdlog::critical("Not compliant with v0/R7");
+        spdlog::critical("Not compliant with v1/R7");
       return false;
     }
 
@@ -364,7 +364,7 @@ namespace poem::v1 {
     }
     if (!compliant) {
       if (verbose)
-        spdlog::critical("Not compliant with v0/R8");
+        spdlog::critical("Not compliant with v1/R8");
       compliant = false;
     }
 
@@ -378,7 +378,7 @@ namespace poem::v1 {
     explicit SpecRules() : SpecRulesBase(1) {}
 
     std::vector<std::string> coordinate_variables() const override {
-      return {"STW_kt", "TWS_kt", "TWA_deg", "WA_deg", "Hs_m"};
+      return {"STW_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"};
     }
 
     std::vector<std::string> mandatory_variables() const override {

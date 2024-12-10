@@ -54,6 +54,10 @@ namespace poem {
       return polar_type_s2enum(m_attributes["polar_type"]);
     }
 
+    void polar_type(const std::string &type) {
+      m_attributes["polar_type"] = type;
+    }
+
     const std::string &polar_type_str() const {
       return m_attributes["polar_type"];
     }

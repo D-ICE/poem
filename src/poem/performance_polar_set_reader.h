@@ -11,6 +11,7 @@
 #include <netcdf>
 #include <semver/semver.hpp>
 
+#include "polar.h"
 #include "polar_set.h"
 #include "performance_polar_set.h"
 #include "specifications/spec_rules.h"
@@ -135,7 +136,7 @@ namespace poem {
       attributes.add_attribute(att.first, att_val);
     }
 
-    POLAR_TYPE polar_type = polar_type_s2enum(group.getName());
+    POLAR_TYPE polar_type = polar_type_s2enum(attributes["polar_type"]);
 
     auto polar_set = std::make_shared<PolarSet>(group.getName(), attributes, polar_type);
 
@@ -247,7 +248,6 @@ namespace poem {
       std::string version;
       ncfile.getAtt("poem_file_format_version").getValues(version);
       poem_file_format_version = (int) semver::version::parse(version, false).major();
-      NIY_POEM
     } else {
       poem_file_format_version = 0;
     }
@@ -276,9 +276,32 @@ namespace poem {
     auto polar_set = read_polar_set(ncfile);
     ncfile.close();
 
-//    polar_set->attributes() = Attributes();
+//    R1
+    auto atts = polar_set->attributes();
+    if (!atts.contains("file_type")) {
+      atts.add_attribute("file_type", "poem");
+    }
+    if (!atts.contains("poem_file_format_version")) {
+      atts.add_attribute("poem_file_format_version", "v1");
+    }
 
-    auto perf_polar_set = std::make_shared<PerformancePolarSet>(polar_set->attributes());
+    auto perf_polar_set = std::make_shared<PerformancePolarSet>(atts);
+
+//    R2
+    polar_set->polar_type("HPPP");
+
+    auto BP_polar = std::reinterpret_pointer_cast<Polar<double, 5>>(polar_set->polar("BrakePower"));
+
+//    R3
+    auto ds = BP_polar->dimension_set();
+    ds->at("STW_kt")->rename("STW_Coord");
+    ds->at("TWS_kt")->rename("TWS_Coord");
+    ds->at("TWA_deg")->rename("TWA_Coord");
+    ds->at("WA_deg")->rename("WA_Coord");
+    ds->at("Hs_m")->rename("Hs_Coord");
+
+//    R6
+    BP_polar->rename("TotalBrakePower");
 
     perf_polar_set->AddPolarSet(polar_set);
 
@@ -287,7 +310,27 @@ namespace poem {
   }
 
   [[nodiscard]] inline std::shared_ptr<PerformancePolarSet> read_v1(const std::string &nc_polar) {
-    NIY_POEM
+
+//    auto perf_polar_set = std::make_shared<PerformancePolarSet>();
+    netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
+
+    Attributes attributes;
+    for (const auto &att: ncfile.getAtts()) {
+      std::string att_val;
+      att.second.getValues(att_val);
+      attributes.add_attribute(att.first, att_val);
+    }
+    auto perf_polar_set = std::make_shared<PerformancePolarSet>(attributes);
+
+    for (auto group: ncfile.getGroups()) {
+      auto polar_set = read_polar_set(group.second);
+      perf_polar_set->AddPolarSet(polar_set);
+    }
+
+    ncfile.close();
+
+    return perf_polar_set;
+
   }
 
   class Reader {

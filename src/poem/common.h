@@ -60,6 +60,8 @@ namespace poem {
 
     const type::POEM_TYPES &type() const { return m_type; }
 
+    void rename(std::string name) {m_name = name;}
+
    private:
     void check_unit() {
       if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
