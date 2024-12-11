@@ -56,7 +56,7 @@ TEST(poem_polar_set, NestedForLoop)
     poem::Attributes attributes;
     attributes.add_attribute("polar_type", "PPP");
     attributes.add_attribute("name", "ship_name_PPP");
-    auto polar_set = std::make_shared<poem::PolarSet>(attributes, poem::POLAR_TYPE::PPP);
+    auto polar_set = std::make_shared<poem::PolarSet>("PPP", attributes, poem::POLAR_TYPE::PPP);
     auto p = polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::POEM_TYPES::DOUBLE, dimension_point_set);
     //(polar, "MylittlePolar");
 
