@@ -26,7 +26,17 @@ namespace poem {
                                                             m_attributes(std::move(attributes)) {
       }
 
-      std::shared_ptr<PolarSet> new_polar_set(POLAR_TYPE, const Attributes &attributes, POLAR_TYPE polar_type) {
+      const std::string &name() const {
+        return m_name;
+      }
+
+      std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes, POLAR_TYPE polar_type) {
+        if (m_polar_set_map.contains(polar_type)) {
+          spdlog::warn("PolarSet of type {} already exists in PerformancePolarSet {}. "
+                       "Attempting to create new one...",
+                       polar_type, name());
+        }
+
         NIY_POEM
         // if (exist(attributes["polar_type"])) {
         //   spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
@@ -37,9 +47,6 @@ namespace poem {
         // return polar_set;
       }
 
-      const std::string &name() const {
-        return m_name;
-      }
 
       void AddPolarSet(std::shared_ptr<PolarSet> polar_set) {
         auto polar_type = polar_set->polar_type();
