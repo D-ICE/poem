@@ -31,20 +31,17 @@ namespace poem {
       }
 
       std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes, POLAR_TYPE polar_type) {
+
         if (m_polar_set_map.contains(polar_type)) {
-          spdlog::warn("PolarSet of type {} already exists in PerformancePolarSet {}. "
+          spdlog::critical("PolarSet of type {} already exists in PerformancePolarSet {}. "
                        "Attempting to create new one...",
                        polar_type, name());
+          CRITICAL_ERROR_POEM
         }
 
-        NIY_POEM
-        // if (exist(attributes["polar_type"])) {
-        //   spdlog::critical("Attempting to create a PolarSet with name {} twice", attributes["name"]);
-        //   CRITICAL_ERROR_POEM
-        // }
-        // auto polar_set = std::make_shared<PolarSet>("", attributes, polar_type);
-        // m_polar_set_map.insert({attributes["polar_type"], polar_set});
-        // return polar_set;
+         auto polar_set = std::make_shared<PolarSet>("", attributes, polar_type);
+         m_polar_set_map.insert({polar_type, polar_set});
+         return polar_set;
       }
 
 
@@ -99,13 +96,24 @@ namespace poem {
         }
       }
 
-      std::shared_ptr<PolarSet> polar_set(const std::string &name) const {
-        NIY_POEM
-        // if (!exist(name)) {
-        //   spdlog::critical("No PolarSet found with name {}", name);
-        //   CRITICAL_ERROR_POEM
-        // }
-        // return m_polar_set_map.at(name);
+//      std::shared_ptr<PolarSet> polar_set(const std::string &name) const {
+//        NIY_POEM
+//        // if (!exist(name)) {
+//        //   spdlog::critical("No PolarSet found with name {}", name);
+//        //   CRITICAL_ERROR_POEM
+//        // }
+//        // return m_polar_set_map.at(name);
+//      }
+
+      std::shared_ptr<PolarSet> polar_set(POLAR_TYPE polar_type) const {
+        std::shared_ptr<PolarSet> polar_set;
+        if (exist(polar_type)) {
+          polar_set = m_polar_set_map.at(polar_type);
+        } else {
+          spdlog::critical("Polar type {} does not exist in PerformancePolarSet {}. ",
+                           polar_type_enum2s(polar_type), m_name);
+        }
+        return polar_set;
       }
 
       PolarSetIter begin() {
