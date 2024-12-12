@@ -14,7 +14,7 @@
 
 namespace poem {
 
-//  static int max_poem_file_version = 1;
+  static int max_poem_file_version = 1;
 
   class SpecRules : public SpecRulesBase {
    public:
