@@ -186,31 +186,31 @@ TEST(poemfull_, reader) {
     std::cout << std::endl;
     std::string pn = ps_ptr->polar_type_str();
     std::array<double, 5> dimension_point{10.1, 10.1, 90.1, 0, 0};
-    //   std::cout << "  Dimension point: (";
-    //   for (auto i : dimension_point)
-    //   {
-    //     std::cout << i << ",";
-    //   }
-    //   std::cout << ")" << std::endl;
-    //   for (auto p : polar_names)
-    //   {
-    //     std::shared_ptr<InterpolablePolar<5> > polar = ps_ptr->polar<double, 5>(p);
-    //     std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;
-    //     const int dim = polar->dim();
-    //     std::cout << "  Polar type: " << polar->polar_type() << std::endl;
-    //     std::cout << "  Polar dim: " << polar->dim() << std::endl;
-    //     std::cout << "  Polar size: " << polar->size() << std::endl;
-    //     std::cout << "  Polar is filled ?: " << polar->is_filled() << std::endl;
-    //     auto dim_name = polar->dimension_set_names();
-    //     for (auto n : dim_name)
-    //     {
-    //       std::cout << "    Dimension " << n;
-    //       std::cout << " - min: " << polar->min_bounds(n);
-    //       std::cout << " - max: " << polar->max_bounds(n) << std::endl;
-    //     }
-    //     std::cout << "    Min & max values of " << p;
-    //     std::cout << " - min: " << polar->min_value();
-    //     std::cout << " - max: " << polar->max_value() << std::endl;
+  //   std::cout << "  Dimension point: (";
+  //   for (auto i : dimension_point)
+  //   {
+  //     std::cout << i << ",";
+  //   }
+  //   std::cout << ")" << std::endl;
+  //   for (auto p : polar_names)
+  //   {
+  //     std::shared_ptr<InterpolablePolar<5> > polar = ps_ptr->polar<double, 5>(p);
+  //     std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;
+  //     const int dim = polar->dim();
+  //     std::cout << "  Polar type: " << polar->polar_type() << std::endl;
+  //     std::cout << "  Polar dim: " << polar->dim() << std::endl;
+  //     std::cout << "  Polar size: " << polar->size() << std::endl;
+  //     std::cout << "  Polar is filled ?: " << polar->is_filled() << std::endl;
+  //     auto dim_name = polar->dimension_set_names();
+  //     for (auto n : dim_name)
+  //     {
+  //       std::cout << "    Dimension " << n;
+  //       std::cout << " - min: " << polar->min_bounds(n);
+  //       std::cout << " - max: " << polar->max_bounds(n) << std::endl;
+  //     }
+  //     std::cout << "    Min & max values of " << p;
+  //     std::cout << " - min: " << polar->min_value();
+  //     std::cout << " - max: " << polar->max_value() << std::endl;
   }
 
   std::cout << std::endl

@@ -30,7 +30,7 @@
     
   cmake:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
+    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_PYTHON=$BUILD_PYPOEM -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
     - make -j6
 
   upload:
@@ -47,6 +47,7 @@ test:
   variables:
     PYTHON_VERSION: "3.10"
     ENABLE_TEST: "ON"
+    BUILD_PYPOEM: ON
   before_script:
     - !reference [.scripts, sshconfig]
     - !reference [.scripts, deps]
@@ -72,6 +73,9 @@ test:
   #   - tags
   image: "python:$PYTHON_VERSION-bullseye"
 
+  variables:
+    BUILD_PYPOEM: ON
+
   before_script:
     - !reference [.scripts, sshconfig]
     - !reference [.scripts, deps]
@@ -85,6 +89,7 @@ python312:
   variables:
     PYTHON_VERSION: "3.12"
     ENABLE_TEST: "OFF"
+    BUILD_PYPOEM: ON
   extends:
     - .build
 
@@ -92,6 +97,7 @@ python311:
   variables:
     PYTHON_VERSION: "3.11"
     ENABLE_TEST: "OFF"
+    BUILD_PYPOEM: ON
   extends:
     - .build
 
@@ -99,6 +105,7 @@ python310:
   variables:
     PYTHON_VERSION: "3.10"
     ENABLE_TEST: "OFF"
+    BUILD_PYPOEM: ON
   extends:
     - .build
 
@@ -106,5 +113,6 @@ python39:
   variables:
     PYTHON_VERSION: "3.9"
     ENABLE_TEST: "OFF"
+    BUILD_PYPOEM: ON
   extends:
     - .build
