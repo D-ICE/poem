@@ -71,7 +71,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
     attributesPPS.add_attribute("name", "MyLittleShip");
     attributesPPS.add_attribute("poem_file_format_version", "v1");
     attributesPPS.add_attribute("vessel_type", "HYBRID");
-    auto perf_polar_set = std::make_shared<poem::PerformancePolarSet>(attributesPPS);
+    auto perf_polar_set = std::make_shared<poem::PerformancePolarSet>("/", attributesPPS);
     perf_polar_set->AddPolarSet(polar_set);
 
     std::cout << "==== Setup ended " << std::endl;
@@ -91,7 +91,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
         std::cout << perf_polar_set->exist(pl) << std::endl;
     }
 
-    std::vector<std::string> res = perf_polar_set->polar_set_list();
+    std::vector<POLAR_TYPE> res = perf_polar_set->polar_set_type_list();
     std::cout << "Polar set list (names): ";
     for (auto r : res)
     {
