@@ -55,12 +55,6 @@ namespace poem {
 
         m_polar_set_map.insert({polar_type, polar_set});
 
-        // NIY_POEM
-        // // if (exist(polar_set->polar_type_str())) {
-        // //   spdlog::critical("Attempting to add a PolarSet with name {} that is already present", polar_set->name());
-        // //   CRITICAL_ERROR_POEM
-        // // }
-        // // m_polar_set_map.insert({polar_set->name(), polar_set});
       }
 
       std::vector<POLAR_TYPE> polar_set_type_list() const {
@@ -81,11 +75,6 @@ namespace poem {
         return list;
       }
 
-      // inline bool exist(const std::string &name) const {
-      //   NIY_POEM
-      //   // return m_polar_set_map.contains(name); // C++20
-      // }
-
       inline bool exist(POLAR_TYPE polar_type) const {
         return m_polar_set_map.contains(polar_type);
       }
@@ -95,15 +84,6 @@ namespace poem {
           it->second->rename_variables(varnames_map);
         }
       }
-
-//      std::shared_ptr<PolarSet> polar_set(const std::string &name) const {
-//        NIY_POEM
-//        // if (!exist(name)) {
-//        //   spdlog::critical("No PolarSet found with name {}", name);
-//        //   CRITICAL_ERROR_POEM
-//        // }
-//        // return m_polar_set_map.at(name);
-//      }
 
       std::shared_ptr<PolarSet> polar_set(POLAR_TYPE polar_type) const {
         std::shared_ptr<PolarSet> polar_set;

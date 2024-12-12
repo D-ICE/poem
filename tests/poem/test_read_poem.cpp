@@ -34,10 +34,10 @@ TEST(poem_, readerInterp) {
     std::cout << pps_ptr->exist(pl) << std::endl;
   }
 
-  std::vector<std::string> res = pps_ptr->polar_set_list();
+  std::vector<POLAR_TYPE> res = pps_ptr->polar_set_type_list();
   std::cout << "Polar set list (names): ";
   for (auto r: res) {
-    std::cout << r << ", ";
+    std::cout << polar_type_enum2s(r) << ", ";
   }
 
   std::cout << std::endl
@@ -159,7 +159,7 @@ TEST(poemfull_, reader) {
     std::cout << pps_ptr->exist(pl) << std::endl;
   }
 
-  std::vector<std::string> res = pps_ptr->polar_set_list();
+  std::vector<POLAR_TYPE> res = pps_ptr->polar_set_type_list();
   std::cout << "Polar set list (names): ";
   for (auto r: res) {
     std::cout << r << ", ";
