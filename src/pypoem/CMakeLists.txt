@@ -1,3 +1,6 @@
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+include(Add_pybind11)
+
 pybind11_add_module(pypoem
   pypoem.cpp
 )

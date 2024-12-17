@@ -64,9 +64,6 @@ include(Add_semver)
 #=============================================================================
 add_subdirectory(src/poem)
 if (POEM_BUILD_PYTHON)
-    find_package(Python3 COMPONENTS Interpreter Development)
-    include(Add_pybind11)
-
     add_subdirectory(src/pypoem)
 endif ()
 
