@@ -32,7 +32,7 @@ namespace poem {
   class InterpolablePolarTable;
 
   /**
-   * Base class for a polar to be used for polymorphism into a PolarSet
+   * Base class for a polar table to be used for polymorphism into a Polar
    */
   class PolarTableBase : public Named {
    public:
@@ -42,7 +42,7 @@ namespace poem {
                    type::POEM_TYPES type,
                    POLAR_TYPE polar_type) :
         Named(name, unit, description, type),
-                                       m_polar_type(polar_type) {}
+        m_polar_type(polar_type) {}
 
     POLAR_TYPE polar_type() const { return m_polar_type; }
 
@@ -52,10 +52,9 @@ namespace poem {
 
     virtual bool is_filled() const = 0;
 
-    //    virtual void append(PolarTableBase *polar) = 0;
-
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
+    double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const
+    {
       return static_cast<const InterpolablePolarTable<_dim> *>(this)->interp(dimension_point, bound_check);
     }
 
@@ -72,8 +71,9 @@ namespace poem {
 
   };
 
+
   /**
-   * Represents a polar for one variable
+   * Represents a polar table for one variable
    *
    * Should not be implemented directly but via a PolarSet
    *
@@ -85,7 +85,7 @@ namespace poem {
 
    public:
 
-    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
+//    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
     PolarTable(const std::string &name,
@@ -96,7 +96,7 @@ namespace poem {
                std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarTableBase(name, unit, description, type, polar_type),
         m_dimension_point_set(dimension_point_set),
-        m_interpolator_is_built(false),
+//        m_interpolator_is_built(false),
         m_nearest_is_built(false),
         m_values(std::vector<T>(dimension_point_set->size())) {}
 
@@ -254,7 +254,7 @@ namespace poem {
     void build_nearest() {
 
       if (!is_filled()) {
-        spdlog::critical("Attempting to build nearest table of a polar before it is totally filled");
+        spdlog::critical("Attempting to build nearest table of a polar table before it is totally filled");
         CRITICAL_ERROR_POEM
       }
 
@@ -280,13 +280,13 @@ namespace poem {
     }
 
    protected:
-    bool m_interpolator_is_built;
+//    bool m_interpolator_is_built;
     bool m_nearest_is_built;
 
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     std::vector<T> m_values;
 
-    std::unique_ptr<InterpolatorND> m_interpolator;
+//    std::unique_ptr<InterpolatorND> m_interpolator;
     std::unique_ptr<NearestND> m_nearest;
 
   };
@@ -295,6 +295,18 @@ namespace poem {
   class InterpolablePolarTable : public PolarTable<double, _dim> {
 
    public:
+
+    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
+
+    InterpolablePolarTable(const std::string &name,
+                           const std::string &unit,
+                           const std::string &description,
+                           type::POEM_TYPES type,
+                           POLAR_TYPE polar_type,
+                           std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
+        PolarTable<double, _dim>(name, unit, description, type, polar_type, dimension_point_set),
+        m_interpolator_is_built(false) {}
+
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       std::lock_guard<std::mutex> lock(this->m_mutex);
 
@@ -322,7 +334,7 @@ namespace poem {
       for (size_t i = 0; i < dimension_set.size(); ++i) {
         auto dim_name = dimension_set->name(i);
         if (prescribed_values.contains(dim_name)) {
-          
+
 
         } else {
 
@@ -330,8 +342,6 @@ namespace poem {
         }
 
       }
-
-
 
 
       NIY_POEM
@@ -367,7 +377,7 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
 
-      this->m_interpolator = std::make_unique<typename PolarTable<double, _dim>::InterpolatorND>();
+      this->m_interpolator = std::make_unique<typename InterpolablePolarTable<_dim>::InterpolatorND>();
 
       using NDArray = boost::multi_array<double, _dim>;
       using IndexArray = boost::array<typename NDArray::index, _dim>;
@@ -386,6 +396,10 @@ namespace poem {
 
       this->m_interpolator_is_built = true;
     }
+
+   private:
+    bool m_interpolator_is_built;
+    std::unique_ptr<InterpolatorND> m_interpolator;
 
   };
 

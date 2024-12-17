@@ -81,7 +81,7 @@ namespace poem::v1 {
       auto dim_name = var.getDim(i).getName();
       if (dim_name != expected_dim_name) {
         if (verbose)
-          spdlog::critical("Dimension {} of {} polar MUST be {}. {} found instead.",
+          spdlog::critical("Dimension {} of {} polar_table MUST be {}. {} found instead.",
                            i, group_name, expected_dim_name, dim_name);
       }
 

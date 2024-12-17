@@ -273,7 +273,7 @@ namespace poem {
     //    R2
     polar_set->polar_type("HPPP");
 
-    auto BP_polar = std::reinterpret_pointer_cast<PolarTable<double, 5> >(polar_set->polar("BrakePower"));
+    auto BP_polar = std::reinterpret_pointer_cast<PolarTable<double, 5> >(polar_set->polar_table("BrakePower"));
 
     //    R3
     auto ds = BP_polar->dimension_set();

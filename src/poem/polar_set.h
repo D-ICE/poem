@@ -21,7 +21,7 @@ namespace poem {
 
   class PolarSet {
    public:
-    using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarTableBase>>;
+    using PolarTableMap = std::unordered_map<std::string, std::shared_ptr<PolarTableBase>>;
 
     PolarSet(const std::string &name, const Attributes &attributes, POLAR_TYPE polar_type) :
         m_name(name),
@@ -67,7 +67,7 @@ namespace poem {
 
     void rename_variables(std::unordered_map<std::string, std::string> varnames_map) {
       for (const auto& var: varnames_map){
-        polar(var.first)->rename(var.second);
+        polar_table(var.first)->rename(var.second);
       }
     }
 
@@ -92,7 +92,7 @@ namespace poem {
       return polar;
     }
 
-    std::shared_ptr<PolarTableBase> polar(const std::string &name) const {
+    std::shared_ptr<PolarTableBase> polar_table(const std::string &name) const {
       try {
         return m_polars_map.at(name);
       } catch (const std::out_of_range &e) {
@@ -102,13 +102,13 @@ namespace poem {
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
-    std::shared_ptr<PolarTable<T, _dim>> polar(const std::string &name) const {
-      return std::reinterpret_pointer_cast<PolarTable<T, _dim>>(polar(name));
+    std::shared_ptr<PolarTable<T, _dim>> polar_table(const std::string &name) const {
+      return std::reinterpret_pointer_cast<PolarTable<T, _dim>>(polar_table(name));
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    std::shared_ptr<InterpolablePolarTable<_dim>> polar(const std::string &name) const {
-      return std::reinterpret_pointer_cast<InterpolablePolarTable<_dim>>(polar(name));
+    std::shared_ptr<InterpolablePolarTable<_dim>> polar_table(const std::string &name) const {
+      return std::reinterpret_pointer_cast<InterpolablePolarTable<_dim>>(polar_table(name));
     }
 
     std::vector<std::string> polar_names() const {
@@ -170,7 +170,7 @@ namespace poem {
     // FIXME: redondant with type defined in m_attributes
     POLAR_TYPE m_polar_type;
 
-    PolarMap m_polars_map;
+    PolarTableMap m_polars_map;
 
     static inline std::mutex m_mutex;
   };

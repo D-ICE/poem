@@ -26,9 +26,9 @@ PYBIND11_MODULE(pypoem, m) {
       // .def("polar_type", &PolarSet::polar_type) // smichel commented for now, need to know POLAR_TYPE class
       .def("polar_type_str", &PolarSet::polar_type_str)
       .def("polar_names", &PolarSet::polar_names)
-      .def("get_5D_polar", &PolarSet::polar<double, 5>)
-      .def("get_4D_polar", &PolarSet::polar<double, 4>)
-      .def("get_3D_polar", &PolarSet::polar<double, 3>); 
+      .def("get_5D_polar", &PolarSet::polar_table<double, 5>)
+      .def("get_4D_polar", &PolarSet::polar_table<double, 4>)
+      .def("get_3D_polar", &PolarSet::polar_table<double, 3>);
 
   using Interp5DPolar = InterpolablePolarTable<5>;
   using Shared5DPolar = std::shared_ptr<InterpolablePolarTable<5>>;

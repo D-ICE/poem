@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
   }
   polar_file = fs::canonical(polar_file);
 
-  spdlog::info("Reading polar file {}", polar_file.string());
+  spdlog::info("Reading polar_table file {}", polar_file.string());
 
   if (program["--sha"] == true) {
     spdlog::info("Computing SHA256 hash for file: {}", polar_file.string());

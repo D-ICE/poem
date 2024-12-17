@@ -129,7 +129,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
         std::cout << ")" << std::endl;
         for (auto p : polar_names)
         {
-            std::shared_ptr<InterpolablePolarTable<5>> polar = ps_ptr->polar<double, 5>(p);
+            std::shared_ptr<InterpolablePolarTable<5>> polar = ps_ptr->polar_table<double, 5>(p);
             std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;
             const int dim = polar->dim();
             std::cout << "  Polar type: " << polar->polar_type() << std::endl;
