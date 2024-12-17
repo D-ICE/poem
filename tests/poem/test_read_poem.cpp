@@ -77,11 +77,11 @@ TEST(poem_, readerInterp) {
       auto dim_name = polar_table->dimension_set_names();
       for (auto n: dim_name) {
         std::cout << "    Dimension " << n;
-        auto coord = polar_table->coordinates(n);
-        std::cout << "  List: (";
-        for (auto i: coord) {
-          std::cout << i << ",";
-        }
+//        auto coord = polar_table->coordinates(n);
+//        std::cout << "  List: (";
+//        for (auto i: coord) {
+//          std::cout << i << ",";
+//        }
         std::cout << ")" << std::endl;
         std::cout << " - min: " << polar_table->min_bounds(n);
         std::cout << " - max: " << polar_table->max_bounds(n) << std::endl;

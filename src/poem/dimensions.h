@@ -33,7 +33,11 @@ namespace poem {
   template<size_t _dim>
   class DimensionSet {
    public:
-    explicit DimensionSet(const std::array<std::shared_ptr<Dimension>, _dim> &dimension_array) :
+    using DimensionArray = std::array<std::shared_ptr<Dimension>, _dim>;
+    using DimensionSetIter = DimensionArray::iterator;
+    using DimensionSetConstIter = DimensionArray::const_iterator;
+
+    explicit DimensionSet(const DimensionArray &dimension_array) :
         m_dimension_array(dimension_array) {
 
       for (size_t idim = 0; idim < _dim; ++idim) {
@@ -69,8 +73,27 @@ namespace poem {
       return list;
     }
 
+    /*
+     * Iterators
+     */
+    DimensionSetIter begin() {
+      return m_dimension_array.begin();
+    }
+
+    DimensionSetIter end() {
+      return m_dimension_array.end();
+    }
+
+    DimensionSetConstIter begin() const {
+      return m_dimension_array.cbegin();
+    }
+
+    DimensionSetConstIter end() const {
+      return m_dimension_array.cend();
+    }
+
    private:
-    std::array<std::shared_ptr<Dimension>, _dim> m_dimension_array;
+    DimensionArray m_dimension_array;
     std::unordered_map<std::string, size_t> m_map_stoi;
   };
 
@@ -84,9 +107,15 @@ namespace poem {
 
   template<size_t _dim>
   class DimensionPoint {
+
    public:
+    using DimensionPointArray = std::array<double, _dim>;
+    using DimensionPointArrayIter = DimensionPointArray::iterator;
+    using DimensionPointArrayConstIter = DimensionPointArray::const_iterator;
+
+
     DimensionPoint(const DimensionSet<_dim> *dimension_set,
-                   const std::array<double, _dim> &array) :
+                   const DimensionPointArray &array) :
         m_dimension_set(dimension_set),
         m_array(array) {}
 
@@ -108,12 +137,36 @@ namespace poem {
       }
     }
 
+    const std::array<double, _dim> &array() const {
+      return m_array;
+    }
+
+    /*
+     * Iterators
+     */
+
+    DimensionPointArrayIter begin() {
+      return m_array.begin();
+    }
+
+    DimensionPointArrayIter end() {
+      return m_array.end();
+    }
+
+    DimensionPointArrayConstIter begin() const {
+      return m_array.cbegin();
+    }
+
+    DimensionPointArrayConstIter end() const {
+      return m_array.cend();
+    }
+
     // FIXME: voir pourquoi on ne parvient pas a mettre cout private...
 //   private:
 //    friend std::ostream &operator<<(std::ostream &, const DimensionPoint<_dim> &);
 
-    std::ostream &cout(std::ostream &os) const {
-      for (size_t i=0; i<_dim; ++i) {
+    inline std::ostream &cout(std::ostream &os) const {
+      for (size_t i = 0; i < _dim; ++i) {
         os << m_dimension_set->name(i) << ": " << m_array.at(i) << ";\t";
       }
       return os;
@@ -121,12 +174,12 @@ namespace poem {
 
    private:
     const DimensionSet<_dim> *m_dimension_set;
-    const std::array<double, _dim> m_array;
+    const DimensionPointArray m_array;
   };
 
 
   template<size_t _dim>
-  std::ostream &operator<<(std::ostream &os, const DimensionPoint<_dim> &dimension_point) {
+  inline std::ostream &operator<<(std::ostream &os, const DimensionPoint<_dim> &dimension_point) {
     return dimension_point.cout(os);
   }
 

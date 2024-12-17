@@ -53,8 +53,7 @@ namespace poem {
     virtual bool is_filled() const = 0;
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const
-    {
+    double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       return static_cast<const InterpolablePolarTable<_dim> *>(this)->interp(dimension_point, bound_check);
     }
 
@@ -118,9 +117,12 @@ namespace poem {
       return m_dimension_point_set->dimension_set();
     }
 
+    std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set() const {
+      return m_dimension_point_set;
+    }
+
     std::vector<std::string> dimension_set_names() const {
-      auto dim_set = m_dimension_point_set->dimension_set();
-      return dim_set->names();
+      return m_dimension_point_set->dimension_set()->names();
     }
 
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
@@ -204,10 +206,10 @@ namespace poem {
       return m_values.size() == m_dimension_point_set->size();
     }
 
-    std::vector<double> coordinates(const std::string &name) const {
-      auto dim_values = m_dimension_point_set->dimension_grid().values(name);
-      return dim_values;
-    }
+//    std::vector<double> coordinates(const std::string &name) const {
+//      auto dim_values = m_dimension_point_set->dimension_grid().values(name);
+//      return dim_values;
+//    }
 
     void bounds(std::array<T, _dim> &min_bounds, std::array<T, _dim> &max_bounds) const {
       for (size_t idx = 0; idx < _dim; ++idx) {
@@ -316,76 +318,60 @@ namespace poem {
       return this->m_interpolator->Interp(dimension_point, bound_check);
     }
 
-    // FIXME: est-ce que possible faire auto sur l'output de maniere a laisser au runtime la determination de _newdim ?
-    template<size_t _newdim>
-    InterpolablePolarTable<_newdim> slice(const std::unordered_map<std::string, double> &prescribed_values) const {
-
-      /**
-       * On a une polair de dimension _dim
-       *
-       * On veut creer un slice, ie une coupe en fixant plusieurs coordonnees
-       *
-       * On passe donc un dict cle(nom de la dimension) / valeur fixee
-       *    -> on verifie que les noms existent
-       *    -> on verifie que les valeurs sont bien dans les bornes (ou c'est fait par l'interpolateur ?)
-       *
-       * Ayant ca, il faut etablir un nouveau DimensionPointSet sur lequel on va vouloir interpoler
-       *
-       * On parcourt chacun des points du DimensionPointSet pour interpoler et remlir la nouvelle polaire
-       *
-       * On squeeze pour retirer les dimensions singleton
-       *
-       */
-
-      // TODO: verifier que les dimensions existent
-
-
-      // Question: Est-ce qu'on veut renvoyer une polaire avec les meme dimensions mais avec des dimensions de la
-      // dimension grid singleton ou bien une nouvelle polaire avec des dimensions reduites ?
-      // On peut faire le seconde option et se doter d'une methode qui permet de squeeze les singletons...
-
+    std::shared_ptr<InterpolablePolarTable<_dim>>
+    slice(const std::unordered_map<std::string, double> &prescribed_values) const {
 
       auto dimension_set = this->m_dimension_point_set->dimension_set();
 
+      // Check names are existing
+      for (const auto &pair: prescribed_values) {
+        if (!dimension_set->is_dim(pair.first)) {
+          spdlog::critical("Slicing PolarTable \"{}\" with unknown dimension name {}", this->m_name, pair.first);
+          CRITICAL_ERROR_POEM
+        }
+        // TODO: tester ranges des valeurs
+
+      }
+
+      // Buildign a new grid
+      auto former_dimension_grid = this->m_dimension_point_set->dimension_grid();
       auto new_dimension_grid = DimensionGrid<_dim>(dimension_set);
+      for (const auto &dimension: *dimension_set) {
+        auto dimension_name = dimension->name();
 
-
-      for (size_t i = 0; i < dimension_set.size(); ++i) {
-        auto dim_name = dimension_set->name(i);
-        if (prescribed_values.contains(dim_name)) {
-
-
+        if (prescribed_values.contains(dimension_name)) {
+          std::cout << "Slicing with " << dimension_name << " = " << prescribed_values.at(dimension_name) << std::endl;
+          new_dimension_grid.set_values(dimension_name, {prescribed_values.at(dimension_name)});
         } else {
-
-
+          std::cout << "Keep sampling on " << dimension_name << std::endl;
+          new_dimension_grid.set_values(dimension_name, former_dimension_grid.values(dimension_name));
         }
 
       }
 
+      auto new_dimension_point_set = std::make_shared<DimensionPointSet<_dim>>(new_dimension_grid);
+//      for (const auto &dimension_point : *new_dimension_point_set) {
+//        std::cout << dimension_point << std::endl;
+//      }
 
-      NIY_POEM
+      // New polar table
+      auto sliced_polar_table = std::make_shared<InterpolablePolarTable<_dim>>(
+          this->m_name,
+          this->m_unit,
+          this->m_description,
+          this->m_type,
+          this->m_polar_type,
+          new_dimension_point_set);
 
-      //      // Checking that the keys of prescribed values are valid dimensions of current polar
-      //      auto dimension_set = this->m_dimension_point_set->dimension_set();
-      //      for (const auto &val: prescribed_values) {
-      //        if (!dimension_set->is_dim(val.first)) {
-      //          spdlog::critical("Attempting to slice polar {} with non-existent dimension name {}", this->m_name, val.first);
-      //          CRITICAL_ERROR_POEM
-      //        }
-      //      }
-      //
-      //      // Checking that _newdim is correct
-      //      if (_dim - prescribed_values.size() != _newdim) {
-      //        spdlog::critical("Inconsistent dimension in slicing");
-      //        CRITICAL_ERROR_POEM
-      //      }
-      //
-      //      // Building a new dimension grid
-      //      auto dimension_grid = this->m_dimension_point_set->dimension_grid();
+      // Interpolation on every DimensionPoint
+      size_t idx = 0;
+      for (const auto &dimension_point: *new_dimension_point_set) {
+        auto val = this->interp(dimension_point.array(), false); // Bound checking already done above
+        std::cout << dimension_point << " -> " << val << std::endl;
+        sliced_polar_table->set_value(idx, val);
+      }
 
-
-
-
+      return sliced_polar_table;
     }
 
    private:

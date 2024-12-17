@@ -7,7 +7,7 @@
 
 using namespace poem;
 
-std::shared_ptr<PolarTable<double, 3>> create_polar_table() {
+std::shared_ptr<InterpolablePolarTable<3>> create_polar_table() {
 
   // Create dimensions
   auto STW_dim = std::make_shared<poem::Dimension>("STW_kt", "kt", "Speed Through Water");
@@ -33,13 +33,28 @@ std::shared_ptr<PolarTable<double, 3>> create_polar_table() {
   auto dimension_point_set = std::make_shared<poem::DimensionPointSet<3>>(dimension_grid);
 
   // Visu of points
-  for (const auto &dimension_point: *dimension_point_set) {
-    std::cout << dimension_point << std::endl;
-  }
+//  for (const auto &dimension_point: *dimension_point_set) {
+//    std::cout << dimension_point << std::endl;
+//  }
 
-  auto polar_table = std::make_shared<PolarTable<double, 3>>("VAR", "-", "Variable",
-                                                             type::POEM_TYPES::DOUBLE,
-                                                             poem::POLAR_TYPE::HVPP, dimension_point_set);
+  auto polar_table = std::make_shared<InterpolablePolarTable<3>>(
+      "VAR", "-", "Variable",
+      type::POEM_TYPES::DOUBLE,
+      poem::POLAR_TYPE::HVPP,
+      dimension_point_set
+  );
+
+  // Filling the polar table
+  size_t idx = 0;
+  for (const auto &dimension_point : *dimension_point_set) {
+    double val = 1.;
+    for (const auto coord : dimension_point) {
+      val *= coord;
+    }
+
+    polar_table->set_value(idx, val);
+    idx++;
+  }
 
   return polar_table;
 }
@@ -47,10 +62,20 @@ std::shared_ptr<PolarTable<double, 3>> create_polar_table() {
 
 TEST(poem_polar_slicing, poem_polar_slicing) {
 
+  // Get a polar table
   auto polar_table = create_polar_table();
 
+  std::unordered_map<std::string, double> slice1{{"STW_kt", 1.2},
+                                                 {"TWS_kt", 2.05}};
 
+  auto sliced1 = polar_table->slice(slice1);
 
-
+  for (const auto& dimension_point : *sliced1->dimension_point_set()) {
+    double val = 1.;
+    for (const auto &coord : dimension_point) {
+      val *= coord;
+    }
+    ASSERT_EQ(polar_table->interp(dimension_point.array(), false), val);
+  }
 
 }
