@@ -12,7 +12,7 @@
 #include <semver/semver.hpp>
 
 #include "polar_table.h"
-#include "polar_set.h"
+#include "polar.h"
 #include "performance_polar_set.h"
 #include "specifications/spec_rules.h"
 #include "exceptions.h"
@@ -38,7 +38,7 @@ namespace poem {
       if (dimension_point_set_map.find(hash_name) != dimension_point_set_map.end()) {
         // This dimension point set is already registered, getting it from registry
         dimension_point_set = std::dynamic_pointer_cast<DimensionPointSet<
-          _dim> >(dimension_point_set_map.at(hash_name));
+            _dim> >(dimension_point_set_map.at(hash_name));
       } else {
         std::array<std::shared_ptr<Dimension>, _dim> array;
         for (int i = 0; i < _dim; ++i) {
@@ -59,11 +59,11 @@ namespace poem {
       nc_var.getAtt("description").getValues(description);
 
       // Create the polar into the polar set
-      auto polar = polar_set->new_polar<T, _dim>(nc_var.getName(),
-                                                 unit,
-                                                 description,
-                                                 var_type,
-                                                 dimension_point_set);
+      auto polar = polar_set->new_polar_table<T, _dim>(nc_var.getName(),
+                                                       unit,
+                                                       description,
+                                                       var_type,
+                                                       dimension_point_set);
 
       // Get values from nc_var
       auto polar_size = dimension_point_set->size();
@@ -314,49 +314,49 @@ namespace poem {
   }
 
   class Reader {
-    public:
-      explicit Reader(const std::string &nc_polar) : m_nc_polar(nc_polar) {
-        if (!fs::exists(nc_polar)) {
-          spdlog::critical("Polar file {} NOT FOUND", nc_polar);
-          CRITICAL_ERROR_POEM
-        }
-
-        // Get the version
-        m_poem_file_version = get_poem_file_version(nc_polar);
-
-        // Check the poem file is compliant with the version
-        auto spec_rules = SpecRules(m_poem_file_version);
-        if (!spec_rules.check(nc_polar, true)) {
-          spdlog::warn("File said to be of POEM standard version {} but not compliant: {}",
-                       m_poem_file_version, m_nc_polar);
-        }
+   public:
+    explicit Reader(const std::string &nc_polar) : m_nc_polar(nc_polar) {
+      if (!fs::exists(nc_polar)) {
+        spdlog::critical("Polar file {} NOT FOUND", nc_polar);
+        CRITICAL_ERROR_POEM
       }
 
-      int poem_file_format_version() const {
-        return m_poem_file_version;
-      }
+      // Get the version
+      m_poem_file_version = get_poem_file_version(nc_polar);
 
-      [[nodiscard]] std::shared_ptr<PerformancePolarSet> read() const {
-        std::shared_ptr<PerformancePolarSet> perf_polar_set;
-        switch (m_poem_file_version) {
-          case 0: {
-            perf_polar_set = read_v0(m_nc_polar);
-            break;
-          }
-          case 1: {
-            perf_polar_set = read_v1(m_nc_polar);
-            break;
-          }
+      // Check the poem file is compliant with the version
+      auto spec_rules = SpecRules(m_poem_file_version);
+      if (!spec_rules.check(nc_polar, true)) {
+        spdlog::warn("File said to be of POEM standard version {} but not compliant: {}",
+                     m_poem_file_version, m_nc_polar);
+      }
+    }
+
+    int poem_file_format_version() const {
+      return m_poem_file_version;
+    }
+
+    [[nodiscard]] std::shared_ptr<PerformancePolarSet> read() const {
+      std::shared_ptr<PerformancePolarSet> perf_polar_set;
+      switch (m_poem_file_version) {
+        case 0: {
+          perf_polar_set = read_v0(m_nc_polar);
+          break;
+        }
+        case 1: {
+          perf_polar_set = read_v1(m_nc_polar);
+          break;
+        }
 
           // TODO: add new version reader
-        }
-
-        return perf_polar_set;
       }
 
-    private:
-      std::string m_nc_polar;
-      int m_poem_file_version;
+      return perf_polar_set;
+    }
+
+   private:
+    std::string m_nc_polar;
+    int m_poem_file_version;
   };
 } // poem
 

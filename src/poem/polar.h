@@ -50,7 +50,7 @@ namespace poem {
 
     const std::string &name() const { return m_name; }
 
-    void rename(std::string name) {m_name=name;}
+    void rename(std::string name) { m_name = name; }
 
     POLAR_TYPE polar_type() const {
       return polar_type_s2enum(m_attributes["polar_type"]);
@@ -66,35 +66,36 @@ namespace poem {
     }
 
     void rename_variables(std::unordered_map<std::string, std::string> varnames_map) {
-      for (const auto& var: varnames_map){
+      for (const auto &var: varnames_map) {
         polar_table(var.first)->rename(var.second);
       }
     }
 
     template<typename T, size_t _dim>
-    std::shared_ptr<PolarTable<T, _dim>> new_polar(const std::string &name,
-                                                   const std::string &unit,
-                                                   const std::string &description,
-                                                   type::POEM_TYPES type,
-                                                   std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+    std::shared_ptr<PolarTable<T, _dim>> new_polar_table(const std::string &name,
+                                                         const std::string &unit,
+                                                         const std::string &description,
+                                                         type::POEM_TYPES type,
+                                                         std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       // Thread safety
       std::lock_guard<std::mutex> lock(m_mutex);
 
-      if (m_polars_map.find(name) != m_polars_map.end()) {
-        return std::reinterpret_pointer_cast<PolarTable<T, _dim>>(m_polars_map.at(name));
+      if (m_polars_tables_map.find(name) != m_polars_tables_map.end()) {
+        return std::reinterpret_pointer_cast<PolarTable<T, _dim>>(m_polars_tables_map.at(name));
       }
 
-      auto polar = std::make_shared<PolarTable<T, _dim>>(name, unit, description, type, m_polar_type, dimension_point_set);
+      auto polar_table = std::make_shared<PolarTable<T, _dim>>(name, unit, description, type, m_polar_type,
+                                                               dimension_point_set);
 
-      m_polars_map.insert({name, polar});
+      m_polars_tables_map.insert({name, polar_table});
 
-      return polar;
+      return polar_table;
     }
 
     std::shared_ptr<PolarTableBase> polar_table(const std::string &name) const {
       try {
-        return m_polars_map.at(name);
+        return m_polars_tables_map.at(name);
       } catch (const std::out_of_range &e) {
         spdlog::critical("No polar with name {}", name);
         CRITICAL_ERROR_POEM
@@ -113,7 +114,7 @@ namespace poem {
 
     std::vector<std::string> polar_names() const {
       std::vector<std::string> polar_names;
-      for (const auto &polar: m_polars_map) {
+      for (const auto &polar: m_polars_tables_map) {
         polar_names.push_back(polar.first);
       }
       return polar_names;
@@ -127,7 +128,7 @@ namespace poem {
 
     int to_netcdf(netCDF::NcGroup &group) const {
 
-      for (const auto &polar: m_polars_map) {
+      for (const auto &polar: m_polars_tables_map) {
         polar.second->to_netcdf(group);
       }
 
@@ -170,7 +171,7 @@ namespace poem {
     // FIXME: redondant with type defined in m_attributes
     POLAR_TYPE m_polar_type;
 
-    PolarTableMap m_polars_map;
+    PolarTableMap m_polars_tables_map;
 
     static inline std::mutex m_mutex;
   };

@@ -9,7 +9,7 @@
 #include <filesystem>
 #include <utility>
 
-#include "polar_set.h"
+#include "polar.h"
 #include "attributes.h"
 
 namespace fs = std::filesystem;

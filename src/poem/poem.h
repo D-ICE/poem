@@ -8,7 +8,7 @@
 #include "exceptions.h"
 #include "performance_polar_set.h"
 #include "polar_type.h"
-#include "polar_set.h"
+#include "polar.h"
 #include "polar_table.h"
 #include "splitter.h"
 #include "performance_polar_set_reader.h"
