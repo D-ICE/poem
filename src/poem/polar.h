@@ -2,8 +2,8 @@
 // Created by frongere on 13/04/23.
 //
 
-#ifndef POEM_POLARSET_H
-#define POEM_POLARSET_H
+#ifndef POEM_POLAR_H
+#define POEM_POLAR_H
 
 #include <memory>
 #include <map>
@@ -178,4 +178,4 @@ namespace poem {
 
 } // poem
 
-#endif // POEM_POLARSET_H
+#endif // POEM_POLAR_H
