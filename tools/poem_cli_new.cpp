@@ -226,8 +226,8 @@ int main(int argc, char *argv[]) {
    *
    * avoir des infos sur une polaire
    * check si une polaire est au bon format poem -> OK
-   * lister les PolarSet disponibles dans un fichier netCDF -> TODO
-   * pour un PolarSet présent, lister les variables (et les cracher dans un fichier utilisable par mship) -> OK
+   * lister les Polar disponibles dans un fichier netCDF -> TODO
+   * pour un Polar présent, lister les variables (et les cracher dans un fichier utilisable par mship) -> OK
    *
    */
   // d50893c80a02ecf22aa00fa144ab3746c506eb4557e307fe790a86c28e76e2d1

@@ -75,7 +75,7 @@ namespace poem {
   /**
    * Represents a polar table for one variable
    *
-   * Should not be implemented directly but via a PolarSet
+   * Should not be implemented directly but via a Polar
    *
    * @tparam T datatype of the polar
    * @tparam _dim number of dimensions of the polar

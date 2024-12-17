@@ -43,17 +43,17 @@ TEST(poem_, readerInterp) {
   std::cout << std::endl
             << std::endl
             << "======================" << std::endl;
-  std::cout << "For each PolarSet, return info " << std::endl;
+  std::cout << "For each Polar, return info " << std::endl;
   std::cout << "======================" << std::endl;
 
-  std::cout << "Construction of PolarSet from the polar_set function" << std::endl;
+  std::cout << "Construction of Polar from the polar_set function" << std::endl;
   // construct polars
   for (auto polar_name: res) {
-    std::shared_ptr<PolarSet> ps_ptr = pps_ptr->polar_set(polar_name);
+    std::shared_ptr<Polar> ps_ptr = pps_ptr->polar_set(polar_name);
 
-    std::cout << "- PolarSet name: " << ps_ptr->name() << std::endl;
-    std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
-    std::cout << "  PolarSet contains: ";
+    std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
+    std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
+    std::cout << "  Polar contains: ";
     auto polar_names = ps_ptr->polar_names();
     for (auto p: polar_names) {
       std::cout << p << ", ";
@@ -110,20 +110,20 @@ TEST(poem_, readerInterp) {
     // std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet_";
     // new_polar_file.append(ps_ptr->polar_type_str());
     // new_polar_file.append(".nc");
-    // std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
+    // std::cout << "I like this Polar, I save it in " << new_polar_file << std::endl;
     // ps_ptr->to_netcdf(new_polar_file);
   }
 
   std::cout << std::endl
             << "======================" << std::endl;
 
-  std::cout << "Construction of PolarSet from the iteraton" << std::endl;
+  std::cout << "Construction of Polar from the iteraton" << std::endl;
   // construct polars
   for (auto mps = pps_ptr->begin(); mps != pps_ptr->end(); mps++) {
-    // std::shared_ptr<PolarSet> ps_ptr = pps_ptr->polar_set(polar_name);
+    // std::shared_ptr<Polar> ps_ptr = pps_ptr->polar_set(polar_name);
     auto ps_ptr = (*mps).second;
-    std::cout << "- PolarSet name: " << ps_ptr->name() << std::endl;
-    std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
+    std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
+    std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
     std::string pn = ps_ptr->polar_type_str();
     std::array<double, 5> dimension_point{10.1, 10.1, 90.1, 0, 0};
     std::cout << "  Dimension point: (";
@@ -168,17 +168,17 @@ TEST(poemfull_, reader) {
   std::cout << std::endl
             << std::endl
             << "======================" << std::endl;
-  std::cout << "For each PolarSet, return info " << std::endl;
+  std::cout << "For each Polar, return info " << std::endl;
   std::cout << "======================" << std::endl;
 
-  std::cout << "Construction of PolarSet from the polar_set function" << std::endl;
+  std::cout << "Construction of Polar from the polar_set function" << std::endl;
   // construct polars
   for (auto polar_name: res) {
-    std::shared_ptr<PolarSet> ps_ptr = pps_ptr->polar_set(polar_name);
+    std::shared_ptr<Polar> ps_ptr = pps_ptr->polar_set(polar_name);
 
-    std::cout << "- PolarSet name: " << ps_ptr->name() << std::endl;
-    std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
-    std::cout << "  PolarSet contains: ";
+    std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
+    std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
+    std::cout << "  Polar contains: ";
     auto polar_names = ps_ptr->polar_names();
     for (auto p: polar_names) {
       std::cout << p << ", ";

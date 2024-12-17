@@ -52,12 +52,12 @@ TEST(poem_performance_polar_set, NestedForLoop)
     auto polar = std::make_shared<poem::PolarTable<double, 5>>("BrakePower", "kW", "Brake Power",
                                                                poem::type::POEM_TYPES::DOUBLE, poem::POLAR_TYPE::PPP, dimension_point_set);
 
-    std::cout << "     PolarSet creation " << std::endl;
+    std::cout << "     Polar creation " << std::endl;
     poem::Attributes attributes;
     attributes.add_attribute("polar_type", "PPP");
     std::string polar_name = "PPP";
 //    attributes.add_attribute("name", "PPP");
-    auto polar_set = std::make_shared<poem::PolarSet>(polar_name, attributes, poem::POLAR_TYPE::PPP);
+    auto polar_set = std::make_shared<poem::Polar>(polar_name, attributes, poem::POLAR_TYPE::PPP);
     polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::POEM_TYPES::DOUBLE, dimension_point_set);
     //(polar, "MylittlePolar");
 
@@ -101,18 +101,18 @@ TEST(poem_performance_polar_set, NestedForLoop)
     std::cout << std::endl
               << std::endl
               << "======================" << std::endl;
-    std::cout << "For each PolarSet, return info " << std::endl;
+    std::cout << "For each Polar, return info " << std::endl;
     std::cout << "======================" << std::endl;
 
-    std::cout << "Construction of PolarSet from the polar_set function" << std::endl;
+    std::cout << "Construction of Polar from the polar_set function" << std::endl;
     // construct polars
     for (auto polar_name : res)
     {
-        std::shared_ptr<PolarSet> ps_ptr = perf_polar_set->polar_set(polar_name);
+        std::shared_ptr<Polar> ps_ptr = perf_polar_set->polar_set(polar_name);
 
-        std::cout << "- PolarSet name: " << ps_ptr->name() << std::endl;
-        std::cout << "  PolarSet type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
-        std::cout << "  PolarSet contains: ";
+        std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
+        std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
+        std::cout << "  Polar contains: ";
         auto polar_names = ps_ptr->polar_names();
         for (auto p : polar_names)
         {
@@ -160,7 +160,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
         // std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PolarSet_";
         // new_polar_file.append(ps_ptr->polar_type_str());
         // new_polar_file.append(".nc");
-        // std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
+        // std::cout << "I like this Polar, I save it in " << new_polar_file << std::endl;
         // ps_ptr->to_netcdf(new_polar_file);
     }
     std::cout << "Well done, PerformancePolarSetTest ended " << std::endl;

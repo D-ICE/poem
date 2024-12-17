@@ -52,11 +52,11 @@ TEST(poem_polar_set, NestedForLoop)
     auto polar = std::make_shared<poem::PolarTable<double, 5>>("BrakePower", "kW", "Brake Power",
                                                                poem::type::POEM_TYPES::DOUBLE, poem::POLAR_TYPE::PPP, dimension_point_set);
 
-    std::cout << "     PolarSet creation " << std::endl;
+    std::cout << "     Polar creation " << std::endl;
     poem::Attributes attributes;
     attributes.add_attribute("polar_type", "PPP");
     attributes.add_attribute("name", "ship_name_PPP");
-    auto polar_set = std::make_shared<poem::PolarSet>("PPP", attributes, poem::POLAR_TYPE::PPP);
+    auto polar_set = std::make_shared<poem::Polar>("PPP", attributes, poem::POLAR_TYPE::PPP);
     auto p = polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::POEM_TYPES::DOUBLE, dimension_point_set);
     //(polar, "MylittlePolar");
 
@@ -64,11 +64,11 @@ TEST(poem_polar_set, NestedForLoop)
 
     std::cout << std::endl
               << "====================== LET'S START test_read.cpp >> PolarSetTest" << std::endl;
-    std::cout << "Hola, this unit test load the PolarSet and read everything it can" << std::endl;    
+    std::cout << "Hola, this unit test load the Polar and read everything it can" << std::endl;
 
-    std::cout << "- PolarSet name: " << attributes["polar_type"] << std::endl;//polar_set->name()
-    std::cout << "  PolarSet type: " << polar_set->polar_type() << " or " << polar_set->polar_type_str() << std::endl;
-    std::cout << "  PolarSet contains: ";
+    std::cout << "- Polar name: " << attributes["polar_type"] << std::endl;//polar_set->name()
+    std::cout << "  Polar type: " << polar_set->polar_type() << " or " << polar_set->polar_type_str() << std::endl;
+    std::cout << "  Polar contains: ";
     auto polar_names = polar_set->polar_names();
     for (auto p : polar_names)
     {

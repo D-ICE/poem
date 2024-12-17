@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 namespace poem {
   class PerformancePolarSet {
-    using PolarSetMap = std::unordered_map<POLAR_TYPE, std::shared_ptr<PolarSet> >;
+    using PolarSetMap = std::unordered_map<POLAR_TYPE, std::shared_ptr<Polar> >;
     using PolarSetIter = PolarSetMap::iterator;
     using PolarSetConstIter = PolarSetMap::const_iterator;
 
@@ -30,26 +30,26 @@ namespace poem {
         return m_name;
       }
 
-      std::shared_ptr<PolarSet> new_polar_set(const Attributes &attributes, POLAR_TYPE polar_type) {
+      std::shared_ptr<Polar> new_polar_set(const Attributes &attributes, POLAR_TYPE polar_type) {
 
         if (m_polar_set_map.contains(polar_type)) {
-          spdlog::critical("PolarSet of type {} already exists in PerformancePolarSet {}. "
+          spdlog::critical("Polar of type {} already exists in PerformancePolarSet {}. "
                        "Attempting to create new one...",
                        polar_type, name());
           CRITICAL_ERROR_POEM
         }
 
-         auto polar_set = std::make_shared<PolarSet>("", attributes, polar_type);
+         auto polar_set = std::make_shared<Polar>("", attributes, polar_type);
          m_polar_set_map.insert({polar_type, polar_set});
          return polar_set;
       }
 
 
-      void AddPolarSet(std::shared_ptr<PolarSet> polar_set) {
+      void AddPolarSet(std::shared_ptr<Polar> polar_set) {
         auto polar_type = polar_set->polar_type();
 
         if (m_polar_set_map.contains(polar_type)) {
-          spdlog::warn("PolarSet of type {} already exists in PerformancePolarSet {}. Assigning twice...",
+          spdlog::warn("Polar of type {} already exists in PerformancePolarSet {}. Assigning twice...",
                        polar_type, name());
         }
 
@@ -85,8 +85,8 @@ namespace poem {
         }
       }
 
-      std::shared_ptr<PolarSet> polar_set(POLAR_TYPE polar_type) const {
-        std::shared_ptr<PolarSet> polar_set;
+      std::shared_ptr<Polar> polar_set(POLAR_TYPE polar_type) const {
+        std::shared_ptr<Polar> polar_set;
         if (exist(polar_type)) {
           polar_set = m_polar_set_map.at(polar_type);
         } else {
@@ -147,7 +147,7 @@ namespace poem {
 
     private:
       std::string m_name;
-      std::unordered_map<POLAR_TYPE, std::shared_ptr<PolarSet> > m_polar_set_map;
+      std::unordered_map<POLAR_TYPE, std::shared_ptr<Polar> > m_polar_set_map;
 
       Attributes m_attributes;
   };

@@ -19,18 +19,18 @@ namespace fs = std::filesystem;
 
 namespace poem {
 
-  class PolarSet {
+  class Polar {
    public:
     using PolarTableMap = std::unordered_map<std::string, std::shared_ptr<PolarTableBase>>;
 
-    PolarSet(const std::string &name, const Attributes &attributes, POLAR_TYPE polar_type) :
+    Polar(const std::string &name, const Attributes &attributes, POLAR_TYPE polar_type) :
         m_name(name),
         m_attributes(attributes),
         m_polar_type(polar_type) {
 
 //      if (attributes["polar_type"] != "ND") { // ND is for v0 that do not contain groups...
 //        if (!attributes.contains("name")) {
-//          spdlog::critical("name attribute is mandatory for PolarSet");
+//          spdlog::critical("name attribute is mandatory for Polar");
 //          CRITICAL_ERROR_POEM
 //        }
 //      }
@@ -39,7 +39,7 @@ namespace poem {
         m_attributes.add_attribute("name", name);
       } else {
         if (name != m_attributes["name"]) {
-          spdlog::warn("PolarSet name {} does not correspond to name attribute {}. Attribute set to {}",
+          spdlog::warn("Polar name {} does not correspond to name attribute {}. Attribute set to {}",
                        name, attributes["name"], name);
           m_attributes.set("name", name);
         }

@@ -21,14 +21,14 @@ PYBIND11_MODULE(pypoem, m) {
       .def("polar_set_list", &PerformancePolarSet::polar_set_list)
       .def("polar_set", &PerformancePolarSet::polar_set);
 
-  py::class_<PolarSet, std::shared_ptr<PolarSet>>(m, "PolarSet")
-      .def("name", &PolarSet::name)
-      // .def("polar_type", &PolarSet::polar_type) // smichel commented for now, need to know POLAR_TYPE class
-      .def("polar_type_str", &PolarSet::polar_type_str)
-      .def("polar_names", &PolarSet::polar_names)
-      .def("get_5D_polar", &PolarSet::polar_table<double, 5>)
-      .def("get_4D_polar", &PolarSet::polar_table<double, 4>)
-      .def("get_3D_polar", &PolarSet::polar_table<double, 3>);
+  py::class_<Polar, std::shared_ptr<Polar>>(m, "Polar")
+      .def("name", &Polar::name)
+      // .def("polar_type", &Polar::polar_type) // smichel commented for now, need to know POLAR_TYPE class
+      .def("polar_type_str", &Polar::polar_type_str)
+      .def("polar_names", &Polar::polar_names)
+      .def("get_5D_polar", &Polar::polar_table<double, 5>)
+      .def("get_4D_polar", &Polar::polar_table<double, 4>)
+      .def("get_3D_polar", &Polar::polar_table<double, 3>);
 
   using Interp5DPolar = InterpolablePolarTable<5>;
   using Shared5DPolar = std::shared_ptr<InterpolablePolarTable<5>>;

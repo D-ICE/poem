@@ -11,7 +11,7 @@
 namespace poem {
 
   /**
-   * Represents different attributes (metadata) to be added to a PolarSet
+   * Represents different attributes (metadata) to be added to a Polar
    */
   class Attributes {
    public:
