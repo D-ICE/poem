@@ -25,10 +25,10 @@ endforeach ()
 # TESTS # smichel: all has to be fixed, for now: commented, only test_read_poem is valid
 #
 set(TESTS
-        test_read_poem
         test_dimension_point_set
+        test_polar
         test_polar_set
-        test_performance_polar_set
+        test_read_poem
         )
 
 foreach (test ${TESTS})
@@ -42,4 +42,4 @@ foreach (test ${TESTS})
 endforeach ()
 
 
-add_executable(test_CRTP_polar_table test_CRTP_polar_table.cpp)
+#add_executable(test_CRTP_polar_table test_CRTP_polar_table.cpp)

@@ -85,7 +85,7 @@ namespace poem {
 
    public:
 
-//    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
+    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
     PolarTable(const std::string &name,
@@ -96,7 +96,7 @@ namespace poem {
                std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarTableBase(name, unit, description, type, polar_type),
         m_dimension_point_set(dimension_point_set),
-//        m_interpolator_is_built(false),
+        m_interpolator_is_built(false),
         m_nearest_is_built(false),
         m_values(std::vector<T>(dimension_point_set->size())) {}
 
@@ -280,13 +280,13 @@ namespace poem {
     }
 
    protected:
-//    bool m_interpolator_is_built;
+    bool m_interpolator_is_built;
     bool m_nearest_is_built;
 
     std::shared_ptr<DimensionPointSet<_dim>> m_dimension_point_set;
     std::vector<T> m_values;
 
-//    std::unique_ptr<InterpolatorND> m_interpolator;
+    std::unique_ptr<InterpolatorND> m_interpolator;
     std::unique_ptr<NearestND> m_nearest;
 
   };
@@ -296,7 +296,7 @@ namespace poem {
 
    public:
 
-    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
+//    using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
 
     InterpolablePolarTable(const std::string &name,
                            const std::string &unit,
@@ -304,8 +304,7 @@ namespace poem {
                            type::POEM_TYPES type,
                            POLAR_TYPE polar_type,
                            std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
-        PolarTable<double, _dim>(name, unit, description, type, polar_type, dimension_point_set),
-        m_interpolator_is_built(false) {}
+        PolarTable<double, _dim>(name, unit, description, type, polar_type, dimension_point_set) {}
 
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       std::lock_guard<std::mutex> lock(this->m_mutex);
@@ -320,6 +319,26 @@ namespace poem {
     // FIXME: est-ce que possible faire auto sur l'output de maniere a laisser au runtime la determination de _newdim ?
     template<size_t _newdim>
     InterpolablePolarTable<_newdim> slice(const std::unordered_map<std::string, double> &prescribed_values) const {
+
+      /**
+       * On a une polair de dimension _dim
+       *
+       * On veut creer un slice, ie une coupe en fixant plusieurs coordonnees
+       *
+       * On passe donc un dict cle(nom de la dimension) / valeur fixee
+       *    -> on verifie que les noms existent
+       *    -> on verifie que les valeurs sont bien dans les bornes (ou c'est fait par l'interpolateur ?)
+       *
+       * Ayant ca, il faut etablir un nouveau DimensionPointSet sur lequel on va vouloir interpoler
+       *
+       * On parcourt chacun des points du DimensionPointSet pour interpoler et remlir la nouvelle polaire
+       *
+       * On squeeze pour retirer les dimensions singleton
+       *
+       */
+
+      // TODO: verifier que les dimensions existent
+
 
       // Question: Est-ce qu'on veut renvoyer une polaire avec les meme dimensions mais avec des dimensions de la
       // dimension grid singleton ou bien une nouvelle polaire avec des dimensions reduites ?
@@ -397,9 +416,9 @@ namespace poem {
       this->m_interpolator_is_built = true;
     }
 
-   private:
-    bool m_interpolator_is_built;
-    std::unique_ptr<InterpolatorND> m_interpolator;
+//   private:
+//    bool m_interpolator_is_built;
+//    std::unique_ptr<InterpolatorND> m_interpolator;
 
   };
 

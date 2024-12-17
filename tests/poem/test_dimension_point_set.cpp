@@ -179,5 +179,6 @@ TEST(poem_splitter, splitter)
   ASSERT_EQ(splitter27.chunk_size(3), 5);
   ASSERT_EQ(splitter27.chunk_offset(4), 22);
   ASSERT_EQ(splitter27.chunk_size(4), 5);
+
   std::cout << "Well done, poem_splitter ended " << std::endl;
 }
