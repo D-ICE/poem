@@ -134,8 +134,8 @@ TEST(poem_polar_set, NestedForLoop) {
       auto dim_name = polar_table_->dimension_set_names();
       for (auto n: dim_name) {
         std::cout << "    Dimension " << n;
-        std::cout << " - min: " << polar_table_->min_bounds(n);
-        std::cout << " - max: " << polar_table_->max_bounds(n) << std::endl;
+        std::cout << " - min: " << polar_table_->min_bound(n);
+        std::cout << " - max: " << polar_table_->max_bound(n) << std::endl;
       }
       std::cout << "    Min & max values of " << p;
       std::cout << " - min: " << polar_table_->min_value();

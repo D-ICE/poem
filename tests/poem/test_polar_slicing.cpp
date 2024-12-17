@@ -46,9 +46,9 @@ std::shared_ptr<InterpolablePolarTable<3>> create_polar_table() {
 
   // Filling the polar table
   size_t idx = 0;
-  for (const auto &dimension_point : *dimension_point_set) {
+  for (const auto &dimension_point: *dimension_point_set) {
     double val = 1.;
-    for (const auto coord : dimension_point) {
+    for (const auto coord: dimension_point) {
       val *= coord;
     }
 
@@ -70,12 +70,19 @@ TEST(poem_polar_slicing, poem_polar_slicing) {
 
   auto sliced1 = polar_table->slice(slice1);
 
-  for (const auto& dimension_point : *sliced1->dimension_point_set()) {
-    double val = 1.;
-    for (const auto &coord : dimension_point) {
-      val *= coord;
+//  double mean = 0.;
+  for (const auto &dimension_point: *sliced1->dimension_point_set()) {
+    double val_calculated = 1.;
+    for (const auto &coord: dimension_point) {
+      val_calculated *= coord;
     }
-    ASSERT_EQ(polar_table->interp(dimension_point.array(), false), val);
+    double val_from_sliced_polar = sliced1->interp(dimension_point.array(), false);
+
+    ASSERT_EQ(val_from_sliced_polar, val_calculated);
   }
+
+//  auto sliced1_squeezed = sliced1->squeeze<1>();
+
+  return;
 
 }

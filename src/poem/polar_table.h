@@ -50,6 +50,9 @@ namespace poem {
 
     virtual size_t size() const = 0;
 
+    template<size_t _dim>
+    std::array<size_t, _dim> shape() const {}
+
     virtual bool is_filled() const = 0;
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
@@ -103,6 +106,14 @@ namespace poem {
 
     size_t size() const override {
       return m_dimension_point_set->size();
+    }
+
+    std::array<double, _dim> shape() const {
+      std::array<double, _dim> shape;
+      for (size_t idx = 0; idx < _dim; idx++) {
+        shape[idx] = m_dimension_point_set->dimension_grid().values(idx).size();
+      }
+      return shape;
     }
 
     void set_value(size_t idx, const T &value) {
@@ -225,12 +236,12 @@ namespace poem {
       max = dim_values[dim_values.size() - 1];
     }
 
-    double min_bounds(const std::string &name) const {
+    double min_bound(const std::string &name) const {
       auto dim_values = m_dimension_point_set->dimension_grid().values(name);
       return dim_values[0];
     }
 
-    double max_bounds(const std::string &name) const {
+    double max_bound(const std::string &name) const {
       auto dim_values = m_dimension_point_set->dimension_grid().values(name);
       return dim_values[dim_values.size() - 1];
     }
@@ -251,6 +262,10 @@ namespace poem {
 
     //   return m_dimension_point_set->values_list();
     // }
+
+    T* data() const {
+      return this->m_values.data();
+    }
 
    private:
     void build_nearest() {
@@ -307,6 +322,15 @@ namespace poem {
                            POLAR_TYPE polar_type,
                            std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
         PolarTable<double, _dim>(name, unit, description, type, polar_type, dimension_point_set) {}
+
+    [[nodiscard]] double mean() const {
+      size_t size = this->size();
+      double mean = 0;
+      for (size_t idx = 0; idx < size; ++idx) {
+        mean += this->m_values[idx];
+      }
+      return mean / (double) size;
+    }
 
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       std::lock_guard<std::mutex> lock(this->m_mutex);
@@ -369,9 +393,25 @@ namespace poem {
         auto val = this->interp(dimension_point.array(), false); // Bound checking already done above
         std::cout << dimension_point << " -> " << val << std::endl;
         sliced_polar_table->set_value(idx, val);
+        idx++;
       }
 
       return sliced_polar_table;
+    }
+
+    /*
+     * Removes Singleton dimensions
+     */
+    template<size_t _newdim>
+    std::shared_ptr<InterpolablePolarTable<_newdim>> squeeze() const {
+      // TODO
+
+      /*
+       * Ca semble complique a faire a cause des template. Il faut que l'utilisateur precise le _newdim. Est-ce viable ?
+       */
+      auto shape = this->shape();
+
+      NIY_POEM
     }
 
    private:

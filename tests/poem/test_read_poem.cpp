@@ -83,8 +83,8 @@ TEST(poem_, readerInterp) {
 //          std::cout << i << ",";
 //        }
         std::cout << ")" << std::endl;
-        std::cout << " - min: " << polar_table->min_bounds(n);
-        std::cout << " - max: " << polar_table->max_bounds(n) << std::endl;
+        std::cout << " - min: " << polar_table->min_bound(n);
+        std::cout << " - max: " << polar_table->max_bound(n) << std::endl;
       }
       std::cout << "    Min & max values of " << p;
       std::cout << " - min: " << polar_table->min_value();
@@ -205,8 +205,8 @@ TEST(poemfull_, reader) {
   //     for (auto n : dim_name)
   //     {
   //       std::cout << "    Dimension " << n;
-  //       std::cout << " - min: " << polar->min_bounds(n);
-  //       std::cout << " - max: " << polar->max_bounds(n) << std::endl;
+  //       std::cout << " - min: " << polar->min_bound(n);
+  //       std::cout << " - max: " << polar->max_bound(n) << std::endl;
   //     }
   //     std::cout << "    Min & max values of " << p;
   //     std::cout << " - min: " << polar->min_value();

@@ -1,0 +1,2 @@
+add_executable(CRTP_polar_table CRTP_polar_table.cpp)
+add_executable(non_template_polars non_template_polars.cpp)

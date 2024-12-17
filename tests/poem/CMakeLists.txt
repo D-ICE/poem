@@ -34,7 +34,6 @@ set(TESTS
 
 foreach (test ${TESTS})
     add_executable(${test} ${test}.cpp
-            test_CRTP_polar_table.cpp
             test_polar_slicing.cpp)
     target_link_libraries(${test} _poem MathUtils::MathUtils gtest_main)
     target_compile_definitions(${test} PUBLIC TEST_SCHEMAS_DIR="${CMAKE_CURRENT_LIST_DIR}/test_schemas")
@@ -42,6 +41,3 @@ foreach (test ${TESTS})
     set_target_properties(${test} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
     add_test(NAME ${test} COMMAND ${test})
 endforeach ()
-
-
-#add_executable(test_CRTP_polar_table test_CRTP_polar_table.cpp)
