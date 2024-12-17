@@ -11,7 +11,7 @@ PYBIND11_MODULE(pypoem, m) {
 
   // m.doc() = "pybind11 example plugin"; // optional module docstring
 
-  m.def("read_polar", [](const std::string &nc_polar){
+  m.def("read_polar_set", [](const std::string &nc_polar){
     return read_polar_set(nc_polar);
     });
 
@@ -30,48 +30,48 @@ PYBIND11_MODULE(pypoem, m) {
       .def("get_4D_polar", &Polar::polar_table<double, 4>)
       .def("get_3D_polar", &Polar::polar_table<double, 3>);
 
-  using Interp5DPolar = InterpolablePolarTable<5>;
-  using Shared5DPolar = std::shared_ptr<InterpolablePolarTable<5>>;
-  py::class_<Interp5DPolar, Shared5DPolar>(m, "InterpolablePolar5D") // Daughter class from Polar, PolarTableBase, Named
-      .def("dim", &Interp5DPolar::dim)
-      .def("size", &Interp5DPolar::size)
-      .def("is_filled", &Interp5DPolar::is_filled)
-      .def("dimension_set_names", &Interp5DPolar::dimension_set_names) 
-      .def("coordinates", &Interp5DPolar::coordinates)
-      .def("min_bounds", &Interp5DPolar::min_bounds)
-      .def("max_bounds", &Interp5DPolar::max_bounds)    
-      .def("min_value", &Interp5DPolar::min_value) 
-      .def("max_value", &Interp5DPolar::max_value) 
-      .def("nearest", &Interp5DPolar::nearest) 
-      .def("interp", &Interp5DPolar::interp);
+  using Interp5DPolarTable = InterpolablePolarTable<5>;
+  using Shared5DPolarTable = std::shared_ptr<InterpolablePolarTable<5>>;
+  py::class_<Interp5DPolarTable, Shared5DPolarTable>(m, "InterpolablePolarTable5D") // Daughter class from Polar, PolarTableBase, Named
+      .def("dim", &Interp5DPolarTable::dim)
+      .def("size", &Interp5DPolarTable::size)
+      .def("is_filled", &Interp5DPolarTable::is_filled)
+      .def("dimension_set_names", &Interp5DPolarTable::dimension_set_names)
+      .def("coordinates", &Interp5DPolarTable::coordinates)
+      .def("min_bounds", &Interp5DPolarTable::min_bounds)
+      .def("max_bounds", &Interp5DPolarTable::max_bounds)
+      .def("min_value", &Interp5DPolarTable::min_value)
+      .def("max_value", &Interp5DPolarTable::max_value)
+      .def("nearest", &Interp5DPolarTable::nearest)
+      .def("interp", &Interp5DPolarTable::interp);
       
-  using Interp4DPolar = InterpolablePolarTable<4>;
-  using Shared4DPolar = std::shared_ptr<InterpolablePolarTable<4>>;
-  py::class_<Interp4DPolar, Shared4DPolar>(m, "InterpolablePolar4D") // Daughter class from Polar, PolarTableBase, Named
-      .def("dim", &Interp4DPolar::dim)
-      .def("size", &Interp4DPolar::size)
-      .def("is_filled", &Interp4DPolar::is_filled)
-      .def("dimension_set_names", &Interp4DPolar::dimension_set_names) 
-      .def("coordinates", &Interp4DPolar::coordinates)
-      .def("min_bounds", &Interp4DPolar::min_bounds)
-      .def("max_bounds", &Interp4DPolar::max_bounds)    
-      .def("min_value", &Interp4DPolar::min_value) 
-      .def("max_value", &Interp4DPolar::max_value) 
-      .def("nearest", &Interp4DPolar::nearest) 
-      .def("interp", &Interp4DPolar::interp);
+  using Interp4DPolarTable = InterpolablePolarTable<4>;
+  using Shared4DPolarTable = std::shared_ptr<InterpolablePolarTable<4>>;
+  py::class_<Interp4DPolarTable, Shared4DPolarTable>(m, "InterpolablePolarTable4D") // Daughter class from Polar, PolarTableBase, Named
+      .def("dim", &Interp4DPolarTable::dim)
+      .def("size", &Interp4DPolarTable::size)
+      .def("is_filled", &Interp4DPolarTable::is_filled)
+      .def("dimension_set_names", &Interp4DPolarTable::dimension_set_names)
+      .def("coordinates", &Interp4DPolarTable::coordinates)
+      .def("min_bounds", &Interp4DPolarTable::min_bounds)
+      .def("max_bounds", &Interp4DPolarTable::max_bounds)
+      .def("min_value", &Interp4DPolarTable::min_value)
+      .def("max_value", &Interp4DPolarTable::max_value)
+      .def("nearest", &Interp4DPolarTable::nearest)
+      .def("interp", &Interp4DPolarTable::interp);
       
-  using Interp3DPolar = InterpolablePolarTable<3>;
-  using Shared3DPolar = std::shared_ptr<InterpolablePolarTable<3>>;
-  py::class_<Interp3DPolar, Shared3DPolar>(m, "InterpolablePolar3D") // Daughter class from Polar, PolarTableBase, Named
-      .def("dim", &Interp3DPolar::dim)
-      .def("size", &Interp3DPolar::size)
-      .def("is_filled", &Interp3DPolar::is_filled)
-      .def("dimension_set_names", &Interp3DPolar::dimension_set_names) 
-      .def("coordinates", &Interp3DPolar::coordinates)
-      .def("min_bounds", &Interp3DPolar::min_bounds)
-      .def("max_bounds", &Interp3DPolar::max_bounds)  
-      .def("min_value", &Interp3DPolar::min_value) 
-      .def("max_value", &Interp3DPolar::max_value)    
-      .def("nearest", &Interp3DPolar::nearest) 
-      .def("interp", &Interp3DPolar::interp);
+  using Interp3DPolarTable = InterpolablePolarTable<3>;
+  using Shared3DPolarTable = std::shared_ptr<InterpolablePolarTable<3>>;
+  py::class_<Interp3DPolarTable, Shared3DPolarTable>(m, "InterpolablePolarTable3D") // Daughter class from Polar, PolarTableBase, Named
+      .def("dim", &Interp3DPolarTable::dim)
+      .def("size", &Interp3DPolarTable::size)
+      .def("is_filled", &Interp3DPolarTable::is_filled)
+      .def("dimension_set_names", &Interp3DPolarTable::dimension_set_names)
+      .def("coordinates", &Interp3DPolarTable::coordinates)
+      .def("min_bounds", &Interp3DPolarTable::min_bounds)
+      .def("max_bounds", &Interp3DPolarTable::max_bounds)
+      .def("min_value", &Interp3DPolarTable::min_value)
+      .def("max_value", &Interp3DPolarTable::max_value)
+      .def("nearest", &Interp3DPolarTable::nearest)
+      .def("interp", &Interp3DPolarTable::interp);
 }
