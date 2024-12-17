@@ -49,8 +49,8 @@ TEST(poem_performance_polar_set, NestedForLoop)
     auto dimension_point_set = std::make_shared<poem::DimensionPointSet<5>>(dimension_grid);
 
     std::cout << "     Polar creation " << std::endl;
-    auto polar = std::make_shared<poem::Polar<double, 5>>("BrakePower", "kW", "Brake Power",
-                                                          poem::type::POEM_TYPES::DOUBLE, poem::POLAR_TYPE::PPP, dimension_point_set);
+    auto polar = std::make_shared<poem::PolarTable<double, 5>>("BrakePower", "kW", "Brake Power",
+                                                               poem::type::POEM_TYPES::DOUBLE, poem::POLAR_TYPE::PPP, dimension_point_set);
 
     std::cout << "     PolarSet creation " << std::endl;
     poem::Attributes attributes;
@@ -129,7 +129,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
         std::cout << ")" << std::endl;
         for (auto p : polar_names)
         {
-            std::shared_ptr<InterpolablePolar<5>> polar = ps_ptr->polar<double, 5>(p);
+            std::shared_ptr<InterpolablePolarTable<5>> polar = ps_ptr->polar<double, 5>(p);
             std::cout << "  Creation of the InterpolableTable (" << p << ") - DONE " << std::endl;
             const int dim = polar->dim();
             std::cout << "  Polar type: " << polar->polar_type() << std::endl;

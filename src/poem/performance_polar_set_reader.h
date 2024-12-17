@@ -11,7 +11,7 @@
 #include <netcdf>
 #include <semver/semver.hpp>
 
-#include "polar.h"
+#include "polar_table.h"
 #include "polar_set.h"
 #include "performance_polar_set.h"
 #include "specifications/spec_rules.h"
@@ -273,7 +273,7 @@ namespace poem {
     //    R2
     polar_set->polar_type("HPPP");
 
-    auto BP_polar = std::reinterpret_pointer_cast<Polar<double, 5> >(polar_set->polar("BrakePower"));
+    auto BP_polar = std::reinterpret_pointer_cast<PolarTable<double, 5> >(polar_set->polar("BrakePower"));
 
     //    R3
     auto ds = BP_polar->dimension_set();

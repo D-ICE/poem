@@ -11,7 +11,7 @@
 #include <mutex>
 #include <filesystem>
 
-#include "polar.h"
+#include "polar_table.h"
 #include "attributes.h"
 #include "polar_type.h"
 
@@ -21,7 +21,7 @@ namespace poem {
 
   class PolarSet {
    public:
-    using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarBase>>;
+    using PolarMap = std::unordered_map<std::string, std::shared_ptr<PolarTableBase>>;
 
     PolarSet(const std::string &name, const Attributes &attributes, POLAR_TYPE polar_type) :
         m_name(name),
@@ -72,27 +72,27 @@ namespace poem {
     }
 
     template<typename T, size_t _dim>
-    std::shared_ptr<Polar<T, _dim>> new_polar(const std::string &name,
-                                              const std::string &unit,
-                                              const std::string &description,
-                                              type::POEM_TYPES type,
-                                              std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
+    std::shared_ptr<PolarTable<T, _dim>> new_polar(const std::string &name,
+                                                   const std::string &unit,
+                                                   const std::string &description,
+                                                   type::POEM_TYPES type,
+                                                   std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) {
 
       // Thread safety
       std::lock_guard<std::mutex> lock(m_mutex);
 
       if (m_polars_map.find(name) != m_polars_map.end()) {
-        return std::reinterpret_pointer_cast<Polar<T, _dim>>(m_polars_map.at(name));
+        return std::reinterpret_pointer_cast<PolarTable<T, _dim>>(m_polars_map.at(name));
       }
 
-      auto polar = std::make_shared<Polar<T, _dim>>(name, unit, description, type, m_polar_type, dimension_point_set);
+      auto polar = std::make_shared<PolarTable<T, _dim>>(name, unit, description, type, m_polar_type, dimension_point_set);
 
       m_polars_map.insert({name, polar});
 
       return polar;
     }
 
-    std::shared_ptr<PolarBase> polar(const std::string &name) const {
+    std::shared_ptr<PolarTableBase> polar(const std::string &name) const {
       try {
         return m_polars_map.at(name);
       } catch (const std::out_of_range &e) {
@@ -102,13 +102,13 @@ namespace poem {
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<!std::is_same_v<T, double>>>
-    std::shared_ptr<Polar<T, _dim>> polar(const std::string &name) const {
-      return std::reinterpret_pointer_cast<Polar<T, _dim>>(polar(name));
+    std::shared_ptr<PolarTable<T, _dim>> polar(const std::string &name) const {
+      return std::reinterpret_pointer_cast<PolarTable<T, _dim>>(polar(name));
     }
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
-    std::shared_ptr<InterpolablePolar<_dim>> polar(const std::string &name) const {
-      return std::reinterpret_pointer_cast<InterpolablePolar<_dim>>(polar(name));
+    std::shared_ptr<InterpolablePolarTable<_dim>> polar(const std::string &name) const {
+      return std::reinterpret_pointer_cast<InterpolablePolarTable<_dim>>(polar(name));
     }
 
     std::vector<std::string> polar_names() const {

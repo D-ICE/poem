@@ -2,8 +2,8 @@
 // Created by frongere on 08/04/23.
 //
 
-#ifndef POEM_POLAR_H
-#define POEM_POLAR_H
+#ifndef POEM_POLAR_TABLE_H
+#define POEM_POLAR_TABLE_H
 
 #include <array>
 #include <vector>
@@ -26,21 +26,21 @@ namespace poem {
 
   // forward declaration
   template<typename T, size_t _dim>
-  class Polar;
+  class PolarTable;
 
   template<size_t _dim>
-  class InterpolablePolar;
+  class InterpolablePolarTable;
 
   /**
    * Base class for a polar to be used for polymorphism into a PolarSet
    */
-  class PolarBase : public Named {
+  class PolarTableBase : public Named {
    public:
-    PolarBase(const std::string &name,
-              const std::string &unit,
-              const std::string &description,
-              type::POEM_TYPES type,
-              POLAR_TYPE polar_type) :
+    PolarTableBase(const std::string &name,
+                   const std::string &unit,
+                   const std::string &description,
+                   type::POEM_TYPES type,
+                   POLAR_TYPE polar_type) :
         Named(name, unit, description, type),
                                        m_polar_type(polar_type) {}
 
@@ -52,16 +52,16 @@ namespace poem {
 
     virtual bool is_filled() const = 0;
 
-    //    virtual void append(PolarBase *polar) = 0;
+    //    virtual void append(PolarTableBase *polar) = 0;
 
     template<typename T, size_t _dim, typename = std::enable_if_t<std::is_same_v<T, double>>>
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-      return static_cast<const InterpolablePolar<_dim> *>(this)->interp(dimension_point, bound_check);
+      return static_cast<const InterpolablePolarTable<_dim> *>(this)->interp(dimension_point, bound_check);
     }
 
     template<typename T, size_t _dim>
     T nearest(const std::array<double, _dim> &dimension_point, bool bound_check) const {
-      return static_cast<const Polar<T, _dim> *>(this)->nearest(dimension_point, bound_check);
+      return static_cast<const PolarTable<T, _dim> *>(this)->nearest(dimension_point, bound_check);
     }
 
     virtual void to_netcdf(netCDF::NcGroup &dataFile) const = 0;
@@ -81,23 +81,23 @@ namespace poem {
    * @tparam _dim number of dimensions of the polar
    */
   template<typename T, size_t _dim>
-  class Polar : public PolarBase {
+  class PolarTable : public PolarTableBase {
 
    public:
 
     using InterpolatorND = mathutils::RegularGridInterpolator<double, _dim>;
     using NearestND = mathutils::RegularGridNearest<T, _dim, double>;
 
-    Polar(const std::string &name,
-          const std::string &unit,
-          const std::string &description,
-          type::POEM_TYPES type,
-          POLAR_TYPE polar_type,
-          std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
-        PolarBase(name, unit, description, type, polar_type),
-                                                                          m_dimension_point_set(dimension_point_set),
-                                                                          m_interpolator_is_built(false),
-                                                                          m_nearest_is_built(false),
+    PolarTable(const std::string &name,
+               const std::string &unit,
+               const std::string &description,
+               type::POEM_TYPES type,
+               POLAR_TYPE polar_type,
+               std::shared_ptr<DimensionPointSet<_dim>> dimension_point_set) :
+        PolarTableBase(name, unit, description, type, polar_type),
+        m_dimension_point_set(dimension_point_set),
+        m_interpolator_is_built(false),
+        m_nearest_is_built(false),
         m_values(std::vector<T>(dimension_point_set->size())) {}
 
     const size_t dim() const override { return _dim; }
@@ -127,7 +127,7 @@ namespace poem {
       std::lock_guard<std::mutex> lock(this->m_mutex);
 
       if (!m_nearest_is_built) {
-        const_cast<Polar<T, _dim> *>(this)->build_nearest(); // necessary as the method is const
+        const_cast<PolarTable<T, _dim> *>(this)->build_nearest(); // necessary as the method is const
       }
 
       // FIXME: bound_check non utilise encore dans RegularGridNearest
@@ -292,14 +292,14 @@ namespace poem {
   };
 
   template<size_t _dim>
-  class InterpolablePolar : public Polar<double, _dim> {
+  class InterpolablePolarTable : public PolarTable<double, _dim> {
 
    public:
     double interp(const std::array<double, _dim> &dimension_point, bool bound_check) const {
       std::lock_guard<std::mutex> lock(this->m_mutex);
 
       if (!this->m_interpolator_is_built) {
-        const_cast<InterpolablePolar<_dim> *>(this)->build_interpolator(); // necessary as the method is const
+        const_cast<InterpolablePolarTable<_dim> *>(this)->build_interpolator(); // necessary as the method is const
       }
 
       return this->m_interpolator->Interp(dimension_point, bound_check);
@@ -307,7 +307,7 @@ namespace poem {
 
     // FIXME: est-ce que possible faire auto sur l'output de maniere a laisser au runtime la determination de _newdim ?
     template<size_t _newdim>
-    InterpolablePolar<_newdim> slice(const std::unordered_map<std::string, double> &prescribed_values) const {
+    InterpolablePolarTable<_newdim> slice(const std::unordered_map<std::string, double> &prescribed_values) const {
 
       // Question: Est-ce qu'on veut renvoyer une polaire avec les meme dimensions mais avec des dimensions de la
       // dimension grid singleton ou bien une nouvelle polaire avec des dimensions reduites ?
@@ -367,7 +367,7 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
 
-      this->m_interpolator = std::make_unique<typename Polar<double, _dim>::InterpolatorND>();
+      this->m_interpolator = std::make_unique<typename PolarTable<double, _dim>::InterpolatorND>();
 
       using NDArray = boost::multi_array<double, _dim>;
       using IndexArray = boost::array<typename NDArray::index, _dim>;
@@ -391,4 +391,4 @@ namespace poem {
 
 } // poem
 
-#endif // POEM_POLAR_H
+#endif // POEM_POLAR_TABLE_H
