@@ -28,12 +28,14 @@ set(TESTS
         test_dimension_point_set
         test_polar
         test_polar_set
+        test_polar_slicing
         test_read_poem
         )
 
 foreach (test ${TESTS})
     add_executable(${test} ${test}.cpp
-            test_CRTP_polar_table.cpp)
+            test_CRTP_polar_table.cpp
+            test_polar_slicing.cpp)
     target_link_libraries(${test} _poem MathUtils::MathUtils gtest_main)
     target_compile_definitions(${test} PUBLIC TEST_SCHEMAS_DIR="${CMAKE_CURRENT_LIST_DIR}/test_schemas")
     target_compile_definitions(${test} PUBLIC POEM_RESOURCE_DIR="${POEM_RESOURCE_DIR}")

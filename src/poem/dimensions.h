@@ -74,13 +74,21 @@ namespace poem {
     std::unordered_map<std::string, size_t> m_map_stoi;
   };
 
+//  template<size_t _dim>
+//  class DimensionPoint;
+//
+//  template<size_t _dim>
+//  inline std::ostream &operator<<(std::ostream &os, const DimensionPoint<_dim> &dimension_point) {
+//    return dimension_point.cout(os);
+//  }
+
   template<size_t _dim>
   class DimensionPoint {
    public:
     DimensionPoint(const DimensionSet<_dim> *dimension_set,
                    const std::array<double, _dim> &array) :
         m_dimension_set(dimension_set),
-                                                            m_array(array) {}
+        m_array(array) {}
 
     const double &operator[](const std::string &name) const {
       try {
@@ -100,10 +108,28 @@ namespace poem {
       }
     }
 
+    // FIXME: voir pourquoi on ne parvient pas a mettre cout private...
+//   private:
+//    friend std::ostream &operator<<(std::ostream &, const DimensionPoint<_dim> &);
+
+    std::ostream &cout(std::ostream &os) const {
+      for (size_t i=0; i<_dim; ++i) {
+        os << m_dimension_set->name(i) << ": " << m_array.at(i) << ";\t";
+      }
+      return os;
+    }
+
    private:
     const DimensionSet<_dim> *m_dimension_set;
     const std::array<double, _dim> m_array;
   };
+
+
+  template<size_t _dim>
+  std::ostream &operator<<(std::ostream &os, const DimensionPoint<_dim> &dimension_point) {
+    return dimension_point.cout(os);
+  }
+
 
   template<size_t _dim>
   class DimensionPointSet;
@@ -212,10 +238,15 @@ namespace poem {
 
   template<size_t _dim>
   class DimensionPointSet : public DimensionPointSetBase {
+
    public:
+    using DimensionPointSetVector = std::vector<DimensionPoint<_dim>>;
+    using DimensionPointSetIter = DimensionPointSetVector::iterator;
+    using DimensionPointSetConstIter = DimensionPointSetVector::const_iterator;
+
     explicit DimensionPointSet(const DimensionGrid<_dim> &dimension_grid) :
         m_dimension_points(dimension_grid.dimension_points()),
-                                                                            m_dimension_grid(dimension_grid) {}
+        m_dimension_grid(dimension_grid) {}
 
     size_t size() const {
       return m_dimension_points.size();
@@ -233,9 +264,28 @@ namespace poem {
       return m_dimension_grid.dimension_set();
     }
 
+    /*
+     * Iterators
+     */
+    DimensionPointSetIter begin() {
+      return m_dimension_points.begin();
+    }
+
+    DimensionPointSetIter end() {
+      return m_dimension_points.end();
+    }
+
+    DimensionPointSetConstIter begin() const {
+      return m_dimension_points.cbegin();
+    }
+
+    DimensionPointSetConstIter end() const {
+      return m_dimension_points.cend();
+    }
+
 
    private:
-    std::vector<DimensionPoint<_dim>> m_dimension_points;
+    DimensionPointSetVector m_dimension_points;
     DimensionGrid<_dim> m_dimension_grid;
 
   };

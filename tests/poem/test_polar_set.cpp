@@ -10,7 +10,7 @@
 
 using namespace poem;
 
-TEST(poem_performance_polar_set, NestedForLoop) {
+TEST(poem_polar_set, NestedForLoop) {
   std::cout << "==== Setup started " << std::endl;
   // Create Dimensions
   std::cout << "     Dimension creation " << std::endl;
