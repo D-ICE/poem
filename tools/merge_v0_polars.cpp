@@ -65,10 +65,10 @@ int main(int argc, char *argv[]) {
 
     reader = Reader(polar_file);
     auto pps = reader.read();
-    auto ps = pps->polar_set("HPPP");
+    auto ps = pps->polar("HPPP");
     ps->rename(*type_iter);
     ps->polar_type(*type_iter);
-    perf_polar_set->AddPolarSet(ps);
+    perf_polar_set->add_polar(ps);
     type_iter++;
   }
 

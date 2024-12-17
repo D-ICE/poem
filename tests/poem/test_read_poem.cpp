@@ -16,13 +16,13 @@ TEST(poem_, readerInterp) {
 
   std::string polar_file = fs::path(POEM_RESOURCE_DIR) / "poem_v1_PerfPolarSet.nc";
 
-  std::shared_ptr<PerformancePolarSet> pps_ptr = read_performance_polar_set(polar_file);
+  std::shared_ptr<PolarSet> pps_ptr = read_polar_set(polar_file);
 
   std::cout << std::endl
             << "====================== LET'S START test_read_poem.cpp" << std::endl;
   std::cout << "Hola, this unit test load " << polar_file << " and read everything it can :)" << std::endl;
 
-  // PerformancePolarSet perf_polar_set = pps_ptr.get();
+  // PolarSet perf_polar_set = pps_ptr.get();
   auto res0 = pps_ptr->name();
   std::cout << "Attribute name: " << res0 << std::endl;
 
@@ -34,7 +34,7 @@ TEST(poem_, readerInterp) {
     std::cout << pps_ptr->exist(pl) << std::endl;
   }
 
-  std::vector<POLAR_TYPE> res = pps_ptr->polar_set_type_list();
+  std::vector<POLAR_TYPE> res = pps_ptr->polar_type_list();
   std::cout << "Polar set list (names): ";
   for (auto r: res) {
     std::cout << polar_type_enum2s(r) << ", ";
@@ -46,10 +46,10 @@ TEST(poem_, readerInterp) {
   std::cout << "For each Polar, return info " << std::endl;
   std::cout << "======================" << std::endl;
 
-  std::cout << "Construction of Polar from the polar_set function" << std::endl;
+  std::cout << "Construction of Polar from the polar function" << std::endl;
   // construct polars
   for (auto polar_name: res) {
-    std::shared_ptr<Polar> ps_ptr = pps_ptr->polar_set(polar_name);
+    std::shared_ptr<Polar> ps_ptr = pps_ptr->polar(polar_name);
 
     std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
     std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
@@ -120,7 +120,7 @@ TEST(poem_, readerInterp) {
   std::cout << "Construction of Polar from the iteraton" << std::endl;
   // construct polars
   for (auto mps = pps_ptr->begin(); mps != pps_ptr->end(); mps++) {
-    // std::shared_ptr<Polar> ps_ptr = pps_ptr->polar_set(polar_name);
+    // std::shared_ptr<Polar> ps_ptr = pps_ptr->polar(polar_name);
     auto ps_ptr = (*mps).second;
     std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
     std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
@@ -133,7 +133,7 @@ TEST(poem_, readerInterp) {
     std::cout << ")" << std::endl;
   }
   std::string new_polar_file = fs::path(POEM_RESOURCE_DIR) / "my_favorite_PerfPolarSet.nc";
-  std::cout << "I like this PerformancePolarSet, I save it in " << new_polar_file << std::endl;
+  std::cout << "I like this PolarSet, I save it in " << new_polar_file << std::endl;
   // pps_ptr->to_netcdf(new_polar_file);
 }
 
@@ -141,13 +141,13 @@ TEST(poemfull_, reader) {
 
   std::string polar_file = fs::path(POEM_RESOURCE_DIR) / "poem_v1_example_5_polars.nc";
 
-  std::shared_ptr<PerformancePolarSet> pps_ptr = read_performance_polar_set(polar_file);
+  std::shared_ptr<PolarSet> pps_ptr = read_polar_set(polar_file);
 
   std::cout << std::endl
             << "====================== LET'S START test_read_poem.cpp" << std::endl;
   std::cout << "Hola, this unit test load " << polar_file << " and read everything it can :)" << std::endl;
 
-  // PerformancePolarSet perf_polar_set = pps_ptr.get();
+  // PolarSet perf_polar_set = pps_ptr.get();
   auto res0 = pps_ptr->name();
   std::cout << "Attribute name: " << res0 << std::endl;
 
@@ -159,7 +159,7 @@ TEST(poemfull_, reader) {
     std::cout << pps_ptr->exist(pl) << std::endl;
   }
 
-  std::vector<POLAR_TYPE> res = pps_ptr->polar_set_type_list();
+  std::vector<POLAR_TYPE> res = pps_ptr->polar_type_list();
   std::cout << "Polar set list (names): ";
   for (auto r: res) {
     std::cout << r << ", ";
@@ -171,10 +171,10 @@ TEST(poemfull_, reader) {
   std::cout << "For each Polar, return info " << std::endl;
   std::cout << "======================" << std::endl;
 
-  std::cout << "Construction of Polar from the polar_set function" << std::endl;
+  std::cout << "Construction of Polar from the polar function" << std::endl;
   // construct polars
   for (auto polar_name: res) {
-    std::shared_ptr<Polar> ps_ptr = pps_ptr->polar_set(polar_name);
+    std::shared_ptr<Polar> ps_ptr = pps_ptr->polar(polar_name);
 
     std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
     std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
@@ -229,8 +229,8 @@ TEST(poem_, reader_writer) {
     spdlog::info("Reading file version v{}", iversion);
     auto reader = Reader(polar_file);
 
-    // read the polar and store it into a PerformancePolarSet
-    std::shared_ptr<PerformancePolarSet> perf_polar_set = reader.read();
+    // read the polar and store it into a PolarSet
+    std::shared_ptr<PolarSet> perf_polar_set = reader.read();
 
     // write it with different version of the file
     spdlog::info("Writing to latest polar file version v{}", POEM_MAX_FILE_VERSION);
@@ -254,8 +254,8 @@ TEST(poem_, reader_writer) {
 //  spdlog::info("Reading file version v0");
 //  auto reader = Reader(polar_file);
 //
-//  // read the polar and store it into a PerformancePolarSet
-//  std::shared_ptr<PerformancePolarSet> perf_polar_set = reader.read();
+//  // read the polar and store it into a PolarSet
+//  std::shared_ptr<PolarSet> perf_polar_set = reader.read();
 //
 //  // write it with different version of the file
 //  spdlog::info("Writing to latest polar file version v{}", POEM_MAX_FILE_VERSION);

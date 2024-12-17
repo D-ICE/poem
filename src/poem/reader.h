@@ -2,8 +2,8 @@
 // Created by frongere on 17/05/24.
 //
 
-#ifndef POEM_PERFORMANCEPOLARSETREADER_H
-#define POEM_PERFORMANCEPOLARSETREADER_H
+#ifndef POEM_READER_H
+#define POEM_READER_H
 
 #include <string>
 #include <filesystem>
@@ -13,7 +13,7 @@
 
 #include "polar_table.h"
 #include "polar.h"
-#include "performance_polar_set.h"
+#include "polar_set.h"
 #include "specifications/spec_rules.h"
 #include "exceptions.h"
 
@@ -22,11 +22,11 @@ namespace fs = std::filesystem;
 namespace poem {
   namespace details {
     template<typename T, size_t _dim>
-    inline void read_polar(const netCDF::NcVar &nc_var,
-                           const std::unordered_map<std::string, std::shared_ptr<Dimension> > &dimension_map,
-                           const std::unordered_map<std::string, std::vector<double> > &dimension_values_map,
-                           std::shared_ptr<Polar> polar_set,
-                           type::POEM_TYPES var_type) {
+    inline void read_polar_table(const netCDF::NcVar &nc_var,
+                                 const std::unordered_map<std::string, std::shared_ptr<Dimension> > &dimension_map,
+                                 const std::unordered_map<std::string, std::vector<double> > &dimension_values_map,
+                                 const std::shared_ptr<Polar> &polar,
+                                 type::POEM_TYPES var_type) {
       std::string hash_name;
       for (int i = 0; i < _dim; ++i) {
         hash_name += nc_var.getDim(i).getName();
@@ -58,33 +58,33 @@ namespace poem {
       nc_var.getAtt("unit").getValues(unit);
       nc_var.getAtt("description").getValues(description);
 
-      // Create the polar into the polar set
-      auto polar = polar_set->new_polar_table<T, _dim>(nc_var.getName(),
-                                                       unit,
-                                                       description,
-                                                       var_type,
-                                                       dimension_point_set);
+      // Create the polar_table into the polar_table set
+      auto polar_table = polar->new_polar_table<T, _dim>(nc_var.getName(),
+                                                         unit,
+                                                         description,
+                                                         var_type,
+                                                         dimension_point_set);
 
       // Get values from nc_var
       auto polar_size = dimension_point_set->size();
       std::vector<T> values(polar_size);
       nc_var.getVar(values.data());
 
-      polar->set_values(values);
+      polar_table->set_values(values);
     }
 
     template<size_t _dim>
-    inline void read_polar(const netCDF::NcVar &nc_var,
-                           const std::unordered_map<std::string, std::shared_ptr<Dimension> > &dimension_map,
-                           const std::unordered_map<std::string, std::vector<double> > &dimension_values_map,
-                           std::shared_ptr<Polar> polar_set) {
+    inline void read_polar_table(const netCDF::NcVar &nc_var,
+                                 const std::unordered_map<std::string, std::shared_ptr<Dimension> > &dimension_map,
+                                 const std::unordered_map<std::string, std::vector<double> > &dimension_values_map,
+                                 std::shared_ptr<Polar> polar) {
       auto type = nc_var.getType();
       switch (type.getId()) {
         case netCDF::NcType::nc_DOUBLE:
-          read_polar<double, _dim>(nc_var, dimension_map, dimension_values_map, polar_set, poem::type::DOUBLE);
+          read_polar_table<double, _dim>(nc_var, dimension_map, dimension_values_map, polar, poem::type::DOUBLE);
           return;
         case netCDF::NcType::nc_INT:
-          read_polar<int, _dim>(nc_var, dimension_map, dimension_values_map, polar_set, poem::type::INT);
+          read_polar_table<int, _dim>(nc_var, dimension_map, dimension_values_map, polar, poem::type::INT);
           return;
         default:
           spdlog::critical("Type {} is not managed yet", type.getTypeClass());
@@ -93,32 +93,32 @@ namespace poem {
     }
   } // details
 
-  inline void read_polar(const netCDF::NcVar &nc_var,
-                         const std::unordered_map<std::string, std::shared_ptr<Dimension> > &dimension_map,
-                         const std::unordered_map<std::string, std::vector<double> > &dimension_values_map,
-                         std::shared_ptr<Polar> polar_set) {
+  inline void read_polar_table(const netCDF::NcVar &nc_var,
+                               const std::unordered_map<std::string, std::shared_ptr<Dimension> > &dimension_map,
+                               const std::unordered_map<std::string, std::vector<double> > &dimension_values_map,
+                               std::shared_ptr<Polar> polar) {
     size_t nbdim = nc_var.getDimCount();
 
     switch (nbdim) {
       case 1:
-        return details::read_polar<1>(nc_var, dimension_map, dimension_values_map, polar_set);
+        return details::read_polar_table<1>(nc_var, dimension_map, dimension_values_map, polar);
       case 2:
-        return details::read_polar<2>(nc_var, dimension_map, dimension_values_map, polar_set);
+        return details::read_polar_table<2>(nc_var, dimension_map, dimension_values_map, polar);
       case 3:
-        return details::read_polar<3>(nc_var, dimension_map, dimension_values_map, polar_set);
+        return details::read_polar_table<3>(nc_var, dimension_map, dimension_values_map, polar);
       case 4:
-        return details::read_polar<4>(nc_var, dimension_map, dimension_values_map, polar_set);
+        return details::read_polar_table<4>(nc_var, dimension_map, dimension_values_map, polar);
       case 5:
-        return details::read_polar<5>(nc_var, dimension_map, dimension_values_map, polar_set);
+        return details::read_polar_table<5>(nc_var, dimension_map, dimension_values_map, polar);
       case 6:
-        return details::read_polar<6>(nc_var, dimension_map, dimension_values_map, polar_set);
+        return details::read_polar_table<6>(nc_var, dimension_map, dimension_values_map, polar);
       default:
         spdlog::critical("Polar dimensions lower than 1 or higher than 6 are forbidden");
         CRITICAL_ERROR_POEM
     }
   }
 
-  inline std::shared_ptr<Polar> read_polar_set(const netCDF::NcGroup &group) {
+  inline std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group) {
     Attributes attributes;
     for (const auto &att: group.getAtts()) {
       std::string att_val;
@@ -128,7 +128,7 @@ namespace poem {
 
     POLAR_TYPE polar_type = polar_type_s2enum(attributes["polar_type"]);
 
-    auto polar_set = std::make_shared<Polar>(group.getName(), attributes, polar_type);
+    auto polar = std::make_shared<Polar>(group.getName(), attributes, polar_type);
 
     // Get dimensions
     std::unordered_map<std::string, std::shared_ptr<Dimension> > dimension_map;
@@ -159,13 +159,13 @@ namespace poem {
       std::string var_name = var_.first;
       if (dimension_map.find(var_name) != dimension_map.end()) continue;
 
-      read_polar(group.getVar(var_name), dimension_map, dimension_values_map, polar_set);
+      read_polar_table(group.getVar(var_name), dimension_map, dimension_values_map, polar);
     }
 
-    return polar_set;
+    return polar;
   }
 
-  inline std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const netCDF::NcGroup &group) {
+  inline std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group) {
     // Get attributes from the group
     Attributes attributes;
     for (const auto &att: group.getAtts()) {
@@ -192,26 +192,26 @@ namespace poem {
 
     spdlog::info("Polar File follows the POEM specifications version v{}", poem_spec_version);
 
-    auto performance_polar_set = std::make_shared<PerformancePolarSet>(group.getName(), attributes);
+    auto polar_set = std::make_shared<PolarSet>(group.getName(), attributes);
 
     // A Polar is a NetCDF Dataset, i.e. a group
 
     if (!has_groups) {
       // For POEM File Format Version v0 only
       // No groups in the NetCDF-4 file, only one DataSet, this is the root group
-      performance_polar_set->AddPolarSet(read_polar_set(group));
+      polar_set->add_polar(read_polar(group));
       NIY_POEM
     } else {
       // TODO: voir si on fixe pas en dur les groupes qu'il est possible d'aller chercher sur la base de PolarType
       for (const auto &group_: group.getGroups()) {
-        performance_polar_set->AddPolarSet(read_polar_set(group_.second));
+        polar_set->add_polar(read_polar(group_.second));
       }
     }
 
-    return performance_polar_set;
+    return polar_set;
   }
 
-  inline std::shared_ptr<PerformancePolarSet> read_performance_polar_set(const std::string &nc_polar) {
+  inline std::shared_ptr<PolarSet> read_polar_set(const std::string &nc_polar) {
     // Does the file exist
     if (!fs::exists(nc_polar)) {
       spdlog::critical("Polar file {} NOT FOUND", nc_polar);
@@ -219,9 +219,9 @@ namespace poem {
     }
 
     netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
-    auto performance_polar_set = read_performance_polar_set(ncfile);
+    auto polar_set = read_polar_set(ncfile);
     ncfile.close();
-    return performance_polar_set;
+    return polar_set;
   }
 
   [[nodiscard]] inline int get_poem_file_version(const std::string &nc_polar) {
@@ -239,7 +239,7 @@ namespace poem {
     return poem_file_format_version;
   }
 
-  [[nodiscard]] inline std::shared_ptr<PerformancePolarSet> read_v0(const std::string &nc_polar) {
+  [[nodiscard]] inline std::shared_ptr<PolarSet> read_v0(const std::string &nc_polar) {
     /**
      * In v0 spec, only Polar are store into the NetCDF file, ie only one root group
      *
@@ -254,9 +254,9 @@ namespace poem {
 
      */
 
-    //    auto perf_polar_set = std::make_shared<PerformancePolarSet>();
+    //    auto perf_polar_set = std::make_shared<PolarSet>();
     netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
-    auto polar_set = read_polar_set(ncfile);
+    auto polar_set = read_polar(ncfile);
     ncfile.close();
 
     //    R1
@@ -268,7 +268,7 @@ namespace poem {
       atts.add_attribute("poem_file_format_version", "v1");
     }
 
-    auto perf_polar_set = std::make_shared<PerformancePolarSet>("/", atts);
+    auto perf_polar_set = std::make_shared<PolarSet>("/", atts);
 
     //    R2
     polar_set->polar_type("HPPP");
@@ -286,13 +286,13 @@ namespace poem {
     //    R6
     BP_polar->rename("TotalBrakePower");
 
-    perf_polar_set->AddPolarSet(polar_set);
+    perf_polar_set->add_polar(polar_set);
 
     return perf_polar_set;
   }
 
-  [[nodiscard]] inline std::shared_ptr<PerformancePolarSet> read_v1(const std::string &nc_polar) {
-    //    auto perf_polar_set = std::make_shared<PerformancePolarSet>();
+  [[nodiscard]] inline std::shared_ptr<PolarSet> read_v1(const std::string &nc_polar) {
+    //    auto perf_polar_set = std::make_shared<PolarSet>();
     netCDF::NcFile ncfile(nc_polar, netCDF::NcFile::read);
 
     Attributes attributes;
@@ -301,11 +301,11 @@ namespace poem {
       att.second.getValues(att_val);
       attributes.add_attribute(att.first, att_val);
     }
-    auto perf_polar_set = std::make_shared<PerformancePolarSet>("/", attributes);
+    auto perf_polar_set = std::make_shared<PolarSet>("/", attributes);
 
     for (auto group: ncfile.getGroups()) {
-      auto polar_set = read_polar_set(group.second);
-      perf_polar_set->AddPolarSet(polar_set);
+      auto polar_set = read_polar(group.second);
+      perf_polar_set->add_polar(polar_set);
     }
 
     ncfile.close();
@@ -336,8 +336,8 @@ namespace poem {
       return m_poem_file_version;
     }
 
-    [[nodiscard]] std::shared_ptr<PerformancePolarSet> read() const {
-      std::shared_ptr<PerformancePolarSet> perf_polar_set;
+    [[nodiscard]] std::shared_ptr<PolarSet> read() const {
+      std::shared_ptr<PolarSet> perf_polar_set;
       switch (m_poem_file_version) {
         case 0: {
           perf_polar_set = read_v0(m_nc_polar);
@@ -360,4 +360,4 @@ namespace poem {
   };
 } // poem
 
-#endif // POEM_PERFORMANCEPOLARSETREADER_H
+#endif // POEM_READER_H

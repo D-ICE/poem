@@ -66,7 +66,7 @@ TEST(poem_polar_set, NestedForLoop)
               << "====================== LET'S START test_read.cpp >> PolarSetTest" << std::endl;
     std::cout << "Hola, this unit test load the Polar and read everything it can" << std::endl;
 
-    std::cout << "- Polar name: " << attributes["polar_type"] << std::endl;//polar_set->name()
+    std::cout << "- Polar name: " << attributes["polar_type"] << std::endl;//polar->name()
     std::cout << "  Polar type: " << polar_set->polar_type() << " or " << polar_set->polar_type_str() << std::endl;
     std::cout << "  Polar contains: ";
     auto polar_names = polar_set->polar_names();

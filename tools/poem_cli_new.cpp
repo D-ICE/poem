@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
     spdlog::info("Using the following file for cleaning: {}", description_file.string());
     description_file = fs::canonical(description_file);
 
-    // TODO : add clean in PerformancePolarSet class
+    // TODO : add clean in PolarSet class
 //    cleaner = VariablesCleaner(description_file, mode);
     rewrite_file = true;
   }

@@ -11,15 +11,15 @@ PYBIND11_MODULE(pypoem, m) {
 
   // m.doc() = "pybind11 example plugin"; // optional module docstring
 
-  m.def("read_performance_polar_set", [](const std::string &nc_polar){
-    return read_performance_polar_set(nc_polar);
+  m.def("read_polar", [](const std::string &nc_polar){
+    return read_polar_set(nc_polar);
     });
 
-  py::class_<PerformancePolarSet, std::shared_ptr<PerformancePolarSet>>(m, "PerformancePolarSet")
-      .def("name", &PerformancePolarSet::name)
-      // .def("exist", &PerformancePolarSet::exist) // smichel bug to fix
-      .def("polar_set_list", &PerformancePolarSet::polar_set_list)
-      .def("polar_set", &PerformancePolarSet::polar_set);
+  py::class_<PolarSet, std::shared_ptr<PolarSet>>(m, "PolarSet")
+      .def("name", &PolarSet::name)
+      // .def("exist", &PolarSet::exist) // smichel bug to fix
+      .def("polar_list", &PolarSet::polar_list)
+      .def("polar", &PolarSet::polar);
 
   py::class_<Polar, std::shared_ptr<Polar>>(m, "Polar")
       .def("name", &Polar::name)

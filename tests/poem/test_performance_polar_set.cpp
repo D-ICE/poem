@@ -61,7 +61,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
     polar_set->new_polar<double, 5>("BrakePower", "kW", "Brake Power", poem::type::POEM_TYPES::DOUBLE, dimension_point_set);
     //(polar, "MylittlePolar");
 
-    std::cout << "     PerformancePolarSet creation " << std::endl;
+    std::cout << "     PolarSet creation " << std::endl;
     poem::Attributes attributesPPS;
     attributesPPS.add_attribute("beam_m", "16.500000");
     attributesPPS.add_attribute("copyright", "D-ICE ENGINEERING (C)");
@@ -71,8 +71,8 @@ TEST(poem_performance_polar_set, NestedForLoop)
     attributesPPS.add_attribute("name", "MyLittleShip");
     attributesPPS.add_attribute("poem_file_format_version", "v1");
     attributesPPS.add_attribute("vessel_type", "HYBRID");
-    auto perf_polar_set = std::make_shared<poem::PerformancePolarSet>("/", attributesPPS);
-    perf_polar_set->AddPolarSet(polar_set);
+    auto perf_polar_set = std::make_shared<poem::PolarSet>("/", attributesPPS);
+  perf_polar_set->add_polar(polar_set);
 
     std::cout << "==== Setup ended " << std::endl;
 
@@ -91,7 +91,7 @@ TEST(poem_performance_polar_set, NestedForLoop)
         std::cout << perf_polar_set->exist(pl) << std::endl;
     }
 
-    std::vector<POLAR_TYPE> res = perf_polar_set->polar_set_type_list();
+    std::vector<POLAR_TYPE> res = perf_polar_set->polar_type_list();
     std::cout << "Polar set list (names): ";
     for (auto r : res)
     {
@@ -104,11 +104,11 @@ TEST(poem_performance_polar_set, NestedForLoop)
     std::cout << "For each Polar, return info " << std::endl;
     std::cout << "======================" << std::endl;
 
-    std::cout << "Construction of Polar from the polar_set function" << std::endl;
+    std::cout << "Construction of Polar from the polar function" << std::endl;
     // construct polars
     for (auto polar_name : res)
     {
-        std::shared_ptr<Polar> ps_ptr = perf_polar_set->polar_set(polar_name);
+        std::shared_ptr<Polar> ps_ptr = perf_polar_set->polar(polar_name);
 
         std::cout << "- Polar name: " << ps_ptr->name() << std::endl;
         std::cout << "  Polar type: " << ps_ptr->polar_type() << " or " << ps_ptr->polar_type_str() << std::endl;
