@@ -8,7 +8,6 @@
 using namespace poem2;
 
 
-
 TEST(poem2, polar_table) {
 
   // Dimensions
@@ -50,6 +49,14 @@ TEST(poem2, polar_table) {
     idx++;
   }
 
+  // Interpolation
+  DimensionPoint dimension_point(dimension_set, {1.2, 3.2, 4.8});
+
+  auto val_interp = polar_table->interp(dimension_point, true);
+  double val_calc = 1.2 * 3.2 * 4.8;
+
+
+  auto shape = polar_table->shape();
 
   return;
 }
