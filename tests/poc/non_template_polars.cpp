@@ -25,6 +25,7 @@
  *  DimensionPointSet definit de maniere ordonnee mais flat la grille de la polaire. Associe egalement
  *
  *  PolarTable est une table ND, interpolable etc...
+ *  On veut l'initialiser avec une DimensionGrid ! Qui a un DimensionPointSet
  *
  *
  *

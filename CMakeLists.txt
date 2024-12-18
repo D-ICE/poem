@@ -64,6 +64,8 @@ include(Add_semver)
 # Targets
 #=============================================================================
 add_subdirectory(src/poem)
+add_subdirectory(src/poem2)
+
 if (POEM_BUILD_PYTHON)
     add_subdirectory(src/pypoem)
 endif ()
