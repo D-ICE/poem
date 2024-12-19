@@ -124,8 +124,8 @@ TEST(poem2, polar_table) {
 
   netCDF::NcFile dataFile(std::string("write_polar_table.nc"), netCDF::NcFile::replace);
 
-  polar_table->to_netcdf(dataFile);
-
+//  polar_table->to_netcdf(dataFile);
+  write(dataFile, polar_table);
   /*
    *  Slice ok
    * Squeeeze ok
