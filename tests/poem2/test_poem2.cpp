@@ -109,14 +109,16 @@ TEST(poem2, polar_table) {
 
   shape = resampled_polar_table->shape();
 
+  // grid to index
+  ASSERT_EQ(polar_table->dimension_grid()->grid_to_index({0, 1, 2}), 5);
 
   // Nearest
   dimension_point = {1.2, 2.1, 2.8};
-  polar_table->nearest(dimension_point);
+  auto nearest_val = polar_table->nearest(dimension_point);
+  ASSERT_EQ(nearest_val, 6.);
 
 
-
-  // sum
+  polar_table->sum(polar_table);
 //  polar_table->sum(polar_table);
 
 

@@ -12,7 +12,6 @@
 #include <dunits/dunits.h>
 
 #include <MathUtils/RegularGridInterpolator.h>
-#include <MathUtils/RegularGridNearest.h>
 
 using namespace poem;
 
@@ -310,6 +309,22 @@ namespace poem2 {
       return new_dimension_grid; // TODO: tester
     }
 
+    size_t grid_to_index(const std::vector<size_t> &grid_indices) const {
+      if (grid_indices.size() != dim()) {
+        spdlog::critical("Number of indices is not equal to the number of dimensions of the DimensionGrid");
+        CRITICAL_ERROR_POEM
+      }
+
+      size_t index = 0;
+      size_t stride = 1;
+      for (int i = dim() - 1; i >= 0; --i) {
+        index += grid_indices[i] * stride;
+        stride *= size(i);
+      }
+
+      return index;
+    }
+
    private:
     void build_dimension_points() const {
       if (!is_filled()) {
@@ -361,9 +376,6 @@ namespace poem2 {
   template<typename T>
   class PolarTable;
 
-//  template<typename T, size_t _dim>
-//  class Interpolator;
-
   struct InterpolatorBase {
     virtual void build() = 0;
   };
@@ -408,57 +420,6 @@ namespace poem2 {
    private:
     PolarTable<T> *m_polar_table;
     std::unique_ptr<mathutils::RegularGridInterpolator<T, _dim>> m_interpolator;
-  };
-
-
-  // ===================================================================================================================
-
-  struct NearestBase {
-    virtual void build() = 0;
-  };
-
-  template<typename T, size_t _dim>
-  class Nearest : public NearestBase {
-   public:
-    explicit Nearest(PolarTable<T> *polar_table) : m_polar_table(polar_table) {}
-
-    T nearest(const DimensionPoint &dimension_point) const {
-
-      std::array<T, _dim> array;
-      size_t idx = 0;
-      for (const auto &coord: dimension_point) {
-        array[idx] = coord;
-        idx++;
-      }
-
-      auto grid_point = m_nearest->Nearest(array);
-      return grid_point.val();
-    }
-
-    void build() override {
-      m_nearest = std::make_unique<mathutils::RegularGridNearest<T, _dim>>();
-      // Check que m_polar_table est filled
-
-      using NDArray = boost::multi_array<double, _dim>;
-      using IndexArray = boost::array<typename NDArray::index, _dim>;
-      IndexArray shape;
-
-      auto dimension_grid = m_polar_table->dimension_grid();
-      for (size_t idim = 0; idim < dimension_grid->dim(); ++idim) {
-        auto values = dimension_grid->values(idim);
-        shape[idim] = values.size();
-        m_nearest->AddCoord(values);
-      }
-
-      NDArray array(shape);
-      std::copy(m_polar_table->values().begin(), m_polar_table->values().end(), array.data());
-      this->m_nearest->AddVar(array);
-    }
-
-
-   private:
-    PolarTable<T> *m_polar_table;
-    std::unique_ptr<mathutils::RegularGridNearest<T, _dim>> m_nearest;
   };
 
   // ===================================================================================================================
@@ -599,27 +560,26 @@ namespace poem2 {
         CRITICAL_ERROR_POEM
       }
 
-      if (!m_nearest) {
-        const_cast<PolarTable<T> *>(this)->build_nearest();
-      }
-
-      T val;
-      switch (dim()) {
-        case 1:
-          val = static_cast<Nearest<T, 1> *>(m_nearest.get())->nearest(dimension_point);
-          break;
-        case 2:
-          val = static_cast<Nearest<T, 2> *>(m_nearest.get())->nearest(dimension_point);
-          break;
-        case 3:
-          val = static_cast<Nearest<T, 3> *>(m_nearest.get())->nearest(dimension_point);
-          break;
-        default:
-          spdlog::critical("ND nearest not supported for dimensions higher than 3 (found {})", dim());
+      std::vector<size_t> indices(dim());
+      size_t index = 0;
+      for (const auto &coord: dimension_point) {
+        if (coord < m_dimension_grid->min(index) || coord > m_dimension_grid->max(index)) {
+          spdlog::critical("[PolarTable::nearest] dimension_point is out of bound of DimensionGrid");
           CRITICAL_ERROR_POEM
+        }
+        auto values = m_dimension_grid->values(index);
+        auto it = std::min_element(values.begin(), values.end(),
+                                   [coord](double a, double b) {
+                                     return std::abs(a - coord) < std::abs(b - coord);
+                                   });
+
+        indices[index] = std::distance(values.begin(), it);
+        index++;
       }
 
-      return val;
+      index = m_dimension_grid->grid_to_index(indices);
+
+      return m_values[index];
     }
 
     T interp(const DimensionPoint &dimension_point, bool bound_check) const {
@@ -787,7 +747,6 @@ namespace poem2 {
    private:
     void reset() {
       m_interpolator.reset();
-      m_nearest.reset();
     }
 
     void build_interpolator() {
@@ -809,30 +768,11 @@ namespace poem2 {
       m_interpolator->build();
     }
 
-    void build_nearest() {
-      switch (dim()) {
-        case 1:
-          m_nearest = std::make_unique<Nearest<T, 1>>(this);
-          break;
-        case 2:
-          m_nearest = std::make_unique<Nearest<T, 2>>(this);
-          break;
-        case 3:
-          m_nearest = std::make_unique<Nearest<T, 3>>(this);
-          break;
-        default:
-          spdlog::critical("ND Nearest not supported for dimensions higher than 3 (found {})", dim());
-          CRITICAL_ERROR_POEM
-      }
-      m_nearest->build();
-    }
-
    private:
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
 
     std::unique_ptr<InterpolatorBase> m_interpolator;
-    std::unique_ptr<NearestBase> m_nearest;
   };
 
   template<typename T>
