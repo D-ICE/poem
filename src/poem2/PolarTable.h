@@ -6,11 +6,13 @@
 #define POEM_POLARTABLE_H
 
 #include <string>
+#include <boost/multi_array.hpp>
 #include <poem/exceptions.h>
 
 #include <dunits/dunits.h>
 
 #include <MathUtils/RegularGridInterpolator.h>
+#include <MathUtils/RegularGridNearest.h>
 
 using namespace poem;
 
@@ -31,9 +33,9 @@ namespace poem2 {
     Named(const std::string &name,
           const std::string &unit,
           const std::string &description) :
-        m_name(std::move(name)),
-        m_unit(std::move(unit)),
-        m_description(std::move(description)) {
+        m_name(name),
+        m_unit(unit),
+        m_description(description) {
 
       check_unit();
 
@@ -46,7 +48,7 @@ namespace poem2 {
       #endif
     }
 
-    const std::string &name() const { return m_name; }
+    virtual const std::string &name() const { return m_name; }
 
     void rename(const std::string &new_name) { m_name = new_name; }
 
@@ -84,7 +86,7 @@ namespace poem2 {
         m_name(name) {
     }
 
-    const std::string &name() const { return m_name; }
+    [[nodiscard]] const std::string &name() const { return m_name; }
 
    private:
     std::string m_name;
@@ -161,6 +163,10 @@ namespace poem2 {
         m_dimension_set(dimension_set),
         m_values(values) {}
 
+    std::shared_ptr<DimensionSet> dimension_set() const {
+      return m_dimension_set;
+    }
+
     size_t size() const {
       return m_dimension_set->size();
     }
@@ -168,6 +174,15 @@ namespace poem2 {
     double &operator[](size_t i) { return m_values[i]; }
 
     const double &operator[](size_t i) const { return m_values[i]; }
+
+    void operator=(const std::vector<double> &values) {
+      if (values.size() != m_values.size()) {
+        spdlog::critical("Attempt to fill a DimensionPoint with bad vector size ({} and {})",
+                         values.size(), m_values.size());
+        CRITICAL_ERROR_POEM
+      }
+      m_values = values;
+    }
 
     /*
      * Iterators
@@ -340,18 +355,14 @@ namespace poem2 {
     return std::make_shared<DimensionGrid>(dimension_set);
   }
 
-
-  // ===================================================================================================================
-  // ===================================================================================================================
-  // ===================================================================================================================
   // ===================================================================================================================
 
   // Forward declaration
   template<typename T>
   class PolarTable;
 
-  template<typename T, size_t _dim>
-  class Interpolator;
+//  template<typename T, size_t _dim>
+//  class Interpolator;
 
   struct InterpolatorBase {
     virtual void build() = 0;
@@ -370,7 +381,7 @@ namespace poem2 {
         idx++;
       }
 
-      m_interpolator->Interp(array, bound_check);
+      return m_interpolator->Interp(array, bound_check);
     }
 
     void build() override {
@@ -394,12 +405,61 @@ namespace poem2 {
 
     }
 
-
    private:
     PolarTable<T> *m_polar_table;
     std::unique_ptr<mathutils::RegularGridInterpolator<T, _dim>> m_interpolator;
   };
 
+
+  // ===================================================================================================================
+
+  struct NearestBase {
+    virtual void build() = 0;
+  };
+
+  template<typename T, size_t _dim>
+  class Nearest : public NearestBase {
+   public:
+    explicit Nearest(PolarTable<T> *polar_table) : m_polar_table(polar_table) {}
+
+    T nearest(const DimensionPoint &dimension_point) const {
+
+      std::array<T, _dim> array;
+      size_t idx = 0;
+      for (const auto &coord: dimension_point) {
+        array[idx] = coord;
+        idx++;
+      }
+
+      auto grid_point = m_nearest->Nearest(array);
+      return grid_point.val();
+    }
+
+    void build() override {
+      m_nearest = std::make_unique<mathutils::RegularGridNearest<T, _dim>>();
+      // Check que m_polar_table est filled
+
+      using NDArray = boost::multi_array<double, _dim>;
+      using IndexArray = boost::array<typename NDArray::index, _dim>;
+      IndexArray shape;
+
+      auto dimension_grid = m_polar_table->dimension_grid();
+      for (size_t idim = 0; idim < dimension_grid->dim(); ++idim) {
+        auto values = dimension_grid->values(idim);
+        shape[idim] = values.size();
+        m_nearest->AddCoord(values);
+      }
+
+      NDArray array(shape);
+      std::copy(m_polar_table->values().begin(), m_polar_table->values().end(), array.data());
+      this->m_nearest->AddVar(array);
+    }
+
+
+   private:
+    PolarTable<T> *m_polar_table;
+    std::unique_ptr<mathutils::RegularGridNearest<T, _dim>> m_nearest;
+  };
 
   // ===================================================================================================================
 
@@ -503,6 +563,12 @@ namespace poem2 {
     }
 
     void sum(std::shared_ptr<PolarTable<T>> other) {
+
+      if (other->dimension_grid()->dimension_set() != m_dimension_grid->dimension_set()) {
+        spdlog::critical("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
+        CRITICAL_ERROR_POEM
+      }
+
       if (other->size() != size()) {
         spdlog::critical("Attempting to sum two PolarTable of different size ({} and {}", size(), other->size());
         CRITICAL_ERROR_POEM
@@ -526,18 +592,43 @@ namespace poem2 {
       return mean / (T) size();
     }
 
-    T nearest(const DimensionPoint &dimension_point, bool bound_check) const {
+    T nearest(const DimensionPoint &dimension_point) const {
 
-//      if (!m_nearest) {
-//        const_cast<PolarTable<T>*>(this)->build_nearest();
-//      }
+      if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
+        spdlog::critical("[PolarTable::nearest] DimensionPoint has not the same DimensionSet as the PolarTable");
+        CRITICAL_ERROR_POEM
+      }
 
+      if (!m_nearest) {
+        const_cast<PolarTable<T> *>(this)->build_nearest();
+      }
 
+      T val;
+      switch (dim()) {
+        case 1:
+          val = static_cast<Nearest<T, 1> *>(m_nearest.get())->nearest(dimension_point);
+          break;
+        case 2:
+          val = static_cast<Nearest<T, 2> *>(m_nearest.get())->nearest(dimension_point);
+          break;
+        case 3:
+          val = static_cast<Nearest<T, 3> *>(m_nearest.get())->nearest(dimension_point);
+          break;
+        default:
+          spdlog::critical("ND nearest not supported for dimensions higher than 3 (found {})", dim());
+          CRITICAL_ERROR_POEM
+      }
 
+      return val;
     }
 
     T interp(const DimensionPoint &dimension_point, bool bound_check) const {
 //      std::lock_guard<std::mutex> lock(this->m_mutex);
+
+      if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
+        spdlog::critical("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
+        CRITICAL_ERROR_POEM
+      }
 
       if (m_type != POEM_DOUBLE) {
         spdlog::critical("Attempting to interpolate on a non-floating point PolarTable");
@@ -657,6 +748,11 @@ namespace poem2 {
 
     std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
 
+      if (new_dimension_grid->dimension_set() != m_dimension_grid->dimension_set()) {
+        spdlog::critical("[PolarTable::resample] DimensionGrid has not the same DimensionSet as the PolarTable");
+        CRITICAL_ERROR_POEM
+      }
+
       if (new_dimension_grid->dim() != dim()) {
         spdlog::critical("Dimension mismatch in resampling operation ({} and {})", new_dimension_grid->dim(), dim());
         CRITICAL_ERROR_POEM
@@ -691,7 +787,7 @@ namespace poem2 {
    private:
     void reset() {
       m_interpolator.reset();
-      // TODO: mettre aussi pour nearest
+      m_nearest.reset();
     }
 
     void build_interpolator() {
@@ -713,12 +809,30 @@ namespace poem2 {
       m_interpolator->build();
     }
 
+    void build_nearest() {
+      switch (dim()) {
+        case 1:
+          m_nearest = std::make_unique<Nearest<T, 1>>(this);
+          break;
+        case 2:
+          m_nearest = std::make_unique<Nearest<T, 2>>(this);
+          break;
+        case 3:
+          m_nearest = std::make_unique<Nearest<T, 3>>(this);
+          break;
+        default:
+          spdlog::critical("ND Nearest not supported for dimensions higher than 3 (found {})", dim());
+          CRITICAL_ERROR_POEM
+      }
+      m_nearest->build();
+    }
+
    private:
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
 
-//    bool m_is_interpolator_built;
     std::unique_ptr<InterpolatorBase> m_interpolator;
+    std::unique_ptr<NearestBase> m_nearest;
   };
 
   template<typename T>

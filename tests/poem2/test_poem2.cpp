@@ -109,11 +109,22 @@ TEST(poem2, polar_table) {
 
   shape = resampled_polar_table->shape();
 
+
+  // Nearest
+  dimension_point = {1.2, 2.1, 2.8};
+  polar_table->nearest(dimension_point);
+
+
+
+  // sum
+//  polar_table->sum(polar_table);
+
+
   /*
    *  Slice ok
    * Squeeeze ok
    * Nearest
-   * mean
+   * mean ok
    * Intégration dans Polar & PolarSet
    * to_netcdf
    *

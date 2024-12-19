@@ -6,16 +6,16 @@ target_include_directories(_poem2 INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/..)
 add_dependencies(_poem2 check_git_${PROJECT_NAME})
 
 target_link_libraries(_poem2 INTERFACE
-        Boost::boost
-#        Boost::headers
-#        Boost::multi_array
-
         MathUtils::MathUtils
         netcdf-cxx4
         spdlog
         nlohmann_json
         dunits
         semver
+
+        Boost::headers
+        Boost::multi_array
+        Boost::numeric_ublas
 )
 
 set_target_properties(_poem2 PROPERTIES

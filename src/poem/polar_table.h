@@ -13,6 +13,7 @@
 #include <iostream>
 #include <algorithm>
 #include <type_traits>
+#include <boost/multi_array.hpp>
 
 #include <netcdf>
 #include <spdlog/spdlog.h>
