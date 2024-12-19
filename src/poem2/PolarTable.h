@@ -610,8 +610,17 @@ namespace poem2 {
         case 3:
           val = static_cast<Interpolator<T, 3> *>(m_interpolator.get())->interp(dimension_point, bound_check);
           break;
+        case 4:
+          val = static_cast<Interpolator<T, 4> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+          break;
+        case 5:
+          val = static_cast<Interpolator<T, 5> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+          break;
+        case 6:
+          val = static_cast<Interpolator<T, 6> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+          break;
         default:
-          spdlog::critical("ND interpolation not supported for dimensions higher than 3 (found {})", dim());
+          spdlog::critical("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
           CRITICAL_ERROR_POEM
       }
 
@@ -761,8 +770,17 @@ namespace poem2 {
         case 3:
           m_interpolator = std::make_unique<Interpolator<T, 3>>(this);
           break;
+        case 4:
+          m_interpolator = std::make_unique<Interpolator<T, 4>>(this);
+          break;
+        case 5:
+          m_interpolator = std::make_unique<Interpolator<T, 5>>(this);
+          break;
+        case 6:
+          m_interpolator = std::make_unique<Interpolator<T, 6>>(this);
+          break;
         default:
-          spdlog::critical("ND interpolation not supported for dimensions higher than 3 (found {})", dim());
+          spdlog::critical("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
           CRITICAL_ERROR_POEM
       }
       m_interpolator->build();
