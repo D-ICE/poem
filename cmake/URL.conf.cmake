@@ -3,9 +3,18 @@ set(mathutils_URL git@frydom-ce.org:ce/mathutils.git)
 set(mathutils_TAG v1.15 CACHE STRING "mathutils version")
 
 # Boost
-set(boost_URL https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz) # Last current version
-set(boost_TAG 1.75 CACHE STRING "Boost version")
-set(boost_FIND_TAG 1.71 CACHE STRING "Minimal version of Boost to find on the system") # Current version on Ubuntu 20.4
+#set(boost_URL https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz) # Last current version
+#set(boost_TAG 1.75 CACHE STRING "Boost version")
+#set(boost_FIND_TAG 1.71 CACHE STRING "Minimal version of Boost to find on the system") # Current version on Ubuntu 20.4
+
+#set(boost_URL https://github.com/boostorg/boost.git) # Last current version
+#set(boost_TAG boost-1.87.0 CACHE STRING "Boost version")
+
+set(boost_URL https://github.com/boostorg/boost/releases/download/boost-1.84.0/boost-1.84.0.tar.xz)
+#set(boost_URL_MD5 893b5203b862eb9bbd08553e24ff146a)
+set(boost_TAG 1.84.0 CACHE STRING "Boost version")
+
+
 
 # nlohmann/json
 set(json_URL https://github.com/nlohmann/json.git)

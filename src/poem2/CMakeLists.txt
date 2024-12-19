@@ -7,6 +7,9 @@ add_dependencies(_poem2 check_git_${PROJECT_NAME})
 
 target_link_libraries(_poem2 INTERFACE
         Boost::boost
+#        Boost::headers
+#        Boost::multi_array
+
         MathUtils::MathUtils
         netcdf-cxx4
         spdlog

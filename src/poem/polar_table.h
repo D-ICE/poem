@@ -147,7 +147,7 @@ namespace poem {
       return m_nearest->Nearest(dimension_point).val();
     }
 
-    void to_netcdf(netCDF::NcGroup &dataFile) const override {
+    void to_netcdf(netCDF::NcGroup &group) const override {
 
       // TODO: check qu'on va ecrire une polaire qui est bien remplie
 
@@ -166,12 +166,12 @@ namespace poem {
 
         // TODO: voir si on eut pas detecter que le nom est deja pris...
         // Declaration of a new dimension ID
-        auto dim = dataFile.getDim(name);
+        auto dim = group.getDim(name);
         if (dim.isNull()) {
-          dim = dataFile.addDim(name, values.size());
+          dim = group.addDim(name, values.size());
 
           // The dimension as a variable
-          netCDF::NcVar nc_var = dataFile.addVar(name, netCDF::ncDouble, dim);
+          netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
           nc_var.setCompression(true, true, 5);
           nc_var.putVar(values.data());
           /*
@@ -188,16 +188,16 @@ namespace poem {
       }
 
       // Storing the values
-      netCDF::NcVar nc_var = dataFile.getVar(name());
+      netCDF::NcVar nc_var = group.getVar(name());
 
       if (nc_var.isNull()) {
 
         switch (type()) {
           case type::DOUBLE:
-            nc_var = dataFile.addVar(name(), netCDF::ncDouble, dims);
+            nc_var = group.addVar(name(), netCDF::ncDouble, dims);
             break;
           case type::INT:
-            nc_var = dataFile.addVar(name(), netCDF::ncInt, dims);
+            nc_var = group.addVar(name(), netCDF::ncInt, dims);
 
         }
         nc_var.setCompression(true, true, 5);

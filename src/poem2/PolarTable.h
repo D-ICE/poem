@@ -8,6 +8,8 @@
 #include <string>
 #include <poem/exceptions.h>
 
+#include <dunits/dunits.h>
+
 #include <MathUtils/RegularGridInterpolator.h>
 
 using namespace poem;
@@ -17,9 +19,68 @@ namespace poem2 {
 
   // ===================================================================================================================
 
-  class Dimension {
+
+  class Named {
    public:
-    explicit Dimension(const std::string &name) :
+    /**
+     * Constructor
+     * @param name the name of the dimension
+     * @param unit the unit used for that dimension
+     * @param description described the dimension
+     */
+    Named(const std::string &name,
+          const std::string &unit,
+          const std::string &description) :
+        m_name(std::move(name)),
+        m_unit(std::move(unit)),
+        m_description(std::move(description)) {
+
+      check_unit();
+
+      #ifndef ALLOW_DIRTY
+      if (git::AnyUncommittedChanges()) {
+        spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
+                         git::GetNormalizedVersionString());
+        CRITICAL_ERROR_POEM
+      }
+      #endif
+    }
+
+    const std::string &name() const { return m_name; }
+
+    void rename(const std::string &new_name) { m_name = new_name; }
+
+    const std::string &unit() const { return m_unit; }
+
+    void change_unit(const std::string &new_unit) { m_unit = new_unit; }
+
+    const std::string &description() const { return m_description; }
+
+    void change_description(const std::string &new_description) { m_description = new_description; }
+
+   private:
+    void check_unit() {
+      if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
+        spdlog::critical("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
+        CRITICAL_ERROR_POEM
+      }
+    }
+
+   protected:
+    std::string m_name;
+    std::string m_unit;
+    std::string m_description;
+
+  };
+
+  // ===================================================================================================================
+
+  class Dimension : public Named {
+   public:
+    explicit Dimension(const std::string &name,
+                       const std::string &unit,
+                       const std::string &description) :
+        Named(name, unit, description),
         m_name(name) {
     }
 
@@ -30,8 +91,10 @@ namespace poem2 {
 
   };
 
-  std::shared_ptr<Dimension> make_dimension(const std::string &name) {
-    return std::make_shared<Dimension>(name);
+  std::shared_ptr<Dimension> make_dimension(const std::string &name,
+                                            const std::string &unit,
+                                            const std::string &description) {
+    return std::make_shared<Dimension>(name, unit, description);
   }
 
   // ===================================================================================================================
@@ -39,14 +102,36 @@ namespace poem2 {
   class DimensionSet {
    public:
     using DimensionVector = std::vector<std::shared_ptr<Dimension>>;
-//    using DimensionSetIter = DimensionVector::iterator;
     using DimensionSetConstIter = DimensionVector::const_iterator;
 
-    DimensionSet(const DimensionVector dimensions) : m_dimensions(dimensions) {}
+    explicit DimensionSet(const DimensionVector dimensions) : m_dimensions(dimensions) {
+      // Building map (acceleration)
+      size_t idx = 0;
+      for (const auto &dimension: dimensions) {
+        m_map.insert({dimension->name(), idx});
+        idx++;
+      }
+    }
 
     size_t size() const { return m_dimensions.size(); }
 
-    const std::string &name(size_t i) const { return m_dimensions[i]->name(); }
+    const std::string &name(size_t i) const { return m_dimensions.at(i)->name(); }
+
+    size_t index(const std::string &name) const {
+      return m_map.at(name);
+    }
+
+    bool is_dim(const std::string &name) const {
+      return m_map.contains(name);
+    }
+
+    std::shared_ptr<Dimension> dimension(size_t i) const {
+      return m_dimensions.at(i);
+    }
+
+    std::shared_ptr<Dimension> dimension(const std::string &name) const {
+      return dimension(index(name));
+    }
 
     DimensionSetConstIter begin() const { return m_dimensions.begin(); }
 
@@ -54,6 +139,7 @@ namespace poem2 {
 
    private:
     DimensionVector m_dimensions;
+    std::unordered_map<std::string, size_t> m_map;
 
   };
 
@@ -67,7 +153,7 @@ namespace poem2 {
     using ValuesConstIter = Values::const_iterator;
 
    public:
-    DimensionPoint(const std::shared_ptr<DimensionSet> &dimension_set) :
+    explicit DimensionPoint(const std::shared_ptr<DimensionSet> &dimension_set) :
         m_dimension_set(dimension_set),
         m_values(dimension_set->size()) {}
 
@@ -119,30 +205,68 @@ namespace poem2 {
     }
 
     void set_values(const std::string &name, const std::vector<double> &values) {
-      //TODO check qu'on a des valeurs en ordre ascendant strictement monotone...
-      size_t idx = 0;
-      for (const auto &dimension: *m_dimension_set) {
-        if (dimension->name() == name) {
-          m_dimensions_values.at(idx) = values;
-          return;
-        }
-        idx++;
+
+      if (!m_dimension_set->is_dim(name)) {
+        spdlog::critical("Unknown dimension name {}", name);
+        CRITICAL_ERROR_POEM
       }
 
-      spdlog::critical("Unknown dimesion name {}", name);
-      CRITICAL_ERROR_POEM
+      // Check that the values are in ascending order
+      double prec = values.front() - 1.;
+      for (const auto &val: values) {
+        if (val <= prec) {
+          spdlog::critical("Sampling values in DimensionGrid dimensions must be in stictly asscending order");
+          CRITICAL_ERROR_POEM
+        }
+        prec = val;
+      }
+
+      m_dimensions_values.at(m_dimension_set->index(name)) = values;
+      m_is_initialized = false;
     }
 
     const std::vector<double> &values(size_t idx) const {
       return m_dimensions_values.at(idx);
     }
 
+    const std::vector<double> &values(const std::string &name) const {
+      return m_dimensions_values.at(m_dimension_set->index(name));
+    }
+
     size_t size() const {
       return dimension_points().size();
     }
 
+    size_t size(size_t idx) const {
+      return m_dimensions_values.at(idx).size();
+    }
+
     size_t dim() const {
       return m_dimension_set->size();
+    }
+
+    std::vector<size_t> shape() const {
+      std::vector<size_t> shape(dim());
+      for (size_t idx = 0; idx < dim(); ++idx) {
+        shape[idx] = size(idx);
+      }
+      return shape;
+    }
+
+    double min(size_t idim) const {
+      return m_dimensions_values.at(idim).at(0);
+    }
+
+    double min(const std::string &name) const {
+      return min(m_dimension_set->index(name));
+    }
+
+    double max(size_t idim) const {
+      return m_dimensions_values.at(idim).at(size(idim) - 1);
+    }
+
+    double max(const std::string &name) const {
+      return max(m_dimension_set->index(name));
     }
 
     std::shared_ptr<DimensionSet> dimension_set() const { return m_dimension_set; }
@@ -152,6 +276,23 @@ namespace poem2 {
         build_dimension_points();
       }
       return m_dimension_points;
+    }
+
+    [[nodiscard]] bool is_filled() const {
+      struct IsEmpty {
+        bool operator()(const std::vector<double> &values) {
+          return !values.empty();
+        }
+      };
+      return std::all_of(m_dimensions_values.begin(), m_dimensions_values.end(), IsEmpty());
+    }
+
+    std::shared_ptr<DimensionGrid> copy() const {
+      auto new_dimension_grid = std::make_shared<DimensionGrid>(m_dimension_set);
+      for (size_t idx = 0; idx < dim(); ++idx) {
+        new_dimension_grid->set_values(m_dimension_set->dimension(idx)->name(), m_dimensions_values.at(idx));
+      }
+      return new_dimension_grid; // TODO: tester
     }
 
    private:
@@ -172,23 +313,7 @@ namespace poem2 {
       DimensionPoint dimension_point(m_dimension_set);
       self->nested_for_loop(dimension_point, m_dimension_set->size());
 
-//      for (const auto &dimension_point_: m_dimension_points) {
-//        std::cout << dimension_point_ << std::endl;
-//      }
-
-
       self->m_is_initialized = true;
-//      NIY_POEM
-
-    }
-
-    [[nodiscard]] bool is_filled() const {
-      struct IsEmpty {
-        bool operator()(const std::vector<double> &values) {
-          return !values.empty();
-        }
-      };
-      return std::all_of(m_dimensions_values.begin(), m_dimensions_values.end(), IsEmpty());
     }
 
     void nested_for_loop(DimensionPoint &dimension_point, size_t index) {
@@ -229,9 +354,7 @@ namespace poem2 {
   class Interpolator;
 
   struct InterpolatorBase {
-
     virtual void build() = 0;
-
   };
 
   template<typename T, size_t _dim>
@@ -280,21 +403,42 @@ namespace poem2 {
 
   // ===================================================================================================================
 
-  class PolarTableBase {
+  enum POEM_TYPES {
+    POEM_DOUBLE,
+    POEM_INT
+  };
+
+  class PolarTableBase : public Named {
+   public:
+    PolarTableBase(const std::string &name,
+                   const std::string &unit,
+                   const std::string &description,
+                   POEM_TYPES type) :
+        Named(name, unit, description),
+        m_type(type) {}
+
+    POEM_TYPES type() const { return m_type; }
+
+   protected:
+    POEM_TYPES m_type;
 
   };
 
   // ===================================================================================================================
 
-//  template<typename T, class = std::enable_if_t<std::is_arithmetic_v<T>>>
   template<typename T>
   class PolarTable : public PolarTableBase {
+
    public:
-    PolarTable(std::shared_ptr<DimensionGrid> dimension_grid) :
-        PolarTableBase(),
+    PolarTable(const std::string &name,
+               const std::string &unit,
+               const std::string &description,
+               POEM_TYPES type,
+               std::shared_ptr<DimensionGrid> dimension_grid) :
+        PolarTableBase(name, unit, description, type),
         m_dimension_grid(dimension_grid),
         m_values(dimension_grid->size()),
-        m_is_interpolator_built(false) {
+        m_interpolator(nullptr) {
 
     }
 
@@ -302,16 +446,16 @@ namespace poem2 {
       return m_dimension_grid->size();
     }
 
+    size_t size(size_t idx) const {
+      return m_dimension_grid->size(idx);
+    }
+
     size_t dim() const {
       return m_dimension_grid->dimension_set()->size();
     }
 
     std::vector<size_t> shape() const {
-      std::vector<size_t> shape(dim());
-      for (size_t idx=0; idx<dim(); ++idx) {
-        shape[idx] = m_dimension_grid->values(idx).size();
-      }
-      return shape;
+      return m_dimension_grid->shape();
     }
 
     std::shared_ptr<DimensionGrid> dimension_grid() const {
@@ -324,25 +468,84 @@ namespace poem2 {
 
     void set_value(size_t idx, const T &value) {
       m_values[idx] = value;
-      m_is_interpolator_built = false;
+      reset();
     }
 
     const std::vector<T> &values() const {
       return m_values;
     }
 
-    T nearest() const {
-      NIY_POEM
+    void set_values(const std::vector<T> &new_values) {
+      if (new_values.size() != m_values.size()) {
+        spdlog::critical("Attempting to set values in PolarTable of different size ({} and {})",
+                         m_values.size(), new_values.size());
+        CRITICAL_ERROR_POEM
+      }
+      m_values = new_values;
+    }
+
+    std::shared_ptr<PolarTable<T>> copy() const {
+      auto polar_table = std::make_shared<PolarTable<T>>(m_name, m_unit, m_description, m_type, m_dimension_grid);
+      polar_table->set_values(m_values);
+      return polar_table;
+    }
+
+    void multiply_by(const T &coeff) {
+      for (auto &val: m_values) {
+        val *= coeff;
+      }
+    }
+
+    void offset(const T &val) {
+      for (auto &val_: m_values) {
+        val_ += val;
+      }
+    }
+
+    void sum(std::shared_ptr<PolarTable<T>> other) {
+      if (other->size() != size()) {
+        spdlog::critical("Attempting to sum two PolarTable of different size ({} and {}", size(), other->size());
+        CRITICAL_ERROR_POEM
+      }
+      for (size_t idx = 0; idx < size(); ++idx) {
+        m_values[idx] += other->m_values[idx];
+      }
+    }
+
+    void abs() {
+      for (auto &val: m_values) {
+        val = std::abs(val);
+      }
+    }
+
+    T mean() const {
+      T mean = 0;
+      for (const auto &val: m_values) {
+        mean += val;
+      }
+      return mean / (T) size();
+    }
+
+    T nearest(const DimensionPoint &dimension_point, bool bound_check) const {
+
+//      if (!m_nearest) {
+//        const_cast<PolarTable<T>*>(this)->build_nearest();
+//      }
+
+
+
     }
 
     T interp(const DimensionPoint &dimension_point, bool bound_check) const {
-      // TODO
 //      std::lock_guard<std::mutex> lock(this->m_mutex);
 
-      if (!m_is_interpolator_built) {
-        auto self = const_cast<PolarTable<T> *>(this);
-        self->build_interpolator();
-        self->m_is_interpolator_built = true;
+      if (m_type != POEM_DOUBLE) {
+        spdlog::critical("Attempting to interpolate on a non-floating point PolarTable");
+        CRITICAL_ERROR_POEM
+      }
+
+      if (!m_interpolator) {
+        const_cast<PolarTable<T> *>(this)->build_interpolator();
       }
 
       T val;
@@ -364,7 +567,133 @@ namespace poem2 {
       return val;
     }
 
+    std::shared_ptr<PolarTable<T>> slice(std::unordered_map<std::string, double> prescribed_values) const {
+
+      // Check that names are existing
+      auto dimension_set = m_dimension_grid->dimension_set();
+      for (const auto &pair: prescribed_values) {
+        if (!dimension_set->is_dim(pair.first)) {
+          spdlog::critical("Slicing PolarTable \"{}\" with unknown dimension name {}", m_name, pair.first);
+          CRITICAL_ERROR_POEM
+        }
+        // TODO: tester ranges des valeurs
+
+      }
+
+      // Building a new grid
+      auto new_dimension_grid = std::make_shared<DimensionGrid>(dimension_set);
+      for (const auto &dimension: *dimension_set) {
+        auto dimension_name = dimension->name();
+
+        if (prescribed_values.contains(dimension_name)) {
+//          std::cout << "Slicing with " << dimension_name << " = " << prescribed_values.at(dimension_name) << std::endl;
+          new_dimension_grid->set_values(dimension_name, {prescribed_values.at(dimension_name)});
+        } else {
+//          std::cout << "Keep sampling on " << dimension_name << std::endl;
+          new_dimension_grid->set_values(dimension_name, m_dimension_grid->values(dimension_name));
+        }
+
+      }
+
+      // New polar table
+      auto sliced_polar_table = std::make_shared<PolarTable<T>>(m_name, m_unit, m_description, m_type,
+                                                                new_dimension_grid);
+
+      // Interpolation on every DimensionPoint
+      size_t idx = 0;
+      for (const auto &dimension_point: new_dimension_grid->dimension_points()) {
+        T val = interp(dimension_point, false); // Bound checking already done above
+//        std::cout << dimension_point << " -> " << val << std::endl;
+        sliced_polar_table->set_value(idx, val);
+        idx++;
+      }
+
+      return sliced_polar_table;
+    }
+
+    // inplace version
+    void squeeze() {
+
+      // Number of dimensions to squeeze
+      size_t n = dim();
+      for (size_t i = 0; i < dim(); ++i) {
+        if (size(i) == 1) n -= 1;
+      }
+
+      if (n == 0) {
+        // No dimension to squeeze, return
+        return;
+      }
+
+      // Create a new reduced DimensionSet
+      std::vector<std::shared_ptr<Dimension>> new_dimensions;
+      new_dimensions.reserve(n);
+      for (size_t i = 0; i < dim(); ++i) {
+        if (size(i) > 1) {
+          new_dimensions.push_back(m_dimension_grid->dimension_set()->dimension(i));
+        }
+      }
+
+      auto new_dimension_set = make_dimension_set(new_dimensions);
+      auto new_dimension_grid = make_dimension_grid(new_dimension_set);
+
+      // Put the values into the new DimensionGrid
+      for (const auto &dimension: *new_dimension_set) {
+        auto name = dimension->name();
+        new_dimension_grid->set_values(name, m_dimension_grid->values(name));
+      }
+
+      m_dimension_grid = new_dimension_grid;
+
+      reset();
+
+    }
+
+    std::shared_ptr<PolarTable<T>> squeeze() const {
+      auto polar_table = copy();
+      polar_table->squeeze();
+      return polar_table;
+    }
+
+    std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
+
+      if (new_dimension_grid->dim() != dim()) {
+        spdlog::critical("Dimension mismatch in resampling operation ({} and {})", new_dimension_grid->dim(), dim());
+        CRITICAL_ERROR_POEM
+      }
+
+      if (!new_dimension_grid->is_filled()) {
+        spdlog::critical("DimensionGrid for resampling is not filled");
+        CRITICAL_ERROR_POEM
+      }
+
+      for (size_t idim = 0; idim < dim(); ++idim) {
+        if (new_dimension_grid->min(idim) < m_dimension_grid->min(idim) ||
+            new_dimension_grid->max(idim) > m_dimension_grid->max(idim)) {
+          spdlog::critical("Out of range values for resampling");
+          CRITICAL_ERROR_POEM
+        }
+      }
+
+      auto resampled_polar_table = std::make_shared<PolarTable<T>>(m_name, m_unit, m_description, m_type,
+                                                                   new_dimension_grid);
+
+      size_t idx = 0;
+      for (const auto &dimension_point: new_dimension_grid->dimension_points()) {
+        T interp_value = interp(dimension_point, false);
+        resampled_polar_table->set_value(idx, interp_value);
+        idx++;
+      }
+
+      return resampled_polar_table;
+    }
+
    private:
+    void reset() {
+      m_interpolator.reset();
+      // TODO: mettre aussi pour nearest
+    }
+
     void build_interpolator() {
 
       switch (dim()) {
@@ -382,20 +711,23 @@ namespace poem2 {
           CRITICAL_ERROR_POEM
       }
       m_interpolator->build();
-      m_is_interpolator_built = true;
     }
 
    private:
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
 
-    bool m_is_interpolator_built;
+//    bool m_is_interpolator_built;
     std::unique_ptr<InterpolatorBase> m_interpolator;
   };
 
   template<typename T>
-  std::shared_ptr<PolarTable<T>> make_polar_table(std::shared_ptr<DimensionGrid> dimension_grid) {
-    return std::make_shared<PolarTable<T>>(dimension_grid);
+  std::shared_ptr<PolarTable<T>> make_polar_table(const std::string &name,
+                                                  const std::string &unit,
+                                                  const std::string &description,
+                                                  POEM_TYPES type,
+                                                  const std::shared_ptr<DimensionGrid> &dimension_grid) {
+    return std::make_shared<PolarTable<T>>(name, unit, description, type, dimension_grid);
   }
 
 }

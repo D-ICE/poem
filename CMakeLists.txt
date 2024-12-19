@@ -24,6 +24,8 @@ option(POEM_BUILD_POC "Build proof of concept tests" ON)
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
+cmake_policy(SET CMP0167 NEW) # Boost
+
 #cmake_policy(SET CMP0148 NEW) # FindPython3 policy
 
 #=============================================================================
