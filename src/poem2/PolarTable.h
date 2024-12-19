@@ -7,6 +7,7 @@
 
 #include <string>
 #include <boost/multi_array.hpp>
+#include <netcdf>
 #include <poem/exceptions.h>
 
 #include <dunits/dunits.h>
@@ -438,7 +439,7 @@ namespace poem2 {
         Named(name, unit, description),
         m_type(type) {}
 
-    POEM_TYPES type() const { return m_type; }
+//    POEM_TYPES type() const { return m_type; }
 
    protected:
     POEM_TYPES m_type;
@@ -752,6 +753,73 @@ namespace poem2 {
 
       return resampled_polar_table;
     }
+
+    void to_netcdf(netCDF::NcGroup &group) const {
+
+      // TODO: check qu'on va ecrire une polaire qui est bien remplie
+
+//      auto grid = m_dimension_point_set->dimension_grid(); // FIXME: dimension_grid est vide;..
+      auto dimension_set = m_dimension_grid->dimension_set();
+
+      // Storing dimensions
+      std::vector<netCDF::NcDim> dims;
+      dims.reserve(dim());
+
+      for (size_t i = 0; i < dim(); ++i) {
+//        m_dimension_grid->
+        auto dimension = dimension_set->dimension(i);
+        auto name = dimension->name();
+        auto values = m_dimension_grid->values(i);
+
+        // TODO: voir si on eut pas detecter que le nom est deja pris...
+        // Declaration of a new dimension ID
+        auto dim = group.getDim(name);
+        if (dim.isNull()) {
+          dim = group.addDim(name, values.size());
+
+          // The dimension as a variable
+          netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
+          nc_var.setCompression(true, true, 5);
+          nc_var.putVar(values.data());
+          /*
+           * FIXME: les attributs ici sont completement decorreles du schema...
+           *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
+           */
+
+          nc_var.putAtt("unit", dimension->unit());
+          nc_var.putAtt("description", dimension->description());
+        }
+
+        dims.push_back(dim);
+
+      }
+
+      // Storing the values
+      netCDF::NcVar nc_var = group.getVar(name());
+
+      if (nc_var.isNull()) {
+
+        switch (m_type) {
+          case POEM_DOUBLE:
+            nc_var = group.addVar(name(), netCDF::ncDouble, dims);
+            break;
+          case POEM_INT:
+            nc_var = group.addVar(name(), netCDF::ncInt, dims);
+
+        }
+        nc_var.setCompression(true, true, 5);
+
+        nc_var.putVar(m_values.data());
+        nc_var.putAtt("unit", unit());
+        nc_var.putAtt("description", description());
+
+      } else {
+        spdlog::critical("Attempting to store more than one time a variable with the same name {}", name());
+        CRITICAL_ERROR_POEM
+      }
+
+    }
+
 
    private:
     void reset() {

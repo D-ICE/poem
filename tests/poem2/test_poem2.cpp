@@ -125,7 +125,7 @@ TEST(poem2, polar_table) {
   /*
    *  Slice ok
    * Squeeeze ok
-   * Nearest
+   * Nearest ok
    * mean ok
    * Intégration dans Polar & PolarSet
    * to_netcdf
