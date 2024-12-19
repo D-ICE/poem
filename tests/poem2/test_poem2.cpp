@@ -122,6 +122,10 @@ TEST(poem2, polar_table) {
 //  polar_table->sum(polar_table);
 
 
+  netCDF::NcFile dataFile(std::string("write_polar_table.nc"), netCDF::NcFile::replace);
+
+  polar_table->to_netcdf(dataFile);
+
   /*
    *  Slice ok
    * Squeeeze ok

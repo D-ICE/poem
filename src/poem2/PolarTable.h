@@ -430,23 +430,9 @@ namespace poem2 {
     POEM_INT
   };
 
-  class PolarTableBase : public Named {
-   public:
-    PolarTableBase(const std::string &name,
-                   const std::string &unit,
-                   const std::string &description,
-                   POEM_TYPES type) :
-        Named(name, unit, description),
-        m_type(type) {}
-
-//    POEM_TYPES type() const { return m_type; }
-
-   protected:
-    POEM_TYPES m_type;
-
-  };
-
   // ===================================================================================================================
+
+  using PolarTableBase = Named;
 
   template<typename T>
   class PolarTable : public PolarTableBase {
@@ -457,7 +443,8 @@ namespace poem2 {
                const std::string &description,
                POEM_TYPES type,
                std::shared_ptr<DimensionGrid> dimension_grid) :
-        PolarTableBase(name, unit, description, type),
+        PolarTableBase(name, unit, description),
+        m_type(type),
         m_dimension_grid(dimension_grid),
         m_values(dimension_grid->size()),
         m_interpolator(nullptr) {
@@ -855,6 +842,8 @@ namespace poem2 {
     }
 
    private:
+    POEM_TYPES m_type;
+
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
 
