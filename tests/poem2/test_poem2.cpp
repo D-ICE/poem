@@ -13,8 +13,6 @@ TEST(poem2, DimensionSet) {
 }
 
 
-
-
 TEST(poem2, polar_table) {
 
   // Dimensions
@@ -139,6 +137,14 @@ TEST(poem2, polar_table) {
   }
 
 
+  // Polar
+  auto polar = Polar("polar", MPPP, dimension_grid);
+  polar.add_polar(polar_table);
+  auto new_polar_table = polar.new_polar_table<int>("VAR2", "-", "VAR2", POEM_DOUBLE);
+
+  auto new_polar_table_back = polar.polar("VAR2");
+  auto type = new_polar_table_back->type();
+
   /*
    *  Slice ok
    * Squeeeze ok
@@ -151,6 +157,35 @@ TEST(poem2, polar_table) {
    * Remise en place des mutexes
    *
    */
+
+  return;
+}
+
+TEST(poem2, PolarTree) {
+
+  auto root = new_root();
+  std::cout << root->address() << std::endl;
+
+  auto ballast = root->new_child("ballast");
+  std::cout << ballast->address() << std::endl;
+
+  auto one_engine = ballast->new_child("one_engine");
+  std::cout << one_engine->address() << std::endl;
+
+
+
+  auto laden = root->new_child("laden");
+  std::cout << laden->address() << std::endl;
+
+  auto two_engine = ballast->new_child("two_engine");
+  std::cout << two_engine->address() << std::endl;
+
+
+
+
+
+
+
 
   return;
 }

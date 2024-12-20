@@ -77,21 +77,7 @@ namespace poem2 {
 
   // ===================================================================================================================
 
-  class Dimension : public Named {
-   public:
-    explicit Dimension(const std::string &name,
-                       const std::string &unit,
-                       const std::string &description) :
-        Named(name, unit, description),
-        m_name(name) {
-    }
-
-    [[nodiscard]] const std::string &name() const { return m_name; }
-
-   private:
-    std::string m_name;
-
-  };
+  using Dimension = Named;
 
   std::shared_ptr<Dimension> make_dimension(const std::string &name,
                                             const std::string &unit,
@@ -436,10 +422,15 @@ namespace poem2 {
 
   // ===================================================================================================================
 
-  using PolarTableBase = Named;
+//  using PolarTableBase = Named;
+
+  struct PolarTableBase {
+    virtual POEM_TYPES type() const = 0;
+    virtual const std::string& get_name() const = 0;
+  };
 
   template<typename T>
-  class PolarTable : public PolarTableBase {
+  class PolarTable : public PolarTableBase, public Named {
 
    public:
     PolarTable(const std::string &name,
@@ -447,7 +438,7 @@ namespace poem2 {
                const std::string &description,
                POEM_TYPES type,
                std::shared_ptr<DimensionGrid> dimension_grid) :
-        PolarTableBase(name, unit, description),
+        Named(name, unit, description),
         m_type(type),
         m_dimension_grid(dimension_grid),
         m_values(dimension_grid->size()),
@@ -455,7 +446,9 @@ namespace poem2 {
 
     }
 
-    POEM_TYPES type() const { return m_type; }
+    const std::string& get_name() const override { return m_name; }
+
+    POEM_TYPES type() const override { return m_type; }
 
     size_t size() const {
       return m_dimension_grid->size();
@@ -1011,6 +1004,67 @@ namespace poem2 {
     return polar_table;
 
   }
+
+  enum POLAR_TYPE {
+    MPPP,
+    HPPP,
+    MVPP,
+    HVPP,
+    VPP
+  };
+
+  /**
+   * A polar stacks Different PolarTable. Either a MPPP, HPPP, MVPP, HVPP, VPP
+   */
+  class Polar {
+   public:
+    Polar(const std::string &name,
+          POLAR_TYPE type,
+          std::shared_ptr<DimensionGrid> dimension_grid) :
+        m_name(name), m_type(type), m_dimension_grid(dimension_grid) {
+
+    }
+
+    const std::string &name() const { return m_name; }
+
+    const POLAR_TYPE &type() const { return m_type; }
+
+    std::shared_ptr<DimensionGrid> dimension_grid() const { return m_dimension_grid; }
+
+    template<typename T>
+    std::shared_ptr<PolarTable<T>> new_polar_table(const std::string &name,
+                                                   const std::string &unit,
+                                                   const std::string &description,
+                                                   const POEM_TYPES type) {
+
+      auto polar_table = make_polar_table<T>(name, unit, description, type, m_dimension_grid);
+      m_polar_tables.insert({name, polar_table});
+      return polar_table;
+    }
+
+    void add_polar(std::shared_ptr<PolarTableBase> polar_table) {
+      m_polar_tables.insert({polar_table->get_name(), polar_table});
+    }
+
+    std::shared_ptr<PolarTableBase> polar(const std::string &name) const {
+      return m_polar_tables.at(name);
+    }
+
+
+   private:
+    std::string m_name;
+    POLAR_TYPE m_type;
+    std::shared_ptr<DimensionGrid> m_dimension_grid;
+    std::unordered_map<std::string, std::shared_ptr<PolarTableBase>> m_polar_tables;
+
+  };
+
+  std::shared_ptr<Polar> make_polar(const std::string &name,
+                                    POLAR_TYPE type,
+                                    std::shared_ptr<DimensionGrid> dimension_grid) {
+    return std::make_shared<Polar>(name, type, dimension_grid);
+  }
+
 
 } // namespace poem
 
