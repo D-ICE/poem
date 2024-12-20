@@ -123,16 +123,30 @@ TEST(poem2, polar_table) {
 
 
   netCDF::NcFile dataFile(std::string("write_polar_table.nc"), netCDF::NcFile::replace);
-
-//  polar_table->to_netcdf(dataFile);
   write(dataFile, polar_table);
+  dataFile.close();
+
+  netCDF::NcFile dataFile_(std::string("write_polar_table.nc"), netCDF::NcFile::read);
+//  auto dimension_grid_ = read_dimension_grid(dataFile_);
+
+  auto var = dataFile_.getVar("VAR");
+  std::shared_ptr<DimensionGrid> dimension_grid_read;
+  auto polar_table_read = read(var, dimension_grid_read, true);
+  dataFile_.close();
+
+  for(size_t i=0; i<polar_table->size(); ++i) {
+    ASSERT_EQ(polar_table->values()[i], dynamic_cast<PolarTable<double>*>(polar_table_read.get())->values()[i]);
+  }
+
+
   /*
    *  Slice ok
    * Squeeeze ok
    * Nearest ok
    * mean ok
    * Intégration dans Polar & PolarSet
-   * to_netcdf
+   * to_netcdf ok
+   * read ok
    *
    * Remise en place des mutexes
    *

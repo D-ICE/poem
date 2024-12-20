@@ -244,6 +244,10 @@ namespace poem2 {
       return m_dimensions_values.at(idx);
     }
 
+    std::vector<double> &values(size_t idx) {
+      return m_dimensions_values.at(idx);
+    }
+
     const std::vector<double> &values(const std::string &name) const {
       return m_dimensions_values.at(m_dimension_set->index(name));
     }
@@ -483,6 +487,10 @@ namespace poem2 {
     }
 
     const std::vector<T> &values() const {
+      return m_values;
+    }
+
+    std::vector<T> &values() {
       return m_values;
     }
 
@@ -863,9 +871,7 @@ namespace poem2 {
 
   template<typename T>
   void write(netCDF::NcGroup &group, std::shared_ptr<PolarTable<T>> polar_table) {
-    // TODO: check qu'on va ecrire une polaire qui est bien remplie
 
-//      auto grid = m_dimension_point_set->dimension_grid(); // FIXME: dimension_grid est vide;..
     auto dimension_grid = polar_table->dimension_grid();
     auto dimension_set = dimension_grid->dimension_set();
 
@@ -879,8 +885,6 @@ namespace poem2 {
       auto name = dimension->name();
       auto values = dimension_grid->values(i);
 
-      // TODO: voir si on eut pas detecter que le nom est deja pris...
-      // Declaration of a new dimension ID
       auto dim = group.getDim(name);
       if (dim.isNull()) {
         dim = group.addDim(name, values.size());
@@ -889,10 +893,6 @@ namespace poem2 {
         netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
         nc_var.setCompression(true, true, 5);
         nc_var.putVar(values.data());
-        /*
-         * FIXME: les attributs ici sont completement decorreles du schema...
-         *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
-         */
 
         nc_var.putAtt("unit", dimension->unit());
         nc_var.putAtt("description", dimension->description());
@@ -928,6 +928,90 @@ namespace poem2 {
     }
   }
 
-}
+  std::shared_ptr<DimensionGrid> read_dimension_grid(const netCDF::NcVar &var) {
+
+    size_t ndim = var.getDimCount();
+
+    auto group = var.getParentGroup();
+
+    std::vector<std::shared_ptr<Dimension>> dimensions(ndim);
+    for (size_t idim = 0; idim < ndim; ++idim) {
+      auto dim = var.getDim((int) idim);
+      std::string name = dim.getName();
+      auto dim_var = group.getVar(name);
+      std::string unit, description;
+      dim_var.getAtt("unit").getValues(unit);
+      dim_var.getAtt("description").getValues(description);
+
+      dimensions[idim] = std::make_shared<Dimension>(name, unit, description);
+    }
+
+    auto dimension_set = make_dimension_set(dimensions);
+    auto dimension_grid = make_dimension_grid(dimension_set);
+
+    for (size_t idim = 0; idim < ndim; ++idim) {
+      auto name = dimension_set->dimension(idim)->name();
+      auto dim_var = group.getVar(name);
+      std::vector<double> values(dim_var.getDim(0).getSize());
+      dim_var.getVar(values.data());
+
+      dimension_grid->set_values(name, values);
+
+    }
+
+    return dimension_grid;
+  }
+
+  std::shared_ptr<PolarTableBase>
+  read(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid, bool build_from_var) {
+
+    if (build_from_var) {
+      dimension_grid = read_dimension_grid(var);
+    }
+
+    if (var.getDimCount() != dimension_grid->dim()) {
+      spdlog::critical("Dimension mismatch between netCDF dataset var and DimensionGrid");
+      CRITICAL_ERROR_POEM
+    }
+
+    size_t ndim = dimension_grid->dim();
+    size_t size = 0;
+
+    std::vector<std::shared_ptr<Dimension>> dimensions(ndim);
+    for (size_t idim = 0; idim < ndim; ++idim) {
+      if (var.getDim((int) idim).getName() != dimension_grid->dimension_set()->dimension(idim)->name()) {
+        spdlog::critical("Dimension name mismatch between netCDF dataset and DimensionGrid");
+        CRITICAL_ERROR_POEM
+      }
+    }
+
+    std::string name = var.getName();
+    std::string unit;
+    var.getAtt("unit").getValues(unit);
+    std::string description;
+    var.getAtt("description").getValues(description);
+
+    std::shared_ptr<PolarTableBase> polar_table;
+
+    switch (var.getType().getTypeClass()) {
+      case netCDF::NcType::nc_DOUBLE: {
+        auto polar_table_ = make_polar_table<double>(name, unit, description, POEM_DOUBLE, dimension_grid);
+        var.getVar(polar_table_->values().data());
+        polar_table = polar_table_;
+        break;
+      }
+      case netCDF::NcType::nc_INT:
+        polar_table = make_polar_table<int>(name, unit, description, POEM_INT, dimension_grid);
+        break;
+      default:
+        spdlog::critical("Cannot read netCDF variable of type {}", var.getType().getName());
+        CRITICAL_ERROR_POEM
+    }
+
+    return polar_table;
+
+  }
+
+} // namespace poem
 
 #endif //POEM_POLARTABLE_H
