@@ -1,0 +1,38 @@
+{
+  "dtwin": {
+    "dtwin_version": "0",
+
+    "binary_files": {
+      "RAW_model": "RAW_model.nc"
+    },
+
+    "vessel": {
+      "name": "Canopee",
+      "_comment": "etc..."
+    },
+
+    "loads": {
+      "calm_water_resistance": {
+        "json_file": "calm_water_resistance.json"
+      },
+      "manoeuvring": {
+        "json_file": "manoeuvring.json"
+      },
+      "propulsion": {
+        "json_file": "propulsion.json"
+      },
+      "wind_loads": {
+        "json_file": "wind_loads.json"
+      },
+      "added_wave_resistance": {
+        "model_type": "FromProvider",
+        "file_polar_from_supplier": "polar_added_wave_resistance.nc",
+        "binary_file": "RAW_model"
+      },
+      "wind_propulsion": {
+        "json_file": "wind_propulsion.json"
+      }
+    }
+
+  }
+}

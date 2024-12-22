@@ -1,0 +1,16 @@
+
+Dans le fichier netCDF, on aura le groupe Polar, qui aura la hierarchie suivante:
+
+
+* dtwin
+    * un attribut avec le json
+    * groupe binaries (contient les modeles qui sont representes en netCDF aussi
+        * un groupe par model avec dedans les dataset décrivant le modèle
+
+* MPPP
+* HPPP
+* MVPP
+* HVPP
+* VPP
+
+

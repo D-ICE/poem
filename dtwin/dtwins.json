@@ -1,0 +1,43 @@
+{
+  "dtwins": {
+
+    "_comment": "si le groupe contient dtwin_format_version, c'est le root",
+    "dtwin_format_version": "1",
+    "dtwin_version": "1",
+
+    "vessel_name": "Canopee",
+
+    "ballast": {
+      "description": "load case ballast",
+      "ballast_one_engine": {
+        "description": "load case ballast with one engine",
+        "_comment": "si on trouve la cle dtwin, c'est qu'on est sur une feuille modale",
+        "dtwin": {
+          "json_file": "dtwin_ballast_one_engine.json"
+        }
+      },
+      "ballast_two_engines": {
+        "description": "load case ballast with two engines",
+        "_comment": "si on trouve la cle dtwin, c'est qu'on est sur une feuille modale",
+        "dtwin": {
+          "json_file": "dtwin_ballast_two_engine"
+        }
+      }
+    },
+    "laden": {
+        "description": "load case laden",
+        "laden_one_engine": {
+          "description": "load case laden with one engine",
+          "dtwin": {
+            "json_file": ""
+          }
+        },
+        "laden_two_engines": {
+          "description": "load case laden with two engines",
+          "dtwin": {
+            "json_file": ""
+          }
+        }
+      }
+  }
+}
