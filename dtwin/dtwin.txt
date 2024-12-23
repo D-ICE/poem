@@ -14,3 +14,18 @@ Dans le fichier netCDF, on aura le groupe Polar, qui aura la hierarchie suivante
 * VPP
 
 
+On veut entrer un DT dans esperado et l'ecrire entierement dans le netCDF
+On veut lire le netCDF et re-exporter le DT
+
+On veut pouvoir montrer la structure du netCDF en ligne de commande
+
+
+
+* ballast
+    * one_engine
+        * MPPP
+        * HPPP
+        * MVPP
+        * HVPP
+        * VPP
+    * two_engine
