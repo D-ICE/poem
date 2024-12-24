@@ -163,25 +163,6 @@ TEST(poem2, polar_table) {
 
 TEST(poem2, PolarTree) {
 
-  auto root = new_root();
-  std::cout << root->address() << std::endl;
-
-  auto ballast = root->new_child("ballast");
-  std::cout << ballast->address() << std::endl;
-
-  auto one_engine = ballast->new_child("one_engine");
-  std::cout << one_engine->address() << std::endl;
-
-
-
-  auto laden = root->new_child("laden");
-  std::cout << laden->address() << std::endl;
-
-  auto two_engine = ballast->new_child("two_engine");
-  std::cout << two_engine->address() << std::endl;
-
-
-
 
 
 

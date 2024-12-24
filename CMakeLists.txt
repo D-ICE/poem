@@ -61,6 +61,7 @@ include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
 include(Add_semver)
+include(Add_dtree)
 
 #=============================================================================
 # Targets

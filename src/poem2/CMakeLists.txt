@@ -12,6 +12,7 @@ target_link_libraries(_poem2 INTERFACE
         nlohmann_json
         dunits
         semver
+        dtree
 
         Boost::headers
         Boost::multi_array

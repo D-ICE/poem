@@ -1014,7 +1014,7 @@ namespace poem2 {
   };
 
   /**
-   * A polar stacks Different PolarTable. Either a MPPP, HPPP, MVPP, HVPP, VPP
+   * A polar stacks Different PolarTable. Can be either a MPPP, HPPP, MVPP, HVPP, VPP
    */
   class Polar {
    public:
