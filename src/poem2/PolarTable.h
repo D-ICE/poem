@@ -422,11 +422,10 @@ namespace poem2 {
 
   // ===================================================================================================================
 
-//  using PolarTableBase = Named;
-
   struct PolarTableBase {
     virtual POEM_TYPES type() const = 0;
-    virtual const std::string& get_name() const = 0;
+
+    virtual const std::string &get_name() const = 0;
   };
 
   template<typename T>
@@ -446,7 +445,7 @@ namespace poem2 {
 
     }
 
-    const std::string& get_name() const override { return m_name; }
+    const std::string &get_name() const override { return m_name; }
 
     POEM_TYPES type() const override { return m_type; }
 
@@ -1005,6 +1004,8 @@ namespace poem2 {
 
   }
 
+  // ===================================================================================================================
+
   enum POLAR_TYPE {
     MPPP,
     HPPP,
@@ -1012,6 +1013,55 @@ namespace poem2 {
     HVPP,
     VPP
   };
+
+  inline POLAR_TYPE polar_type_s2enum(const std::string &polar_type_) {
+    POLAR_TYPE polar_type;
+    if (polar_type_ == "MPPP") {
+      polar_type = MPPP;
+    } else if (polar_type_ == "HPPP") {
+      polar_type = HPPP;
+    } else if (polar_type_ == "HVPP") {
+      polar_type = HVPP;
+    } else if (polar_type_ == "MVPP") {
+      polar_type = MVPP;
+    } else if (polar_type_ == "VPP") {
+      polar_type = VPP;
+    } else if (polar_type_ == "ND") {
+      // This is the v0 version of POEM specs...
+      polar_type = HPPP;
+    } else if (polar_type_ == "/") {
+      // This is the root group and might be a v0 version of POEM specs...
+      polar_type = HPPP;
+    } else {
+      spdlog::critical("Polar type \"{}\" unknown", polar_type);
+      CRITICAL_ERROR_POEM
+    }
+    return polar_type;
+  }
+
+  inline std::string polar_type_enum2s(const POLAR_TYPE &polar_type_) {
+    std::string polar_type;
+    switch (polar_type_) {
+      case MPPP:
+        polar_type = "MPPP";
+        break;
+      case HPPP:
+        polar_type = "HPPP";
+        break;
+      case HVPP:
+        polar_type = "HVPP";
+        break;
+      case MVPP:
+        polar_type = "MVPP";
+        break;
+      case VPP:
+        polar_type = "VPP";
+        break;
+    }
+    return polar_type;
+  }
+
+  // ===================================================================================================================
 
   /**
    * A polar stacks Different PolarTable. Can be either a MPPP, HPPP, MVPP, HVPP, VPP
@@ -1064,6 +1114,42 @@ namespace poem2 {
                                     std::shared_ptr<DimensionGrid> dimension_grid) {
     return std::make_shared<Polar>(name, type, dimension_grid);
   }
+
+  // ===================================================================================================================
+
+  class PolarSet {
+   public:
+    explicit PolarSet(const std::string &name) : m_name(name) {}
+
+    std::shared_ptr<Polar> crete_polar(POLAR_TYPE type,
+                                       std::shared_ptr<DimensionGrid> dimension_grid) {
+
+      std::string polar_name = m_name + "." + polar_type_enum2s(type);
+      if (has_polar(type)) {
+        spdlog::warn("In PolarSet {}, Polar {} already exists", m_name, polar_name);
+        return m_polars[type];
+      }
+
+      auto polar = std::make_shared<Polar>(polar_name, type, dimension_grid);
+      m_polars.insert({type, polar});
+      return polar;
+    }
+
+    bool has_polar(POLAR_TYPE type) { return m_polars.contains(type); }
+
+    std::shared_ptr<Polar> polar(POLAR_TYPE type) {
+      if (!has_polar(type)) {
+        spdlog::critical("PolarSet {} has no Polar of type {}", m_name, polar_type_enum2s(type));
+        CRITICAL_ERROR_POEM
+      }
+      return m_polars[type];
+    }
+
+   private:
+    std::string m_name;
+    std::unordered_map<POLAR_TYPE, std::shared_ptr<Polar>> m_polars;
+
+  };
 
 
 } // namespace poem

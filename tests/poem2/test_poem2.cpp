@@ -161,7 +161,13 @@ TEST(poem2, polar_table) {
   return;
 }
 
-TEST(poem2, PolarTree) {
+TEST(poem2, PolarTreeNode) {
+
+  auto root = std::make_shared<PolarTreeNode>("root");
+  ASSERT_TRUE(root->is_root());
+
+  auto ballast_load = root->new_child<PolarTreeNode>("ballast_load");
+  auto ballast_one_engine = ballast_load->new_child<PolarTreeNode>("ballast_one_engine");
 
 
 

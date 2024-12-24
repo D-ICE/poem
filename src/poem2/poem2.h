@@ -6,6 +6,6 @@
 #define POEM_POEM2_H
 
 #include "PolarTable.h"
-#include "PolarTree.h"
+#include "PolarTreeNode.h"
 
 #endif //POEM_POEM2_H
