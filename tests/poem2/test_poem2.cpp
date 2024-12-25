@@ -132,8 +132,8 @@ TEST(poem2, polar_table) {
   auto polar_table_read = read(var, dimension_grid_read, true);
   dataFile_.close();
 
-  for(size_t i=0; i<polar_table->size(); ++i) {
-    ASSERT_EQ(polar_table->values()[i], dynamic_cast<PolarTable<double>*>(polar_table_read.get())->values()[i]);
+  for (size_t i = 0; i < polar_table->size(); ++i) {
+    ASSERT_EQ(polar_table->values()[i], dynamic_cast<PolarTable<double> *>(polar_table_read.get())->values()[i]);
   }
 
 
@@ -168,6 +168,48 @@ TEST(poem2, PolarTreeNode) {
 
   auto ballast_load = root->new_child<PolarTreeNode>("ballast_load");
   auto ballast_one_engine = ballast_load->new_child<PolarTreeNode>("ballast_one_engine");
+  auto ballast_two_engines = ballast_load->new_child<PolarTreeNode>("ballast_two_engines");
+
+  auto laden_load = root->new_child<PolarTreeNode>("laden_load");
+  auto laden_one_engine = laden_load->new_child<PolarTreeNode>("laden_one_engine");
+  auto laden_two_engines = laden_load->new_child<PolarTreeNode>("laden_two_engines");
+
+  // root->ballast_load->ballast_one_engine
+  //                   ->ballast_two_engines
+  //     ->laden_load->laden_one_engine
+  //                 ->laden_two_engines
+
+
+  ASSERT_ANY_THROW(laden_load->polar_set());
+
+  auto STW = make_dimension("STW", "kt", "");
+  auto TWS = make_dimension("TWS", "kt", "");
+  auto TWA = make_dimension("TWA", "deg", "");
+  auto WA = make_dimension("WA", "deg", "");
+  auto Hs = make_dimension("Hs", "m", "");
+
+
+  auto dimension_set_5D = make_dimension_set({STW, TWS, TWA, WA, Hs});
+  auto dimension_grid_5D = make_dimension_grid(dimension_set_5D);
+  dimension_grid_5D->set_values("STW", {1, 2, 3});
+  dimension_grid_5D->set_values("TWS", {1, 2, 3});
+  dimension_grid_5D->set_values("TWA", {1, 2, 3});
+  dimension_grid_5D->set_values("WA", {1, 2, 3});
+  dimension_grid_5D->set_values("Hs", {1, 2, 3});
+
+  auto dimension_set_4D = make_dimension_set({TWS, TWA, WA, Hs});
+  auto dimension_grid_4D = make_dimension_grid(dimension_set_4D);
+  dimension_grid_4D->set_values("TWS", {1, 2, 3});
+  dimension_grid_4D->set_values("TWA", {1, 2, 3});
+  dimension_grid_4D->set_values("WA", {1, 2, 3});
+  dimension_grid_4D->set_values("Hs", {1, 2, 3});
+
+  auto polar_set = laden_two_engines->polar_set();
+  auto polar_MPPP = polar_set->crete_polar(MPPP, dimension_grid_5D);
+  auto polar_HPPP = polar_set->crete_polar(HPPP, dimension_grid_5D);
+  auto polar_MVPP = polar_set->crete_polar(MVPP, dimension_grid_5D);
+  auto polar_HVPP = polar_set->crete_polar(HVPP, dimension_grid_5D);
+  auto polar_VPP = polar_set->crete_polar(VPP, dimension_grid_4D);
 
 
 

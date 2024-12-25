@@ -48,29 +48,28 @@ namespace poem2 {
 
   class PolarTreeNode : public dtree::Node {
    public:
+
     explicit PolarTreeNode(const std::string &name) :
         dtree::Node(name),
         m_polar_set(nullptr) {}
 
-//    std::shared_ptr<Polar> create_polar(POLAR_TYPE type, std::shared_ptr<DimensionGrid> dimension_grid) {
-//
-//
-//
-//      if (!is_leaf()) {
-//        spdlog::critical("Cannot create Polar on a non-leaf node ({})", name());
-//        CRITICAL_ERROR_POEM
-//      }
-//      std::string polar_name = name() + ".PPP"; // TODO: convert type to string
-//
-//      m_polars.insert({type, std::make_shared<Polar>(polar_name, type, dimension_grid)});
-//
-//      return m_polars[type];
-//    }
+    std::shared_ptr<PolarSet> polar_set() const {
+
+      if (!is_leaf()) {
+        spdlog::critical("This PolarTreeNode {} cannot handle a PolarSet (not leaf)", name());
+        CRITICAL_ERROR_POEM
+      }
+
+      if (!m_polar_set) {
+        const_cast<PolarTreeNode*>(this)->m_polar_set = std::make_shared<PolarSet>(name());
+      }
+
+      return m_polar_set;
+    }
 
 
    private:
     std::shared_ptr<PolarSet> m_polar_set;
-//    std::unordered_map<POLAR_TYPE, std::shared_ptr<Polar>> m_polars;
   };
 
 
