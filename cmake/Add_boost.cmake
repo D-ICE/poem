@@ -9,12 +9,7 @@ FetchContent_Declare(Boost
         EXCLUDE_FROM_ALL
 )
 
+set(BOOST_INCLUDE_LIBRARIES filesystem multi_array numeric/ublas)
+
 message(STATUS "******* FINDING Boost dependency on the system from ${PROJECT_NAME} (requested version: ${boost_TAG}) *******")
 FetchContent_MakeAvailable(boost)
-
-#add_library(Boost::boost INTERFACE IMPORTED)
-#target_link_libraries(Boost::boost INTERFACE
-#        Boost::headers
-#        Boost::multi_array
-#        Boost::numeric_ublas
-#)
