@@ -1,6 +1,6 @@
 add_library(_poem2 INTERFACE)
 
-target_include_directories(_poem2 INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(_poem2 INTERFACE ..)
 target_include_directories(_poem2 INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/..)
 
 add_dependencies(_poem2 check_git_${PROJECT_NAME})

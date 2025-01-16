@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <filesystem>
-#include <dtree/dtree.h>
+#include "dtree/dtree.h"
 
 #include "PolarTable.h"
 #include "poem/exceptions.h"
@@ -25,7 +25,12 @@ using namespace poem;
 
 namespace poem2 {
 
+  /// Replaces spaces by _
+  /// Removes special characters
   std::string clean_name(const std::string &str) {
+    // FIXME: semblerait que la fonctionnalite soit aussi dans cools...
+    // FIXME: removes also numeric characters
+
     std::string s = str;
     for (size_t i = 0; i < s.size(); i++) {
       if (s[i] == ' ') {
@@ -45,6 +50,9 @@ namespace poem2 {
 
     return s;
   }
+
+
+
 
   class PolarTreeNode : public dtree::Node {
    public:

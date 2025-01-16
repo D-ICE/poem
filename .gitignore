@@ -19,3 +19,6 @@ pypoem.egg*
 *.egg
 *.pyc
 tests/*/*.so
+
+docs/API/cpp/build
+docs/API/cpp/Doxyfile

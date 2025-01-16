@@ -6,16 +6,15 @@
 #define POEM_POLARTABLE_H
 
 #include <string>
-#include <boost/multi_array.hpp>
-#include <netcdf>
+#include "boost/multi_array.hpp"
+#include "netcdf"
 #include <poem/exceptions.h>
 
-#include <dunits/dunits.h>
+#include "dunits/dunits.h"
 
-#include <MathUtils/RegularGridInterpolator.h>
+#include "MathUtils/RegularGridInterpolator.h"
 
 using namespace poem;
-
 
 namespace poem2 {
 
