@@ -211,10 +211,4 @@ TEST(poem2, PolarTreeNode) {
   auto polar_HVPP = polar_set->crete_polar(HVPP, dimension_grid_5D);
   auto polar_VPP = polar_set->crete_polar(VPP, dimension_grid_4D);
 
-
-
-
-
-
-  return;
 }

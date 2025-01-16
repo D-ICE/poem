@@ -6,7 +6,6 @@ target_include_directories(_poem INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/..)
 add_dependencies(_poem check_git_${PROJECT_NAME})
 
 target_link_libraries(_poem INTERFACE
-        Boost::headers
         MathUtils::MathUtils
         netcdf-cxx4
         spdlog
