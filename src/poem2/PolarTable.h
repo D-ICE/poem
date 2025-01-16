@@ -891,74 +891,74 @@ namespace poem {
       return resampled_polar_table;
     }
 
-    /**
-     * Writes the table into a NetCDF group
-     */
-    void to_netcdf(netCDF::NcGroup &group) const {
-
-      // TODO: check qu'on va ecrire une polaire qui est bien remplie
-
-//      auto grid = m_dimension_point_set->dimension_grid(); // FIXME: dimension_grid est vide;..
-      auto dimension_set = m_dimension_grid->dimension_set();
-
-      // Storing dimensions
-      std::vector<netCDF::NcDim> dims;
-      dims.reserve(dim());
-
-      for (size_t i = 0; i < dim(); ++i) {
-//        m_dimension_grid->
-        auto dimension = dimension_set->dimension(i);
-        auto name = dimension->name();
-        auto values = m_dimension_grid->values(i);
-
-        // TODO: voir si on eut pas detecter que le nom est deja pris...
-        // Declaration of a new dimension ID
-        auto dim = group.getDim(name);
-        if (dim.isNull()) {
-          dim = group.addDim(name, values.size());
-
-          // The dimension as a variable
-          netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
-          nc_var.setCompression(true, true, 5);
-          nc_var.putVar(values.data());
-          /*
-           * FIXME: les attributs ici sont completement decorreles du schema...
-           *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
-           */
-
-          nc_var.putAtt("unit", dimension->unit());
-          nc_var.putAtt("description", dimension->description());
-        }
-
-        dims.push_back(dim);
-
-      }
-
-      // Storing the values
-      netCDF::NcVar nc_var = group.getVar(Named::name());
-
-      if (nc_var.isNull()) {
-
-        switch (m_type) {
-          case POEM_DOUBLE:
-            nc_var = group.addVar(Named::name(), netCDF::ncDouble, dims);
-            break;
-          case POEM_INT:
-            nc_var = group.addVar(Named::name(), netCDF::ncInt, dims);
-
-        }
-        nc_var.setCompression(true, true, 5);
-
-        nc_var.putVar(m_values.data());
-        nc_var.putAtt("unit", unit());
-        nc_var.putAtt("description", description());
-
-      } else {
-        spdlog::critical("Attempting to store more than one time a variable with the same name {}", Named::name());
-        CRITICAL_ERROR_POEM
-      }
-
-    }
+//    /**
+//     * Writes the table into a NetCDF group
+//     */
+//    void to_netcdf(netCDF::NcGroup &group) const {
+//
+//      // TODO: check qu'on va ecrire une polaire qui est bien remplie
+//
+////      auto grid = m_dimension_point_set->dimension_grid(); // FIXME: dimension_grid est vide;..
+//      auto dimension_set = m_dimension_grid->dimension_set();
+//
+//      // Storing dimensions
+//      std::vector<netCDF::NcDim> dims;
+//      dims.reserve(dim());
+//
+//      for (size_t i = 0; i < dim(); ++i) {
+////        m_dimension_grid->
+//        auto dimension = dimension_set->dimension(i);
+//        auto name = dimension->name();
+//        auto values = m_dimension_grid->values(i);
+//
+//        // TODO: voir si on eut pas detecter que le nom est deja pris...
+//        // Declaration of a new dimension ID
+//        auto dim = group.getDim(name);
+//        if (dim.isNull()) {
+//          dim = group.addDim(name, values.size());
+//
+//          // The dimension as a variable
+//          netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
+//          nc_var.setCompression(true, true, 5);
+//          nc_var.putVar(values.data());
+//          /*
+//           * FIXME: les attributs ici sont completement decorreles du schema...
+//           *  il faudrait ajouter ces champs dynamiquement en amont et les stocker dans un vecteur
+//           */
+//
+//          nc_var.putAtt("unit", dimension->unit());
+//          nc_var.putAtt("description", dimension->description());
+//        }
+//
+//        dims.push_back(dim);
+//
+//      }
+//
+//      // Storing the values
+//      netCDF::NcVar nc_var = group.getVar(Named::name());
+//
+//      if (nc_var.isNull()) {
+//
+//        switch (m_type) {
+//          case POEM_DOUBLE:
+//            nc_var = group.addVar(Named::name(), netCDF::ncDouble, dims);
+//            break;
+//          case POEM_INT:
+//            nc_var = group.addVar(Named::name(), netCDF::ncInt, dims);
+//
+//        }
+//        nc_var.setCompression(true, true, 5);
+//
+//        nc_var.putVar(m_values.data());
+//        nc_var.putAtt("unit", unit());
+//        nc_var.putAtt("description", description());
+//
+//      } else {
+//        spdlog::critical("Attempting to store more than one time a variable with the same name {}", Named::name());
+//        CRITICAL_ERROR_POEM
+//      }
+//
+//    }
 
    private:
     void reset() {
@@ -1156,6 +1156,9 @@ namespace poem {
 
   // ===================================================================================================================
 
+  /**
+   * The different types of available polar modes in poem
+   */
   enum POLAR_TYPE {
     MPPP,
     HPPP,
@@ -1164,6 +1167,9 @@ namespace poem {
     VPP
   };
 
+  /**
+   * Converts a string representation into its corresponding POLAR_TYPE
+   */
   inline POLAR_TYPE polar_type_s2enum(const std::string &polar_type_) {
     POLAR_TYPE polar_type;
     if (polar_type_ == "MPPP") {
@@ -1189,6 +1195,9 @@ namespace poem {
     return polar_type;
   }
 
+  /**
+   * Converts a POLAR_TYPE into its corresponding string representation
+   */
   inline std::string polar_type_enum2s(const POLAR_TYPE &polar_type_) {
     std::string polar_type;
     switch (polar_type_) {
@@ -1214,7 +1223,9 @@ namespace poem {
   // ===================================================================================================================
 
   /**
-   * A polar stacks Different PolarTable. Can be either a MPPP, HPPP, MVPP, HVPP, VPP
+   * A Polar stacks Different PolarTable
+   *
+   * A Polar can be one of the POLAR_TYPE available (MPPP, HPPP, MVPP, HVPP, VPP)
    */
   class Polar {
    public:
