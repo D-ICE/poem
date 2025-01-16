@@ -17,11 +17,11 @@ include:
   script:
     - mkdir build && cd build
     - cmake ..
-      -- -DCMAKE_BUILD_TYPE=Release 
-      -- -DPOEM_BUILD_TESTS=ON 
-      -- -DPOEM_BUILD_TOOLS=ON 
-      -- -DPOEM_ALLOW_DIRTY=OFF 
-      -- -DPOEM_BUILD_PYTHON=ON
+      -DCMAKE_BUILD_TYPE=Release 
+      -DPOEM_BUILD_TESTS=ON 
+      -DPOEM_BUILD_TOOLS=ON 
+      -DPOEM_ALLOW_DIRTY=OFF 
+      -DPOEM_BUILD_PYTHON=ON
 
 
 build-testing:
