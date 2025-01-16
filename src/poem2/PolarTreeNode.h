@@ -10,7 +10,7 @@
 #include "dtree/dtree.h"
 
 #include "PolarTable.h"
-#include "poem/exceptions.h"
+#include "poem2/exceptions.h"
 
 /**
  * PolarTreeNode repose sur dtree. Un noeud leaf contient un PolarSet et un DT
@@ -21,9 +21,7 @@
 
 namespace fs = std::filesystem;
 
-using namespace poem;
-
-namespace poem2 {
+namespace poem {
 
   /// Replaces spaces by _
   /// Removes special characters

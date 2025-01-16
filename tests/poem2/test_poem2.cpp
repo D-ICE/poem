@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <poem2/poem2.h>
 
-using namespace poem2;
+using namespace poem;
 
 TEST(poem2, version) {
   std::cout<< "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
@@ -97,7 +97,7 @@ TEST(poem2, polar_table) {
   auto new_dimension_grid = polar_table->dimension_grid()->copy();
   new_dimension_grid->set_values("STW", {1, 1.5, 2, 2.5, 3});
   auto resampled_polar_table = polar_table->resample(new_dimension_grid);
-  resampled_polar_table->rename("VAR_resampled");
+  resampled_polar_table->change_name("VAR_resampled");
 
 
   for (const auto &dimension_point_: resampled_polar_table->dimension_points()) {

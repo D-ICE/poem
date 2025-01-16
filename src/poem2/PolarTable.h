@@ -8,23 +8,24 @@
 #include <string>
 #include "boost/multi_array.hpp"
 #include "netcdf"
-#include <poem/exceptions.h>
+#include <poem2/exceptions.h>
 
 #include "dunits/dunits.h"
 
 #include "MathUtils/RegularGridInterpolator.h"
 
-using namespace poem;
-
-namespace poem2 {
+namespace poem {
 
   // ===================================================================================================================
 
-
+  /**
+   * Base class with name, unit and description
+   */
   class Named {
    public:
+
     /**
-     * Constructor
+     * CTOR
      * @param name the name of the dimension
      * @param unit the unit used for that dimension
      * @param description described the dimension
@@ -49,7 +50,7 @@ namespace poem2 {
 
     virtual const std::string &name() const { return m_name; }
 
-    void rename(const std::string &new_name) { m_name = new_name; }
+    void change_name(const std::string &new_name) { m_name = new_name; }
 
     const std::string &unit() const { return m_unit; }
 
@@ -76,8 +77,24 @@ namespace poem2 {
 
   // ===================================================================================================================
 
-  using Dimension = Named;
+  /**
+   * Declares a polar table dimension with name, unit and description
+   */
+  class Dimension : public Named {
+   public:
+    Dimension(const std::string &name,
+              const std::string &unit,
+              const std::string &description) :
+        Named(name, unit, description) {}
+  };
 
+  /**
+   * Helper function to create a shared_ptr of Dimension
+   * @param name
+   * @param unit
+   * @param description
+   * @return
+   */
   std::shared_ptr<Dimension> make_dimension(const std::string &name,
                                             const std::string &unit,
                                             const std::string &description) {
@@ -86,6 +103,9 @@ namespace poem2 {
 
   // ===================================================================================================================
 
+  /**
+   * Declares an ordered set of Dimension objects to be used as a basis to define the dimensions of a PolarTable
+   */
   class DimensionSet {
    public:
     using DimensionVector = std::vector<std::shared_ptr<Dimension>>;
@@ -135,6 +155,9 @@ namespace poem2 {
   }
 
   // ===================================================================================================================
+  /**
+   * A particular point corresponding to a DimensionSet
+   */
   class DimensionPoint {
     using Values = std::vector<double>;
     using ValuesConstIter = Values::const_iterator;
@@ -196,6 +219,9 @@ namespace poem2 {
 
   // ===================================================================================================================
 
+  /**
+   * Defines a numerical sampling for each of Dimension object in a DimensionSet
+   */
   class DimensionGrid {
    public:
     explicit DimensionGrid(const std::shared_ptr<DimensionSet> &dimension_set) :
@@ -237,6 +263,10 @@ namespace poem2 {
       return m_dimensions_values.at(m_dimension_set->index(name));
     }
 
+    /**
+     * Number of points in the grid
+     * @return
+     */
     size_t size() const {
       return dimension_points().size();
     }
@@ -414,6 +444,9 @@ namespace poem2 {
 
   // ===================================================================================================================
 
+  /**
+   * The data types supported by POEM in a PolarTable
+   */
   enum POEM_TYPES {
     POEM_DOUBLE,
     POEM_INT
@@ -424,13 +457,27 @@ namespace poem2 {
   struct PolarTableBase {
     virtual POEM_TYPES type() const = 0;
 
-    virtual const std::string &get_name() const = 0;
+    virtual const std::string &name() const = 0;
   };
 
+  /**
+   * A multidimensional numerical table representing a variable
+   *
+   * @tparam T the datatype of the data into the PolarTable
+   */
   template<typename T>
-  class PolarTable : public PolarTableBase, public Named {
+ class PolarTable : public PolarTableBase, public Named, public std::enable_shared_from_this<PolarTable<T>> {
 
    public:
+   /**
+    * Constructor
+    *
+    * @param name name of the table
+    * @param unit unit of the table
+    * @param description description of the table
+    * @param type datatype of the table
+    * @param dimension_grid the grid of the table
+    */
     PolarTable(const std::string &name,
                const std::string &unit,
                const std::string &description,
@@ -444,47 +491,95 @@ namespace poem2 {
 
     }
 
-    const std::string &get_name() const override { return m_name; }
+    /**
+     * Get the name of the table
+     */
+    [[nodiscard]] const std::string &name() const override { return Named::m_name; }
 
-    POEM_TYPES type() const override { return m_type; }
+    /**
+     * Get the type of the table
+     */
+    [[nodiscard]] POEM_TYPES type() const override { return m_type; }
 
-    size_t size() const {
+    /**
+     * Number of points in the table (equal to the number of DimensionPoint in the Grid)
+     */
+    [[nodiscard]] size_t size() const {
       return m_dimension_grid->size();
     }
 
-    size_t size(size_t idx) const {
+    /**
+     * Number of points along the dimension with index idx
+     *
+     * It is equal to the number of elements of the grid for that dimension
+     * @param idx index of the dimension
+     */
+    [[nodiscard]] size_t size(size_t idx) const {
       return m_dimension_grid->size(idx);
     }
 
-    size_t dim() const {
+    /**
+     * Number of dimensions of the table
+     *
+     * Also the size of the associated DimensionSet
+     */
+    [[nodiscard]] size_t dim() const {
       return m_dimension_grid->dimension_set()->size();
     }
 
-    std::vector<size_t> shape() const {
+    /**
+     * Get a vector of sizes for the dimensions of the table
+     *
+     * Also the shape of the associated DimensionGrid
+     */
+    [[nodiscard]] std::vector<size_t> shape() const {
       return m_dimension_grid->shape();
     }
 
-    std::shared_ptr<DimensionGrid> dimension_grid() const {
+    /**
+     * Get the associated DimensionGrid
+     */
+    [[nodiscard]] std::shared_ptr<DimensionGrid> dimension_grid() const {
       return m_dimension_grid;
     }
 
+    /**
+     * Get the vector of DimensionPoint corresponding to the associated DimensionGrid of the table
+     */
     [[nodiscard]] const std::vector<DimensionPoint> &dimension_points() const {
       return m_dimension_grid->dimension_points();
     }
 
+    /**
+     * Set a particular value of the table at index idx corresponding to the DimensionPoint that you can get from
+     * dimension_points()
+     *
+     * @param idx index of the value to set
+     * @param value value to set
+     */
     void set_value(size_t idx, const T &value) {
       m_values[idx] = value;
       reset();
     }
 
-    const std::vector<T> &values() const {
+    /**
+     * Get the whole data vector of the table.
+     */
+    [[nodiscard]] const std::vector<T> &values() const {
       return m_values;
     }
 
+    /**
+     * Get the whole data vector of the table.
+     */
     std::vector<T> &values() {
       return m_values;
     }
 
+    /**
+     * Set the whole data vector of the table
+     * @param new_values vector of values
+     */
     void set_values(const std::vector<T> &new_values) {
       if (new_values.size() != m_values.size()) {
         spdlog::critical("Attempting to set values in PolarTable of different size ({} and {})",
@@ -494,24 +589,38 @@ namespace poem2 {
       m_values = new_values;
     }
 
-    std::shared_ptr<PolarTable<T>> copy() const {
+    /**
+     * Makes a copy of the current PolarTable (shared_ptr)
+     *
+     * DimensionGrid is kept shared but data vector is copied
+     */
+    [[nodiscard]] std::shared_ptr<PolarTable<T>> copy() const {
       auto polar_table = std::make_shared<PolarTable<T>>(m_name, m_unit, m_description, m_type, m_dimension_grid);
       polar_table->set_values(m_values);
       return polar_table;
     }
 
+    /**
+     * Multiplies the data of the table by a scalar
+     */
     void multiply_by(const T &coeff) {
       for (auto &val: m_values) {
         val *= coeff;
       }
     }
 
+    /**
+     * Adds a scalar offset to the data
+     */
     void offset(const T &val) {
       for (auto &val_: m_values) {
         val_ += val;
       }
     }
 
+    /**
+     * Sums two tables
+     */
     void sum(std::shared_ptr<PolarTable<T>> other) {
 
       if (other->dimension_grid()->dimension_set() != m_dimension_grid->dimension_set()) {
@@ -528,13 +637,20 @@ namespace poem2 {
       }
     }
 
+    /**
+     * Takes the absolute value of the data
+     */
     void abs() {
       for (auto &val: m_values) {
         val = std::abs(val);
       }
     }
 
-    T mean() const {
+    /**
+     * Calculates the mean of the table
+     * @return
+     */
+    [[nodiscard]] T mean() const {
       T mean = 0;
       for (const auto &val: m_values) {
         mean += val;
@@ -542,7 +658,11 @@ namespace poem2 {
       return mean / (T) size();
     }
 
-    T nearest(const DimensionPoint &dimension_point) const {
+    /**
+     * Get the value corresponding to the nearest DimensionPoint from given dimension_point in the associated
+     * DimensionGrid
+     */
+    [[nodiscard]] T nearest(const DimensionPoint &dimension_point) const {
 
       if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
         spdlog::critical("[PolarTable::nearest] DimensionPoint has not the same DimensionSet as the PolarTable");
@@ -571,7 +691,10 @@ namespace poem2 {
       return m_values[index];
     }
 
-    T interp(const DimensionPoint &dimension_point, bool bound_check) const {
+    /**
+     * Get the value of the interpolation to dimension_point
+     */
+    [[nodiscard]] T interp(const DimensionPoint &dimension_point, bool bound_check) const {
 //      std::lock_guard<std::mutex> lock(this->m_mutex);
 
       if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
@@ -616,7 +739,14 @@ namespace poem2 {
       return val;
     }
 
-    std::shared_ptr<PolarTable<T>> slice(std::unordered_map<std::string, double> prescribed_values) const {
+    /**
+     * Get a slice in the table given values for different dimensions
+     *
+     * prescribed_values is a std::unordered_map whose key is the name of a dimension (must be a valid Dimension name
+     * of the associated DimensionSet) and value is the prescribed value for this dimension
+     */
+    [[nodiscard]] std::shared_ptr<PolarTable<T>>
+    slice(std::unordered_map<std::string, double> prescribed_values) const {
 
       // Check that names are existing
       auto dimension_set = m_dimension_grid->dimension_set();
@@ -660,8 +790,14 @@ namespace poem2 {
       return sliced_polar_table;
     }
 
-    // inplace version
-    void squeeze() {
+    /**
+     * Removes Dimension if it is a singleton (only one associated value in the associated DimensionGrid for a Dimension)
+     *
+     * Inline version
+     *
+     * @return true if the dimension has been reduced, false otherwise
+     */
+    bool squeeze() {
 
       // Number of dimensions to squeeze
       size_t n = dim();
@@ -671,7 +807,7 @@ namespace poem2 {
 
       if (n == 0) {
         // No dimension to squeeze, return
-        return;
+        return false;
       }
 
       // Create a new reduced DimensionSet
@@ -696,15 +832,28 @@ namespace poem2 {
 
       reset();
 
+      return true;
     }
 
-    std::shared_ptr<PolarTable<T>> squeeze() const {
-      auto polar_table = copy();
-      polar_table->squeeze();
+    /**
+     * Removes Dimension if it is a singleton (only one associated value in the associated DimensionGrid for a Dimension)
+     *
+     * @return a copy of the PolarTable with fewer dimensions if some of the dimensions were singleton, otherwise
+     * returns shared_ptr of itself
+     */
+    [[nodiscard]] std::shared_ptr<PolarTable<T>> squeeze() const {
+      std::shared_ptr<PolarTable<T>> polar_table;
+
+      auto polar_table_ = copy();
+      if (polar_table_->squeeze()) {
+        polar_table = polar_table_;
+      } else {
+        polar_table = this->shared_from_this();
+      }
       return polar_table;
     }
 
-    std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
+    [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
 
       if (new_dimension_grid->dimension_set() != m_dimension_grid->dimension_set()) {
         spdlog::critical("[PolarTable::resample] DimensionGrid has not the same DimensionSet as the PolarTable");
@@ -742,6 +891,9 @@ namespace poem2 {
       return resampled_polar_table;
     }
 
+    /**
+     * Writes the table into a NetCDF group
+     */
     void to_netcdf(netCDF::NcGroup &group) const {
 
       // TODO: check qu'on va ecrire une polaire qui est bien remplie
@@ -783,16 +935,16 @@ namespace poem2 {
       }
 
       // Storing the values
-      netCDF::NcVar nc_var = group.getVar(name());
+      netCDF::NcVar nc_var = group.getVar(Named::name());
 
       if (nc_var.isNull()) {
 
         switch (m_type) {
           case POEM_DOUBLE:
-            nc_var = group.addVar(name(), netCDF::ncDouble, dims);
+            nc_var = group.addVar(Named::name(), netCDF::ncDouble, dims);
             break;
           case POEM_INT:
-            nc_var = group.addVar(name(), netCDF::ncInt, dims);
+            nc_var = group.addVar(Named::name(), netCDF::ncInt, dims);
 
         }
         nc_var.setCompression(true, true, 5);
@@ -802,12 +954,11 @@ namespace poem2 {
         nc_var.putAtt("description", description());
 
       } else {
-        spdlog::critical("Attempting to store more than one time a variable with the same name {}", name());
+        spdlog::critical("Attempting to store more than one time a variable with the same name {}", Named::name());
         CRITICAL_ERROR_POEM
       }
 
     }
-
 
    private:
     void reset() {
@@ -1092,7 +1243,7 @@ namespace poem2 {
     }
 
     void add_polar(std::shared_ptr<PolarTableBase> polar_table) {
-      m_polar_tables.insert({polar_table->get_name(), polar_table});
+      m_polar_tables.insert({polar_table->name(), polar_table});
     }
 
     std::shared_ptr<PolarTableBase> polar(const std::string &name) const {
