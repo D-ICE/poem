@@ -7,6 +7,11 @@
 
 using namespace poem2;
 
+TEST(poem2, version) {
+  std::cout<< "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
+}
+
+
 // TODO: faire test pour chaque classe importante
 TEST(poem2, DimensionSet) {
   // TODO

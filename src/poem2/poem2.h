@@ -5,6 +5,8 @@
 #ifndef POEM_POEM2_H
 #define POEM_POEM2_H
 
+#include "poem2/version.h"
+
 #include "PolarTable.h"
 #include "PolarTreeNode.h"
 
