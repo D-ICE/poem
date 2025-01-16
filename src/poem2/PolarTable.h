@@ -445,17 +445,19 @@ namespace poem {
   // ===================================================================================================================
 
   /**
-   * The data types supported by POEM in a PolarTable
+   * PolarTable datatype
    */
-  enum POEM_TYPES {
+  enum POEM_DATATYPE {
+    /// double
     POEM_DOUBLE,
-    POEM_INT
+    /// int
+    POEM_INT,
   };
 
   // ===================================================================================================================
 
   struct PolarTableBase {
-    virtual POEM_TYPES type() const = 0;
+    virtual POEM_DATATYPE type() const = 0;
 
     virtual const std::string &name() const = 0;
   };
@@ -466,22 +468,22 @@ namespace poem {
    * @tparam T the datatype of the data into the PolarTable
    */
   template<typename T>
- class PolarTable : public PolarTableBase, public Named, public std::enable_shared_from_this<PolarTable<T>> {
+  class PolarTable : public PolarTableBase, public Named, public std::enable_shared_from_this<PolarTable<T>> {
 
    public:
-   /**
-    * Constructor
-    *
-    * @param name name of the table
-    * @param unit unit of the table
-    * @param description description of the table
-    * @param type datatype of the table
-    * @param dimension_grid the grid of the table
-    */
+    /**
+     * Constructor
+     *
+     * @param name name of the table
+     * @param unit unit of the table
+     * @param description description of the table
+     * @param type datatype of the table
+     * @param dimension_grid the grid of the table
+     */
     PolarTable(const std::string &name,
                const std::string &unit,
                const std::string &description,
-               POEM_TYPES type,
+               POEM_DATATYPE type,
                std::shared_ptr<DimensionGrid> dimension_grid) :
         Named(name, unit, description),
         m_type(type),
@@ -499,7 +501,7 @@ namespace poem {
     /**
      * Get the type of the table
      */
-    [[nodiscard]] POEM_TYPES type() const override { return m_type; }
+    [[nodiscard]] POEM_DATATYPE type() const override { return m_type; }
 
     /**
      * Number of points in the table (equal to the number of DimensionPoint in the Grid)
@@ -994,7 +996,7 @@ namespace poem {
     }
 
    private:
-    POEM_TYPES m_type;
+    POEM_DATATYPE m_type;
 
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
@@ -1006,7 +1008,7 @@ namespace poem {
   std::shared_ptr<PolarTable<T>> make_polar_table(const std::string &name,
                                                   const std::string &unit,
                                                   const std::string &description,
-                                                  POEM_TYPES type,
+                                                  POEM_DATATYPE type,
                                                   const std::shared_ptr<DimensionGrid> &dimension_grid) {
     return std::make_shared<PolarTable<T>>(name, unit, description, type, dimension_grid);
   }
@@ -1157,50 +1159,92 @@ namespace poem {
   // ===================================================================================================================
 
   /**
+   * Control type of a Polar
+   */
+  enum CONTROL_TYPE {
+    /// Velocity control
+    VELOCITY_CONTROL,
+    /// Power control
+    POWER_CONTROL,
+    /// No control
+    NO_CONTROL
+  };
+
+  /**
    * The different types of available polar modes in poem
    */
-  enum POLAR_TYPE {
+  enum POLAR_MODE {
+    /// Motor Power Prediction Program (motor propulsion only, VELOCITY_CONTROL)
     MPPP,
+    /// Hybrid Power Prediction Program (motor and wind propulsion, VELOCITY_CONTROL)
     HPPP,
+    /// Motor Velocity Prediction Program (motor propulsion only, POWER_CONTROL)
     MVPP,
+    /// Hybrid Velocity Prediction Program (motor and wind propulsion, POWER_CONTROL)
     HVPP,
+    /// Velocity Prediction Program (wind propulsion only, NO_CONTROL)
     VPP
   };
 
   /**
-   * Converts a string representation into its corresponding POLAR_TYPE
+   * Get the control type from POLAR_MODE
    */
-  inline POLAR_TYPE polar_type_s2enum(const std::string &polar_type_) {
-    POLAR_TYPE polar_type;
-    if (polar_type_ == "MPPP") {
-      polar_type = MPPP;
-    } else if (polar_type_ == "HPPP") {
-      polar_type = HPPP;
-    } else if (polar_type_ == "HVPP") {
-      polar_type = HVPP;
-    } else if (polar_type_ == "MVPP") {
-      polar_type = MVPP;
-    } else if (polar_type_ == "VPP") {
-      polar_type = VPP;
-    } else if (polar_type_ == "ND") {
-      // This is the v0 version of POEM specs...
-      polar_type = HPPP;
-    } else if (polar_type_ == "/") {
-      // This is the root group and might be a v0 version of POEM specs...
-      polar_type = HPPP;
-    } else {
-      spdlog::critical("Polar type \"{}\" unknown", polar_type);
-      CRITICAL_ERROR_POEM
+  CONTROL_TYPE control_type (POLAR_MODE polar_mode) {
+    CONTROL_TYPE control_type;
+    switch (polar_mode) {
+      case MPPP:
+        control_type = VELOCITY_CONTROL;
+        break;
+      case HPPP:
+        control_type = VELOCITY_CONTROL;
+        break;
+      case MVPP:
+        control_type = POWER_CONTROL;
+        break;
+      case HVPP:
+        control_type = POWER_CONTROL;
+        break;
+      case VPP:
+        control_type = NO_CONTROL;
+        break;
     }
-    return polar_type;
+    return control_type;
   }
 
   /**
-   * Converts a POLAR_TYPE into its corresponding string representation
+   * Converts a string representation into its corresponding POLAR_MODE
    */
-  inline std::string polar_type_enum2s(const POLAR_TYPE &polar_type_) {
+  inline POLAR_MODE string_to_polar_mode(const std::string &polar_type_) {
+    POLAR_MODE polar_mode;
+    if (polar_type_ == "MPPP") {
+      polar_mode = MPPP;
+    } else if (polar_type_ == "HPPP") {
+      polar_mode = HPPP;
+    } else if (polar_type_ == "HVPP") {
+      polar_mode = HVPP;
+    } else if (polar_type_ == "MVPP") {
+      polar_mode = MVPP;
+    } else if (polar_type_ == "VPP") {
+      polar_mode = VPP;
+    } else if (polar_type_ == "ND") {
+      // This is the v0 version of POEM specs...
+      polar_mode = HPPP;
+    } else if (polar_type_ == "/") {
+      // This is the root group and might be a v0 version of POEM specs...
+      polar_mode = HPPP;
+    } else {
+      spdlog::critical("Polar type \"{}\" unknown", polar_mode);
+      CRITICAL_ERROR_POEM
+    }
+    return polar_mode;
+  }
+
+  /**
+   * Converts a POLAR_MODE into its corresponding string representation
+   */
+  inline std::string polar_mode_to_string(const POLAR_MODE &polar_mode_) {
     std::string polar_type;
-    switch (polar_type_) {
+    switch (polar_mode_) {
       case MPPP:
         polar_type = "MPPP";
         break;
@@ -1223,22 +1267,22 @@ namespace poem {
   // ===================================================================================================================
 
   /**
-   * A Polar stacks Different PolarTable
+   * A Polar stacks the PolarTable for one POLAR_MODE
    *
-   * A Polar can be one of the POLAR_TYPE available (MPPP, HPPP, MVPP, HVPP, VPP)
+   * Every PolarTable in a Polar share the same DimensionGrid
    */
   class Polar {
    public:
     Polar(const std::string &name,
-          POLAR_TYPE type,
+          POLAR_MODE mode,
           std::shared_ptr<DimensionGrid> dimension_grid) :
-        m_name(name), m_type(type), m_dimension_grid(dimension_grid) {
+        m_name(name), m_mode(mode), m_dimension_grid(dimension_grid) {
 
     }
 
     const std::string &name() const { return m_name; }
 
-    const POLAR_TYPE &type() const { return m_type; }
+    const POLAR_MODE &mode() const { return m_mode; }
 
     std::shared_ptr<DimensionGrid> dimension_grid() const { return m_dimension_grid; }
 
@@ -1246,7 +1290,7 @@ namespace poem {
     std::shared_ptr<PolarTable<T>> new_polar_table(const std::string &name,
                                                    const std::string &unit,
                                                    const std::string &description,
-                                                   const POEM_TYPES type) {
+                                                   const POEM_DATATYPE type) {
 
       auto polar_table = make_polar_table<T>(name, unit, description, type, m_dimension_grid);
       m_polar_tables.insert({name, polar_table});
@@ -1264,51 +1308,54 @@ namespace poem {
 
    private:
     std::string m_name;
-    POLAR_TYPE m_type;
+    POLAR_MODE m_mode;
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::unordered_map<std::string, std::shared_ptr<PolarTableBase>> m_polar_tables;
 
   };
 
   std::shared_ptr<Polar> make_polar(const std::string &name,
-                                    POLAR_TYPE type,
+                                    POLAR_MODE mode,
                                     std::shared_ptr<DimensionGrid> dimension_grid) {
-    return std::make_shared<Polar>(name, type, dimension_grid);
+    return std::make_shared<Polar>(name, mode, dimension_grid);
   }
 
   // ===================================================================================================================
 
+  /**
+   * A PolarSet stacks the different Polar for one OperationMode
+   */
   class PolarSet {
    public:
     explicit PolarSet(const std::string &name) : m_name(name) {}
 
-    std::shared_ptr<Polar> crete_polar(POLAR_TYPE type,
+    std::shared_ptr<Polar> crete_polar(POLAR_MODE mode,
                                        std::shared_ptr<DimensionGrid> dimension_grid) {
 
-      std::string polar_name = m_name + "." + polar_type_enum2s(type);
-      if (has_polar(type)) {
+      std::string polar_name = m_name + "." + polar_mode_to_string(mode);
+      if (has_polar(mode)) {
         spdlog::warn("In PolarSet {}, Polar {} already exists", m_name, polar_name);
-        return m_polars[type];
+        return m_polars[mode];
       }
 
-      auto polar = std::make_shared<Polar>(polar_name, type, dimension_grid);
-      m_polars.insert({type, polar});
+      auto polar = std::make_shared<Polar>(polar_name, mode, dimension_grid);
+      m_polars.insert({mode, polar});
       return polar;
     }
 
-    bool has_polar(POLAR_TYPE type) { return m_polars.contains(type); }
+    bool has_polar(POLAR_MODE mode) { return m_polars.contains(mode); }
 
-    std::shared_ptr<Polar> polar(POLAR_TYPE type) {
-      if (!has_polar(type)) {
-        spdlog::critical("PolarSet {} has no Polar of type {}", m_name, polar_type_enum2s(type));
+    std::shared_ptr<Polar> polar(POLAR_MODE mode) {
+      if (!has_polar(mode)) {
+        spdlog::critical("PolarSet {} has no Polar of type {}", m_name, polar_mode_to_string(mode));
         CRITICAL_ERROR_POEM
       }
-      return m_polars[type];
+      return m_polars[mode];
     }
 
    private:
     std::string m_name;
-    std::unordered_map<POLAR_TYPE, std::shared_ptr<Polar>> m_polars;
+    std::unordered_map<POLAR_MODE, std::shared_ptr<Polar>> m_polars;
 
   };
 

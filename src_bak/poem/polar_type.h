@@ -20,7 +20,7 @@ namespace poem {
     VPP,  // No Control, wind propulsion only
   };
 
-  inline POLAR_TYPE polar_type_s2enum(const std::string &polar_type_) {
+  inline POLAR_TYPE string_to_polar_mode(const std::string &polar_type_) {
     POLAR_TYPE polar_type;
     if (polar_type_ == "PPP") {
       polar_type = PPP;
