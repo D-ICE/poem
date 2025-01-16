@@ -33,9 +33,9 @@ build-testing:
 
   script:
     - !reference [ .build, script ]
-    - make poem2_tests -j6
+    - make poem_tests -j6
     - cd bin/tests
-    - ./poem2_tests
+    - ./poem_tests
 
 
 ## smichel: test ci following weval as a 'template'
