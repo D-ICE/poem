@@ -5,22 +5,22 @@
 #include <gtest/gtest.h>
 #include <netcdf>
 
-#include "poem2/poem.h"
+#include "poem/poem.h"
 
 using namespace poem;
 
-TEST(poem2, version) {
+TEST(poem, version) {
   std::cout<< "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
 }
 
 
 // TODO: faire test pour chaque classe importante
-TEST(poem2, DimensionSet) {
+TEST(poem, DimensionSet) {
   // TODO
 }
 
 
-TEST(poem2, polar_table) {
+TEST(poem, polar_table) {
 
   // Dimensions
   auto STW = make_dimension("STW", "kt", "Speed Through Water");
@@ -168,7 +168,7 @@ TEST(poem2, polar_table) {
   return;
 }
 
-TEST(poem2, OperationMode) {
+TEST(poem, OperationMode) {
 
   auto root = std::make_shared<OperationMode>("root");
   ASSERT_TRUE(root->is_root());

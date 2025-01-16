@@ -34,8 +34,8 @@ cmake_policy(SET CMP0167 NEW) # Boost
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Add_cmake_ref.cmake)
 list(APPEND CMAKE_MODULE_PATH ${cmake-ref_SOURCE_DIR}/cmake)
 
-set(PRE_CONFIGURE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/poem2/version.h.in CACHE FILEPATH "" FORCE)
-set(POST_CONFIGURE_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/poem2/version.h CACHE FILEPATH "" FORCE)
+set(PRE_CONFIGURE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/poem/version.h.in CACHE FILEPATH "" FORCE)
+set(POST_CONFIGURE_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/poem/version.h CACHE FILEPATH "" FORCE)
 set(GIT_WORKING_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE FILEPATH "" FORCE)
 set(GIT_STATE_FILE ${CMAKE_CURRENT_BINARY_DIR}/git-state-hash CACHE FILEPATH "" FORCE)
 
@@ -68,8 +68,7 @@ include(Add_dtree)
 #=============================================================================
 # Targets
 #=============================================================================
-#add_subdirectory(src/poem)
-add_subdirectory(src/poem2)
+add_subdirectory(src/poem)
 
 #if (POEM_BUILD_PYTHON)
 #    add_subdirectory(src/pypoem)

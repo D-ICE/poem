@@ -60,7 +60,7 @@ namespace poem {
     std::shared_ptr<PolarSet> polar_set() const {
 
       if (!is_leaf()) {
-        spdlog::critical("This PolarTreeNode {} cannot handle a PolarSet (not leaf)", name());
+        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not leaf)", name());
         CRITICAL_ERROR_POEM
       }
 

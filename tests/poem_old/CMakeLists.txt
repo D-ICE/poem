@@ -1,12 +1,18 @@
 #
 # RESOURCE FILES FOR TESTING
-#
 include(resources.cmake)
 
+#
+# TESTS # smichel: all has to be fixed, for now: commented, only test_read_poem is valid
+#
 set(TESTS
         poem_tests.cpp
-        test_poem.cpp
-)
+        test_dimension_point_set.cpp
+        test_polar.cpp
+        test_polar_set.cpp
+        test_polar_slicing.cpp
+        test_read_poem.cpp
+        )
 
 add_executable(poem_tests)
 target_sources(poem_tests PRIVATE ${TESTS})
