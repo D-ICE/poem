@@ -3,7 +3,9 @@
 //
 
 #include <gtest/gtest.h>
-#include <poem2/poem2.h>
+#include <netcdf>
+
+#include "poem2/poem.h"
 
 using namespace poem;
 
@@ -166,18 +168,18 @@ TEST(poem2, polar_table) {
   return;
 }
 
-TEST(poem2, PolarTreeNode) {
+TEST(poem2, OperationMode) {
 
-  auto root = std::make_shared<PolarTreeNode>("root");
+  auto root = std::make_shared<OperationMode>("root");
   ASSERT_TRUE(root->is_root());
 
-  auto ballast_load = root->new_child<PolarTreeNode>("ballast_load");
-  auto ballast_one_engine = ballast_load->new_child<PolarTreeNode>("ballast_one_engine");
-  auto ballast_two_engines = ballast_load->new_child<PolarTreeNode>("ballast_two_engines");
+  auto ballast_load = root->new_child<OperationMode>("ballast_load");
+  auto ballast_one_engine = ballast_load->new_child<OperationMode>("ballast_one_engine");
+  auto ballast_two_engines = ballast_load->new_child<OperationMode>("ballast_two_engines");
 
-  auto laden_load = root->new_child<PolarTreeNode>("laden_load");
-  auto laden_one_engine = laden_load->new_child<PolarTreeNode>("laden_one_engine");
-  auto laden_two_engines = laden_load->new_child<PolarTreeNode>("laden_two_engines");
+  auto laden_load = root->new_child<OperationMode>("laden_load");
+  auto laden_one_engine = laden_load->new_child<OperationMode>("laden_one_engine");
+  auto laden_two_engines = laden_load->new_child<OperationMode>("laden_two_engines");
 
   // root->ballast_load->ballast_one_engine
   //                   ->ballast_two_engines

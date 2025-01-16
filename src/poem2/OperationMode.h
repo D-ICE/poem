@@ -2,18 +2,18 @@
 // Created by frongere on 20/12/24.
 //
 
-#ifndef POEM_POLARTREENODE_H
-#define POEM_POLARTREENODE_H
+#ifndef POEM_OPERATIONMODE_H
+#define POEM_OPERATIONMODE_H
 
-#include <memory>
 #include <filesystem>
-#include "dtree/dtree.h"
 
-#include "PolarTable.h"
-#include "poem2/exceptions.h"
+#include <dtree/dtree.h>
+
+#include "exceptions.h"
+#include "PolarSet.h"
 
 /**
- * PolarTreeNode repose sur dtree. Un noeud leaf contient un PolarSet et un DT
+ * OperationMode repose sur dtree. Un noeud leaf contient un PolarSet et un DT
  *      PolarSet (contient des Polar, au plus 5)
  *          Polar (MPPP, HPPP, MVPP, HVPP, VPP)
  *              PolarTable
@@ -50,12 +50,10 @@ namespace poem {
   }
 
 
-
-
-  class PolarTreeNode : public dtree::Node {
+  class OperationMode : public dtree::Node {
    public:
 
-    explicit PolarTreeNode(const std::string &name) :
+    explicit OperationMode(const std::string &name) :
         dtree::Node(name),
         m_polar_set(nullptr) {}
 
@@ -67,7 +65,7 @@ namespace poem {
       }
 
       if (!m_polar_set) {
-        const_cast<PolarTreeNode*>(this)->m_polar_set = std::make_shared<PolarSet>(name());
+        const_cast<OperationMode*>(this)->m_polar_set = std::make_shared<PolarSet>(name());
       }
 
       return m_polar_set;
@@ -78,7 +76,6 @@ namespace poem {
     std::shared_ptr<PolarSet> m_polar_set;
   };
 
-
 }  // poem
 
-#endif //POEM_POLARTREENODE_H
+#endif //POEM_OPERATIONMODE_H
