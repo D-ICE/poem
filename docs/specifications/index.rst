@@ -31,13 +31,16 @@ other means and read by Weather Routing solutions.
    For any questions, please contact François Rongère <francois.rongere@dice-engineering.com>
 
 
-POEM File Format Specification versions (last version is 1)
-===========================================================
+POEM File Format Specification versions
+=======================================
 .. toctree::
    :maxdepth: 1
 
-   v1/index.rst
+..    v1/index.rst
    v0/index.rst
+
+.. note::
+    Version 1 of the standard is under construction and should be released in February 2025
 
 
 POEM is made Open Source with the support of the French Agency for Ecological Transition (OPERVENT project, 2024)

@@ -276,11 +276,11 @@ TEST(poem, PolarSet) {
   write_polar_set(dataFile, polar_set);
   dataFile.close();
 
-//  // Reading back
-//  netCDF::NcFile dataFile_(std::string("polar_set.nc"), netCDF::NcFile::read);
-//  auto polar_ = read_polar(dataFile_);
-//
-//  ASSERT_EQ(*polar, *polar_);
+  // Reading back
+  netCDF::NcFile dataFile_(std::string("polar_set.nc"), netCDF::NcFile::read);
+  auto polar_set_ = read_polar_set(dataFile_);
+
+  ASSERT_EQ(*polar_set, *polar_set_);
 
 }
 
@@ -307,44 +307,105 @@ TEST(poem, OperationMode) {
 
   ASSERT_ANY_THROW(laden_load->polar_set());
 
-  auto STW = make_dimension("STW", "kt", "");
-  auto TWS = make_dimension("TWS", "kt", "");
-  auto TWA = make_dimension("TWA", "deg", "");
-  auto WA = make_dimension("WA", "deg", "");
-  auto Hs = make_dimension("Hs", "m", "");
 
-  auto dimension_set_5D = make_dimension_set({STW, TWS, TWA, WA, Hs});
-  auto dimension_grid_5D = make_dimension_grid(dimension_set_5D);
-  dimension_grid_5D->set_values("STW", {1, 2, 3});
-  dimension_grid_5D->set_values("TWS", {1, 2, 3});
-  dimension_grid_5D->set_values("TWA", {1, 2, 3});
-  dimension_grid_5D->set_values("WA", {1, 2, 3});
-  dimension_grid_5D->set_values("Hs", {1, 2, 3});
+  // Dimensions
+  auto STW = make_dimension("STW", "kt", "Speed Through Water");
+  auto TWS = make_dimension("TWS", "kt", "True Wind Speed");
+  auto TWA = make_dimension("TWA", "deg", "True Wind Angle");
+  auto WA = make_dimension("WA", "deg", "Waves Angle");
+  auto Hs = make_dimension("Hs", "m", "Waves Significant Height");
+  auto BrakePower = make_dimension("BrakePower", "kW", "Brake Power");
 
-  auto dimension_set_4D = make_dimension_set({TWS, TWA, WA, Hs});
-  auto dimension_grid_4D = make_dimension_grid(dimension_set_4D);
-  dimension_grid_4D->set_values("TWS", {1, 2, 3});
-  dimension_grid_4D->set_values("TWA", {1, 2, 3});
-  dimension_grid_4D->set_values("WA", {1, 2, 3});
-  dimension_grid_4D->set_values("Hs", {1, 2, 3});
+  // DimensionSet
+  auto dimension_set_speed_control = make_dimension_set({STW, TWS, TWA, WA, Hs});
+  auto dimension_set_power_control = make_dimension_set({BrakePower, TWS, TWA, WA, Hs});
+  auto dimension_set_no_control = make_dimension_set({TWS, TWA, WA, Hs});
 
-  auto polar_set = laden_two_engines->polar_set();
-  auto polar_MPPP = polar_set->create_polar(MPPP, dimension_grid_5D);
-  auto MPPP_double = polar_MPPP->new_polar_table<double>("Double", "kW", "double", POEM_DOUBLE);
-  MPPP_double->fill_with(10.);
-  auto MPPP_int = polar_MPPP->new_polar_table<int>("Int", "-", "int", POEM_INT);
-  MPPP_int->fill_with(3);
+  // DimensionGrid
+  auto STW_values = mathutils::linspace<double>(8, 20, 13);
+  auto TWS_values = mathutils::linspace<double>(0, 40, 9);
+  auto TWA_values = mathutils::linspace<double>(0, 180, 13);
+  auto WA_values = mathutils::linspace<double>(0, 180, 13);
+  auto Hs_values = mathutils::linspace<double>(0, 8, 9);
+  auto BrakePower_values = mathutils::linspace<double>(1000, 6500, 12);
 
-  auto polar_HPPP = polar_set->create_polar(HPPP, dimension_grid_5D);
-  auto polar_MVPP = polar_set->create_polar(MVPP, dimension_grid_5D);
-  auto polar_HVPP = polar_set->create_polar(HVPP, dimension_grid_5D);
-  auto polar_VPP = polar_set->create_polar(VPP, dimension_grid_4D);
+  auto dimension_grid_speed_control = make_dimension_grid(dimension_set_speed_control);
+  dimension_grid_speed_control->set_values("STW", STW_values);
+  dimension_grid_speed_control->set_values("TWS", TWS_values);
+  dimension_grid_speed_control->set_values("TWA", TWA_values);
+  dimension_grid_speed_control->set_values("WA", WA_values);
+  dimension_grid_speed_control->set_values("Hs", Hs_values);
+
+  auto dimension_grid_power_control = make_dimension_grid(dimension_set_power_control);
+  dimension_grid_power_control->set_values("BrakePower", BrakePower_values);
+  dimension_grid_power_control->set_values("TWS", TWS_values);
+  dimension_grid_power_control->set_values("TWA", TWA_values);
+  dimension_grid_power_control->set_values("WA", WA_values);
+  dimension_grid_power_control->set_values("Hs", Hs_values);
+
+  auto dimension_grid_no_control = make_dimension_grid(dimension_set_no_control);
+  dimension_grid_no_control->set_values("TWS", TWS_values);
+  dimension_grid_no_control->set_values("TWA", TWA_values);
+  dimension_grid_no_control->set_values("WA", WA_values);
+  dimension_grid_no_control->set_values("Hs", Hs_values);
+
+  // PolarSet
+  auto polar_set = make_polar_set("polar_set");
+  polar_set->create_polar(MPPP, dimension_grid_speed_control);
+  polar_set->create_polar(HPPP, dimension_grid_speed_control);
+  polar_set->create_polar(MVPP, dimension_grid_power_control);
+  polar_set->create_polar(HVPP, dimension_grid_power_control);
+  polar_set->create_polar(VPP, dimension_grid_no_control);
+
+  // Create some tables into the different Polar
+  polar_set->polar(MPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
+  polar_set->polar(MPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(HPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
+  polar_set->polar(HPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(MVPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
+  polar_set->polar(MVPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(HVPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
+  polar_set->polar(HVPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(VPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
+  polar_set->polar(VPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  ballast_one_engine->set_polar_set(polar_set);
+  ballast_two_engines->set_polar_set(polar_set);
+  laden_one_engine->set_polar_set(polar_set);
+  laden_two_engines->set_polar_set(polar_set);
 
   // Writing
+  netCDF::NcFile dataFile_ballast_one_engine(std::string("ballast_one_engine.nc"), netCDF::NcFile::replace);
+  write_operation_mode(dataFile_ballast_one_engine, ballast_one_engine);
+  dataFile_ballast_one_engine.close();
 
+//  // Reading back
+//  netCDF::NcFile dataFile_ballast_one_engine_(std::string("ballast_one_engine.nc"), netCDF::NcFile::read);
+//  auto ballast_one_engine_ = read_operation_mode(dataFile_ballast_one_engine_);
+//
+//  ASSERT_EQ(*ballast_one_engine, *ballast_one_engine_);
 
-  // Reading
+  // Writing
+  netCDF::NcFile dataFile_root(std::string("vessel.nc"), netCDF::NcFile::replace);
+  write_operation_mode(dataFile_root, root);
+  dataFile_root.close();
 
+//  // Reading back
+//  netCDF::NcFile dataFile_root_(std::string("vessel.nc"), netCDF::NcFile::read);
+//  auto root_ = read_operation_mode(dataFile_root_);
+//
+//  ASSERT_EQ(*root, *root_);
 
+}
+
+TEST(poem, read_poem_v0_example) {
+
+  ASSERT_ANY_THROW(read_poem_nc_file("dont_exist.nc"));
+
+  auto operation_mode = read_poem_nc_file("poem_v0_example.nc");
 
 }

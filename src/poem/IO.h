@@ -7,9 +7,12 @@
 
 #include <memory>
 #include <netcdf>
+#include <filesystem>
 
 #include "exceptions.h"
 #include "PolarTable.h"
+
+namespace fs = std::filesystem;
 
 namespace poem {
 
@@ -19,7 +22,8 @@ namespace poem {
 
   namespace internal {
     template<typename T>
-    void write_polar_table_(netCDF::NcGroup &group, const netCDF::NcType &nc_type, std::shared_ptr<PolarTable<T>> polar_table) {
+    void write_polar_table_(netCDF::NcGroup &group, const netCDF::NcType &nc_type,
+                            std::shared_ptr<PolarTable<T>> polar_table) {
 
       auto dimension_grid = polar_table->dimension_grid();
       auto dimension_set = dimension_grid->dimension_set();
@@ -137,7 +141,8 @@ namespace poem {
    *                                otherwise, the one given as argument is used (must be valid)
    */
   std::shared_ptr<PolarTableBase>
-  read_polar_table(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid, bool dimension_grid_from_var) {
+  read_polar_table(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid,
+                   bool dimension_grid_from_var) {
 
     if (dimension_grid_from_var) {
       dimension_grid = read_dimension_grid_from_var(var);
@@ -200,6 +205,7 @@ namespace poem {
     for (const auto &polar_table: *polar) {
       write_polar_table(group, polar_table.second);
     }
+    // FIXME: un peu premature la gestion des atteibuts...
     group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
   }
 
@@ -241,15 +247,112 @@ namespace poem {
   // ===================================================================================================================
 
   void write_polar_set(netCDF::NcGroup &group, std::shared_ptr<PolarSet> polar_set) {
-    for (const auto& polar : *polar_set) {
+    for (const auto &polar: *polar_set) {
       auto new_group = group.addGroup(polar_mode_to_string(polar.first));
       write_polar(new_group, polar.second);
     }
   }
 
-  std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup& group) {
-    NIY_POEM
+  std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group) {
+
+    std::string polar_set_name;
+    if (group.isRootGroup()) {
+      polar_set_name = "default";
+    } else {
+      polar_set_name = group.getName();
+    }
+
+    auto polar_set = std::make_shared<PolarSet>(polar_set_name);
+
+    for (const auto &subgroup: group.getGroups()) {
+      if (!is_polar_mode(subgroup.first)) continue; // Group name for Polar MUST be a POLAR_MODE string representation
+
+      auto polar = read_polar(subgroup.second);
+      polar_set->add_polar(polar);
+
+    }
+
+    return polar_set;
   }
+
+  // ===================================================================================================================
+  // I/O for OperationMode
+  // ===================================================================================================================
+
+  void write_operation_mode(netCDF::NcGroup &group, std::shared_ptr<OperationMode> operation_mode) {
+
+    if (operation_mode->is_leaf()) {
+      if (!operation_mode->has_polar_set()) {
+        spdlog::critical("OperationMode {} is a leaf but has no PolarSet enclosed");
+        CRITICAL_ERROR_POEM
+      }
+      write_polar_set(group, operation_mode->polar_set());
+    } else {
+      // just creating a subgroup and keep writing childs
+      for (const auto &operation_mode_: operation_mode->children<OperationMode>()) {
+        auto new_group = group.addGroup(operation_mode_->name());
+        write_operation_mode(new_group, operation_mode_);
+      }
+
+    }
+  }
+
+  bool is_leaf_operation_mode(const netCDF::NcGroup &group) {
+    auto subgroups = group.getGroups();
+    return subgroups.contains("MPPP") ||
+           subgroups.contains("HPPP") ||
+           subgroups.contains("MVPP") ||
+           subgroups.contains("HVPP") ||
+           subgroups.contains("VPP");
+  }
+
+  std::shared_ptr<OperationMode> read_poem_nc_file(const std::string &filename) {
+    if (!fs::exists(filename)){
+      spdlog::critical("NetCDF file not found: {}", filename);
+      CRITICAL_ERROR_POEM
+    }
+
+    auto operation_mode = std::make_shared<OperationMode>("root");
+
+
+
+    /*
+     * 1 - on regarde quel est la version poem du fichier
+     * 2 -
+     */
+
+
+
+    return operation_mode;
+  }
+
+
+//  void
+//  read_operation_mode(const netCDF::NcGroup &group, std::shared_ptr<OperationMode> operation_mode) {
+//    if (!group.isRootGroup()) {
+//      NIY_POEM
+//    }
+//
+//    NIY_POEM
+//  }
+
+//  std::shared_ptr<OperationMode> read_operation_mode(const netCDF::NcGroup &group) {
+//
+//    std::shared_ptr<OperationMode> operation_mode;
+//    if (group.isRootGroup()) {
+////      operation_mode = std::
+//    }
+//
+//    std::shared_ptr<OperationMode> operation_mode;
+//
+//    if (is_leaf_operation_mode(group)) {
+//      // Reading a PolarSet
+//    } else {
+//
+//    }
+//
+//  }
+
 
 }  // poem
 

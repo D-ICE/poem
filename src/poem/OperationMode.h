@@ -70,12 +70,27 @@ namespace poem {
       }
 
       if (!m_polar_set) {
-        const_cast<OperationMode*>(this)->m_polar_set = std::make_shared<PolarSet>(absolute_path());
+        const_cast<OperationMode *>(this)->m_polar_set = std::make_shared<PolarSet>(absolute_path());
       }
 
       return m_polar_set;
     }
 
+    void set_polar_set(std::shared_ptr<PolarSet> polar_set) {
+      m_polar_set = polar_set;
+    }
+
+    bool has_polar_set() const {
+      return m_polar_set != nullptr;
+    }
+
+    bool operator==(const OperationMode &other) const {
+      NIY_POEM
+    }
+
+    bool operator!=(const OperationMode &other) const {
+      return !(other == *this);
+    }
 
    private:
     std::shared_ptr<PolarSet> m_polar_set;
