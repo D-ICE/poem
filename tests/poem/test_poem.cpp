@@ -406,6 +406,10 @@ TEST(poem, read_poem_v0_example) {
 
   ASSERT_ANY_THROW(read_poem_nc_file("dont_exist.nc"));
 
-  auto operation_mode = read_poem_nc_file("poem_v0_example.nc");
+  auto operation_mode = read_poem_nc_file("poem_v0_example_no_sails.nc");
+
+  netCDF::NcFile datafile(std::string("poem_v0_example_no_sails_v0_to_v1.nc"), netCDF::NcFile::replace);
+  write_operation_mode(datafile, operation_mode);
+  datafile.close();
 
 }

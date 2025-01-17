@@ -8,9 +8,11 @@
 #include <memory>
 #include <netcdf>
 #include <filesystem>
+#include <semver/semver.hpp>
 
 #include "exceptions.h"
 #include "PolarTable.h"
+#include "specifications/spec_checkers.h"
 
 namespace fs = std::filesystem;
 
@@ -213,10 +215,41 @@ namespace poem {
 
     auto polar_name = group.getName(); // TODO: en prevision d'avoir un path, est-ce qu'on ne prend que le dernier element du path ?
 
+    POLAR_MODE polar_mode;
     if (!is_polar_mode(polar_name)) {
+      // Trying to infer polar_mode from group name
+
       if (group.getAtts().contains("POLAR_MODE")) {
-        group.getAtt("POLAR_MODE").getValues(polar_name);
-        // TODO: ici la mecanique pour inferer le mode des polaires v0...
+        std::string polar_mode_str;
+        group.getAtt("POLAR_MODE").getValues(polar_mode_str);
+        polar_mode = string_to_polar_mode(polar_mode_str);
+        // TODO: verifier
+
+      } else if (group.getAtts().contains("vessel_type")) {
+        // For v0...
+        std::string vessel_type;
+        group.getAtt("vessel_type").getValues(vessel_type);
+        if (vessel_type == "HYBRID") {
+          polar_mode = HPPP;
+        } else if (vessel_type == "MOTOR") {
+          polar_mode = MPPP;
+        } else {
+          spdlog::critical("While reading file with format v0, vessel_type {} unknown");
+          CRITICAL_ERROR_POEM
+        }
+
+        polar_name = polar_mode_to_string(polar_mode);
+
+      } else {
+        spdlog::critical("Cannot infer the POLAR_MODE of group {}", polar_name);
+        CRITICAL_ERROR_POEM
+      }
+    } else {
+      if (group.getAtts().contains("POLAR_MODE")) {
+        std::string polar_mode_str;
+        group.getAtt("POLAR_MODE").getValues(polar_mode_str);
+        polar_mode = string_to_polar_mode(polar_mode_str);
+
       } else {
         spdlog::critical("Cannot infer the POLAR_MODE of group {}", polar_name);
         CRITICAL_ERROR_POEM
@@ -224,7 +257,7 @@ namespace poem {
     }
 
     std::shared_ptr<DimensionGrid> dimension_grid;
-    auto polar = make_polar(polar_name, string_to_polar_mode(polar_name), dimension_grid);
+    auto polar = make_polar(polar_name, polar_mode, dimension_grid);
 
     bool dimension_grid_from_var = true;
     for (const auto &nc_var: group.getVars()) {
@@ -306,22 +339,76 @@ namespace poem {
            subgroups.contains("VPP");
   }
 
-  std::shared_ptr<OperationMode> read_poem_nc_file(const std::string &filename) {
+  std::string get_version_from_nc_file(const std::string& filename) {
     if (!fs::exists(filename)){
       spdlog::critical("NetCDF file not found: {}", filename);
       CRITICAL_ERROR_POEM
     }
 
-    auto operation_mode = std::make_shared<OperationMode>("root");
+    netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
 
+    std::string poem_file_format_version;
+    if(!datafile.getAtts().contains("poem_file_format_version")) {
+      // This is likely to be a file with version v0
+      poem_file_format_version = "v0";
+    } else {
+      std::string spec_version;
+      datafile.getAtt("poem_file_format_version");
+    }
 
+    datafile.close();
+    return poem_file_format_version;
+  }
 
-    /*
-     * 1 - on regarde quel est la version poem du fichier
-     * 2 -
-     */
+  std::shared_ptr<OperationMode> read_v0(const std::string &filename) {
 
+    // OperationMode is root and we set the vessel name as filename as we do not have vessel name in v0
+    std::string vessel_name = fs::path(filename).stem();
 
+    auto operation_mode = std::make_shared<OperationMode>(vessel_name);
+    auto polar_set = make_polar_set(vessel_name);
+    operation_mode->set_polar_set(polar_set);
+
+    netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
+    auto polar = read_polar(datafile);
+    datafile.close();
+
+    polar_set->add_polar(polar);
+
+    return operation_mode;
+  }
+
+  std::shared_ptr<OperationMode> read_v1(const std::string &filename) {
+
+    auto operation_mode = std::make_shared<OperationMode>("");
+    NIY_POEM
+    return operation_mode;
+  }
+
+  std::shared_ptr<OperationMode> read_poem_nc_file(const std::string &filename) {
+
+    spdlog::info("Reading file: {}", filename);
+
+    auto poem_file_format_version = get_version_from_nc_file(filename);
+    int major_version = (int) semver::version::parse(poem_file_format_version, false).major();
+
+    spdlog::info("POEM file format version detected: v{}", major_version);
+    if (!spec_check(filename, major_version)) {
+      spdlog::critical("File is not compliant with version v{}", major_version);
+      CRITICAL_ERROR_POEM
+    } else {
+      spdlog::info("File is compliant with version v{}", major_version);
+    }
+
+    std::shared_ptr<OperationMode> operation_mode;
+    switch (major_version) {
+      case 0:
+        operation_mode = read_v0(filename);
+        break;
+      case 1:
+        operation_mode = read_v1(filename);
+        break;
+    }
 
     return operation_mode;
   }

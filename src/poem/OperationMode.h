@@ -62,21 +62,26 @@ namespace poem {
         dtree::Node(name),
         m_polar_set(nullptr) {}
 
+    std::shared_ptr<PolarSet> create_polar_set(const std::string& name) {}
+
     std::shared_ptr<PolarSet> polar_set() const {
 
       if (!is_leaf()) {
-        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not leaf)", absolute_path().string());
+        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not a leaf)", absolute_path().string());
         CRITICAL_ERROR_POEM
       }
-
       if (!m_polar_set) {
-        const_cast<OperationMode *>(this)->m_polar_set = std::make_shared<PolarSet>(absolute_path());
+        spdlog::critical("In OperationMode {}, the PolarSet has not been set yet", absolute_path().string());
       }
 
       return m_polar_set;
     }
 
     void set_polar_set(std::shared_ptr<PolarSet> polar_set) {
+      if (m_polar_set) {
+        spdlog::critical("In OperationMode {}, the PolarSet already exists", absolute_path().string());
+        CRITICAL_ERROR_POEM
+      }
       m_polar_set = polar_set;
     }
 

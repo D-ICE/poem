@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-===========================================
-Performance pOlar intErchange forMat (POEM)
-===========================================
+========================================
+Performance pOlar Exchange forMat (POEM)
+========================================
 
 This document describes the **POEM File Format Specifications**. It is proposed by *D-ICE ENGINEERING*
 to the Wind-Propulsion community. It is intended to provide a common efficient solution to store and
@@ -50,3 +50,4 @@ POEM is made Open Source with the support of the French Agency for Ecological Tr
    :width: 200px
    :align: left
 
+.. TODO: ajouter logo D-ICE
