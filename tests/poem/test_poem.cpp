@@ -46,6 +46,8 @@ TEST(poem, PolarTable) {
 
   // PolarTable
   auto polar_table = make_polar_table<double>("VAR", "-", "VAR", POEM_DOUBLE, dimension_grid);
+  ASSERT_ANY_THROW(make_polar_table<double>("a", "unknown_to_dunits", "", POEM_DOUBLE, dimension_grid));
+  ASSERT_ANY_THROW(make_polar_table<int>("b", "-", "", POEM_DOUBLE, dimension_grid));
 //  auto polar = std::make_shared<PolarTable<double>>(dimension_grid);
 
   auto dimension_points = polar_table->dimension_points();
@@ -127,30 +129,30 @@ TEST(poem, PolarTable) {
 //  polar_table->sum(polar_table);
 
 
-  netCDF::NcFile dataFile(std::string("write_polar_table.nc"), netCDF::NcFile::replace);
+  netCDF::NcFile dataFile(std::string("polar_table.nc"), netCDF::NcFile::replace);
   write(dataFile, polar_table);
   dataFile.close();
 
-  netCDF::NcFile dataFile_(std::string("write_polar_table.nc"), netCDF::NcFile::read);
-//  auto dimension_grid_ = read_dimension_grid(dataFile_);
+  netCDF::NcFile dataFile_(std::string("polar_table.nc"), netCDF::NcFile::read);
 
   auto var = dataFile_.getVar("VAR");
   std::shared_ptr<DimensionGrid> dimension_grid_read;
   auto polar_table_read = read(var, dimension_grid_read, true);
   dataFile_.close();
 
+  // TODO: developper operateur == sur PolarTable
   for (size_t i = 0; i < polar_table->size(); ++i) {
     ASSERT_EQ(polar_table->values()[i], dynamic_cast<PolarTable<double> *>(polar_table_read.get())->values()[i]);
   }
 
 
-  // Polar
-  auto polar = Polar("polar", MPPP, dimension_grid);
-  polar.add_polar(polar_table);
-  auto new_polar_table = polar.new_polar_table<int>("VAR2", "-", "VAR2", POEM_DOUBLE);
-
-  auto new_polar_table_back = polar.polar("VAR2");
-  auto type = new_polar_table_back->type();
+//  // Polar
+//  auto polar = Polar("polar", MPPP, dimension_grid);
+//  polar.add_polar_table(polar_table);
+//  auto new_polar_table = polar.new_polar_table<int>("VAR2", "-", "VAR2", POEM_DOUBLE);
+//
+//  auto new_polar_table_back = polar.polar("VAR2");
+//  auto type = new_polar_table_back->type();
 
   /*
    *  Slice ok
@@ -165,12 +167,50 @@ TEST(poem, PolarTable) {
    *
    */
 
-  return;
 }
+
+TEST(poem, Polar) {
+  // Dimensions
+  auto dim1 = make_dimension("dim1", "-", "dim1");
+  auto dim2 = make_dimension("dim2", "-", "dim2");
+  auto dim3 = make_dimension("dim3", "-", "dim3");
+
+  // DimensionSet
+  auto dimension_set = make_dimension_set({dim1, dim2, dim3});
+
+  // DimensionGrid
+  auto dimension_grid = make_dimension_grid(dimension_set);
+  dimension_grid->set_values("dim1", {1, 2, 3, 4, 5});
+  dimension_grid->set_values("dim2", {1, 2, 3, 4, 5});
+  dimension_grid->set_values("dim3", {1, 2, 3, 4, 5});
+
+  // Polar
+  auto polar = make_polar("MPPP", MPPP, dimension_grid);
+
+  // PolarTables
+  auto table_double = polar->new_polar_table<double>("table_double", "-", "table_double", POEM_DOUBLE);
+  table_double->fill_with(1.);
+  auto table_int = polar->new_polar_table<int>("table_int", "-", "table_int", POEM_INT);
+  table_int->fill_with(2);
+
+  netCDF::NcFile dataFile(std::string("polar.nc"), netCDF::NcFile::replace);
+  write(dataFile, polar);
+  dataFile.close();
+
+  // TODO: developper un operateur == pour Polar
+  netCDF::NcFile dataFile_(std::string("polar.nc"), netCDF::NcFile::read);
+//  auto polar_ = read(dataFile_, MPPP, true);
+  auto polar_ = read(dataFile_);
+
+  // TODO: check que polar et polar_ ont bien les meme contenus
+
+}
+
 
 TEST(poem, OperationMode) {
 
-  auto root = std::make_shared<OperationMode>("root");
+  // TODO: voir si dans dtree on fait apparaitre le nom de root... /root
+  auto root = std::make_shared<OperationMode>("vessel_name");
   ASSERT_TRUE(root->is_root());
 
   auto ballast_load = root->new_child<OperationMode>("ballast_load");
@@ -213,6 +253,11 @@ TEST(poem, OperationMode) {
 
   auto polar_set = laden_two_engines->polar_set();
   auto polar_MPPP = polar_set->create_polar(MPPP, dimension_grid_5D);
+  auto MPPP_double = polar_MPPP->new_polar_table<double>("Double", "kW", "double", POEM_DOUBLE);
+  MPPP_double->fill_with(10.);
+  auto MPPP_int = polar_MPPP->new_polar_table<int>("Int", "-", "int", POEM_INT);
+  MPPP_int->fill_with(3);
+
   auto polar_HPPP = polar_set->create_polar(HPPP, dimension_grid_5D);
   auto polar_MVPP = polar_set->create_polar(MVPP, dimension_grid_5D);
   auto polar_HVPP = polar_set->create_polar(HVPP, dimension_grid_5D);

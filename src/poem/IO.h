@@ -13,62 +13,83 @@
 
 namespace poem {
 
-  template<typename T>
-  void write(netCDF::NcGroup &group, std::shared_ptr<PolarTable<T>> polar_table) {
+  // ===================================================================================================================
+  // I/O for PolarTable
+  // ===================================================================================================================
 
-    auto dimension_grid = polar_table->dimension_grid();
-    auto dimension_set = dimension_grid->dimension_set();
+  namespace internal {
+    template<typename T>
+    void write_(netCDF::NcGroup &group, const netCDF::NcType &nc_type, std::shared_ptr<PolarTable<T>> polar_table) {
 
-    // Storing dimensions
-    size_t ndim = polar_table->dim();
-    std::vector<netCDF::NcDim> dims;
-    dims.reserve(ndim);
+      auto dimension_grid = polar_table->dimension_grid();
+      auto dimension_set = dimension_grid->dimension_set();
 
-    for (size_t i = 0; i < ndim; ++i) {
-      auto dimension = dimension_set->dimension(i);
-      auto name = dimension->name();
-      auto values = dimension_grid->values(i);
+      // Storing dimensions
+      size_t ndim = polar_table->dim();
+      std::vector<netCDF::NcDim> dims;
+      dims.reserve(ndim);
 
-      auto dim = group.getDim(name);
-      if (dim.isNull()) {
-        dim = group.addDim(name, values.size());
+      for (size_t i = 0; i < ndim; ++i) {
+        auto dimension = dimension_set->dimension(i);
+        auto name = dimension->name();
+        auto values = dimension_grid->values(i);
 
-        // The dimension as a variable
-        netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
+        auto dim = group.getDim(name);
+        if (dim.isNull()) {
+          dim = group.addDim(name, values.size());
+
+          // The dimension as a variable
+          netCDF::NcVar nc_var = group.addVar(name, netCDF::ncDouble, dim);
+          nc_var.setCompression(true, true, 5);
+          nc_var.putVar(values.data());
+
+          nc_var.putAtt("unit", dimension->unit());
+          nc_var.putAtt("description", dimension->description());
+        }
+
+        dims.push_back(dim);
+
+      }
+
+      // Storing the values
+      auto polar_name = polar_table->name();
+      netCDF::NcVar nc_var = group.getVar(polar_name);
+
+      if (nc_var.isNull()) {
+
+        nc_var = group.addVar(polar_name, nc_type, dims);
+
+//        switch (polar_table->type()) {
+//          case POEM_DOUBLE:
+//            nc_var = group.addVar(polar_name, netCDF::ncDouble, dims);
+//            break;
+//          case POEM_INT:
+//            nc_var = group.addVar(polar_name, netCDF::ncInt, dims);
+//
+//        }
         nc_var.setCompression(true, true, 5);
-        nc_var.putVar(values.data());
 
-        nc_var.putAtt("unit", dimension->unit());
-        nc_var.putAtt("description", dimension->description());
+        nc_var.putVar(polar_table->values().data());
+        nc_var.putAtt("unit", polar_table->unit());
+        nc_var.putAtt("description", polar_table->description());
+
+      } else {
+        spdlog::critical("Attempting to store more than one time a variable with the same name {}", polar_name);
+        CRITICAL_ERROR_POEM
       }
-
-      dims.push_back(dim);
-
     }
+  }
 
-    // Storing the values
-    auto polar_name = polar_table->name();
-    netCDF::NcVar nc_var = group.getVar(polar_name);
-
-    if (nc_var.isNull()) {
-
-      switch (polar_table->type()) {
-        case POEM_DOUBLE:
-          nc_var = group.addVar(polar_name, netCDF::ncDouble, dims);
-          break;
-        case POEM_INT:
-          nc_var = group.addVar(polar_name, netCDF::ncInt, dims);
-
-      }
-      nc_var.setCompression(true, true, 5);
-
-      nc_var.putVar(polar_table->values().data());
-      nc_var.putAtt("unit", polar_table->unit());
-      nc_var.putAtt("description", polar_table->description());
-
-    } else {
-      spdlog::critical("Attempting to store more than one time a variable with the same name {}", polar_name);
-      CRITICAL_ERROR_POEM
+  /**
+   * Writes a PolarTableBase into a NetCDF group (non templated)
+   */
+  void write(netCDF::NcGroup &group, std::shared_ptr<PolarTableBase> polar_table) {
+    switch (polar_table->type()) {
+      case POEM_DOUBLE:
+        internal::write_(group, netCDF::ncDouble, std::dynamic_pointer_cast<PolarTable<double>>(polar_table));
+        break;
+      case POEM_INT:
+        internal::write_(group, netCDF::ncInt, std::dynamic_pointer_cast<PolarTable<int>>(polar_table));
     }
   }
 
@@ -106,10 +127,18 @@ namespace poem {
     return dimension_grid;
   }
 
+  /**
+   * Read a NetCDF variable and returns it as a PolarTableBase
+   *
+   * @param var the NetCDF variable
+   * @param dimension_grid reference to the DimensionGrid to be used
+   * @param dimension_grid_from_var if true, the DimensionGrid is built from the variable,
+   *                                otherwise, the one given as argument is used (must be valid)
+   */
   std::shared_ptr<PolarTableBase>
-  read(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid, bool build_from_var) {
+  read(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid, bool dimension_grid_from_var) {
 
-    if (build_from_var) {
+    if (dimension_grid_from_var) {
       dimension_grid = read_dimension_grid(var);
     }
 
@@ -154,6 +183,52 @@ namespace poem {
 
     return polar_table;
 
+  }
+
+  // ===================================================================================================================
+  // I/O for Polar
+  // ===================================================================================================================
+
+  void write(netCDF::NcGroup &group, std::shared_ptr<Polar> polar) {
+    std::shared_ptr<DimensionGrid> dimension_grid;
+    for (const auto &polar_table: *polar) {
+      write(group, polar_table.second);
+    }
+    group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
+  }
+
+  std::shared_ptr<Polar>
+  read(const netCDF::NcGroup &group) {
+
+    auto polar_name = group.getName(); // TODO: en prevision d'avoir un path, est-ce qu'on ne prend que le dernier element du path ?
+
+    if (!is_polar_mode(polar_name)) {
+      if (group.getAtts().contains("POLAR_MODE")) {
+        group.getAtt("POLAR_MODE").getValues(polar_name);
+        // TODO: ici la mecanique pour inferer le mode des polaires v0...
+      } else {
+        spdlog::critical("Cannot infer the POLAR_MODE of group {}", polar_name);
+        CRITICAL_ERROR_POEM
+      }
+    }
+
+    std::shared_ptr<DimensionGrid> dimension_grid;
+    auto polar = make_polar(polar_name, string_to_polar_mode(polar_name), dimension_grid);
+
+    bool dimension_grid_from_var = true;
+    for (const auto &nc_var: group.getVars()) {
+      if (group.getCoordVars().contains(nc_var.first)) continue;
+      auto polar_table = read(nc_var.second, dimension_grid, dimension_grid_from_var);
+
+      if (dimension_grid_from_var) {
+        polar->dimension_grid() = dimension_grid;
+        dimension_grid_from_var = false;
+      }
+
+      polar->add_polar_table(polar_table);
+    }
+
+    return polar;
   }
 
 }  // poem

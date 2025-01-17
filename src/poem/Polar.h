@@ -69,29 +69,41 @@ namespace poem {
   /**
    * Converts a string representation into its corresponding POLAR_MODE
    */
-  inline POLAR_MODE string_to_polar_mode(const std::string &polar_type_) {
+  inline POLAR_MODE string_to_polar_mode(const std::string &polar_mode_str) {
     POLAR_MODE polar_mode;
-    if (polar_type_ == "MPPP") {
+    if (polar_mode_str == "MPPP") {
       polar_mode = MPPP;
-    } else if (polar_type_ == "HPPP") {
+    } else if (polar_mode_str == "HPPP") {
       polar_mode = HPPP;
-    } else if (polar_type_ == "HVPP") {
+    } else if (polar_mode_str == "HVPP") {
       polar_mode = HVPP;
-    } else if (polar_type_ == "MVPP") {
+    } else if (polar_mode_str == "MVPP") {
       polar_mode = MVPP;
-    } else if (polar_type_ == "VPP") {
+    } else if (polar_mode_str == "VPP") {
       polar_mode = VPP;
-    } else if (polar_type_ == "ND") {
-      // This is the v0 version of POEM specs...
-      polar_mode = HPPP;
-    } else if (polar_type_ == "/") {
-      // This is the root group and might be a v0 version of POEM specs...
-      polar_mode = HPPP;
+//    } else if (polar_mode_str == "ND") {
+//      // This is the v0 version of POEM specs...
+//      polar_mode = HPPP;
+//    } else if (polar_mode_str == "/") {
+//      // This is the root group and might be a v0 version of POEM specs...
+//      polar_mode = HPPP;
     } else {
       spdlog::critical("Polar type \"{}\" unknown", polar_mode);
       CRITICAL_ERROR_POEM
     }
     return polar_mode;
+  }
+
+  /**
+   * Tells if a string represents a valid polar mode
+   */
+  bool is_polar_mode(const std::string& polar_mode_str) {
+    try {
+      string_to_polar_mode(polar_mode_str);
+    } catch (const PoemException& e) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -131,6 +143,10 @@ namespace poem {
    */
   class Polar {
    public:
+    using PolarTableMap = std::unordered_map<std::string, std::shared_ptr<PolarTableBase>>;
+    using PolarTableMapIter = PolarTableMap::iterator;
+
+   public:
     Polar(const std::string &name,
           POLAR_MODE mode,
           std::shared_ptr<DimensionGrid> dimension_grid) :
@@ -143,6 +159,7 @@ namespace poem {
     const POLAR_MODE &mode() const { return m_mode; }
 
     std::shared_ptr<DimensionGrid> dimension_grid() const { return m_dimension_grid; }
+    std::shared_ptr<DimensionGrid>& dimension_grid() { return m_dimension_grid; }
 
     template<typename T>
     std::shared_ptr<PolarTable<T>> new_polar_table(const std::string &name,
@@ -155,7 +172,12 @@ namespace poem {
       return polar_table;
     }
 
-    void add_polar(std::shared_ptr<PolarTableBase> polar_table) {
+    void add_polar_table(std::shared_ptr<PolarTableBase> polar_table) {
+      if (m_dimension_grid != polar_table->dimension_grid()) {
+        spdlog::critical("While adding PolarTable {} to Polar {}, DimensionGrid mismatch",
+                         polar_table->name(), m_name);
+        CRITICAL_ERROR_POEM
+      }
       m_polar_tables.insert({polar_table->name(), polar_table});
     }
 
@@ -163,12 +185,19 @@ namespace poem {
       return m_polar_tables.at(name);
     }
 
+    PolarTableMapIter begin() {
+      return m_polar_tables.begin();
+    }
+
+    PolarTableMapIter end() {
+      return m_polar_tables.end();
+    }
 
    private:
     std::string m_name;
     POLAR_MODE m_mode;
     std::shared_ptr<DimensionGrid> m_dimension_grid;
-    std::unordered_map<std::string, std::shared_ptr<PolarTableBase>> m_polar_tables;
+    PolarTableMap m_polar_tables;
 
   };
 

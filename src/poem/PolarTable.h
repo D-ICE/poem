@@ -99,6 +99,8 @@ namespace poem {
     virtual POEM_DATATYPE type() const = 0;
 
     virtual const std::string &name() const = 0;
+
+    virtual std::shared_ptr<DimensionGrid> dimension_grid() const = 0;
   };
 
   /**
@@ -129,6 +131,24 @@ namespace poem {
         m_dimension_grid(dimension_grid),
         m_values(dimension_grid->size()),
         m_interpolator(nullptr) {
+
+      switch (type) {
+        case POEM_DOUBLE:
+          if (!std::is_same_v<T, double>) {
+            spdlog::critical("Type template argument and specified POEM_DATATYPE {} mismatch at the creation "
+                             "of PolarTable {}", "POEM_DOUBLE", name);
+            CRITICAL_ERROR_POEM
+          }
+          break;
+
+        case POEM_INT:
+          if (!std::is_same_v<T, int>) {
+            spdlog::critical("Type template argument and specified POEM_DATATYPE {} mismatch at the creation "
+                             "of PolarTable {}", "POEM_INT", name);
+            CRITICAL_ERROR_POEM
+          }
+          break;
+      }
 
     }
 
@@ -180,7 +200,7 @@ namespace poem {
     /**
      * Get the associated DimensionGrid
      */
-    [[nodiscard]] std::shared_ptr<DimensionGrid> dimension_grid() const {
+    [[nodiscard]] std::shared_ptr<DimensionGrid> dimension_grid() const override {
       return m_dimension_grid;
     }
 
@@ -228,6 +248,14 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
       m_values = new_values;
+    }
+
+    /**
+     * Fill the table with the given value
+     * @param value
+     */
+    void fill_with(T value) {
+      m_values = std::vector<T>(dimension_grid()->size(), value);
     }
 
     /**
