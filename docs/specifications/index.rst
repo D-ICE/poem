@@ -36,8 +36,9 @@ POEM File Format Specification versions
 .. toctree::
    :maxdepth: 1
 
+    v0/index.rst
 ..    v1/index.rst
-   v0/index.rst
+
 
 .. note::
     Version 1 of the standard is under construction and should be released in February 2025
