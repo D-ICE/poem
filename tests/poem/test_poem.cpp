@@ -231,7 +231,6 @@ TEST(poem, OperationMode) {
   auto WA = make_dimension("WA", "deg", "");
   auto Hs = make_dimension("Hs", "m", "");
 
-
   auto dimension_set_5D = make_dimension_set({STW, TWS, TWA, WA, Hs});
   auto dimension_grid_5D = make_dimension_grid(dimension_set_5D);
   dimension_grid_5D->set_values("STW", {1, 2, 3});
@@ -259,6 +258,11 @@ TEST(poem, OperationMode) {
   auto polar_HVPP = polar_set->create_polar(HVPP, dimension_grid_5D);
   auto polar_VPP = polar_set->create_polar(VPP, dimension_grid_4D);
 
-  std::cout << polar_MPPP->name() << std::endl;
+  // Writing
+
+
+  // Reading
+
+
 
 }
