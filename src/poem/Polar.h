@@ -186,7 +186,9 @@ namespace poem {
     }
 
     bool operator==(const Polar& other) const {
-      bool equal = m_name == other.m_name;
+      bool equal = true;
+      // TODO: voir comment on fait pour les noms
+//      bool equal = m_name == other.m_name;
       equal &= m_mode == other.m_mode;
       equal &= *m_dimension_grid == *other.m_dimension_grid;
       equal &= m_polar_tables.size() == other.m_polar_tables.size();
