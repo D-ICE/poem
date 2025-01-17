@@ -12,13 +12,6 @@
 #include "exceptions.h"
 #include "PolarSet.h"
 
-/**
- * OperationMode repose sur dtree. Un noeud leaf contient un PolarSet et un DT
- *      PolarSet (contient des Polar, au plus 5)
- *          Polar (MPPP, HPPP, MVPP, HVPP, VPP)
- *              PolarTable
- */
-
 namespace fs = std::filesystem;
 
 namespace poem {
@@ -49,7 +42,19 @@ namespace poem {
     return s;
   }
 
+  /*
+   * OperationMode repose sur dtree. Un noeud leaf contient un PolarSet et un DT
+   *      PolarSet (contient des Polar, au plus 5)
+   *          Polar (MPPP, HPPP, MVPP, HVPP, VPP)
+   *              PolarTable
+   */
 
+
+  /**
+   * This is a mode of operation of a vessel.
+   *
+   * It is a node of a tree structure. Only leafs must contain valid PolarSet
+   */
   class OperationMode : public dtree::Node {
    public:
 
@@ -60,12 +65,12 @@ namespace poem {
     std::shared_ptr<PolarSet> polar_set() const {
 
       if (!is_leaf()) {
-        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not leaf)", name());
+        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not leaf)", absolute_path().string());
         CRITICAL_ERROR_POEM
       }
 
       if (!m_polar_set) {
-        const_cast<OperationMode*>(this)->m_polar_set = std::make_shared<PolarSet>(name());
+        const_cast<OperationMode*>(this)->m_polar_set = std::make_shared<PolarSet>(absolute_path());
       }
 
       return m_polar_set;

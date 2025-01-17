@@ -14,13 +14,13 @@ TEST(poem, version) {
 }
 
 
-// TODO: faire test pour chaque classe importante
-TEST(poem, DimensionSet) {
-  // TODO
-}
+//// TODO: faire test pour chaque classe importante
+//TEST(poem, DimensionSet) {
+//  // TODO
+//}
 
 
-TEST(poem, polar_table) {
+TEST(poem, PolarTable) {
 
   // Dimensions
   auto STW = make_dimension("STW", "kt", "Speed Through Water");
@@ -212,10 +212,12 @@ TEST(poem, OperationMode) {
   dimension_grid_4D->set_values("Hs", {1, 2, 3});
 
   auto polar_set = laden_two_engines->polar_set();
-  auto polar_MPPP = polar_set->crete_polar(MPPP, dimension_grid_5D);
-  auto polar_HPPP = polar_set->crete_polar(HPPP, dimension_grid_5D);
-  auto polar_MVPP = polar_set->crete_polar(MVPP, dimension_grid_5D);
-  auto polar_HVPP = polar_set->crete_polar(HVPP, dimension_grid_5D);
-  auto polar_VPP = polar_set->crete_polar(VPP, dimension_grid_4D);
+  auto polar_MPPP = polar_set->create_polar(MPPP, dimension_grid_5D);
+  auto polar_HPPP = polar_set->create_polar(HPPP, dimension_grid_5D);
+  auto polar_MVPP = polar_set->create_polar(MVPP, dimension_grid_5D);
+  auto polar_HVPP = polar_set->create_polar(HVPP, dimension_grid_5D);
+  auto polar_VPP = polar_set->create_polar(VPP, dimension_grid_4D);
+
+  std::cout << polar_MPPP->name() << std::endl;
 
 }

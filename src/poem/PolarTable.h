@@ -35,10 +35,18 @@ namespace poem {
   template<typename T>
   class PolarTable;
 
+  /**
+   * Non template base class for Interpolator class used by PolarTable
+   */
   struct InterpolatorBase {
     virtual void build() = 0;
   };
 
+  /**
+   * Multidimensional interpolation class
+   * @tparam T the datatype of the interpolation
+   * @tparam _dim the number of dimension of the PolarTable
+   */
   template<typename T, size_t _dim>
   class Interpolator : public InterpolatorBase {
    public:
@@ -84,6 +92,9 @@ namespace poem {
   // ===================================================================================================================
   // ===================================================================================================================
 
+  /**
+   * Non template base class for PolarTable
+   */
   struct PolarTableBase {
     virtual POEM_DATATYPE type() const = 0;
 
@@ -341,6 +352,7 @@ namespace poem {
         const_cast<PolarTable<T> *>(this)->build_interpolator();
       }
 
+      // FIXME: ce switch devrait plutot se trouver dans la class Interpolator !
       T val;
       switch (dim()) {
         case 1:
@@ -597,6 +609,7 @@ namespace poem {
 
     void build_interpolator() {
 
+      // FIXME: ce switch devrait plutot se trouver dans la classe Interpolator !
       switch (dim()) {
         case 1:
           m_interpolator = std::make_unique<Interpolator<T, 1>>(this);

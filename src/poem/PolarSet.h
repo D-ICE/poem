@@ -22,10 +22,10 @@ namespace poem {
    public:
     explicit PolarSet(const std::string &name) : m_name(name) {}
 
-    std::shared_ptr<Polar> crete_polar(POLAR_MODE mode,
+    std::shared_ptr<Polar> create_polar(POLAR_MODE mode,
                                        std::shared_ptr<DimensionGrid> dimension_grid) {
 
-      std::string polar_name = m_name + "." + polar_mode_to_string(mode);
+      std::string polar_name = m_name + "/" + polar_mode_to_string(mode);
       if (has_polar(mode)) {
         spdlog::warn("In PolarSet {}, Polar {} already exists", m_name, polar_name);
         return m_polars[mode];

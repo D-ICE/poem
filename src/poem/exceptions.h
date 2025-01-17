@@ -19,6 +19,9 @@
 
 namespace poem {
 
+  /**
+   * poem own exception class
+   */
   struct PoemException : public std::exception {
     PoemException(const std::string &msg) : m_msg(msg) {};
 

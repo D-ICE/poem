@@ -11,6 +11,11 @@
 
 namespace poem {
 
+  /**
+   * Class allowing to split most equally a vector in different parts.
+   *
+   * This is to be used for parallel calculations on a DimensionPoint vector
+   */
   class Splitter {
    public:
     using OffsetSizeContainer = std::vector<std::pair<size_t, size_t>>;

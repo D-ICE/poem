@@ -15,7 +15,7 @@
 namespace poem {
 
   /**
-  * A particular point corresponding to a DimensionSet
+  * A particular numerical realisation of a DimensionSet, ie a vector of values for each Dimension of a DimensionSet
   */
   class DimensionPoint {
     using Values = std::vector<double>;
