@@ -98,6 +98,21 @@ namespace poem {
       return max(m_dimension_set->index(name));
     }
 
+    bool operator==(const DimensionGrid &other) const {
+      bool equal = *m_dimension_set == *(other.m_dimension_set);
+      for (size_t i=0; i<dim(); ++i) {
+        auto this_values = m_dimensions_values[i];
+        auto other_values = other.m_dimensions_values[i];
+        equal &= this_values == other_values;
+      }
+      equal &= m_dimension_points == other.m_dimension_points;
+      return equal;
+    }
+
+    bool operator!=(const auto &other) const {
+      return !(other == *this);
+    }
+
     std::shared_ptr<DimensionSet> dimension_set() const { return m_dimension_set; }
 
     [[nodiscard]] const std::vector<DimensionPoint> &dimension_points() const {

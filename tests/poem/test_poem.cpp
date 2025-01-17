@@ -140,11 +140,7 @@ TEST(poem, PolarTable) {
   auto polar_table_read = read(var, dimension_grid_read, true);
   dataFile_.close();
 
-  // TODO: developper operateur == sur PolarTable
-  for (size_t i = 0; i < polar_table->size(); ++i) {
-    ASSERT_EQ(polar_table->values()[i], dynamic_cast<PolarTable<double> *>(polar_table_read.get())->values()[i]);
-  }
-
+  ASSERT_EQ(*polar_table, dynamic_cast<PolarTable<double>&>(*polar_table_read));
 
 //  // Polar
 //  auto polar = Polar("polar", MPPP, dimension_grid);
@@ -193,16 +189,16 @@ TEST(poem, Polar) {
   auto table_int = polar->new_polar_table<int>("table_int", "-", "table_int", POEM_INT);
   table_int->fill_with(2);
 
+  // Writing
   netCDF::NcFile dataFile(std::string("polar.nc"), netCDF::NcFile::replace);
   write(dataFile, polar);
   dataFile.close();
 
-  // TODO: developper un operateur == pour Polar
+  // Reading back
   netCDF::NcFile dataFile_(std::string("polar.nc"), netCDF::NcFile::read);
-//  auto polar_ = read(dataFile_, MPPP, true);
   auto polar_ = read(dataFile_);
 
-  // TODO: check que polar et polar_ ont bien les meme contenus
+  ASSERT_EQ(*polar, *polar_);
 
 }
 

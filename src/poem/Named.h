@@ -54,6 +54,16 @@ namespace poem {
 
     void change_description(const std::string &new_description) { m_description = new_description; }
 
+    bool operator==(const Named &other) const {
+      return m_name == other.m_name
+             && m_unit == other.m_unit
+             && m_description == other.m_description;
+    }
+
+    bool operator!=(const Named &other) const {
+      return !(other == *this);
+    }
+
    private:
     void check_unit() {
       if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {

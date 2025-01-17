@@ -51,6 +51,17 @@ namespace poem {
       m_values = values;
     }
 
+    bool operator==(const DimensionPoint& other) const {
+      bool equal = *m_dimension_set == *other.m_dimension_set;
+      equal &= m_values.size() == other.m_values.size();
+      equal &= m_values == other.m_values;
+      return equal;
+    }
+
+    bool operator!=(const DimensionPoint& other) const {
+      return !(other == *this);
+    }
+
     /*
      * Iterators
      */

@@ -51,6 +51,18 @@ namespace poem {
       return dimension(index(name));
     }
 
+    bool operator==(const DimensionSet& other) const {
+      bool equal = size() == other.size();
+      for (size_t i=0; i<size(); ++i) {
+        equal &= *m_dimensions[i] == *other.m_dimensions[i];
+      }
+      return equal;
+    }
+
+    bool operator!=(const DimensionSet& other) const {
+      return !(other == *this);
+    }
+
     DimensionSetConstIter begin() const { return m_dimensions.begin(); }
 
     DimensionSetConstIter end() const { return m_dimensions.end(); }

@@ -185,6 +185,21 @@ namespace poem {
       return m_polar_tables.at(name);
     }
 
+    bool operator==(const Polar& other) const {
+      bool equal = m_name == other.m_name;
+      equal &= m_mode == other.m_mode;
+      equal &= *m_dimension_grid == *other.m_dimension_grid;
+      equal &= m_polar_tables.size() == other.m_polar_tables.size();
+      for (const auto polar_table : m_polar_tables) {
+        equal &= *polar_table.second == *other.m_polar_tables.at(polar_table.first);
+      }
+      return equal;
+    }
+
+    bool operator!=(const Polar& other) const {
+      return !(other == *this);
+    }
+
     PolarTableMapIter begin() {
       return m_polar_tables.begin();
     }

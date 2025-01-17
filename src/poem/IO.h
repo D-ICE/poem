@@ -173,9 +173,14 @@ namespace poem {
         polar_table = polar_table_;
         break;
       }
-      case netCDF::NcType::nc_INT:
-        polar_table = make_polar_table<int>(name, unit, description, POEM_INT, dimension_grid);
+
+      case netCDF::NcType::nc_INT: {
+        auto polar_table_ = make_polar_table<int>(name, unit, description, POEM_INT, dimension_grid);
+        var.getVar(polar_table_->values().data());
+        polar_table = polar_table_;
         break;
+      }
+
       default:
         spdlog::critical("Cannot read netCDF variable of type {}", var.getType().getName());
         CRITICAL_ERROR_POEM

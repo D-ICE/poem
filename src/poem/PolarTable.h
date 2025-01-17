@@ -86,7 +86,7 @@ namespace poem {
 
    private:
     PolarTable<T> *m_polar_table;
-    std::unique_ptr<mathutils::RegularGridInterpolator<T, _dim>> m_interpolator;
+    std::unique_ptr<mathutils::RegularGridInterpolator < T, _dim>> m_interpolator;
   };
 
   // ===================================================================================================================
@@ -101,6 +101,9 @@ namespace poem {
     virtual const std::string &name() const = 0;
 
     virtual std::shared_ptr<DimensionGrid> dimension_grid() const = 0;
+
+    virtual bool operator==(const PolarTableBase& other) const = 0;
+    virtual bool operator!=(const PolarTableBase& other) const = 0;
   };
 
   /**
@@ -325,6 +328,23 @@ namespace poem {
         mean += val;
       }
       return mean / (T) size();
+    }
+
+    /**
+     * Operator to check if two PolarTables are equal.
+     *
+     * Equality is tested on values of DimensionGrid and value vector of the table, not the address of the DimensionGrid
+     */
+    bool operator==(const PolarTableBase &other) const override {
+      if (m_type != other.type()) return false;
+      auto other_ = static_cast<const PolarTable<T>*>(&other);
+      bool equal = *m_dimension_grid == *other_->m_dimension_grid;
+      equal &= m_values == other_->m_values;
+      return equal;
+    }
+
+    bool operator!=(const PolarTableBase& other) const override {
+      return !(other == *this);
     }
 
     /**
