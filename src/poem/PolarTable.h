@@ -331,7 +331,7 @@ namespace poem {
     }
 
     /**
-     * Operator to check if two PolarTables are equal.
+     * Operator ==
      *
      * Equality is tested on values of DimensionGrid and value vector of the table, not the address of the DimensionGrid
      */
@@ -343,6 +343,11 @@ namespace poem {
       return equal;
     }
 
+    /**
+     * Operator !=
+     *
+     * Equality is tested on values of DimensionGrid and value vector of the table, not the address of the DimensionGrid
+     */
     bool operator!=(const PolarTableBase& other) const override {
       return !(other == *this);
     }
@@ -441,7 +446,7 @@ namespace poem {
       // Check that names are existing
       auto dimension_set = m_dimension_grid->dimension_set();
       for (const auto &pair: prescribed_values) {
-        if (!dimension_set->is_dim(pair.first)) {
+        if (!dimension_set->contains(pair.first)) {
           spdlog::critical("Slicing PolarTable \"{}\" with unknown dimension name {}", m_name, pair.first);
           CRITICAL_ERROR_POEM
         }

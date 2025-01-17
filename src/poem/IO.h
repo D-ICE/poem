@@ -19,7 +19,7 @@ namespace poem {
 
   namespace internal {
     template<typename T>
-    void write_(netCDF::NcGroup &group, const netCDF::NcType &nc_type, std::shared_ptr<PolarTable<T>> polar_table) {
+    void write_polar_table_(netCDF::NcGroup &group, const netCDF::NcType &nc_type, std::shared_ptr<PolarTable<T>> polar_table) {
 
       auto dimension_grid = polar_table->dimension_grid();
       auto dimension_set = dimension_grid->dimension_set();
@@ -83,17 +83,18 @@ namespace poem {
   /**
    * Writes a PolarTableBase into a NetCDF group (non templated)
    */
-  void write(netCDF::NcGroup &group, std::shared_ptr<PolarTableBase> polar_table) {
+  void write_polar_table(netCDF::NcGroup &group, std::shared_ptr<PolarTableBase> polar_table) {
     switch (polar_table->type()) {
       case POEM_DOUBLE:
-        internal::write_(group, netCDF::ncDouble, std::dynamic_pointer_cast<PolarTable<double>>(polar_table));
+        internal::write_polar_table_(group, netCDF::ncDouble,
+                                     std::dynamic_pointer_cast<PolarTable<double>>(polar_table));
         break;
       case POEM_INT:
-        internal::write_(group, netCDF::ncInt, std::dynamic_pointer_cast<PolarTable<int>>(polar_table));
+        internal::write_polar_table_(group, netCDF::ncInt, std::dynamic_pointer_cast<PolarTable<int>>(polar_table));
     }
   }
 
-  std::shared_ptr<DimensionGrid> read_dimension_grid(const netCDF::NcVar &var) {
+  std::shared_ptr<DimensionGrid> read_dimension_grid_from_var(const netCDF::NcVar &var) {
 
     size_t ndim = var.getDimCount();
 
@@ -136,10 +137,10 @@ namespace poem {
    *                                otherwise, the one given as argument is used (must be valid)
    */
   std::shared_ptr<PolarTableBase>
-  read(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid, bool dimension_grid_from_var) {
+  read_polar_table(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> &dimension_grid, bool dimension_grid_from_var) {
 
     if (dimension_grid_from_var) {
-      dimension_grid = read_dimension_grid(var);
+      dimension_grid = read_dimension_grid_from_var(var);
     }
 
     if (var.getDimCount() != dimension_grid->dim()) {
@@ -194,16 +195,15 @@ namespace poem {
   // I/O for Polar
   // ===================================================================================================================
 
-  void write(netCDF::NcGroup &group, std::shared_ptr<Polar> polar) {
+  void write_polar(netCDF::NcGroup &group, std::shared_ptr<Polar> polar) {
     std::shared_ptr<DimensionGrid> dimension_grid;
     for (const auto &polar_table: *polar) {
-      write(group, polar_table.second);
+      write_polar_table(group, polar_table.second);
     }
     group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
   }
 
-  std::shared_ptr<Polar>
-  read(const netCDF::NcGroup &group) {
+  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group) {
 
     auto polar_name = group.getName(); // TODO: en prevision d'avoir un path, est-ce qu'on ne prend que le dernier element du path ?
 
@@ -223,7 +223,7 @@ namespace poem {
     bool dimension_grid_from_var = true;
     for (const auto &nc_var: group.getVars()) {
       if (group.getCoordVars().contains(nc_var.first)) continue;
-      auto polar_table = read(nc_var.second, dimension_grid, dimension_grid_from_var);
+      auto polar_table = read_polar_table(nc_var.second, dimension_grid, dimension_grid_from_var);
 
       if (dimension_grid_from_var) {
         polar->dimension_grid() = dimension_grid;
@@ -234,6 +234,21 @@ namespace poem {
     }
 
     return polar;
+  }
+
+  // ===================================================================================================================
+  // I/O for PolarSet
+  // ===================================================================================================================
+
+  void write_polar_set(netCDF::NcGroup &group, std::shared_ptr<PolarSet> polar_set) {
+    for (const auto& polar : *polar_set) {
+      auto new_group = group.addGroup(polar_mode_to_string(polar.first));
+      write_polar(new_group, polar.second);
+    }
+  }
+
+  std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup& group) {
+    NIY_POEM
   }
 
 }  // poem

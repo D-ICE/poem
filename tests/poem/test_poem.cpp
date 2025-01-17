@@ -5,12 +5,14 @@
 #include <gtest/gtest.h>
 #include <netcdf>
 
+#include <MathUtils/VectorGeneration.h>
+
 #include "poem/poem.h"
 
 using namespace poem;
 
 TEST(poem, version) {
-  std::cout<< "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
+  std::cout << "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
 }
 
 
@@ -130,17 +132,17 @@ TEST(poem, PolarTable) {
 
 
   netCDF::NcFile dataFile(std::string("polar_table.nc"), netCDF::NcFile::replace);
-  write(dataFile, polar_table);
+  write_polar_table(dataFile, polar_table);
   dataFile.close();
 
   netCDF::NcFile dataFile_(std::string("polar_table.nc"), netCDF::NcFile::read);
 
   auto var = dataFile_.getVar("VAR");
   std::shared_ptr<DimensionGrid> dimension_grid_read;
-  auto polar_table_read = read(var, dimension_grid_read, true);
+  auto polar_table_read = read_polar_table(var, dimension_grid_read, true);
   dataFile_.close();
 
-  ASSERT_EQ(*polar_table, dynamic_cast<PolarTable<double>&>(*polar_table_read));
+  ASSERT_EQ(*polar_table, dynamic_cast<PolarTable<double> &>(*polar_table_read));
 
 //  // Polar
 //  auto polar = Polar("polar", MPPP, dimension_grid);
@@ -191,14 +193,94 @@ TEST(poem, Polar) {
 
   // Writing
   netCDF::NcFile dataFile(std::string("polar.nc"), netCDF::NcFile::replace);
-  write(dataFile, polar);
+  write_polar(dataFile, polar);
   dataFile.close();
 
   // Reading back
   netCDF::NcFile dataFile_(std::string("polar.nc"), netCDF::NcFile::read);
-  auto polar_ = read(dataFile_);
+  auto polar_ = read_polar(dataFile_);
 
   ASSERT_EQ(*polar, *polar_);
+
+}
+
+TEST(poem, PolarSet) {
+  // Dimensions
+  auto STW = make_dimension("STW", "kt", "Speed Through Water");
+  auto TWS = make_dimension("TWS", "kt", "True Wind Speed");
+  auto TWA = make_dimension("TWA", "deg", "True Wind Angle");
+  auto WA = make_dimension("WA", "deg", "Waves Angle");
+  auto Hs = make_dimension("Hs", "m", "Waves Significant Height");
+  auto BrakePower = make_dimension("BrakePower", "kW", "Brake Power");
+
+  // DimensionSet
+  auto dimension_set_speed_control = make_dimension_set({STW, TWS, TWA, WA, Hs});
+  auto dimension_set_power_control = make_dimension_set({BrakePower, TWS, TWA, WA, Hs});
+  auto dimension_set_no_control = make_dimension_set({TWS, TWA, WA, Hs});
+
+  // DimensionGrid
+  auto STW_values = mathutils::linspace<double>(8, 20, 13);
+  auto TWS_values = mathutils::linspace<double>(0, 40, 9);
+  auto TWA_values = mathutils::linspace<double>(0, 180, 13);
+  auto WA_values = mathutils::linspace<double>(0, 180, 13);
+  auto Hs_values = mathutils::linspace<double>(0, 8, 9);
+  auto BrakePower_values = mathutils::linspace<double>(1000, 6500, 12);
+
+  auto dimension_grid_speed_control = make_dimension_grid(dimension_set_speed_control);
+  dimension_grid_speed_control->set_values("STW", STW_values);
+  dimension_grid_speed_control->set_values("TWS", TWS_values);
+  dimension_grid_speed_control->set_values("TWA", TWA_values);
+  dimension_grid_speed_control->set_values("WA", WA_values);
+  dimension_grid_speed_control->set_values("Hs", Hs_values);
+
+  auto dimension_grid_power_control = make_dimension_grid(dimension_set_power_control);
+  dimension_grid_power_control->set_values("BrakePower", BrakePower_values);
+  dimension_grid_power_control->set_values("TWS", TWS_values);
+  dimension_grid_power_control->set_values("TWA", TWA_values);
+  dimension_grid_power_control->set_values("WA", WA_values);
+  dimension_grid_power_control->set_values("Hs", Hs_values);
+
+  auto dimension_grid_no_control = make_dimension_grid(dimension_set_no_control);
+  dimension_grid_no_control->set_values("TWS", TWS_values);
+  dimension_grid_no_control->set_values("TWA", TWA_values);
+  dimension_grid_no_control->set_values("WA", WA_values);
+  dimension_grid_no_control->set_values("Hs", Hs_values);
+
+  // PolarSet
+  auto polar_set = make_polar_set("polar_set");
+  polar_set->create_polar(MPPP, dimension_grid_speed_control);
+  polar_set->create_polar(HPPP, dimension_grid_speed_control);
+  polar_set->create_polar(MVPP, dimension_grid_power_control);
+  polar_set->create_polar(HVPP, dimension_grid_power_control);
+  polar_set->create_polar(VPP, dimension_grid_no_control);
+
+  // Create some tables into the different Polar
+  polar_set->polar(MPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
+  polar_set->polar(MPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(HPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
+  polar_set->polar(HPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(MVPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
+  polar_set->polar(MVPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(HVPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
+  polar_set->polar(HVPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+  polar_set->polar(VPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
+  polar_set->polar(VPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+
+
+  // Writing
+  netCDF::NcFile dataFile(std::string("polar_set.nc"), netCDF::NcFile::replace);
+  write_polar_set(dataFile, polar_set);
+  dataFile.close();
+
+//  // Reading back
+//  netCDF::NcFile dataFile_(std::string("polar_set.nc"), netCDF::NcFile::read);
+//  auto polar_ = read_polar(dataFile_);
+//
+//  ASSERT_EQ(*polar, *polar_);
 
 }
 

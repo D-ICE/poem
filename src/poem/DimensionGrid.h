@@ -27,7 +27,7 @@ namespace poem {
 
     void set_values(const std::string &name, const std::vector<double> &values) {
 
-      if (!m_dimension_set->is_dim(name)) {
+      if (!m_dimension_set->contains(name)) {
         spdlog::critical("Unknown dimension name {}", name);
         CRITICAL_ERROR_POEM
       }

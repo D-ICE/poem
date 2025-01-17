@@ -39,7 +39,7 @@ namespace poem {
       return m_map.at(name);
     }
 
-    bool is_dim(const std::string &name) const {
+    bool contains(const std::string &name) const {
       return m_map.contains(name);
     }
 

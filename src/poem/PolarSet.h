@@ -20,11 +20,16 @@ namespace poem {
    */
   class PolarSet {
    public:
+    using PolarMap = std::unordered_map<POLAR_MODE, std::shared_ptr<Polar>>;
+    using PolarMapIter = PolarMap::iterator;
+
+   public:
     explicit PolarSet(const std::string &name) : m_name(name) {}
 
     std::shared_ptr<Polar> create_polar(POLAR_MODE mode,
                                        std::shared_ptr<DimensionGrid> dimension_grid) {
 
+      // FIXME: voir si la construction auto du nom est une bonne chose
       std::string polar_name = m_name + "/" + polar_mode_to_string(mode);
       if (has_polar(mode)) {
         spdlog::warn("In PolarSet {}, Polar {} already exists", m_name, polar_name);
@@ -46,11 +51,23 @@ namespace poem {
       return m_polars[mode];
     }
 
+    PolarMapIter begin() {
+      return m_polars.begin();
+    }
+
+    PolarMapIter end() {
+      return m_polars.end();
+    }
+
    private:
     std::string m_name;
-    std::unordered_map<POLAR_MODE, std::shared_ptr<Polar>> m_polars;
+    PolarMap m_polars;
 
   };
+
+  std::shared_ptr<PolarSet> make_polar_set(const std::string& name) {
+    return std::make_shared<PolarSet>(name);
+  }
 
 }  // poem
 
