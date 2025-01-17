@@ -6,6 +6,9 @@ file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
 
 set(RESOURCE_FILES
         poem_v0_example.nc
+        poem_v0_example_no_sails.nc
+        poem_v0_example_with_sails.nc
+
         poem_v1_example.nc
         poem_v1_PerfPolarSet.nc
         poem_v1_example_5_polars.nc
