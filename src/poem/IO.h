@@ -220,10 +220,8 @@ namespace poem {
       // Trying to infer polar_mode from group name
 
       if (group.getAtts().contains("POLAR_MODE")) {
-        std::string polar_mode_str;
-        group.getAtt("POLAR_MODE").getValues(polar_mode_str);
-        polar_mode = string_to_polar_mode(polar_mode_str);
-        // TODO: verifier
+        group.getAtt("POLAR_MODE").getValues(polar_name);
+        polar_mode = string_to_polar_mode(polar_name);
 
       } else if (group.getAtts().contains("vessel_type")) {
         // For v0...
@@ -245,15 +243,7 @@ namespace poem {
         CRITICAL_ERROR_POEM
       }
     } else {
-      if (group.getAtts().contains("POLAR_MODE")) {
-        std::string polar_mode_str;
-        group.getAtt("POLAR_MODE").getValues(polar_mode_str);
-        polar_mode = string_to_polar_mode(polar_mode_str);
-
-      } else {
-        spdlog::critical("Cannot infer the POLAR_MODE of group {}", polar_name);
-        CRITICAL_ERROR_POEM
-      }
+      polar_mode = string_to_polar_mode(polar_name);
     }
 
     std::shared_ptr<DimensionGrid> dimension_grid;

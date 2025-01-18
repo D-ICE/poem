@@ -186,13 +186,11 @@ namespace poem {
     }
 
     bool operator==(const Polar& other) const {
-      bool equal = true;
-      // TODO: voir comment on fait pour les noms
-//      bool equal = m_name == other.m_name;
+      bool equal = m_name == other.m_name;
       equal &= m_mode == other.m_mode;
       equal &= *m_dimension_grid == *other.m_dimension_grid;
       equal &= m_polar_tables.size() == other.m_polar_tables.size();
-      for (const auto polar_table : m_polar_tables) {
+      for (const auto &polar_table : m_polar_tables) {
         equal &= *polar_table.second == *other.m_polar_tables.at(polar_table.first);
       }
       return equal;
