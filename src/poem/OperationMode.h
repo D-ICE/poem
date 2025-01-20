@@ -67,11 +67,11 @@ namespace poem {
     std::shared_ptr<PolarSet> polar_set() const {
 
       if (!is_leaf()) {
-        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not a leaf)", absolute_path().string());
+        spdlog::critical("This OperationMode {} cannot handle a PolarSet (not a leaf)", full_name().string());
         CRITICAL_ERROR_POEM
       }
       if (!m_polar_set) {
-        spdlog::critical("In OperationMode {}, the PolarSet has not been set yet", absolute_path().string());
+        spdlog::critical("In OperationMode {}, the PolarSet has not been set yet", full_name().string());
       }
 
       return m_polar_set;
@@ -79,7 +79,7 @@ namespace poem {
 
     void set_polar_set(std::shared_ptr<PolarSet> polar_set) {
       if (m_polar_set) {
-        spdlog::critical("In OperationMode {}, the PolarSet already exists", absolute_path().string());
+        spdlog::critical("In OperationMode {}, the PolarSet already exists", full_name().string());
         CRITICAL_ERROR_POEM
       }
       m_polar_set = polar_set;

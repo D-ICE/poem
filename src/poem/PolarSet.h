@@ -30,7 +30,8 @@ namespace poem {
                                         std::shared_ptr<DimensionGrid> dimension_grid) {
 
       // FIXME: voir si la construction auto du nom est une bonne chose
-      std::string polar_name = m_name + "/" + polar_mode_to_string(mode);
+//      std::string polar_name = m_name + "/" + polar_mode_to_string(mode);
+      std::string polar_name = polar_mode_to_string(mode);
       if (has_polar(mode)) {
         spdlog::warn("In PolarSet {}, Polar {} already exists", m_name, polar_name);
         return m_polars[mode];

@@ -202,6 +202,8 @@ TEST(poem, Polar) {
 
   ASSERT_EQ(*polar, *polar_);
 
+  ASSERT_EQ(polar->name(), "MPPP");
+
 }
 
 TEST(poem, PolarSet) {
@@ -249,10 +251,24 @@ TEST(poem, PolarSet) {
   // PolarSet
   auto polar_set = make_polar_set("polar_set");
   polar_set->create_polar(MPPP, dimension_grid_speed_control);
+  ASSERT_EQ(polar_set->polar(MPPP)->name(), "MPPP");
+  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "/polar_set/MPPP");
+
   polar_set->create_polar(HPPP, dimension_grid_speed_control);
+  ASSERT_EQ(polar_set->polar(HPPP)->name(), "HPPP");
+  ASSERT_EQ(polar_set->polar(HPPP)->full_name(), "/polar_set/HPPP");
+
   polar_set->create_polar(MVPP, dimension_grid_power_control);
+  ASSERT_EQ(polar_set->polar(MVPP)->name(), "MVPP");
+  ASSERT_EQ(polar_set->polar(MVPP)->full_name(), "/polar_set/MVPP");
+
   polar_set->create_polar(HVPP, dimension_grid_power_control);
+  ASSERT_EQ(polar_set->polar(HVPP)->name(), "HVPP");
+  ASSERT_EQ(polar_set->polar(HVPP)->full_name(), "/polar_set/HVPP");
+
   polar_set->create_polar(VPP, dimension_grid_no_control);
+  ASSERT_EQ(polar_set->polar(VPP)->name(), "VPP");
+  ASSERT_EQ(polar_set->polar(VPP)->full_name(), "/polar_set/VPP");
 
   // Create some tables into the different Polar
   polar_set->polar(MPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
@@ -269,7 +285,6 @@ TEST(poem, PolarSet) {
 
   polar_set->polar(VPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
   polar_set->polar(VPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
-
 
   // Writing
   netCDF::NcFile dataFile(std::string("polar_set.nc"), netCDF::NcFile::replace);
@@ -288,21 +303,29 @@ TEST(poem, PolarSet) {
 TEST(poem, OperationMode) {
 
   // TODO: voir si dans dtree on fait apparaitre le nom de root... /root
-  auto root = std::make_shared<OperationMode>("vessel_name");
-  ASSERT_TRUE(root->is_root());
+  auto vessel = std::make_shared<OperationMode>("vessel");
+  ASSERT_TRUE(vessel->is_root());
 
-  auto ballast_load = root->new_child<OperationMode>("ballast_load");
+  auto ballast_load = vessel->new_child<OperationMode>("ballast_load");
   auto ballast_one_engine = ballast_load->new_child<OperationMode>("ballast_one_engine");
   auto ballast_two_engines = ballast_load->new_child<OperationMode>("ballast_two_engines");
 
-  auto laden_load = root->new_child<OperationMode>("laden_load");
+  auto laden_load = vessel->new_child<OperationMode>("laden_load");
   auto laden_one_engine = laden_load->new_child<OperationMode>("laden_one_engine");
   auto laden_two_engines = laden_load->new_child<OperationMode>("laden_two_engines");
 
-  // root->ballast_load->ballast_one_engine
-  //                   ->ballast_two_engines
-  //     ->laden_load->laden_one_engine
-  //                 ->laden_two_engines
+
+  // vessel_name ->ballast_load -> ballast_one_engine
+  //                            -> ballast_two_engines
+  //             ->laden_load   -> laden_one_engine
+  //                            ->laden_two_engines
+
+  ASSERT_EQ(vessel->name(), "vessel");
+  ASSERT_EQ(vessel->full_name(), "/vessel");
+  ASSERT_EQ(ballast_load->name(), "ballast_load");
+  ASSERT_EQ(ballast_load->full_name(), "/vessel/ballast_load");
+  ASSERT_EQ(ballast_one_engine->name(), "ballast_one_engine");
+  ASSERT_EQ(ballast_one_engine->full_name(), "/vessel/ballast_load/ballast_one_engine");
 
 
   ASSERT_ANY_THROW(laden_load->polar_set());
@@ -360,6 +383,8 @@ TEST(poem, OperationMode) {
   // Create some tables into the different Polar
   polar_set->polar(MPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
   polar_set->polar(MPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+  ASSERT_EQ(polar_set->polar(MPPP)->name(), "MPPP");
+  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "polar_set/MPPP");
 
   polar_set->polar(HPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
   polar_set->polar(HPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
@@ -391,7 +416,7 @@ TEST(poem, OperationMode) {
 
   // Writing
   netCDF::NcFile dataFile_root(std::string("vessel.nc"), netCDF::NcFile::replace);
-  write_operation_mode(dataFile_root, root);
+  write_operation_mode(dataFile_root, vessel);
   dataFile_root.close();
 
 //  // Reading back

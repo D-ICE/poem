@@ -10,6 +10,7 @@
 
 #include "DimensionGrid.h"
 #include "PolarTable.h"
+//#include "PolarSet.h"
 
 namespace poem {
 
@@ -97,10 +98,10 @@ namespace poem {
   /**
    * Tells if a string represents a valid polar mode
    */
-  bool is_polar_mode(const std::string& polar_mode_str) {
+  bool is_polar_mode(const std::string &polar_mode_str) {
     try {
       string_to_polar_mode(polar_mode_str);
-    } catch (const PoemException& e) {
+    } catch (const PoemException &e) {
       return false;
     }
     return true;
@@ -135,6 +136,8 @@ namespace poem {
   // ===================================================================================================================
   // ===================================================================================================================
 
+  // Forward declaration
+  class PolarSet;
 
   /**
    * A Polar stacks the PolarTable for one POLAR_MODE
@@ -156,10 +159,21 @@ namespace poem {
 
     const std::string &name() const { return m_name; }
 
+    const std::string &full_name() const {
+      std::string full_name_;
+      if (m_polar_set_parent) {
+        full_name_ = m_polar_set_parent->full_name() + "/" + m_name;
+      } else {
+        full_name_ = "/" + m_name;
+      }
+      return full_name_;
+    }
+
     const POLAR_MODE &mode() const { return m_mode; }
 
     std::shared_ptr<DimensionGrid> dimension_grid() const { return m_dimension_grid; }
-    std::shared_ptr<DimensionGrid>& dimension_grid() { return m_dimension_grid; }
+
+    std::shared_ptr<DimensionGrid> &dimension_grid() { return m_dimension_grid; }
 
     template<typename T>
     std::shared_ptr<PolarTable<T>> new_polar_table(const std::string &name,
@@ -185,18 +199,18 @@ namespace poem {
       return m_polar_tables.at(name);
     }
 
-    bool operator==(const Polar& other) const {
+    bool operator==(const Polar &other) const {
       bool equal = m_name == other.m_name;
       equal &= m_mode == other.m_mode;
       equal &= *m_dimension_grid == *other.m_dimension_grid;
       equal &= m_polar_tables.size() == other.m_polar_tables.size();
-      for (const auto &polar_table : m_polar_tables) {
+      for (const auto &polar_table: m_polar_tables) {
         equal &= *polar_table.second == *other.m_polar_tables.at(polar_table.first);
       }
       return equal;
     }
 
-    bool operator!=(const Polar& other) const {
+    bool operator!=(const Polar &other) const {
       return !(other == *this);
     }
 
@@ -213,6 +227,8 @@ namespace poem {
     POLAR_MODE m_mode;
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     PolarTableMap m_polar_tables;
+
+    std::shared_ptr<PolarSet> m_polar_set_parent;
 
   };
 
