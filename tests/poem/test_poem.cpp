@@ -373,7 +373,11 @@ TEST(poem, OperationMode) {
   dimension_grid_no_control->set_values("Hs", Hs_values);
 
   // PolarSet
-  auto polar_set = make_polar_set("polar_set");
+//  auto polar_set = make_polar_set("polar_set");
+  auto polar_set = ballast_one_engine->create_polar_set();
+  ASSERT_EQ(polar_set->name(), "ballast_one_engine");
+  ASSERT_EQ(polar_set->full_name(), "/vessel/ballast_load/ballast_one_engine");
+
   polar_set->create_polar(MPPP, dimension_grid_speed_control);
   polar_set->create_polar(HPPP, dimension_grid_speed_control);
   polar_set->create_polar(MVPP, dimension_grid_power_control);
@@ -384,7 +388,8 @@ TEST(poem, OperationMode) {
   polar_set->polar(MPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
   polar_set->polar(MPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
   ASSERT_EQ(polar_set->polar(MPPP)->name(), "MPPP");
-  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "/polar_set/MPPP");
+  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "/vessel/ballast_load/ballast_one_engine/MPPP");
+  ASSERT_EQ(polar_set->polar(MPPP)->polar_table("BrakePower")->full_name(), "/vessel/ballast_load/ballast_one_engine/MPPP/BrakePower");
 
   polar_set->polar(HPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
   polar_set->polar(HPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
@@ -398,10 +403,14 @@ TEST(poem, OperationMode) {
   polar_set->polar(VPP)->new_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
   polar_set->polar(VPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
 
+
+
   ballast_one_engine->set_polar_set(polar_set);
   ballast_two_engines->set_polar_set(polar_set);
   laden_one_engine->set_polar_set(polar_set);
   laden_two_engines->set_polar_set(polar_set);
+
+//  ASSERT_EQ()
 
   // Writing
   netCDF::NcFile dataFile_ballast_one_engine(std::string("ballast_one_engine.nc"), netCDF::NcFile::replace);

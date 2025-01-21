@@ -21,13 +21,17 @@ namespace poem {
   /**
    * A PolarSet stacks the different Polar for one OperationMode
    */
- class PolarSet : public std::enable_shared_from_this<PolarSet> {
+ class PolarSet {
    public:
     using PolarMap = std::unordered_map<POLAR_MODE, std::shared_ptr<Polar>>;
     using PolarMapIter = PolarMap::iterator;
 
    public:
-    explicit PolarSet(const std::string &name) : m_name(name) {}
+    explicit PolarSet(const std::string &name) :
+    m_name(name),
+    m_operation_mode_parent(nullptr) {}
+
+    const std::string& name() const;
 
     std::string full_name() const;
 
@@ -50,11 +54,15 @@ namespace poem {
 
     PolarMapIter end();
 
+    void set_operation_mode_parent(OperationMode * operation_mode) {
+      m_operation_mode_parent = operation_mode;
+    }
+
    private:
     std::string m_name;
     PolarMap m_polars;
 
-   std::shared_ptr<OperationMode> m_operation_mode_parent;
+   OperationMode* m_operation_mode_parent;
 
   };
 

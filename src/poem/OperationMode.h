@@ -33,14 +33,14 @@ namespace poem {
    *
    * It is a node of a tree structure. Only leafs must contain valid PolarSet
    */
-  class OperationMode : public dtree::Node {
+ class OperationMode : public dtree::Node {
    public:
 
     explicit OperationMode(const std::string &name) :
         dtree::Node(name),
         m_polar_set(nullptr) {}
 
-    std::shared_ptr<PolarSet> create_polar_set(const std::string& name);
+    std::shared_ptr<PolarSet> create_polar_set();
 
     std::shared_ptr<PolarSet> polar_set() const;
 

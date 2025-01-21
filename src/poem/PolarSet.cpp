@@ -7,10 +7,14 @@
 
 namespace poem {
 
+  const std::string& PolarSet::name() const {
+    return m_name;
+  }
+
   std::string PolarSet::full_name() const {
     std::string full_name_;
     if (m_operation_mode_parent) {
-      full_name_ = m_operation_mode_parent->full_name().string() + "/" + m_name;
+      full_name_ = m_operation_mode_parent->full_name().string();
     } else {
       full_name_ = "/" + m_name;
     }
@@ -28,7 +32,7 @@ namespace poem {
     }
 
     auto polar = std::make_shared<Polar>(polar_name, mode, dimension_grid);
-    polar->set_polar_set_parent(shared_from_this());
+    polar->set_polar_set_parent(this);
 
     m_polars.insert({mode, polar});
     return polar;
@@ -41,7 +45,7 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-    polar->set_polar_set_parent(shared_from_this());
+    polar->set_polar_set_parent(this);
 
     m_polars.insert({polar->mode(), polar});
   }

@@ -3,6 +3,7 @@
 //
 
 //#include "PolarTable.h"
+#include "Polar.h"
 
 namespace poem {
 
@@ -13,7 +14,8 @@ namespace poem {
       m_type(type),
       m_dimension_grid(dimension_grid),
       m_values(dimension_grid->size()),
-      m_interpolator(nullptr) {
+      m_interpolator(nullptr),
+      m_polar_parent(nullptr) {
 
     switch (type) {
       case POEM_DOUBLE:
@@ -37,6 +39,17 @@ namespace poem {
 
   template<typename T>
   const std::string &PolarTable<T>::name() const { return Named::m_name; }
+
+  template<typename T>
+  std::string PolarTable<T>::full_name() const {
+    std::string full_name_;
+    if (m_polar_parent) {
+      full_name_ = m_polar_parent->full_name() + "/" + m_name;
+    } else {
+      full_name_ = "/" + m_name;
+    }
+    return full_name_;
+  }
 
   template<typename T>
   POEM_DATATYPE PolarTable<T>::type() const { return m_type; }
@@ -380,6 +393,11 @@ namespace poem {
     }
 
     return resampled_polar_table;
+  }
+
+  template<typename T>
+  void PolarTable<T>::set_polar_parent(Polar *polar) {
+    m_polar_parent = polar;
   }
 
   template<typename T>

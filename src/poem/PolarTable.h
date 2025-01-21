@@ -92,6 +92,9 @@ namespace poem {
   // ===================================================================================================================
   // ===================================================================================================================
 
+  // Forward declaration
+  class Polar;
+
   /**
    * Non template base class for PolarTable
    */
@@ -99,8 +102,10 @@ namespace poem {
     virtual POEM_DATATYPE type() const = 0;
 
     virtual const std::string &name() const = 0;
+    virtual std::string full_name() const = 0;
 
     virtual std::shared_ptr<DimensionGrid> dimension_grid() const = 0;
+    virtual void set_polar_parent(Polar *polar) = 0;
 
     virtual bool operator==(const PolarTableBase& other) const = 0;
     virtual bool operator!=(const PolarTableBase& other) const = 0;
@@ -134,6 +139,11 @@ namespace poem {
      * Get the name of the table
      */
     [[nodiscard]] const std::string &name() const override;
+
+    /**
+     * Get the name of the table
+     */
+    [[nodiscard]] std::string full_name() const override;
 
     /**
      * Get the type of the table
@@ -294,6 +304,7 @@ namespace poem {
 
     [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const;
 
+    void set_polar_parent(Polar *polar) override;
 
    private:
     void reset();
@@ -305,6 +316,8 @@ namespace poem {
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
     std::unique_ptr<InterpolatorBase> m_interpolator;
+
+    Polar* m_polar_parent;
   };
 
 

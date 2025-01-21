@@ -30,7 +30,11 @@ namespace poem {
     return s;
   }
 
-  std::shared_ptr<PolarSet> OperationMode::create_polar_set(const std::string &name) {}
+  std::shared_ptr<PolarSet> OperationMode::create_polar_set() {
+    auto polar_set = std::make_shared<PolarSet>(name());
+    polar_set->set_operation_mode_parent(this);
+    return polar_set;
+  }
 
   std::shared_ptr<PolarSet> OperationMode::polar_set() const {
 

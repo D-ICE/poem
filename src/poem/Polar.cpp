@@ -110,10 +110,12 @@ namespace poem {
                        polar_table->name(), m_name);
       CRITICAL_ERROR_POEM
     }
+    polar_table->set_polar_parent(this);
+
     m_polar_tables.insert({polar_table->name(), polar_table});
   }
 
-  std::shared_ptr<PolarTableBase> Polar::polar(const std::string &name) const {
+  std::shared_ptr<PolarTableBase> Polar::polar_table(const std::string &name) const {
     return m_polar_tables.at(name);
   }
 
@@ -140,7 +142,7 @@ namespace poem {
     return m_polar_tables.end();
   }
 
-  void Polar::set_polar_set_parent(std::shared_ptr<PolarSet> polar_set) {
+  void Polar::set_polar_set_parent(PolarSet *polar_set) {
     m_polar_set_parent = polar_set;
   }
 

@@ -81,7 +81,10 @@ namespace poem {
     Polar(const std::string &name,
           POLAR_MODE mode,
           std::shared_ptr<DimensionGrid> dimension_grid) :
-        m_name(name), m_mode(mode), m_dimension_grid(dimension_grid) {}
+        m_name(name),
+        m_mode(mode),
+        m_dimension_grid(dimension_grid),
+        m_polar_set_parent(nullptr) {}
 
     const std::string &name() const;
 
@@ -101,7 +104,7 @@ namespace poem {
 
     void add_polar_table(std::shared_ptr<PolarTableBase> polar_table);
 
-    std::shared_ptr<PolarTableBase> polar(const std::string &name) const;
+    std::shared_ptr<PolarTableBase> polar_table(const std::string &name) const;
 
     bool operator==(const Polar &other) const;
 
@@ -111,7 +114,7 @@ namespace poem {
 
     PolarTableMapIter end();
 
-    void set_polar_set_parent(std::shared_ptr<PolarSet> polar_set);
+    void set_polar_set_parent(PolarSet *polar_set);
 
    private:
     std::string m_name;
@@ -119,7 +122,7 @@ namespace poem {
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     PolarTableMap m_polar_tables;
 
-    std::shared_ptr<PolarSet> m_polar_set_parent;
+    PolarSet *m_polar_set_parent;
 
   };
 
@@ -129,6 +132,7 @@ namespace poem {
                          const POEM_DATATYPE type) {
 
     auto polar_table = make_polar_table<T>(name, unit, description, type, m_dimension_grid);
+    polar_table->set_polar_parent(this);
     m_polar_tables.insert({name, polar_table});
     return polar_table;
   }
