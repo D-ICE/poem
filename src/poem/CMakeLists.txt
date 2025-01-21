@@ -21,6 +21,7 @@ target_link_libraries(_poem PUBLIC
 )
 
 target_sources(_poem PUBLIC
+        Attributes.cpp
         Dimension.cpp
         DimensionGrid.cpp
         DimensionPoint.cpp

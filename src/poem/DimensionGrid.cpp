@@ -49,13 +49,17 @@ namespace poem {
     return m_dimensions_values.at(idx).size();
   }
 
-  size_t DimensionGrid::dim() const {
+  size_t DimensionGrid::size(const std::string& dim_name) const {
+    return size(m_dimension_set->index(dim_name));
+  }
+
+  size_t DimensionGrid::ndims() const {
     return m_dimension_set->size();
   }
 
   std::vector<size_t> DimensionGrid::shape() const {
-    std::vector<size_t> shape(dim());
-    for (size_t idx = 0; idx < dim(); ++idx) {
+    std::vector<size_t> shape(ndims());
+    for (size_t idx = 0; idx < ndims(); ++idx) {
       shape[idx] = size(idx);
     }
     return shape;
@@ -79,7 +83,7 @@ namespace poem {
 
   bool DimensionGrid::operator==(const DimensionGrid &other) const {
     bool equal = *m_dimension_set == *(other.m_dimension_set);
-    for (size_t i=0; i<dim(); ++i) {
+    for (size_t i=0; i < ndims(); ++i) {
       auto this_values = m_dimensions_values[i];
       auto other_values = other.m_dimensions_values[i];
       equal &= this_values == other_values;
@@ -112,21 +116,21 @@ namespace poem {
 
   std::shared_ptr<DimensionGrid> DimensionGrid::copy() const {
     auto new_dimension_grid = std::make_shared<DimensionGrid>(m_dimension_set);
-    for (size_t idx = 0; idx < dim(); ++idx) {
+    for (size_t idx = 0; idx < ndims(); ++idx) {
       new_dimension_grid->set_values(m_dimension_set->dimension(idx)->name(), m_dimensions_values.at(idx));
     }
     return new_dimension_grid; // TODO: tester
   }
 
   size_t DimensionGrid::grid_to_index(const std::vector<size_t> &grid_indices) const {
-    if (grid_indices.size() != dim()) {
+    if (grid_indices.size() != ndims()) {
       spdlog::critical("Number of indices is not equal to the number of dimensions of the DimensionGrid");
       CRITICAL_ERROR_POEM
     }
 
     size_t index = 0;
     size_t stride = 1;
-    for (int i = dim() - 1; i >= 0; --i) {
+    for (int i = ndims() - 1; i >= 0; --i) {
       index += grid_indices[i] * stride;
       stride *= size(i);
     }

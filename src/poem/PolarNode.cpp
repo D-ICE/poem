@@ -70,12 +70,39 @@ namespace poem {
     return std::dynamic_pointer_cast<PolarTableBase>(shared_from_this());
   }
 
+  std::shared_ptr<PolarTable<double>> PolarNode::as_polar_table_double() {
+    if (m_polar_node_type != POLAR_TABLE) {
+      spdlog::critical("PolarNode {} is not a PolarTableBase", m_name);
+      CRITICAL_ERROR_POEM
+    }
+    return std::dynamic_pointer_cast<PolarTable<double>>(shared_from_this());
+  }
+
+  std::shared_ptr<PolarTable<int>> PolarNode::as_polar_table_int() {
+    if (m_polar_node_type != POLAR_TABLE) {
+      spdlog::critical("PolarNode {} is not a PolarTableBase", m_name);
+      CRITICAL_ERROR_POEM
+    }
+    return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
+  }
+
   bool PolarNode::operator==(const PolarNode &other) const {
-    NIY_POEM
+    bool equal = true;
+    equal &= m_name == other.m_name;
+    equal &= m_attributes == other.m_attributes;
+    return equal;
   }
 
   bool PolarNode::operator!=(const PolarNode &other) const {
     return !(other == *this);
+  }
+
+  Attributes& PolarNode::attributes() {
+    return m_attributes;
+  }
+
+  const Attributes& PolarNode::attributes() const {
+    return m_attributes;
   }
 
 }  // poem

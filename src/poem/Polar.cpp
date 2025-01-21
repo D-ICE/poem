@@ -35,7 +35,8 @@ namespace poem {
   }
 
   bool Polar::operator==(const Polar &other) const {
-    bool equal = m_name == other.m_name;
+    bool equal = true;
+    equal &= PolarNode::operator==(other);
     equal &= m_mode == other.m_mode;
     equal &= *m_dimension_grid == *other.m_dimension_grid;
     equal &= n_children() == other.n_children();
@@ -48,6 +49,24 @@ namespace poem {
 
   bool Polar::operator!=(const Polar &other) const {
     return !(other == *this);
+  }
+
+  std::shared_ptr<Polar> Polar::resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
+    auto new_polar = make_polar(m_name, m_mode, new_dimension_grid);
+    for (const auto &polar_table: children<PolarTableBase>()) {
+      switch (polar_table->type()) {
+        case POEM_DOUBLE:
+          new_polar->attach_polar_table(polar_table->as_polar_table_double()->resample(new_dimension_grid));
+          break;
+        case POEM_INT:
+          spdlog::warn("In resampling of Polar {}, PolarTable of type POEM_INT is skipped", m_name);
+//          new_polar->attach_polar_table(polar_table->as_polar_table_int()->resample(new_dimension_grid));
+          break;
+      }
+    }
+
+    new_polar->attributes() = m_attributes;
+    return new_polar;
   }
 
   std::shared_ptr<Polar>

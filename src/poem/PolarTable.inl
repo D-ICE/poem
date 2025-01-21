@@ -157,6 +157,7 @@ namespace poem {
     if (m_type != other.type()) return false;
     auto other_ = static_cast<const PolarTable<T> *>(&other);
     bool equal = *m_dimension_grid == *other_->m_dimension_grid;
+    equal &= PolarNode::operator==(other);
     equal &= m_values == other_->m_values;
     return equal;
   }
@@ -345,8 +346,8 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-    if (new_dimension_grid->dim() != dim()) {
-      spdlog::critical("Dimension mismatch in resampling operation ({} and {})", new_dimension_grid->dim(), dim());
+    if (new_dimension_grid->ndims() != dim()) {
+      spdlog::critical("Dimension mismatch in resampling operation ({} and {})", new_dimension_grid->ndims(), dim());
       CRITICAL_ERROR_POEM
     }
 

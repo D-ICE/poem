@@ -15,13 +15,6 @@ TEST(poem, version) {
   std::cout << "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
 }
 
-
-//// TODO: faire test pour chaque classe importante
-//TEST(poem, DimensionSet) {
-//  // TODO
-//}
-
-
 TEST(poem, PolarTable) {
 
   // Dimensions
@@ -40,16 +33,13 @@ TEST(poem, PolarTable) {
   dimension_grid->set_values("STW", {1, 2, 3});
   dimension_grid->set_values("TWS", {1, 2, 3});
   ASSERT_NO_THROW(dimension_grid->dimension_points());
-//  auto dimension_points = dimension_grid->dimension_points();
 
   // PolarTable
   auto polar_table = make_polar_table<double>("VAR", "-", "VAR", POEM_DOUBLE, dimension_grid);
   ASSERT_ANY_THROW(make_polar_table<double>("a", "unknown_to_dunits", "", POEM_DOUBLE, dimension_grid));
   ASSERT_ANY_THROW(make_polar_table<int>("b", "-", "", POEM_DOUBLE, dimension_grid));
-//  auto polar = std::make_shared<PolarTable<double>>(dimension_grid);
 
   auto dimension_points = polar_table->dimension_points();
-
 
   // Filling the polar with values
   size_t idx = 0;
@@ -124,50 +114,24 @@ TEST(poem, PolarTable) {
   auto nearest_val = polar_table->nearest(dimension_point);
   ASSERT_EQ(nearest_val, 6.);
 
-
   polar_table->sum(polar_table);
-//  polar_table->sum(polar_table);
 
+  // Writing
+  to_netcdf(polar_table, "polar_table.nc");
 
-  netCDF::NcFile data_file(std::string("polar_table.nc"), netCDF::NcFile::replace);
-  to_netcdf(polar_table, data_file);
-//  polar_table->to_netcdf(data_file);
-//  write_polar_table(dataFile, polar_table);
-  data_file.close();
-
-  netCDF::NcFile dataFile_(std::string("polar_table.nc"), netCDF::NcFile::read);
+  netCDF::NcFile dataFile_("polar_table.nc", netCDF::NcFile::read);
 
   auto var = dataFile_.getVar("VAR");
   std::shared_ptr<DimensionGrid> dimension_grid_read;
   auto polar_table_read = read_polar_table(var, dimension_grid_read, true);
   dataFile_.close();
 
-  ASSERT_EQ(*polar_table, dynamic_cast<PolarTable<double> &>(*polar_table_read));
-
-//  // Polar
-//  auto polar = Polar("polar", MPPP, dimension_grid);
-//  polar.add_polar_table(polar_table);
-//  auto new_polar_table = polar.new_polar_table<int>("VAR2", "-", "VAR2", POEM_DOUBLE);
-//
-//  auto new_polar_table_back = polar.polar("VAR2");
-//  auto type = new_polar_table_back->type();
-
-  /*
-   *  Slice ok
-   * Squeeeze ok
-   * Nearest ok
-   * mean ok
-   * Intégration dans Polar & PolarSet
-   * to_netcdf ok
-   * read ok
-   *
-   * Remise en place des mutexes
-   *
-   */
+  ASSERT_EQ(*polar_table, *polar_table_read->as_polar_table_double());
 
 }
 
 TEST(poem, Polar) {
+
   // Dimensions
   auto dim1 = make_dimension("dim1", "-", "dim1");
   auto dim2 = make_dimension("dim2", "-", "dim2");
@@ -193,7 +157,7 @@ TEST(poem, Polar) {
 
   // Writing
   netCDF::NcFile dataFile(std::string("polar.nc"), netCDF::NcFile::replace);
-  write_polar(polar, dataFile);
+  to_netcdf(polar, dataFile);
   dataFile.close();
 
   // Reading back
@@ -249,27 +213,27 @@ TEST(poem, PolarSet) {
   dimension_grid_no_control->set_values("Hs", Hs_values);
 
   // PolarSet
-  auto polar_set = make_polar_set("as_polar_set");
+  auto polar_set = make_polar_set("polar_set");
   polar_set->create_polar(MPPP, dimension_grid_speed_control);
 
   ASSERT_EQ(polar_set->polar(MPPP)->name(), "MPPP");
-  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "/as_polar_set/MPPP");
+  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "/polar_set/MPPP");
 
   polar_set->create_polar(HPPP, dimension_grid_speed_control);
   ASSERT_EQ(polar_set->polar(HPPP)->name(), "HPPP");
-  ASSERT_EQ(polar_set->polar(HPPP)->full_name(), "/as_polar_set/HPPP");
+  ASSERT_EQ(polar_set->polar(HPPP)->full_name(), "/polar_set/HPPP");
 
   polar_set->create_polar(MVPP, dimension_grid_power_control);
   ASSERT_EQ(polar_set->polar(MVPP)->name(), "MVPP");
-  ASSERT_EQ(polar_set->polar(MVPP)->full_name(), "/as_polar_set/MVPP");
+  ASSERT_EQ(polar_set->polar(MVPP)->full_name(), "/polar_set/MVPP");
 
   polar_set->create_polar(HVPP, dimension_grid_power_control);
   ASSERT_EQ(polar_set->polar(HVPP)->name(), "HVPP");
-  ASSERT_EQ(polar_set->polar(HVPP)->full_name(), "/as_polar_set/HVPP");
+  ASSERT_EQ(polar_set->polar(HVPP)->full_name(), "/polar_set/HVPP");
 
   polar_set->create_polar(VPP, dimension_grid_no_control);
   ASSERT_EQ(polar_set->polar(VPP)->name(), "VPP");
-  ASSERT_EQ(polar_set->polar(VPP)->full_name(), "/as_polar_set/VPP");
+  ASSERT_EQ(polar_set->polar(VPP)->full_name(), "/polar_set/VPP");
 
   // Create some tables into the different Polar
   polar_set->polar(MPPP)->create_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
@@ -288,13 +252,14 @@ TEST(poem, PolarSet) {
   polar_set->polar(VPP)->create_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
 
   // Writing
-  netCDF::NcFile dataFile(std::string("as_polar_set.nc"), netCDF::NcFile::replace);
-  write_polar_set(polar_set, dataFile);
+  netCDF::NcFile dataFile(std::string("polar_set.nc"), netCDF::NcFile::replace);
+  to_netcdf(polar_set, dataFile);
   dataFile.close();
 
   // Reading back
-  netCDF::NcFile dataFile_(std::string("as_polar_set.nc"), netCDF::NcFile::read);
-  auto polar_set_ = read_polar_set(dataFile_);
+  netCDF::NcFile dataFile_(std::string("polar_set.nc"), netCDF::NcFile::read);
+  auto polar_set_ = read_polar_set(dataFile_, "polar_set");
+  dataFile_.close();
 
   ASSERT_EQ(*polar_set, *polar_set_);
 
@@ -382,11 +347,12 @@ TEST(poem, PolarNode) {
   auto laden_one_engine = laden_load->new_child<PolarSet>("laden_one_engine");
   auto laden_two_engines = laden_load->new_child<PolarSet>("laden_two_engines");
 
-
-  // vessel_name ->ballast_load -> ballast_one_engine
-  //                            -> ballast_two_engines
-  //             ->laden_load   -> laden_one_engine
-  //                            ->laden_two_engines
+  /*
+   * vessel_name ->ballast_load -> ballast_one_engine
+   *                            -> ballast_two_engines
+   *             ->laden_load   -> laden_one_engine
+   *                            ->laden_two_engines
+   */
 
   ASSERT_EQ(vessel->name(), "vessel");
   ASSERT_EQ(vessel->full_name(), "/vessel");
@@ -435,7 +401,7 @@ TEST(poem, read_poem_v0_example) {
 
   auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc");
 
-  to_netcdf(vessel, "poem_v0_example_no_sails_v0_to_v1.nc");
+  to_netcdf(vessel, "poem_v0_example_no_sails_v0_to_last_version.nc");
 
 //  read_poem_nc_file("poem_v0_example_no_sails_v0_to_v1.nc");
 

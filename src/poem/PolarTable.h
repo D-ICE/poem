@@ -60,7 +60,7 @@ namespace poem {
       IndexArray shape;
 
       auto dimension_grid = m_polar_table->dimension_grid();
-      for (size_t idim = 0; idim < dimension_grid->dim(); ++idim) {
+      for (size_t idim = 0; idim < dimension_grid->ndims(); ++idim) {
         auto values = dimension_grid->values(idim);
         shape[idim] = values.size();
         m_interpolator->AddCoord(values);
@@ -109,21 +109,21 @@ namespace poem {
 
     virtual bool operator!=(const PolarTableBase &other) const = 0;
 
-    std::shared_ptr<PolarTable<double>> as_polar_table_double() {
-      if (m_type != POEM_DOUBLE) {
-        spdlog::critical("PolarTable {} has no type double", m_name);
-        CRITICAL_ERROR_POEM
-      }
-      return std::dynamic_pointer_cast<PolarTable<double>>(shared_from_this());
-    }
-
-    std::shared_ptr<PolarTable<int>> as_polar_table_int() {
-      if (m_type != POEM_INT) {
-        spdlog::critical("PolarTable {} has no type int", m_name);
-        CRITICAL_ERROR_POEM
-      }
-      return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
-    }
+//    std::shared_ptr<PolarTable<double>> as_polar_table_double() {
+//      if (m_type != POEM_DOUBLE) {
+//        spdlog::critical("PolarTable {} has no type double", m_name);
+//        CRITICAL_ERROR_POEM
+//      }
+//      return std::dynamic_pointer_cast<PolarTable<double>>(shared_from_this());
+//    }
+//
+//    std::shared_ptr<PolarTable<int>> as_polar_table_int() {
+//      if (m_type != POEM_INT) {
+//        spdlog::critical("PolarTable {} has no type int", m_name);
+//        CRITICAL_ERROR_POEM
+//      }
+//      return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
+//    }
 
    protected:
     POEM_DATATYPE m_type;

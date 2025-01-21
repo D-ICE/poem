@@ -55,6 +55,8 @@ namespace poem {
 
     bool operator!=(const Polar &other) const;
 
+    std::shared_ptr<Polar> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const;
+
    private:
     POLAR_MODE m_mode;
     std::shared_ptr<DimensionGrid> m_dimension_grid;

@@ -6,6 +6,7 @@
 #define POEM_POEM_H
 
 #include "poem/version.h"
+#include "Attributes.h"
 #include "Dimension.h"
 #include "DimensionSet.h"
 #include "DimensionGrid.h"

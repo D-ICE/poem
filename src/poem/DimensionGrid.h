@@ -43,7 +43,9 @@ namespace poem {
 
     size_t size(size_t idx) const;
 
-    size_t dim() const;
+    size_t size(const std::string& dim_name) const;
+
+    size_t ndims() const;
 
     std::vector<size_t> shape() const;
 

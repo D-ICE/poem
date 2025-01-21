@@ -56,8 +56,7 @@ namespace poem {
   bool PolarSet::operator==(const PolarSet &other) const {
     // We do not compare name, just enclosed polars
     bool equal = true;
-    // FIXME: voir si on doit quand meme comparer les noms...
-//    equal &= m_name == other.m_name;
+    equal &= PolarNode::operator==(other);
     equal &= nb_polars() == other.nb_polars();
     for (const auto &polar: children<Polar>()) {
       equal &= *polar == *child<Polar>(polar->name());

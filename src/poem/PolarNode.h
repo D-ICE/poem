@@ -11,6 +11,7 @@
 
 #include "exceptions.h"
 #include "enums.h"
+#include "Attributes.h"
 
 namespace fs = std::filesystem;
 
@@ -26,6 +27,9 @@ namespace poem {
   class Polar;
 
   class PolarTableBase;
+
+  template<typename T>
+  class PolarTable;
 
 
   /**
@@ -48,12 +52,21 @@ namespace poem {
 
     std::shared_ptr<PolarTableBase> as_polar_table();
 
+    std::shared_ptr<PolarTable<double>> as_polar_table_double();
+
+    std::shared_ptr<PolarTable<int>> as_polar_table_int();
+
     bool operator==(const PolarNode &other) const;
 
     bool operator!=(const PolarNode &other) const;
 
+    Attributes &attributes();
+
+    const Attributes &attributes() const;
+
    protected:
     POLAR_NODE_TYPE m_polar_node_type;
+    Attributes m_attributes;
 
   };
 
