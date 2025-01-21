@@ -14,6 +14,10 @@
 
 namespace poem {
 
+  // ===================================================================================================================
+  // WRITERS
+  // ===================================================================================================================
+
   void write_polar_table(std::shared_ptr<PolarTableBase> polar_table, netCDF::NcGroup &group) {
     switch (polar_table->type()) {
       case POEM_DOUBLE:
@@ -23,6 +27,78 @@ namespace poem {
       case POEM_INT:
         internal::write_polar_table_(polar_table->as_polar_table_int(), netCDF::ncInt, group);
     }
+  }
+
+  void write_polar(std::shared_ptr<Polar> polar, netCDF::NcGroup &group) {
+    std::shared_ptr<DimensionGrid> dimension_grid;
+    for (const auto &polar_table: polar->children<PolarTableBase>()) {
+      write_polar_table(polar_table, group);
+    }
+    // FIXME: un peu premature la gestion des atteibuts...
+    group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
+  }
+
+  void write_polar_set(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
+    for (const auto &polar: polar_set->children<Polar>()) {
+      auto new_group = group.addGroup(polar_mode_to_string(polar->mode()));
+      write_polar(polar, new_group);
+    }
+  }
+
+  void write_polar_node(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
+    // just creating a subgroup and keep writing children
+    for (const auto &polar_node_: polar_node->children<PolarNode>()) {
+      auto new_group = group.addGroup(polar_node_->name());
+      to_netcdf(polar_node_, new_group);
+    }
+  }
+
+  void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
+
+    switch (polar_node->polar_node_type()) {
+      case POLAR_NODE: {
+        write_polar_node(polar_node, group);
+        break;
+      }
+      case POLAR_SET: {
+        write_polar_set(polar_node->as_polar_set(), group);
+        break;
+      }
+      case POLAR: {
+        NIY_POEM
+        break;
+      }
+      case POLAR_TABLE: {
+        write_polar_table(polar_node->as_polar_table(), group);
+        break;
+      }
+    }
+
+  }
+
+  // ===================================================================================================================
+  // READERS
+  // ===================================================================================================================
+
+  std::string get_version_from_nc_file(const std::string &filename) {
+    if (!fs::exists(filename)) {
+      spdlog::critical("NetCDF file not found: {}", filename);
+      CRITICAL_ERROR_POEM
+    }
+
+    netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
+
+    std::string poem_file_format_version;
+    if (!datafile.getAtts().contains("poem_file_format_version")) {
+      // This is likely to be a file with version v0
+      poem_file_format_version = "v0";
+    } else {
+      std::string spec_version;
+      datafile.getAtt("poem_file_format_version");
+    }
+
+    datafile.close();
+    return poem_file_format_version;
   }
 
   std::shared_ptr<DimensionGrid> read_dimension_grid_from_var(const netCDF::NcVar &var) {
@@ -59,10 +135,9 @@ namespace poem {
     return dimension_grid;
   }
 
-  std::shared_ptr<PolarTableBase>
-  read_polar_table(const netCDF::NcVar &var,
-                   std::shared_ptr<DimensionGrid> &dimension_grid,
-                   bool dimension_grid_from_var) {
+  std::shared_ptr<PolarTableBase> read_polar_table(const netCDF::NcVar &var,
+                                                   std::shared_ptr<DimensionGrid> &dimension_grid,
+                                                   bool dimension_grid_from_var) {
 
     if (dimension_grid_from_var) {
       dimension_grid = read_dimension_grid_from_var(var);
@@ -113,15 +188,6 @@ namespace poem {
 
     return polar_table;
 
-  }
-
-  void write_polar(std::shared_ptr<Polar> polar, netCDF::NcGroup &group) {
-    std::shared_ptr<DimensionGrid> dimension_grid;
-    for (const auto &polar_table: polar->children<PolarTableBase>()) {
-      write_polar_table(polar_table, group);
-    }
-    // FIXME: un peu premature la gestion des atteibuts...
-    group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
   }
 
   std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group) {
@@ -178,13 +244,6 @@ namespace poem {
     return polar;
   }
 
-  void write_polar_set(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
-    for (const auto &polar: polar_set->children<Polar>()) {
-      auto new_group = group.addGroup(polar_mode_to_string(polar->mode()));
-      write_polar(polar, new_group);
-    }
-  }
-
   std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group) {
 
     std::string polar_set_name;
@@ -208,50 +267,12 @@ namespace poem {
     return polar_set;
   }
 
-  void write_polar_node(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
-    // just creating a subgroup and keep writing children
-    for (const auto &polar_node_: polar_node->children<PolarNode>()) {
-      auto new_group = group.addGroup(polar_node_->name());
-      to_netcdf(polar_node_, new_group);
-    }
-  }
-
-//  bool is_leaf_operation_mode(const netCDF::NcGroup &group) {
-//    auto subgroups = group.getGroups();
-//    return subgroups.contains("MPPP") ||
-//           subgroups.contains("HPPP") ||
-//           subgroups.contains("MVPP") ||
-//           subgroups.contains("HVPP") ||
-//           subgroups.contains("VPP");
-//  }
-
-  std::string get_version_from_nc_file(const std::string &filename) {
-    if (!fs::exists(filename)) {
-      spdlog::critical("NetCDF file not found: {}", filename);
-      CRITICAL_ERROR_POEM
-    }
-
-    netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
-
-    std::string poem_file_format_version;
-    if (!datafile.getAtts().contains("poem_file_format_version")) {
-      // This is likely to be a file with version v0
-      poem_file_format_version = "v0";
-    } else {
-      std::string spec_version;
-      datafile.getAtt("poem_file_format_version");
-    }
-
-    datafile.close();
-    return poem_file_format_version;
-  }
-
   std::shared_ptr<PolarNode> read_v0(const std::string &filename) {
 
     // PolarNode is root and we set the vessel name as filename as we do not have vessel name in v0
     std::string vessel_name = fs::path(filename).stem();
 
-    auto polar_set= std::make_shared<PolarSet>(vessel_name);
+    auto polar_set = std::make_shared<PolarSet>(vessel_name);
 
     netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
     auto polar = read_polar(datafile);
@@ -295,30 +316,6 @@ namespace poem {
     }
 
     return operation_mode;
-  }
-
-
-  void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
-
-    switch (polar_node->polar_node_type()) {
-      case POLAR_NODE: {
-        write_polar_node(polar_node, group);
-        break;
-      }
-      case POLAR_SET: {
-        write_polar_set(polar_node->as_polar_set(), group);
-        break;
-      }
-      case POLAR: {
-        NIY_POEM
-        break;
-      }
-      case POLAR_TABLE: {
-        write_polar_table(polar_node->as_polar_table(), group);
-        break;
-      }
-    }
-
   }
 
 }  // poem
