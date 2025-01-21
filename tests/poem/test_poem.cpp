@@ -384,7 +384,7 @@ TEST(poem, OperationMode) {
   polar_set->polar(MPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
   polar_set->polar(MPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
   ASSERT_EQ(polar_set->polar(MPPP)->name(), "MPPP");
-  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "polar_set/MPPP");
+  ASSERT_EQ(polar_set->polar(MPPP)->full_name(), "/polar_set/MPPP");
 
   polar_set->polar(HPPP)->new_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
   polar_set->polar(HPPP)->new_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);

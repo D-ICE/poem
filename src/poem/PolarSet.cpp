@@ -3,11 +3,19 @@
 //
 
 #include "PolarSet.h"
+#include "OperationMode.h"
 
 namespace poem {
 
-
-  std::string PolarSet::full_name() const { NIY_POEM }
+  std::string PolarSet::full_name() const {
+    std::string full_name_;
+    if (m_operation_mode_parent) {
+      full_name_ = m_operation_mode_parent->full_name().string() + "/" + m_name;
+    } else {
+      full_name_ = "/" + m_name;
+    }
+    return full_name_;
+  }
 
   std::shared_ptr<Polar> PolarSet::create_polar(POLAR_MODE mode, std::shared_ptr<DimensionGrid> dimension_grid) {
 
@@ -20,6 +28,8 @@ namespace poem {
     }
 
     auto polar = std::make_shared<Polar>(polar_name, mode, dimension_grid);
+    polar->set_polar_set_parent(shared_from_this());
+
     m_polars.insert({mode, polar});
     return polar;
   }
@@ -30,6 +40,8 @@ namespace poem {
                        m_name, polar_mode_to_string(polar->mode()));
       CRITICAL_ERROR_POEM
     }
+
+    polar->set_polar_set_parent(shared_from_this());
 
     m_polars.insert({polar->mode(), polar});
   }

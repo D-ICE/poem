@@ -111,6 +111,8 @@ namespace poem {
 
     PolarTableMapIter end();
 
+    void set_polar_set_parent(std::shared_ptr<PolarSet> polar_set);
+
    private:
     std::string m_name;
     POLAR_MODE m_mode;

@@ -54,6 +54,7 @@ namespace poem {
 
    private:
     std::shared_ptr<PolarSet> m_polar_set;
+
   };
 
 }  // poem

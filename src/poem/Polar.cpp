@@ -140,6 +140,10 @@ namespace poem {
     return m_polar_tables.end();
   }
 
+  void Polar::set_polar_set_parent(std::shared_ptr<PolarSet> polar_set) {
+    m_polar_set_parent = polar_set;
+  }
+
   std::shared_ptr<Polar>
   make_polar(const std::string &name, POLAR_MODE mode, std::shared_ptr<DimensionGrid> dimension_grid) {
     return std::make_shared<Polar>(name, mode, dimension_grid);
