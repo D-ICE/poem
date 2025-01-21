@@ -5,15 +5,10 @@
 #ifndef POEM_IO_H
 #define POEM_IO_H
 
-//#include <memory>
 #include <netcdf>
 #include <filesystem>
-//#include <semver/semver.hpp>
-//
+
 #include "exceptions.h"
-////#include "PolarTable.h"
-////#include "Dimension.h"
-//#include "specifications/spec_checkers.h"
 
 namespace fs = std::filesystem;
 
@@ -38,6 +33,8 @@ namespace poem {
   // WRITERS
   // ===================================================================================================================
 
+  int get_current_spec_version();
+
   namespace internal {
 
     template<typename T>
@@ -59,6 +56,8 @@ namespace poem {
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group);
 
+  void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string& filename);
+
 //  void from_netcdf(const netCDF::NcGroup &group);
 
 
@@ -66,7 +65,7 @@ namespace poem {
   // READERS
   // ===================================================================================================================
 
-  std::string get_version_from_nc_file(const std::string &filename);
+  int get_version_from_nc_file(const std::string &filename);
 
   std::shared_ptr<DimensionGrid> read_dimension_grid_from_var(const netCDF::NcVar &var);
 

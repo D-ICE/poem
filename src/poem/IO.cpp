@@ -18,6 +18,10 @@ namespace poem {
   // WRITERS
   // ===================================================================================================================
 
+  int get_current_spec_version() {
+    return semver::version::parse(git::LastTag(), false).major();
+  }
+
   void write_polar_table(std::shared_ptr<PolarTableBase> polar_table, netCDF::NcGroup &group) {
     switch (polar_table->type()) {
       case POEM_DOUBLE:
@@ -55,6 +59,8 @@ namespace poem {
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
 
+    int major_version = get_current_spec_version();
+
     switch (polar_node->polar_node_type()) {
       case POLAR_NODE: {
         write_polar_node(polar_node, group);
@@ -76,11 +82,21 @@ namespace poem {
 
   }
 
+  void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
+    spdlog::info("Writing file (version v{}): {}",
+                 get_current_spec_version(),
+                 fs::absolute(filename).string());
+
+    netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
+    to_netcdf(polar_node, root_group);
+    root_group.close();
+  }
+
   // ===================================================================================================================
   // READERS
   // ===================================================================================================================
 
-  std::string get_version_from_nc_file(const std::string &filename) {
+  int get_version_from_nc_file(const std::string &filename) {
     if (!fs::exists(filename)) {
       spdlog::critical("NetCDF file not found: {}", filename);
       CRITICAL_ERROR_POEM
@@ -88,17 +104,19 @@ namespace poem {
 
     netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
 
-    std::string poem_file_format_version;
-    if (!datafile.getAtts().contains("poem_file_format_version")) {
-      // This is likely to be a file with version v0
-      poem_file_format_version = "v0";
-    } else {
+    int major_version;
+    if (datafile.getAtts().contains("poem_file_format_version")) {
       std::string spec_version;
-      datafile.getAtt("poem_file_format_version");
-    }
+      datafile.getAtt("poem_file_format_version").getValues(spec_version);
+      major_version = (int) semver::version::parse(spec_version, false).major();
 
+    } else {
+      // This is likely to be a file with version v0
+      major_version = 0;
+    }
     datafile.close();
-    return poem_file_format_version;
+
+    return major_version;
   }
 
   std::shared_ptr<DimensionGrid> read_dimension_grid_from_var(const netCDF::NcVar &var) {
@@ -294,8 +312,7 @@ namespace poem {
 
     spdlog::info("Reading file: {}", filename);
 
-    auto poem_file_format_version = get_version_from_nc_file(filename);
-    int major_version = (int) semver::version::parse(poem_file_format_version, false).major();
+    int major_version = get_version_from_nc_file(filename);
 
     spdlog::info("POEM file format version detected: v{}", major_version);
     if (!spec_check(filename, major_version)) {

@@ -410,9 +410,7 @@ TEST(poem, PolarNode) {
 
 
   // Writing
-  netCDF::NcFile datafile_ballast_one_engine(std::string("ballast_one_engine.nc"), netCDF::NcFile::replace);
-  to_netcdf(ballast_one_engine, datafile_ballast_one_engine);
-  datafile_ballast_one_engine.close();
+  to_netcdf(ballast_one_engine, "ballast_one_engine.nc");
 
 //  // Reading back
 //  netCDF::NcFile dataFile_ballast_one_engine_(std::string("ballast_one_engine.nc"), netCDF::NcFile::read);
@@ -421,9 +419,7 @@ TEST(poem, PolarNode) {
 //  ASSERT_EQ(*ballast_one_engine, *ballast_one_engine_);
 
   // Writing
-  netCDF::NcFile datafile_root(std::string("vessel.nc"), netCDF::NcFile::replace);
-  to_netcdf(vessel, datafile_root);
-  datafile_root.close();
+  to_netcdf(vessel, "vessel.nc");
 
 //  // Reading back
 //  netCDF::NcFile dataFile_root_(std::string("vessel.nc"), netCDF::NcFile::read);
@@ -437,10 +433,10 @@ TEST(poem, read_poem_v0_example) {
 
   ASSERT_ANY_THROW(read_poem_nc_file("dont_exist.nc"));
 
-  auto operation_mode = read_poem_nc_file("poem_v0_example_no_sails.nc");
+  auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc");
 
-  netCDF::NcFile datafile(std::string("poem_v0_example_no_sails_v0_to_v1.nc"), netCDF::NcFile::replace);
-  to_netcdf(operation_mode, datafile);
-  datafile.close();
+  to_netcdf(vessel, "poem_v0_example_no_sails_v0_to_v1.nc");
+
+//  read_poem_nc_file("poem_v0_example_no_sails_v0_to_v1.nc");
 
 }
