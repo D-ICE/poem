@@ -10,7 +10,6 @@
 
 #include "DimensionGrid.h"
 #include "PolarTable.h"
-//#include "PolarSet.h"
 
 namespace poem {
 
@@ -45,93 +44,22 @@ namespace poem {
   /**
    * Get the control type from POLAR_MODE
    */
-  CONTROL_TYPE control_type(POLAR_MODE polar_mode) {
-    CONTROL_TYPE control_type;
-    switch (polar_mode) {
-      case MPPP:
-        control_type = VELOCITY_CONTROL;
-        break;
-      case HPPP:
-        control_type = VELOCITY_CONTROL;
-        break;
-      case MVPP:
-        control_type = POWER_CONTROL;
-        break;
-      case HVPP:
-        control_type = POWER_CONTROL;
-        break;
-      case VPP:
-        control_type = NO_CONTROL;
-        break;
-    }
-    return control_type;
-  }
+  CONTROL_TYPE control_type(POLAR_MODE polar_mode);
 
   /**
    * Converts a string representation into its corresponding POLAR_MODE
    */
-  inline POLAR_MODE string_to_polar_mode(const std::string &polar_mode_str) {
-    POLAR_MODE polar_mode;
-    if (polar_mode_str == "MPPP") {
-      polar_mode = MPPP;
-    } else if (polar_mode_str == "HPPP") {
-      polar_mode = HPPP;
-    } else if (polar_mode_str == "HVPP") {
-      polar_mode = HVPP;
-    } else if (polar_mode_str == "MVPP") {
-      polar_mode = MVPP;
-    } else if (polar_mode_str == "VPP") {
-      polar_mode = VPP;
-//    } else if (polar_mode_str == "ND") {
-//      // This is the v0 version of POEM specs...
-//      polar_mode = HPPP;
-//    } else if (polar_mode_str == "/") {
-//      // This is the root group and might be a v0 version of POEM specs...
-//      polar_mode = HPPP;
-    } else {
-      spdlog::critical("Polar type \"{}\" unknown", polar_mode);
-      CRITICAL_ERROR_POEM
-    }
-    return polar_mode;
-  }
+  POLAR_MODE string_to_polar_mode(const std::string &polar_mode_str);
 
   /**
    * Tells if a string represents a valid polar mode
    */
-  bool is_polar_mode(const std::string &polar_mode_str) {
-    try {
-      string_to_polar_mode(polar_mode_str);
-    } catch (const PoemException &e) {
-      return false;
-    }
-    return true;
-  }
+  bool is_polar_mode(const std::string &polar_mode_str);
 
   /**
    * Converts a POLAR_MODE into its corresponding string representation
    */
-  inline std::string polar_mode_to_string(const POLAR_MODE &polar_mode_) {
-    std::string polar_type;
-    switch (polar_mode_) {
-      case MPPP:
-        polar_type = "MPPP";
-        break;
-      case HPPP:
-        polar_type = "HPPP";
-        break;
-      case HVPP:
-        polar_type = "HVPP";
-        break;
-      case MVPP:
-        polar_type = "MVPP";
-        break;
-      case VPP:
-        polar_type = "VPP";
-        break;
-    }
-    return polar_type;
-  }
-
+  std::string polar_mode_to_string(const POLAR_MODE &polar_mode_);
 
   // ===================================================================================================================
   // ===================================================================================================================
@@ -153,74 +81,35 @@ namespace poem {
     Polar(const std::string &name,
           POLAR_MODE mode,
           std::shared_ptr<DimensionGrid> dimension_grid) :
-        m_name(name), m_mode(mode), m_dimension_grid(dimension_grid) {
+        m_name(name), m_mode(mode), m_dimension_grid(dimension_grid) {}
 
-    }
+    const std::string &name() const;
 
-    const std::string &name() const { return m_name; }
+    std::string full_name() const;
 
-    const std::string &full_name() const {
-      std::string full_name_;
-      if (m_polar_set_parent) {
-        full_name_ = m_polar_set_parent->full_name() + "/" + m_name;
-      } else {
-        full_name_ = "/" + m_name;
-      }
-      return full_name_;
-    }
+    const POLAR_MODE &mode() const;
 
-    const POLAR_MODE &mode() const { return m_mode; }
+    std::shared_ptr<DimensionGrid> dimension_grid() const;
 
-    std::shared_ptr<DimensionGrid> dimension_grid() const { return m_dimension_grid; }
-
-    std::shared_ptr<DimensionGrid> &dimension_grid() { return m_dimension_grid; }
+    std::shared_ptr<DimensionGrid> &dimension_grid();
 
     template<typename T>
     std::shared_ptr<PolarTable<T>> new_polar_table(const std::string &name,
                                                    const std::string &unit,
                                                    const std::string &description,
-                                                   const POEM_DATATYPE type) {
+                                                   const POEM_DATATYPE type);
 
-      auto polar_table = make_polar_table<T>(name, unit, description, type, m_dimension_grid);
-      m_polar_tables.insert({name, polar_table});
-      return polar_table;
-    }
+    void add_polar_table(std::shared_ptr<PolarTableBase> polar_table);
 
-    void add_polar_table(std::shared_ptr<PolarTableBase> polar_table) {
-      if (m_dimension_grid != polar_table->dimension_grid()) {
-        spdlog::critical("While adding PolarTable {} to Polar {}, DimensionGrid mismatch",
-                         polar_table->name(), m_name);
-        CRITICAL_ERROR_POEM
-      }
-      m_polar_tables.insert({polar_table->name(), polar_table});
-    }
+    std::shared_ptr<PolarTableBase> polar(const std::string &name) const;
 
-    std::shared_ptr<PolarTableBase> polar(const std::string &name) const {
-      return m_polar_tables.at(name);
-    }
+    bool operator==(const Polar &other) const;
 
-    bool operator==(const Polar &other) const {
-      bool equal = m_name == other.m_name;
-      equal &= m_mode == other.m_mode;
-      equal &= *m_dimension_grid == *other.m_dimension_grid;
-      equal &= m_polar_tables.size() == other.m_polar_tables.size();
-      for (const auto &polar_table: m_polar_tables) {
-        equal &= *polar_table.second == *other.m_polar_tables.at(polar_table.first);
-      }
-      return equal;
-    }
+    bool operator!=(const Polar &other) const;
 
-    bool operator!=(const Polar &other) const {
-      return !(other == *this);
-    }
+    PolarTableMapIter begin();
 
-    PolarTableMapIter begin() {
-      return m_polar_tables.begin();
-    }
-
-    PolarTableMapIter end() {
-      return m_polar_tables.end();
-    }
+    PolarTableMapIter end();
 
    private:
     std::string m_name;
@@ -232,11 +121,19 @@ namespace poem {
 
   };
 
+  template<typename T>
+  std::shared_ptr<PolarTable<T>>
+  Polar::new_polar_table(const std::string &name, const std::string &unit, const std::string &description,
+                         const POEM_DATATYPE type) {
+
+    auto polar_table = make_polar_table<T>(name, unit, description, type, m_dimension_grid);
+    m_polar_tables.insert({name, polar_table});
+    return polar_table;
+  }
+
   std::shared_ptr<Polar> make_polar(const std::string &name,
                                     POLAR_MODE mode,
-                                    std::shared_ptr<DimensionGrid> dimension_grid) {
-    return std::make_shared<Polar>(name, mode, dimension_grid);
-  }
+                                    std::shared_ptr<DimensionGrid> dimension_grid);
 
 }  // poem
 

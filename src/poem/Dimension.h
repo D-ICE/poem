@@ -30,7 +30,7 @@ namespace poem {
    * @param description
    * @return
    */
-  std::shared_ptr<Dimension> make_dimension(const std::string &name,
+  inline std::shared_ptr<Dimension> make_dimension(const std::string &name,
                                             const std::string &unit,
                                             const std::string &description) {
     return std::make_shared<Dimension>(name, unit, description);

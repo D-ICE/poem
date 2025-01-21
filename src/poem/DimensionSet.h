@@ -22,50 +22,27 @@ namespace poem {
     using DimensionVector = std::vector<std::shared_ptr<Dimension>>;
     using DimensionSetConstIter = DimensionVector::const_iterator;
 
-    explicit DimensionSet(const DimensionVector dimensions) : m_dimensions(dimensions) {
-      // Building map (acceleration)
-      size_t idx = 0;
-      for (const auto &dimension: dimensions) {
-        m_map.insert({dimension->name(), idx});
-        idx++;
-      }
-    }
+    explicit DimensionSet(const DimensionVector dimensions);
 
-    size_t size() const { return m_dimensions.size(); }
+    size_t size() const;
 
-    const std::string &name(size_t i) const { return m_dimensions.at(i)->name(); }
+    const std::string &name(size_t i) const;
 
-    size_t index(const std::string &name) const {
-      return m_map.at(name);
-    }
+    size_t index(const std::string &name) const;
 
-    bool contains(const std::string &name) const {
-      return m_map.contains(name);
-    }
+    bool contains(const std::string &name) const;
 
-    std::shared_ptr<Dimension> dimension(size_t i) const {
-      return m_dimensions.at(i);
-    }
+    std::shared_ptr<Dimension> dimension(size_t i) const;
 
-    std::shared_ptr<Dimension> dimension(const std::string &name) const {
-      return dimension(index(name));
-    }
+    std::shared_ptr<Dimension> dimension(const std::string &name) const;
 
-    bool operator==(const DimensionSet& other) const {
-      bool equal = size() == other.size();
-      for (size_t i=0; i<size(); ++i) {
-        equal &= *m_dimensions[i] == *other.m_dimensions[i];
-      }
-      return equal;
-    }
+    bool operator==(const DimensionSet& other) const;
 
-    bool operator!=(const DimensionSet& other) const {
-      return !(other == *this);
-    }
+    bool operator!=(const DimensionSet& other) const;
 
-    DimensionSetConstIter begin() const { return m_dimensions.begin(); }
+    DimensionSetConstIter begin() const;
 
-    DimensionSetConstIter end() const { return m_dimensions.end(); }
+    DimensionSetConstIter end() const;
 
    private:
     DimensionVector m_dimensions;
@@ -73,7 +50,7 @@ namespace poem {
 
   };
 
-  std::shared_ptr<DimensionSet> make_dimension_set(const std::vector<std::shared_ptr<Dimension>> dimensions) {
+  inline std::shared_ptr<DimensionSet> make_dimension_set(const std::vector<std::shared_ptr<Dimension>> dimensions) {
     return std::make_shared<DimensionSet>(dimensions);
   }
 

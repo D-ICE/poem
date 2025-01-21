@@ -1,11 +1,12 @@
-add_library(_poem INTERFACE)
+add_library(_poem STATIC)
+# TODO: donner possibilite de faire du shared
 
-target_include_directories(_poem INTERFACE ..)
-target_include_directories(_poem INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/..)
+target_include_directories(_poem PUBLIC ..)
+target_include_directories(_poem PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/..)
 
 add_dependencies(_poem check_git_${PROJECT_NAME})
 
-target_link_libraries(_poem INTERFACE
+target_link_libraries(_poem PUBLIC
         MathUtils::MathUtils
         netcdf-cxx4
         spdlog
@@ -17,6 +18,16 @@ target_link_libraries(_poem INTERFACE
         Boost::headers
         Boost::multi_array
         Boost::numeric_ublas
+)
+
+target_sources(_poem PUBLIC
+        DimensionGrid.cpp
+        DimensionPoint.cpp
+        DimensionSet.cpp
+        OperationMode.cpp
+        Polar.cpp
+        PolarSet.cpp
+        Splitter.cpp
 )
 
 set_target_properties(_poem PROPERTIES

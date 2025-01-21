@@ -30,52 +30,29 @@ namespace poem {
         m_dimension_set(dimension_set),
         m_values(values) {}
 
-    std::shared_ptr<DimensionSet> dimension_set() const {
-      return m_dimension_set;
-    }
+    std::shared_ptr<DimensionSet> dimension_set() const;
 
-    size_t size() const {
-      return m_dimension_set->size();
-    }
+    size_t size() const;
 
-    double &operator[](size_t i) { return m_values[i]; }
+    double &operator[](size_t i);
 
-    const double &operator[](size_t i) const { return m_values[i]; }
+    const double &operator[](size_t i) const;
 
-    void operator=(const std::vector<double> &values) {
-      if (values.size() != m_values.size()) {
-        spdlog::critical("Attempt to fill a DimensionPoint with bad vector size ({} and {})",
-                         values.size(), m_values.size());
-        CRITICAL_ERROR_POEM
-      }
-      m_values = values;
-    }
+    void operator=(const std::vector<double> &values);
 
-    bool operator==(const DimensionPoint& other) const {
-      bool equal = *m_dimension_set == *other.m_dimension_set;
-      equal &= m_values.size() == other.m_values.size();
-      equal &= m_values == other.m_values;
-      return equal;
-    }
+    bool operator==(const DimensionPoint& other) const;
 
-    bool operator!=(const DimensionPoint& other) const {
-      return !(other == *this);
-    }
+    bool operator!=(const DimensionPoint& other) const;
 
     /*
      * Iterators
      */
-    ValuesConstIter begin() const { return m_values.cbegin(); }
+    ValuesConstIter begin() const;
 
-    ValuesConstIter end() const { return m_values.cend(); }
+    ValuesConstIter end() const;
 
 
-    std::ostream &cout(std::ostream &os) const {
-      for (size_t i = 0; i < m_dimension_set->size(); ++i) {
-        os << m_dimension_set->name(i) << ": " << m_values.at(i) << ";\t";
-      }
-      return os;
-    }
+    std::ostream &cout(std::ostream &os) const;
 
    private:
     std::shared_ptr<DimensionSet> m_dimension_set;
@@ -83,9 +60,7 @@ namespace poem {
 
   };
 
-  std::ostream &operator<<(std::ostream &os, const DimensionPoint &dimension_point) {
-    return dimension_point.cout(os);
-  }
+  std::ostream &operator<<(std::ostream &os, const DimensionPoint &dimension_point);
 
 }  // poem
 

@@ -9,6 +9,7 @@
 #include <dunits/dunits.h>
 
 #include "exceptions.h"
+#include "poem/version.h"
 
 namespace poem {
 
