@@ -3,9 +3,10 @@
 //
 
 #include "DimensionGrid.h"
+#include "Dimension.h"
+#include "DimensionSet.h"
 
 namespace poem {
-
 
   void poem::DimensionGrid::set_values(const std::string &name, const std::vector<double> &values) {
 

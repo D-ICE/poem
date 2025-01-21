@@ -21,60 +21,28 @@ namespace poem {
 
     /**
      * CTOR
-     * @param name the name of the dimension
      * @param unit the unit used for that dimension
      * @param description described the dimension
      */
-    Named(const std::string &name,
-          const std::string &unit,
-          const std::string &description) :
-        m_name(name),
-        m_unit(unit),
-        m_description(description) {
+    Named(const std::string &unit,
+          const std::string &description);
 
-      check_unit();
+    const std::string &unit() const;
 
-      #ifndef ALLOW_DIRTY
-      if (git::AnyUncommittedChanges()) {
-        spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
-                         git::GetNormalizedVersionString());
-        CRITICAL_ERROR_POEM
-      }
-      #endif
-    }
+    void change_unit(const std::string &new_unit);
 
-    virtual const std::string &name() const { return m_name; }
+    const std::string &description() const;
 
-    void change_name(const std::string &new_name) { m_name = new_name; }
+    void change_description(const std::string &new_description);
 
-    const std::string &unit() const { return m_unit; }
+    bool operator==(const Named &other) const;
 
-    void change_unit(const std::string &new_unit) { m_unit = new_unit; }
-
-    const std::string &description() const { return m_description; }
-
-    void change_description(const std::string &new_description) { m_description = new_description; }
-
-    bool operator==(const Named &other) const {
-      return m_name == other.m_name
-             && m_unit == other.m_unit
-             && m_description == other.m_description;
-    }
-
-    bool operator!=(const Named &other) const {
-      return !(other == *this);
-    }
+    bool operator!=(const Named &other) const;
 
    private:
-    void check_unit() {
-      if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
-        spdlog::critical("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
-        CRITICAL_ERROR_POEM
-      }
-    }
+    void check_unit();
 
    protected:
-    std::string m_name;
     std::string m_unit;
     std::string m_description;
 

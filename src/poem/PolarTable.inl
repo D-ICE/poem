@@ -3,19 +3,17 @@
 //
 
 //#include "PolarTable.h"
-#include "Polar.h"
+//#include "Polar.h"
+
+#include "PolarTable.h"
 
 namespace poem {
 
   template<typename T>
   PolarTable<T>::PolarTable(const std::string &name, const std::string &unit, const std::string &description,
                             POEM_DATATYPE type, std::shared_ptr<DimensionGrid> dimension_grid) :
-      Named(name, unit, description),
-      m_type(type),
-      m_dimension_grid(dimension_grid),
-      m_values(dimension_grid->size()),
-      m_interpolator(nullptr),
-      m_polar_parent(nullptr) {
+      PolarTableBase(name, unit, description, type, dimension_grid),
+      m_values(dimension_grid->size()) {
 
     switch (type) {
       case POEM_DOUBLE:
@@ -35,20 +33,6 @@ namespace poem {
         break;
     }
 
-  }
-
-  template<typename T>
-  const std::string &PolarTable<T>::name() const { return Named::m_name; }
-
-  template<typename T>
-  std::string PolarTable<T>::full_name() const {
-    std::string full_name_;
-    if (m_polar_parent) {
-      full_name_ = m_polar_parent->full_name() + "/" + m_name;
-    } else {
-      full_name_ = "/" + m_name;
-    }
-    return full_name_;
   }
 
   template<typename T>
@@ -279,10 +263,8 @@ namespace poem {
       auto dimension_name = dimension->name();
 
       if (prescribed_values.contains(dimension_name)) {
-//          std::cout << "Slicing with " << dimension_name << " = " << prescribed_values.at(dimension_name) << std::endl;
         new_dimension_grid->set_values(dimension_name, {prescribed_values.at(dimension_name)});
       } else {
-//          std::cout << "Keep sampling on " << dimension_name << std::endl;
         new_dimension_grid->set_values(dimension_name, m_dimension_grid->values(dimension_name));
       }
 
@@ -296,7 +278,6 @@ namespace poem {
     size_t idx = 0;
     for (const auto &dimension_point: new_dimension_grid->dimension_points()) {
       T val = interp(dimension_point, false); // Bound checking already done above
-//        std::cout << dimension_point << " -> " << val << std::endl;
       sliced_polar_table->set_value(idx, val);
       idx++;
     }
@@ -396,11 +377,6 @@ namespace poem {
   }
 
   template<typename T>
-  void PolarTable<T>::set_polar_parent(Polar *polar) {
-    m_polar_parent = polar;
-  }
-
-  template<typename T>
   void PolarTable<T>::reset() {
     m_interpolator.reset();
   }
@@ -432,6 +408,7 @@ namespace poem {
         spdlog::critical("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
         CRITICAL_ERROR_POEM
     }
+
     m_interpolator->build();
   }
 

@@ -69,5 +69,4 @@ namespace poem {
     return m_offsets_sizes.cend();
   }
 
-
 }  // poem

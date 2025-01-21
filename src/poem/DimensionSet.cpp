@@ -3,6 +3,7 @@
 //
 
 #include "DimensionSet.h"
+#include "Dimension.h"
 
 namespace poem {
 
@@ -38,7 +39,7 @@ namespace poem {
 
   bool DimensionSet::operator==(const DimensionSet &other) const {
     bool equal = size() == other.size();
-    for (size_t i=0; i<size(); ++i) {
+    for (size_t i = 0; i < size(); ++i) {
       equal &= *m_dimensions[i] == *other.m_dimensions[i];
     }
     return equal;
@@ -51,4 +52,5 @@ namespace poem {
   DimensionSet::DimensionSetConstIter DimensionSet::begin() const { return m_dimensions.begin(); }
 
   DimensionSet::DimensionSetConstIter DimensionSet::end() const { return m_dimensions.end(); }
+
 }  // poem

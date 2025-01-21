@@ -11,25 +11,13 @@
 #include <MathUtils/RegularGridInterpolator.h>
 
 #include "exceptions.h"
+#include "enums.h"
 #include "Named.h"
+#include "PolarNode.h"
 #include "Dimension.h"
-#include "DimensionSet.h"
 #include "DimensionGrid.h"
 
 namespace poem {
-
-  /**
-   * PolarTable datatype
-   */
-  enum POEM_DATATYPE {
-    /// double
-    POEM_DOUBLE,
-    /// int
-    POEM_INT,
-  };
-
-  // ===================================================================================================================
-  // ===================================================================================================================
 
   // Forward declaration
   template<typename T>
@@ -65,7 +53,7 @@ namespace poem {
 
     void build() override {
       m_interpolator = std::make_unique<mathutils::RegularGridInterpolator<T, _dim>>();
-      // Check que m_polar_table est filled
+      // TODO: Check que m_polar_table est filled
 
       using NDArray = boost::multi_array<double, _dim>;
       using IndexArray = boost::array<typename NDArray::index, _dim>;
@@ -86,7 +74,7 @@ namespace poem {
 
    private:
     PolarTable<T> *m_polar_table;
-    std::unique_ptr<mathutils::RegularGridInterpolator < T, _dim>> m_interpolator;
+    std::unique_ptr<mathutils::RegularGridInterpolator<T, _dim>> m_interpolator;
   };
 
   // ===================================================================================================================
@@ -98,18 +86,52 @@ namespace poem {
   /**
    * Non template base class for PolarTable
    */
-  struct PolarTableBase {
+  struct PolarTableBase : public PolarNode, public Named {
+
+    PolarTableBase(const std::string &name,
+                   const std::string &unit,
+                   const std::string &description,
+                   POEM_DATATYPE type,
+                   std::shared_ptr<DimensionGrid> dimension_grid) :
+        PolarNode(name),
+        Named(unit, description),
+        m_type(type),
+        m_dimension_grid(dimension_grid),
+        m_interpolator(nullptr) {
+      m_polar_node_type = POLAR_TABLE;
+    }
+
     virtual POEM_DATATYPE type() const = 0;
 
-    virtual const std::string &name() const = 0;
-    virtual std::string full_name() const = 0;
-
     virtual std::shared_ptr<DimensionGrid> dimension_grid() const = 0;
-    virtual void set_polar_parent(Polar *polar) = 0;
 
-    virtual bool operator==(const PolarTableBase& other) const = 0;
-    virtual bool operator!=(const PolarTableBase& other) const = 0;
+    virtual bool operator==(const PolarTableBase &other) const = 0;
+
+    virtual bool operator!=(const PolarTableBase &other) const = 0;
+
+    std::shared_ptr<PolarTable<double>> as_polar_table_double() {
+      if (m_type != POEM_DOUBLE) {
+        spdlog::critical("PolarTable {} has no type double", m_name);
+        CRITICAL_ERROR_POEM
+      }
+      return std::dynamic_pointer_cast<PolarTable<double>>(shared_from_this());
+    }
+
+    std::shared_ptr<PolarTable<int>> as_polar_table_int() {
+      if (m_type != POEM_INT) {
+        spdlog::critical("PolarTable {} has no type int", m_name);
+        CRITICAL_ERROR_POEM
+      }
+      return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
+    }
+
+   protected:
+    POEM_DATATYPE m_type;
+    std::shared_ptr<DimensionGrid> m_dimension_grid;
+    std::unique_ptr<InterpolatorBase> m_interpolator;
+
   };
+
 
   /**
    * A multidimensional numerical table representing a variable
@@ -117,7 +139,7 @@ namespace poem {
    * @tparam T the datatype of the data into the PolarTable
    */
   template<typename T>
-  class PolarTable : public PolarTableBase, public Named, public std::enable_shared_from_this<PolarTable<T>> {
+  class PolarTable : public PolarTableBase {
 
    public:
     /**
@@ -134,16 +156,6 @@ namespace poem {
                const std::string &description,
                POEM_DATATYPE type,
                std::shared_ptr<DimensionGrid> dimension_grid);
-
-    /**
-     * Get the name of the table
-     */
-    [[nodiscard]] const std::string &name() const override;
-
-    /**
-     * Get the name of the table
-     */
-    [[nodiscard]] std::string full_name() const override;
 
     /**
      * Get the type of the table
@@ -263,7 +275,7 @@ namespace poem {
      *
      * Equality is tested on values of DimensionGrid and value vector of the table, not the address of the DimensionGrid
      */
-    bool operator!=(const PolarTableBase& other) const override;
+    bool operator!=(const PolarTableBase &other) const override;
 
     /**
      * Get the value corresponding to the nearest DimensionPoint from given dimension_point in the associated
@@ -304,20 +316,14 @@ namespace poem {
 
     [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const;
 
-    void set_polar_parent(Polar *polar) override;
-
    private:
     void reset();
 
     void build_interpolator();
 
    private:
-    POEM_DATATYPE m_type;
-    std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::vector<T> m_values;
-    std::unique_ptr<InterpolatorBase> m_interpolator;
 
-    Polar* m_polar_parent;
   };
 
 

@@ -21,10 +21,14 @@ target_link_libraries(_poem PUBLIC
 )
 
 target_sources(_poem PUBLIC
+        Dimension.cpp
         DimensionGrid.cpp
         DimensionPoint.cpp
         DimensionSet.cpp
-        OperationMode.cpp
+        enums.cpp
+        IO.cpp
+        Named.cpp
+        PolarNode.cpp
         Polar.cpp
         PolarSet.cpp
         Splitter.cpp

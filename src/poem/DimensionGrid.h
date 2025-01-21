@@ -9,10 +9,12 @@
 #include <vector>
 
 #include "exceptions.h"
-#include "DimensionSet.h"
 #include "DimensionPoint.h"
 
 namespace poem {
+
+  // Forward declaration
+  class DimensionSet;
 
   /**
    * Defines a numerical sampling for each of Dimension object in a DimensionSet
@@ -59,9 +61,9 @@ namespace poem {
 
     std::shared_ptr<DimensionSet> dimension_set() const;
 
-    [[nodiscard]] const std::vector<DimensionPoint> &dimension_points() const;
+    const std::vector<DimensionPoint> &dimension_points() const;
 
-    [[nodiscard]] bool is_filled() const;
+    bool is_filled() const;
 
     std::shared_ptr<DimensionGrid> copy() const;
 

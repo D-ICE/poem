@@ -19,8 +19,14 @@ namespace poem {
    public:
     Dimension(const std::string &name,
               const std::string &unit,
-              const std::string &description) :
-        Named(name, unit, description) {}
+              const std::string &description);
+
+    const std::string &name() const;
+
+    void change_name(const std::string &name);
+
+   private:
+    std::string m_name;
   };
 
   /**
@@ -31,8 +37,8 @@ namespace poem {
    * @return
    */
   inline std::shared_ptr<Dimension> make_dimension(const std::string &name,
-                                            const std::string &unit,
-                                            const std::string &description) {
+                                                   const std::string &unit,
+                                                   const std::string &description) {
     return std::make_shared<Dimension>(name, unit, description);
   }
 

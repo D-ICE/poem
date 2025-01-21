@@ -10,9 +10,10 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Dimension.h"
-
 namespace poem {
+
+  // Forward declaration
+  class Dimension;
 
   /**
    * Declares an ordered set of Dimension objects to be used as a basis to define the dimensions of a PolarTable

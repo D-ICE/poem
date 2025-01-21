@@ -12,7 +12,7 @@
 #include "PolarTable.h"
 #include "Polar.h"
 #include "PolarSet.h"
-#include "OperationMode.h"
+#include "PolarNode.h"
 #include "IO.h"
 
 #endif //POEM_POEM_H

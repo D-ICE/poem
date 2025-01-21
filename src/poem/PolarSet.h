@@ -11,34 +11,26 @@
 
 #include "exceptions.h"
 #include "DimensionGrid.h"
-#include "Polar.h"
+#include "enums.h"
+#include "PolarNode.h"
 
 namespace poem {
 
   // Forward declaration
-  class OperationMode;
+  class Polar;
 
   /**
    * A PolarSet stacks the different Polar for one OperationMode
    */
- class PolarSet {
-   public:
-    using PolarMap = std::unordered_map<POLAR_MODE, std::shared_ptr<Polar>>;
-    using PolarMapIter = PolarMap::iterator;
+  class PolarSet : public PolarNode {
 
    public:
-    explicit PolarSet(const std::string &name) :
-    m_name(name),
-    m_operation_mode_parent(nullptr) {}
-
-    const std::string& name() const;
-
-    std::string full_name() const;
+    explicit PolarSet(const std::string &name);
 
     std::shared_ptr<Polar> create_polar(POLAR_MODE mode,
                                         std::shared_ptr<DimensionGrid> dimension_grid);
 
-    void add_polar(std::shared_ptr<Polar> polar);
+    void attach_polar(std::shared_ptr<Polar> polar);
 
     size_t nb_polars() const;
 
@@ -49,20 +41,6 @@ namespace poem {
     bool operator==(const PolarSet &other) const;
 
     bool operator!=(const PolarSet &other) const;
-
-    PolarMapIter begin();
-
-    PolarMapIter end();
-
-    void set_operation_mode_parent(OperationMode * operation_mode) {
-      m_operation_mode_parent = operation_mode;
-    }
-
-   private:
-    std::string m_name;
-    PolarMap m_polars;
-
-   OperationMode* m_operation_mode_parent;
 
   };
 

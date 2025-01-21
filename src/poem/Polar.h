@@ -8,87 +8,32 @@
 #include <string>
 #include <memory>
 
-#include "DimensionGrid.h"
-#include "PolarTable.h"
+#include "PolarNode.h"
+#include "enums.h"
 
 namespace poem {
 
-  /**
-   * Control type of a Polar
-   */
-  enum CONTROL_TYPE {
-    /// Velocity control
-    VELOCITY_CONTROL,
-    /// Power control
-    POWER_CONTROL,
-    /// No control
-    NO_CONTROL
-  };
-
-  /**
-   * The different types of available polar modes in poem
-   */
-  enum POLAR_MODE {
-    /// Motor Power Prediction Program (motor propulsion only, VELOCITY_CONTROL)
-    MPPP,
-    /// Hybrid Power Prediction Program (motor and wind propulsion, VELOCITY_CONTROL)
-    HPPP,
-    /// Motor Velocity Prediction Program (motor propulsion only, POWER_CONTROL)
-    MVPP,
-    /// Hybrid Velocity Prediction Program (motor and wind propulsion, POWER_CONTROL)
-    HVPP,
-    /// Velocity Prediction Program (wind propulsion only, NO_CONTROL)
-    VPP
-  };
-
-  /**
-   * Get the control type from POLAR_MODE
-   */
-  CONTROL_TYPE control_type(POLAR_MODE polar_mode);
-
-  /**
-   * Converts a string representation into its corresponding POLAR_MODE
-   */
-  POLAR_MODE string_to_polar_mode(const std::string &polar_mode_str);
-
-  /**
-   * Tells if a string represents a valid polar mode
-   */
-  bool is_polar_mode(const std::string &polar_mode_str);
-
-  /**
-   * Converts a POLAR_MODE into its corresponding string representation
-   */
-  std::string polar_mode_to_string(const POLAR_MODE &polar_mode_);
-
-  // ===================================================================================================================
-  // ===================================================================================================================
-
   // Forward declaration
   class PolarSet;
+
+  class PolarTableBase;
+
+  template<typename T>
+  class PolarTable;
+
+  class DimensionGrid;
 
   /**
    * A Polar stacks the PolarTable for one POLAR_MODE
    *
    * Every PolarTable in a Polar share the same DimensionGrid
    */
-  class Polar {
-   public:
-    using PolarTableMap = std::unordered_map<std::string, std::shared_ptr<PolarTableBase>>;
-    using PolarTableMapIter = PolarTableMap::iterator;
+  class Polar : public PolarNode {
 
    public:
     Polar(const std::string &name,
           POLAR_MODE mode,
-          std::shared_ptr<DimensionGrid> dimension_grid) :
-        m_name(name),
-        m_mode(mode),
-        m_dimension_grid(dimension_grid),
-        m_polar_set_parent(nullptr) {}
-
-    const std::string &name() const;
-
-    std::string full_name() const;
+          std::shared_ptr<DimensionGrid> dimension_grid);
 
     const POLAR_MODE &mode() const;
 
@@ -97,12 +42,12 @@ namespace poem {
     std::shared_ptr<DimensionGrid> &dimension_grid();
 
     template<typename T>
-    std::shared_ptr<PolarTable<T>> new_polar_table(const std::string &name,
-                                                   const std::string &unit,
-                                                   const std::string &description,
-                                                   const POEM_DATATYPE type);
+    std::shared_ptr<PolarTable<T>> create_polar_table(const std::string &name,
+                                                      const std::string &unit,
+                                                      const std::string &description,
+                                                      const POEM_DATATYPE type);
 
-    void add_polar_table(std::shared_ptr<PolarTableBase> polar_table);
+    void attach_polar_table(std::shared_ptr<PolarTableBase> polar_table);
 
     std::shared_ptr<PolarTableBase> polar_table(const std::string &name) const;
 
@@ -110,30 +55,19 @@ namespace poem {
 
     bool operator!=(const Polar &other) const;
 
-    PolarTableMapIter begin();
-
-    PolarTableMapIter end();
-
-    void set_polar_set_parent(PolarSet *polar_set);
-
    private:
-    std::string m_name;
     POLAR_MODE m_mode;
     std::shared_ptr<DimensionGrid> m_dimension_grid;
-    PolarTableMap m_polar_tables;
-
-    PolarSet *m_polar_set_parent;
 
   };
 
   template<typename T>
   std::shared_ptr<PolarTable<T>>
-  Polar::new_polar_table(const std::string &name, const std::string &unit, const std::string &description,
-                         const POEM_DATATYPE type) {
+  Polar::create_polar_table(const std::string &name, const std::string &unit, const std::string &description,
+                            const POEM_DATATYPE type) {
 
     auto polar_table = make_polar_table<T>(name, unit, description, type, m_dimension_grid);
-    polar_table->set_polar_parent(this);
-    m_polar_tables.insert({name, polar_table});
+    add_child(polar_table);
     return polar_table;
   }
 

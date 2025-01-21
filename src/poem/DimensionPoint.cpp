@@ -6,7 +6,6 @@
 
 namespace poem {
 
-
   std::shared_ptr<DimensionSet> DimensionPoint::dimension_set() const {
     return m_dimension_set;
   }

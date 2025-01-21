@@ -51,7 +51,6 @@ namespace poem {
 
     ValuesConstIter end() const;
 
-
     std::ostream &cout(std::ostream &os) const;
 
    private:
