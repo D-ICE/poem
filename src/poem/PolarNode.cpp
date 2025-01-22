@@ -97,12 +97,66 @@ namespace poem {
     return !(other == *this);
   }
 
-  Attributes& PolarNode::attributes() {
+  Attributes &PolarNode::attributes() {
     return m_attributes;
   }
 
-  const Attributes& PolarNode::attributes() const {
+  const Attributes &PolarNode::attributes() const {
     return m_attributes;
+  }
+
+  void PolarNode::polar_tables_paths(std::vector<std::string> &paths) const {
+
+    if (m_polar_node_type == POLAR_TABLE) {
+      paths.push_back(full_name());
+    }
+
+    if (!is_leaf()) {
+      for (const auto &child: children<PolarNode>()) {
+        child->polar_tables_paths(paths);
+      }
+    }
+  }
+
+  std::shared_ptr<PolarNode> PolarNode::from_path(const fs::path &path) {
+
+    fs::path path_ = path;
+    if (path_.is_absolute()) {
+      path_ = path_.relative_path();
+    }
+
+    auto iter = path_.begin();
+    auto current_node_name = (*iter).string();
+    if ((*iter).string() != m_name) {
+      spdlog::critical("In PolarNode {} and path mismatch: {}", m_name, path_.string());
+      CRITICAL_ERROR_POEM
+    }
+
+    std::shared_ptr<PolarNode> polar_node;
+
+    iter++;
+    if (iter == path_.end()) {
+      polar_node = std::dynamic_pointer_cast<PolarNode>(shared_from_this());
+
+    } else {
+      auto next_node_name = (*iter).string();
+      fs::path next_path;
+      for (; iter!=path_.end(); ++iter) {
+        next_path = next_path / *iter;
+      }
+      polar_node = child<PolarNode>(next_node_name)->from_path(next_path);
+    }
+
+    return polar_node;
+  }
+
+  json PolarNode::layout() const {
+    NIY_POEM
+    json node;
+
+    node[m_name] = nullptr;
+
+    return node;
   }
 
   std::shared_ptr<PolarNode> make_polar_node(const std::string &name) {

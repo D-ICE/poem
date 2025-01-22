@@ -399,7 +399,32 @@ TEST(poem, read_poem_v0_example) {
 
   ASSERT_ANY_THROW(read_poem_nc_file("dont_exist.nc"));
 
-  auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc", "vessel");
+  auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc",
+                                  "vessel"); // TODO: voir a mettre le nom du fichier ?
+
+  std::vector<std::string> polar_tables_paths;
+  vessel->polar_tables_paths(polar_tables_paths);
+
+  for (const auto &path: polar_tables_paths) {
+    auto polar_table = vessel->from_path(path)->as_polar_table();
+    switch (polar_table->type()) {
+      case poem::POEM_DOUBLE: {
+        auto polar_table_double = polar_table->as_polar_table_double();
+        break;
+      }
+
+      case poem::POEM_INT: {
+        auto polar_table_int = polar_table->as_polar_table_int();
+        break;
+      }
+    }
+  }
+
+
+
+
+//  auto json = vessel->layout();
+//  std::cout << json.dump(2) << std::endl;
 
   to_netcdf(vessel, "poem_v0_example_no_sails_v0_to_last_version.nc");
 

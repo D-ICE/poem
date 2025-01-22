@@ -290,41 +290,59 @@ namespace poem {
 
   }
 
-  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group, const std::string &mode) {
+  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group, const std::string &name) {
 
-    auto polar_name = group.getName();
-
-    POLAR_MODE polar_mode;
-    if (!is_polar_mode(polar_name)) {
-      // Trying to infer polar_mode from group name
-
-      if (group.getAtts().contains("polar_mode")) {
-        group.getAtt("polar_mode").getValues(polar_name);
-        polar_mode = string_to_polar_mode(polar_name);
-
-      } else if (group.getAtts().contains("vessel_type")) {
-        // For v0...
-        std::string vessel_type;
-        group.getAtt("vessel_type").getValues(vessel_type);
-        if (vessel_type == "HYBRID") {
-          polar_mode = HPPP;
-        } else if (vessel_type == "MOTOR") {
-          polar_mode = MPPP;
-        } else {
-          spdlog::critical("While reading file with format v0, vessel_type {} unknown");
-          CRITICAL_ERROR_POEM
-        }
-
-      } else {
-        spdlog::critical("Cannot infer the POLAR_MODE of group {} while reading Polar", polar_name);
+    std::string name_;
+    if (name == "from-group") {
+      if (group.isRootGroup()) {
+        spdlog::critical("While reading PolarNode, when group is root, the polar node name must be specified as"
+                         "it cannot be retrieved from group name");
         CRITICAL_ERROR_POEM
       }
+      name_ = group.getName();
     } else {
-      polar_mode = string_to_polar_mode(polar_name);
+      name_ = name;
     }
 
+    // C'est dans le read_v0 qu'on doit gerer le nom en HPPP ou MPPP
+
+//
+//    NIY_POEM
+////    auto polar_name = group.getName();
+//
+//    POLAR_MODE polar_mode;
+//    if (!is_polar_mode(polar_name)) {
+//      // Trying to infer polar_mode from group name
+//
+//      if (group.getAtts().contains("polar_mode")) {
+//        group.getAtt("polar_mode").getValues(polar_name);
+//        polar_mode = string_to_polar_mode(polar_name);
+//
+//      } else if (group.getAtts().contains("vessel_type")) {
+//        // For v0...
+//        std::string vessel_type;
+//        group.getAtt("vessel_type").getValues(vessel_type);
+//        if (vessel_type == "HYBRID") {
+//          polar_mode = HPPP;
+//        } else if (vessel_type == "MOTOR") {
+//          polar_mode = MPPP;
+//        } else {
+//          spdlog::critical("While reading file with format v0, vessel_type {} unknown");
+//          CRITICAL_ERROR_POEM
+//        }
+//
+//      } else {
+//        spdlog::critical("Cannot infer the POLAR_MODE of group {} while reading Polar", polar_name);
+//        CRITICAL_ERROR_POEM
+//      }
+//    } else {
+//      polar_mode = string_to_polar_mode(polar_name);
+//    }
+
+    POLAR_MODE polar_mode = string_to_polar_mode(name_);
+
     std::shared_ptr<DimensionGrid> dimension_grid;
-    auto polar = make_polar(polar_name, polar_mode, dimension_grid);
+    auto polar = make_polar(name, polar_mode, dimension_grid);
 
     bool dimension_grid_from_var = true;
     for (const auto &nc_var: group.getVars()) {
@@ -344,8 +362,10 @@ namespace poem {
 
   std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group, const std::string &polar_set_name) {
 
+    NIY_POEM
+
     std::string polar_set_name_;
-    if (polar_set_name == "from_group") {
+    if (polar_set_name == "from-group") {
       if (group.isRootGroup()) {
         spdlog::critical("While reading PolarSet, if the given group is root, the name must be specified");
         CRITICAL_ERROR_POEM
@@ -372,18 +392,22 @@ namespace poem {
 
   std::shared_ptr<PolarNode> read_polar_node(const netCDF::NcGroup &group, const std::string &polar_node_name_) {
 
+    // FIXME: c'est a priori plus sioux que ca is root ou pas... surtout quand on itere en recursif
+
+    /*
+     * group is_root & from-group -> non
+     * group is_root & name -> utilise name
+     * group !is_root & from-group
+     */
+
     std::string polar_node_name;
-    if (polar_node_name_ == "from_group") {
+    if (polar_node_name_ == "from-group") {
       if (group.isRootGroup()) {
-        if (group.getAtts().contains("vessel_name")) {
-          group.getAtt("vessel_name").getValues(polar_node_name);
-        } else {
-          spdlog::critical("Cannot infer name of the PolarNode");
-          CRITICAL_ERROR_POEM
-        }
-      } else {
-        polar_node_name = group.getName();
+        spdlog::critical("While reading PolarNode, when group is root, the polar node name must be specified as"
+                         "it cannot be retrieved from group name");
+        CRITICAL_ERROR_POEM
       }
+      polar_node_name = group.getName();
     } else {
       polar_node_name = polar_node_name_;
     }
@@ -394,7 +418,7 @@ namespace poem {
     switch (polar_mode_type) {
       case POLAR_NODE: {
         polar_node = make_polar_node(polar_node_name);
-        for (const auto& subgroup : group.getGroups()) {
+        for (const auto &subgroup: group.getGroups()) {
           auto new_polar_node = read_polar_node(subgroup.second);
           new_polar_node->attach_to(polar_node);
         }
@@ -424,21 +448,37 @@ namespace poem {
 
     // PolarNode is root and we set the vessel name as filename as we do not have vessel name in v0
 //    std::string vessel_name = fs::path(filename).stem();
-    if (root_name == "from_file") {
+    if (root_name == "from-file") {
       spdlog::critical("While reading POEM file version v0, root_name must be specified");
       CRITICAL_ERROR_POEM
     }
 
-    auto root_node = std::make_shared<PolarSet>(root_name);
-    root_node->attributes().add_attribute("vessel_name", root_name);
-
+    // Get the polar_name
     netCDF::NcFile datafile(filename, netCDF::NcFile::read);
-    auto polar = read_polar(datafile);
+
+    POLAR_MODE polar_mode;
+    std::string vessel_type;
+    datafile.getAtt("vessel_type").getValues(vessel_type);
+    if (vessel_type == "HYBRID") {
+      polar_mode = HPPP;
+    } else if (vessel_type == "MOTOR") {
+      polar_mode = MPPP;
+    } else {
+      spdlog::critical("While reading file with format v0, vessel_type {} unknown");
+      CRITICAL_ERROR_POEM
+    }
+
+    // On voudrait avoir /vessel/MPPP/polar_tables...
+    // /PolarSet/Polar/PolarTables...
+
+    auto root_node = make_polar_set(root_name);
+    auto polar = read_polar(datafile, polar_mode_to_string(polar_mode));
     datafile.close();
 
-    root_node->attach_polar(polar);
+    polar->attach_to(root_node);
 
     return root_node;
+
   }
 
   std::shared_ptr<PolarNode> read_v1(const std::string &filename, const std::string &root_name) {
@@ -454,6 +494,7 @@ namespace poem {
     auto root_node = read_polar_node(datafile, root_name);
     datafile.close();
 
+    NIY_POEM
     // vessel_name
 
 //    auto operation_mode = std::make_shared<PolarNode>("");
@@ -464,11 +505,10 @@ namespace poem {
 
   std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name) {
 
-    spdlog::info("Reading file: {}", filename);
-
     int major_version = get_version(filename);
+    spdlog::info("Reading file (version v{}): {}", major_version, fs::absolute(filename).string());
 
-    spdlog::info("POEM file format version detected: v{}", major_version);
+    // Check compliancy with specification
     if (!spec_check(filename, major_version)) {
       spdlog::critical("File is not compliant with version v{}", major_version);
       CRITICAL_ERROR_POEM

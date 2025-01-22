@@ -123,19 +123,19 @@ namespace poem {
   std::shared_ptr<PolarTableBase> read_polar_table(const std::string &name,
                                                    const netCDF::NcGroup &group);
 
-  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group, const std::string &mode = "from_group");
+  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group, const std::string &name = "from-group");
 
   std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group,
-                                           const std::string &polar_set_name = "from_group");
+                                           const std::string &polar_set_name = "from-group");
 
   std::shared_ptr<PolarNode> read_polar_node(const netCDF::NcGroup &group,
-                                             const std::string &polar_node_name_="from_group");
+                                             const std::string &polar_node_name_ = "from-group");
 
-  std::shared_ptr<PolarNode> read_v0(const std::string &filename, const std::string &root_name);
+  std::shared_ptr<PolarNode> read_v0(const std::string &filename, const std::string &root_name = "from-file");
 
-  std::shared_ptr<PolarNode> read_v1(const std::string &filename, const std::string &root_name);
+  std::shared_ptr<PolarNode> read_v1(const std::string &filename, const std::string &root_name = "from-file");
 
-  std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name = "from_file");
+  std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name = "from-file");
 
   POLAR_NODE_TYPE guess_polar_node_type(const netCDF::NcGroup &group);
 

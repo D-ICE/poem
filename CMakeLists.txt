@@ -49,6 +49,7 @@ include(git_watcher)
 # Dependencies
 #=============================================================================
 
+include(Add_cools)
 include(Add_Boost)
 include(Add_mathutils)
 include(Add_json)

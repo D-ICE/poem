@@ -8,12 +8,14 @@
 #include <filesystem>
 
 #include <dtree/dtree.h>
+#include <nlohmann/json.hpp>
 
 #include "exceptions.h"
 #include "enums.h"
 #include "Attributes.h"
 
 namespace fs = std::filesystem;
+using json = nlohmann::json;
 
 namespace poem {
 
@@ -63,6 +65,12 @@ namespace poem {
     Attributes &attributes();
 
     const Attributes &attributes() const;
+
+    json layout() const;
+
+    void polar_tables_paths(std::vector<std::string> &paths) const;
+
+    std::shared_ptr<PolarNode> from_path(const fs::path& path);
 
    protected:
     POLAR_NODE_TYPE m_polar_node_type;
