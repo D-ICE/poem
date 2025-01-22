@@ -9,6 +9,7 @@
 #include <filesystem>
 
 #include "exceptions.h"
+#include "enums.h"
 #include "Attributes.h"
 
 namespace fs = std::filesystem;
@@ -42,7 +43,7 @@ namespace poem {
                  netCDF::NcGroup &group);
 //  }  // internal
 
-  int get_current_spec_version();
+  int current_poem_standard_version();
 
   std::vector<netCDF::NcDim> write_dimension_grid(std::shared_ptr<DimensionGrid> dimension_grid,
                                                   netCDF::NcGroup &group);
@@ -53,7 +54,7 @@ namespace poem {
 //   template <typename T>
 //  void to_netcdf(std::shared_ptr<PolarTableBase> polar_table, netCDF::NcGroup &group);
 
-  void to_netcdf(const Attributes& attributes, netCDF::NcGroup& group);
+  void to_netcdf(const Attributes &attributes, netCDF::NcGroup &group);
 
   void to_netcdf(std::shared_ptr<Polar> polar, netCDF::NcGroup &group);
 
@@ -72,9 +73,40 @@ namespace poem {
   // READERS
   // ===================================================================================================================
 
-  int get_version_from_nc_file(const std::string &filename);
+  int get_version(const std::string &filename);
 
   std::shared_ptr<DimensionGrid> read_dimension_grid_from_var(const netCDF::NcVar &var);
+
+  /*
+   * Lors de la lecture:
+   *
+   * le groupe root doit faire apparaitre un attribut vessel_name qui est le nom du groupe
+   *
+   * un PolarNode est un groupe. Tout est PolarNode finalement -> doit aiguiller la lecture ?
+   *
+   * on a a faire a un PolarSet si on trouve des groupes avec des noms tel que HPPP, MPPP etc...
+   *
+   * c'est un Polar si le nom du groupe est MPPP... on doit trouver un attribut polar_mode
+   * si le groupe est root, on a plus que l'attribut polar_mode
+   *
+   * un PolarTable est une variable
+   *
+   * on veut donc les prototypes suivants:
+   *
+   *
+   *
+   * read_polar_node(group) -> ca applique les heuristiques pour determiner quel type de groupe et ca dispatche
+   *
+   * read_polar_set(group)
+   *
+   * read_polar(group)
+   *
+   * read_polar_table(group)
+   *
+   *
+   *
+   */
+
 
   /**
    * Read a NetCDF variable and returns it as a PolarTableBase
@@ -88,16 +120,24 @@ namespace poem {
                                                    std::shared_ptr<DimensionGrid> &dimension_grid,
                                                    bool dimension_grid_from_var);
 
-  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group);
+  std::shared_ptr<PolarTableBase> read_polar_table(const std::string &name,
+                                                   const netCDF::NcGroup &group);
+
+  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group, const std::string &mode = "from_group");
 
   std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group,
-                                           const std::string& polar_set_name="same_as_group");
+                                           const std::string &polar_set_name = "from_group");
 
-  std::shared_ptr<PolarNode> read_v0(const std::string &filename);
+  std::shared_ptr<PolarNode> read_polar_node(const netCDF::NcGroup &group,
+                                             const std::string &polar_node_name_="from_group");
 
-  std::shared_ptr<PolarNode> read_v1(const std::string &filename);
+  std::shared_ptr<PolarNode> read_v0(const std::string &filename, const std::string &root_name);
 
-  std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename);
+  std::shared_ptr<PolarNode> read_v1(const std::string &filename, const std::string &root_name);
+
+  std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name = "from_file");
+
+  POLAR_NODE_TYPE guess_polar_node_type(const netCDF::NcGroup &group);
 
 }  // poem
 

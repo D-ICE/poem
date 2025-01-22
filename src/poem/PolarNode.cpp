@@ -105,4 +105,8 @@ namespace poem {
     return m_attributes;
   }
 
+  std::shared_ptr<PolarNode> make_polar_node(const std::string &name) {
+    return std::make_shared<PolarNode>(name);
+  }
+
 }  // poem

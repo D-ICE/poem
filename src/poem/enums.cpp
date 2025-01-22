@@ -79,4 +79,27 @@ namespace poem {
     return polar_type;
   }
 
+  std::string polar_node_type_to_string(POLAR_NODE_TYPE polar_node_type) {
+    std::string polar_node_type_str;
+    switch (polar_node_type) {
+      case POLAR_NODE:
+        polar_node_type_str = "polar_node";
+        break;
+      case POLAR_SET:
+        polar_node_type_str = "polar_set";
+        break;
+      case POLAR:
+        polar_node_type_str = "polar";
+        break;
+      case POLAR_TABLE:
+        polar_node_type_str = "polar_table";
+        break;
+    }
+    return polar_node_type_str;
+  }
+
+  POLAR_NODE_TYPE string_to_polar_node_type(const std::string &polar_node_type_str) {
+    NIY_POEM
+  }
+
 }  // poem

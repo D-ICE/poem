@@ -70,6 +70,8 @@ namespace poem {
 
   };
 
+  std::shared_ptr<PolarNode> make_polar_node(const std::string& name);
+
 }  // poem
 
 #endif //POEM_POLARNODE_H

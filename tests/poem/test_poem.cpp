@@ -399,7 +399,7 @@ TEST(poem, read_poem_v0_example) {
 
   ASSERT_ANY_THROW(read_poem_nc_file("dont_exist.nc"));
 
-  auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc");
+  auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc", "vessel");
 
   to_netcdf(vessel, "poem_v0_example_no_sails_v0_to_last_version.nc");
 
