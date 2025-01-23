@@ -16,6 +16,9 @@ namespace poem {
       case POEM_INT:
         type_str = "int";
         break;
+      default:
+        spdlog::critical("Type not supported");
+        CRITICAL_ERROR_POEM
     }
     return type_str;
   }

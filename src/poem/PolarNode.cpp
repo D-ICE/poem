@@ -4,6 +4,7 @@
 
 #include "PolarNode.h"
 
+#include "Dimension.h"
 #include "PolarSet.h"
 #include "Polar.h"
 #include "PolarTable.h"
@@ -68,22 +69,6 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
     return std::dynamic_pointer_cast<PolarTableBase>(shared_from_this());
-  }
-
-  std::shared_ptr<PolarTable<double>> PolarNode::as_polar_table_double() {
-    if (m_polar_node_type != POLAR_TABLE) {
-      spdlog::critical("PolarNode {} is not a PolarTableBase", m_name);
-      CRITICAL_ERROR_POEM
-    }
-    return std::dynamic_pointer_cast<PolarTable<double>>(shared_from_this());
-  }
-
-  std::shared_ptr<PolarTable<int>> PolarNode::as_polar_table_int() {
-    if (m_polar_node_type != POLAR_TABLE) {
-      spdlog::critical("PolarNode {} is not a PolarTableBase", m_name);
-      CRITICAL_ERROR_POEM
-    }
-    return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
   }
 
   bool PolarNode::operator==(const PolarNode &other) const {

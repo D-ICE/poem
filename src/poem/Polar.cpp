@@ -63,6 +63,10 @@ namespace poem {
           spdlog::warn("In resampling of Polar {}, PolarTable of type POEM_INT is skipped", m_name);
 //          new_polar->attach_polar_table(polar_table->as_polar_table_int()->resample(new_dimension_grid));
           break;
+        default:
+          spdlog::critical("Type not supported");
+          CRITICAL_ERROR_POEM
+
       }
     }
 

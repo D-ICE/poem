@@ -405,8 +405,8 @@ TEST(poem, read_poem_v0_example) {
 
   // Generating the layout
   auto layout = vessel->layout();
-  std::ofstream o("layout.json");
-  o << std::setw(2) << layout << std::endl;
+  std::ofstream output("layout.json");
+  output << std::setw(2) << layout << std::endl;
 
 
   std::vector<std::string> polar_tables_paths;

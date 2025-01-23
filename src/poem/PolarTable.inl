@@ -7,6 +7,8 @@
 
 #include "PolarTable.h"
 
+#include "exceptions.h"
+
 namespace poem {
 
   template<typename T>
@@ -31,6 +33,10 @@ namespace poem {
           CRITICAL_ERROR_POEM
         }
         break;
+
+      default:
+        spdlog::critical("Type not supported");
+        CRITICAL_ERROR_POEM
     }
 
   }

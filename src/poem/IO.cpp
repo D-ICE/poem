@@ -149,14 +149,18 @@ namespace poem {
         break;
       }
       case POLAR_TABLE: {
-        auto type = polar_node->as_polar_table()->type();
+        auto polar_table = polar_node->as_polar_table();
+        auto type = polar_table->type();
         switch (type) {
           case POEM_DOUBLE:
-            to_netcdf(polar_node->as_polar_table_double(), netCDF::ncDouble, group);
+            to_netcdf(polar_table->as_polar_table_double(), netCDF::ncDouble, group);
             break;
           case POEM_INT:
-            to_netcdf(polar_node->as_polar_table_int(), netCDF::ncInt, group);
+            to_netcdf(polar_table->as_polar_table_int(), netCDF::ncInt, group);
             break;
+          default:
+            spdlog::critical("Type not supported");
+            CRITICAL_ERROR_POEM
         }
         break;
       }
@@ -283,7 +287,7 @@ namespace poem {
       }
 
       default:
-        spdlog::critical("Cannot read netCDF variable of type {}", var.getType().getName());
+        spdlog::critical("Type not supported");
         CRITICAL_ERROR_POEM
     }
 

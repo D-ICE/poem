@@ -54,10 +54,6 @@ namespace poem {
 
     std::shared_ptr<PolarTableBase> as_polar_table();
 
-    std::shared_ptr<PolarTable<double>> as_polar_table_double();
-
-    std::shared_ptr<PolarTable<int>> as_polar_table_int();
-
     bool operator==(const PolarNode &other) const;
 
     bool operator!=(const PolarNode &other) const;
