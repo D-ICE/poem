@@ -20,6 +20,7 @@ option(POEM_BUILD_TOOLS "Build tools" ON)
 option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " OFF)
 option(POEM_BUILD_PYTHON "Build pypoem, the python interface" ON)
 option(POEM_BUILD_POC "Build proof of concept tests" ON)
+option(POEM_DEPS_GRAPH "Build the graph dependency of the lib" ON)
 
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
@@ -56,6 +57,8 @@ include(Add_json)
 include(Add_fmt)
 include(Add_spdlog)
 include(Add_dunits)
+include(Add_semver)
+include(Add_dtree)
 
 # netcdf related dependencies
 include(Add_zlib)
@@ -63,8 +66,7 @@ include(Add_curl)
 include(Add_hdf5)
 include(Add_netcdf-c)
 include(Add_netcdf-cxx4)
-include(Add_semver)
-include(Add_dtree)
+
 
 #=============================================================================
 # Targets
@@ -84,3 +86,13 @@ endif ()
 #     include(Add_argparse)
 #     add_subdirectory(tools)
 # endif ()
+
+
+# TODO: mettre dans cmake-ref dans un CMakeLists.txt
+if (POEM_DEPS_GRAPH)
+    add_custom_target(poem_deps_graph ALL
+            COMMAND ${CMAKE_COMMAND} "--graphviz=graphviz/poem.dot" .
+            COMMAND dot -Tpng graphviz/poem.dot -o poem.png
+            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    )
+endif ()

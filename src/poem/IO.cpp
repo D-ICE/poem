@@ -171,6 +171,7 @@ namespace poem {
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);
+    root_group.putAtt("POEM software version", git::GetNormalizedVersionString());
     root_group.close();
   }
 

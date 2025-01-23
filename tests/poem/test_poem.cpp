@@ -162,7 +162,7 @@ TEST(poem, Polar) {
 
   // Reading back
   netCDF::NcFile dataFile_(std::string("polar.nc"), netCDF::NcFile::read);
-  auto polar_ = read_polar(dataFile_);
+  auto polar_ = read_polar(dataFile_, "MPPP");
 
   ASSERT_EQ(*polar, *polar_);
 
