@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(poem)
+project(poem LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -17,17 +17,15 @@ endif (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 #-----------------------------------------------------------------------------
 option(POEM_BUILD_TESTS "Build tests" ON)
 option(POEM_BUILD_TOOLS "Build tools" ON)
-option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " OFF)
+option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " ON)
 option(POEM_BUILD_PYTHON "Build pypoem, the python interface" ON)
 option(POEM_BUILD_POC "Build proof of concept tests" ON)
-option(POEM_DEPS_GRAPH "Build the graph dependency of the lib" ON)
+#option(POEM_DEPS_GRAPH "Build the graph dependency of the lib" ON)
 
 cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
 cmake_policy(SET CMP0167 NEW) # Boost
-
-#cmake_policy(SET CMP0148 NEW) # FindPython3 policy
 
 #=============================================================================
 # Retrieving the current Git revision
@@ -87,11 +85,3 @@ endif ()
 # endif ()
 
 
-# TODO: mettre dans cmake-ref dans un CMakeLists.txt
-if (POEM_DEPS_GRAPH)
-    add_custom_target(poem_deps_graph ALL
-            COMMAND ${CMAKE_COMMAND} "--graphviz=graphviz/poem.dot" .
-            COMMAND dot -Tpng graphviz/poem.dot -o poem.png
-            WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    )
-endif ()

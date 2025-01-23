@@ -76,6 +76,7 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::set_value(size_t idx, const T &value) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_values[idx] = value;
     reset();
   }
@@ -87,11 +88,13 @@ namespace poem {
 
   template<typename T>
   vector<T> &PolarTable<T>::values() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_values;
   }
 
   template<typename T>
   void PolarTable<T>::set_values(const vector<T> &new_values) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (new_values.size() != m_values.size()) {
       LogCriticalError("Attempting to set values in PolarTable of different size ({} and {})",
                        m_values.size(), new_values.size());
@@ -102,6 +105,7 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::fill_with(T value) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_values = std::vector<T>(dimension_grid()->size(), value);
   }
 
@@ -114,6 +118,7 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::multiply_by(const T &coeff) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     for (auto &val: m_values) {
       val *= coeff;
     }
@@ -121,6 +126,7 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::offset(const T &val) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     for (auto &val_: m_values) {
       val_ += val;
     }
@@ -128,6 +134,7 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::sum(std::shared_ptr<PolarTable<T>> other) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (other->dimension_grid()->dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
       CRITICAL_ERROR_POEM
@@ -144,6 +151,7 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::abs() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     for (auto &val: m_values) {
       val = std::abs(val);
     }
@@ -205,7 +213,6 @@ namespace poem {
 
   template<typename T>
   T PolarTable<T>::interp(const DimensionPoint &dimension_point, bool bound_check) const {
-//      std::lock_guard<std::mutex> lock(this->m_mutex);
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
@@ -294,7 +301,6 @@ namespace poem {
 
   template<typename T>
   bool PolarTable<T>::squeeze() {
-
     // Number of dimensions to squeeze
     size_t n = dim();
     for (size_t i = 0; i < dim(); ++i) {
@@ -305,6 +311,7 @@ namespace poem {
       // No dimension to squeeze, return
       return false;
     }
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     // Create a new reduced DimensionSet
     std::vector<std::shared_ptr<Dimension>> new_dimensions;
@@ -385,12 +392,14 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::reset() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_interpolator.reset();
   }
 
   template<typename T>
   void PolarTable<T>::build_interpolator() {
 
+    std::lock_guard<std::mutex> lock(m_mutex);
     // FIXME: ce switch devrait plutot se trouver dans la classe Interpolator !
     switch (dim()) {
       case 1:
