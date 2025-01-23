@@ -7,6 +7,19 @@
 
 namespace poem {
 
+  std::string poem_datatype_to_string(POEM_DATATYPE type) {
+    std::string type_str;
+    switch (type) {
+      case POEM_DOUBLE:
+        type_str = "double";
+        break;
+      case POEM_INT:
+        type_str = "int";
+        break;
+    }
+    return type_str;
+  }
+
   CONTROL_TYPE control_type(POLAR_MODE polar_mode) {
     CONTROL_TYPE control_type;
     switch (polar_mode) {

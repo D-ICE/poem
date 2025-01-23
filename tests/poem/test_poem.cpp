@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 #include <netcdf>
+#include <fstream>
 
 #include <MathUtils/VectorGeneration.h>
 
@@ -401,6 +402,12 @@ TEST(poem, read_poem_v0_example) {
 
   auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc",
                                   "vessel"); // TODO: voir a mettre le nom du fichier ?
+
+  // Generating the layout
+  auto layout = vessel->layout();
+  std::ofstream o("layout.json");
+  o << std::setw(2) << layout << std::endl;
+
 
   std::vector<std::string> polar_tables_paths;
   vessel->polar_tables_paths(polar_tables_paths);

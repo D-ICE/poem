@@ -19,6 +19,8 @@ namespace poem {
     POEM_INT,
   };
 
+  std::string poem_datatype_to_string(POEM_DATATYPE type);
+
 /**
    * Control type of a Polar
    */

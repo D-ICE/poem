@@ -151,10 +151,48 @@ namespace poem {
   }
 
   json PolarNode::layout() const {
-    NIY_POEM
     json node;
 
-    node[m_name] = nullptr;
+    std::vector<std::string> paths;
+    polar_tables_paths(paths);
+
+    for (const auto &path : paths) {
+
+      auto polar_table = const_cast<PolarNode*>(this)->from_path(path)->as_polar_table();
+
+      // Register DimensionGrid from parent
+      auto parent = polar_table->parent<Polar>();
+      auto parent_full_name = parent->full_name();
+
+      if (!node["dimension_grids"].contains(parent_full_name)) {
+        // DimensionGrid of parent does not exist yet
+
+        auto dimension_grid = parent->dimension_grid();
+
+        std::vector<std::string> dimensions;
+        dimensions.reserve(dimension_grid->dimension_set()->size());
+        for (const auto &dimension : *dimension_grid->dimension_set()) {
+          dimensions.push_back(dimension->name());
+          node["dimension_grids"][parent_full_name][dimension->name()]["unit"] = dimension->unit();
+          node["dimension_grids"][parent_full_name][dimension->name()]["description"] = dimension->description();
+          node["dimension_grids"][parent_full_name][dimension->name()]["values"] =
+              dimension_grid->values(dimension->name());
+
+        }
+        node["dimension_grids"][parent_full_name]["dimensions"] = dimensions;
+      }
+
+      node["polar_tables"][path]["datatype"] = poem_datatype_to_string(polar_table->type());
+      node["polar_tables"][path]["unit"] = polar_table->unit();
+      node["polar_tables"][path]["description"] = polar_table->description();
+      node["polar_tables"][path]["dimension_grid"] = parent_full_name;
+      if (polar_table->attributes().contains("component")) {
+        node["polar_tables"][path]["component"] = polar_table->attributes()["component"];
+      } else {
+        node["polar_tables"][path]["component"] = "None";
+      }
+
+    }
 
     return node;
   }
