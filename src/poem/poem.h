@@ -15,5 +15,6 @@
 #include "PolarSet.h"
 #include "PolarNode.h"
 #include "IO.h"
+#include "Splitter.h"
 
 #endif //POEM_POEM_H
