@@ -24,7 +24,7 @@ namespace poem {
 
   void Polar::attach_polar_table(std::shared_ptr<PolarTableBase> polar_table) {
     if (m_dimension_grid != polar_table->dimension_grid()) {
-      spdlog::critical("While adding PolarTable {} to Polar {}, DimensionGrid mismatch",
+      LogCriticalError("While adding PolarTable {} to Polar {}, DimensionGrid mismatch",
                        polar_table->name(), m_name);
       CRITICAL_ERROR_POEM
     }
@@ -60,11 +60,11 @@ namespace poem {
           new_polar->attach_polar_table(polar_table->as_polar_table_double()->resample(new_dimension_grid));
           break;
         case POEM_INT:
-          spdlog::warn("In resampling of Polar {}, PolarTable of type POEM_INT is skipped", m_name);
+          LogWarningError("In resampling of Polar {}, PolarTable of type POEM_INT is skipped", m_name);
 //          new_polar->attach_polar_table(polar_table->as_polar_table_int()->resample(new_dimension_grid));
           break;
         default:
-          spdlog::critical("Type not supported");
+          LogCriticalError("Type not supported");
           CRITICAL_ERROR_POEM
 
       }

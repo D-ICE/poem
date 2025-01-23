@@ -29,7 +29,7 @@ namespace poem {
       }
     }
     if (str != s) {
-      spdlog::warn("Name \"{}\" has been changed in \"{}\"", str, s);
+      LogWarningError("Name \"{}\" has been changed in \"{}\"", str, s);
     }
 
     return s;
@@ -49,7 +49,7 @@ namespace poem {
 
   std::shared_ptr<PolarSet> PolarNode::as_polar_set() {
     if (m_polar_node_type != POLAR_SET) {
-      spdlog::critical("PolarNode {} is not a PolarSet", m_name);
+      LogCriticalError("PolarNode {} is not a PolarSet", m_name);
       CRITICAL_ERROR_POEM
     }
     return std::dynamic_pointer_cast<PolarSet>(shared_from_this());
@@ -57,7 +57,7 @@ namespace poem {
 
   std::shared_ptr<Polar> PolarNode::as_polar() {
     if (m_polar_node_type != POLAR) {
-      spdlog::critical("PolarNode {} is not a Polar", m_name);
+      LogCriticalError("PolarNode {} is not a Polar", m_name);
       CRITICAL_ERROR_POEM
     }
     return std::dynamic_pointer_cast<Polar>(shared_from_this());
@@ -65,7 +65,7 @@ namespace poem {
 
   std::shared_ptr<PolarTableBase> PolarNode::as_polar_table() {
     if (m_polar_node_type != POLAR_TABLE) {
-      spdlog::critical("PolarNode {} is not a PolarTableBase", m_name);
+      LogCriticalError("PolarNode {} is not a PolarTableBase", m_name);
       CRITICAL_ERROR_POEM
     }
     return std::dynamic_pointer_cast<PolarTableBase>(shared_from_this());
@@ -113,7 +113,7 @@ namespace poem {
     auto iter = path_.begin();
     auto current_node_name = (*iter).string();
     if ((*iter).string() != m_name) {
-      spdlog::critical("In PolarNode {} and path mismatch: {}", m_name, path_.string());
+      LogCriticalError("In PolarNode {} and path mismatch: {}", m_name, path_.string());
       CRITICAL_ERROR_POEM
     }
 

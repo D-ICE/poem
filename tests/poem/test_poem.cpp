@@ -428,8 +428,6 @@ TEST(poem, read_poem_v0_example) {
   }
 
 
-
-
 //  auto json = vessel->layout();
 //  std::cout << json.dump(2) << std::endl;
 

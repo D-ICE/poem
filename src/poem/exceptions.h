@@ -7,7 +7,8 @@
 
 #include <string>
 #include <exception>
-#include <spdlog/spdlog.h>
+#include <cools/spdlog.h>
+
 
 #define CRITICAL_ERROR_POEM                                                  \
   std::string msg = fmt::format("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
@@ -17,16 +18,19 @@
   std::string msg = fmt::format("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
   throw PoemException(msg);
 
+
+using namespace cools::logging;
+
 namespace poem {
 
   /**
    * poem own exception class
    */
   struct PoemException : public std::exception {
-    PoemException(const std::string &msg) : m_msg(msg) {};
+    explicit PoemException(const std::string &msg) : m_msg(msg) {};
 
-    const char *what() const throw() override {
-      spdlog::critical(m_msg);
+    [[nodiscard]] const char *what() const throw() override {
+      LogCriticalError(m_msg);
       return "POEM EXCEPTION";
     }
 

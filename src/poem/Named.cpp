@@ -15,7 +15,7 @@ namespace poem {
 
     #ifndef ALLOW_DIRTY
     if (git::AnyUncommittedChanges()) {
-        spdlog::critical("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
+        LogCriticalError("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
                          git::GetNormalizedVersionString());
         CRITICAL_ERROR_POEM
       }
@@ -41,7 +41,7 @@ namespace poem {
 
   void Named::check_unit() {
     if (!dunits::UnitsChecker::getInstance().is_valid_unit(m_unit, true)) {
-      spdlog::critical("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
+      LogCriticalError("Unit \"{}\" is not a valid unit as per dunits library.", m_unit);
       CRITICAL_ERROR_POEM
     }
   }

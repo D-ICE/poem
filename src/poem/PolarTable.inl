@@ -20,7 +20,7 @@ namespace poem {
     switch (type) {
       case POEM_DOUBLE:
         if (!std::is_same_v<T, double>) {
-          spdlog::critical("Type template argument and specified POEM_DATATYPE {} mismatch at the creation "
+          LogCriticalError("Type template argument and specified POEM_DATATYPE {} mismatch at the creation "
                            "of PolarTable {}", "POEM_DOUBLE", name);
           CRITICAL_ERROR_POEM
         }
@@ -28,14 +28,14 @@ namespace poem {
 
       case POEM_INT:
         if (!std::is_same_v<T, int>) {
-          spdlog::critical("Type template argument and specified POEM_DATATYPE {} mismatch at the creation "
+          LogCriticalError("Type template argument and specified POEM_DATATYPE {} mismatch at the creation "
                            "of PolarTable {}", "POEM_INT", name);
           CRITICAL_ERROR_POEM
         }
         break;
 
       default:
-        spdlog::critical("Type not supported");
+        LogCriticalError("Type not supported");
         CRITICAL_ERROR_POEM
     }
 
@@ -93,7 +93,7 @@ namespace poem {
   template<typename T>
   void PolarTable<T>::set_values(const vector<T> &new_values) {
     if (new_values.size() != m_values.size()) {
-      spdlog::critical("Attempting to set values in PolarTable of different size ({} and {})",
+      LogCriticalError("Attempting to set values in PolarTable of different size ({} and {})",
                        m_values.size(), new_values.size());
       CRITICAL_ERROR_POEM
     }
@@ -129,12 +129,12 @@ namespace poem {
   template<typename T>
   void PolarTable<T>::sum(std::shared_ptr<PolarTable<T>> other) {
     if (other->dimension_grid()->dimension_set() != m_dimension_grid->dimension_set()) {
-      spdlog::critical("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
+      LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
       CRITICAL_ERROR_POEM
     }
 
     if (other->size() != size()) {
-      spdlog::critical("Attempting to sum two PolarTable of different size ({} and {}", size(), other->size());
+      LogCriticalError("Attempting to sum two PolarTable of different size ({} and {}", size(), other->size());
       CRITICAL_ERROR_POEM
     }
     for (size_t idx = 0; idx < size(); ++idx) {
@@ -177,7 +177,7 @@ namespace poem {
   T PolarTable<T>::nearest(const DimensionPoint &dimension_point) const {
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
-      spdlog::critical("[PolarTable::nearest] DimensionPoint has not the same DimensionSet as the PolarTable");
+      LogCriticalError("[PolarTable::nearest] DimensionPoint has not the same DimensionSet as the PolarTable");
       CRITICAL_ERROR_POEM
     }
 
@@ -185,7 +185,7 @@ namespace poem {
     size_t index = 0;
     for (const auto &coord: dimension_point) {
       if (coord < m_dimension_grid->min(index) || coord > m_dimension_grid->max(index)) {
-        spdlog::critical("[PolarTable::nearest] dimension_point is out of bound of DimensionGrid");
+        LogCriticalError("[PolarTable::nearest] dimension_point is out of bound of DimensionGrid");
         CRITICAL_ERROR_POEM
       }
       auto values = m_dimension_grid->values(index);
@@ -208,12 +208,12 @@ namespace poem {
 //      std::lock_guard<std::mutex> lock(this->m_mutex);
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
-      spdlog::critical("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
+      LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
       CRITICAL_ERROR_POEM
     }
 
     if (m_type != POEM_DOUBLE) {
-      spdlog::critical("Attempting to interpolate on a non-floating point PolarTable");
+      LogCriticalError("Attempting to interpolate on a non-floating point PolarTable");
       CRITICAL_ERROR_POEM
     }
 
@@ -243,7 +243,7 @@ namespace poem {
         val = static_cast<Interpolator<T, 6> *>(m_interpolator.get())->interp(dimension_point, bound_check);
         break;
       default:
-        spdlog::critical("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
+        LogCriticalError("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
         CRITICAL_ERROR_POEM
     }
 
@@ -257,7 +257,7 @@ namespace poem {
     auto dimension_set = m_dimension_grid->dimension_set();
     for (const auto &pair: prescribed_values) {
       if (!dimension_set->contains(pair.first)) {
-        spdlog::critical("Slicing PolarTable \"{}\" with unknown dimension name {}", m_name, pair.first);
+        LogCriticalError("Slicing PolarTable \"{}\" with unknown dimension name {}", m_name, pair.first);
         CRITICAL_ERROR_POEM
       }
       // TODO: tester ranges des valeurs
@@ -348,24 +348,24 @@ namespace poem {
   std::shared_ptr<PolarTable<T>> PolarTable<T>::resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
 
     if (new_dimension_grid->dimension_set() != m_dimension_grid->dimension_set()) {
-      spdlog::critical("[PolarTable::resample] DimensionGrid has not the same DimensionSet as the PolarTable");
+      LogCriticalError("[PolarTable::resample] DimensionGrid has not the same DimensionSet as the PolarTable");
       CRITICAL_ERROR_POEM
     }
 
     if (new_dimension_grid->ndims() != dim()) {
-      spdlog::critical("Dimension mismatch in resampling operation ({} and {})", new_dimension_grid->ndims(), dim());
+      LogCriticalError("Dimension mismatch in resampling operation ({} and {})", new_dimension_grid->ndims(), dim());
       CRITICAL_ERROR_POEM
     }
 
     if (!new_dimension_grid->is_filled()) {
-      spdlog::critical("DimensionGrid for resampling is not filled");
+      LogCriticalError("DimensionGrid for resampling is not filled");
       CRITICAL_ERROR_POEM
     }
 
     for (size_t idim = 0; idim < dim(); ++idim) {
       if (new_dimension_grid->min(idim) < m_dimension_grid->min(idim) ||
           new_dimension_grid->max(idim) > m_dimension_grid->max(idim)) {
-        spdlog::critical("Out of range values for resampling");
+        LogCriticalError("Out of range values for resampling");
         CRITICAL_ERROR_POEM
       }
     }
@@ -412,7 +412,7 @@ namespace poem {
         m_interpolator = std::make_unique<Interpolator<T, 6>>(this);
         break;
       default:
-        spdlog::critical("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
+        LogCriticalError("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
         CRITICAL_ERROR_POEM
     }
 

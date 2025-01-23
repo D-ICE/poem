@@ -11,7 +11,7 @@ namespace poem {
   void poem::DimensionGrid::set_values(const std::string &name, const std::vector<double> &values) {
 
     if (!m_dimension_set->contains(name)) {
-      spdlog::critical("Unknown dimension name {}", name);
+      LogCriticalError("Unknown dimension name {}", name);
       CRITICAL_ERROR_POEM
     }
 
@@ -19,7 +19,7 @@ namespace poem {
     double prec = values.front() - 1.;
     for (const auto &val: values) {
       if (val <= prec) {
-        spdlog::critical("Sampling values in DimensionGrid dimensions must be in stictly asscending order");
+        LogCriticalError("Sampling values in DimensionGrid dimensions must be in stictly asscending order");
         CRITICAL_ERROR_POEM
       }
       prec = val;
@@ -124,7 +124,7 @@ namespace poem {
 
   size_t DimensionGrid::grid_to_index(const std::vector<size_t> &grid_indices) const {
     if (grid_indices.size() != ndims()) {
-      spdlog::critical("Number of indices is not equal to the number of dimensions of the DimensionGrid");
+      LogCriticalError("Number of indices is not equal to the number of dimensions of the DimensionGrid");
       CRITICAL_ERROR_POEM
     }
 
@@ -140,7 +140,7 @@ namespace poem {
 
   void DimensionGrid::build_dimension_points() const {
     if (!is_filled()) {
-      spdlog::critical("DimensionGrid is not fully filled");
+      LogCriticalError("DimensionGrid is not fully filled");
       CRITICAL_ERROR_POEM
     }
 

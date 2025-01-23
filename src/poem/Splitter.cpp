@@ -9,7 +9,7 @@ namespace poem {
   Splitter::Splitter(size_t size, size_t chunk_size) : m_size(size) {
 
     if (chunk_size == 0) {
-      spdlog::critical("Chunk size must be stricly positive");
+      LogCriticalError("Chunk size must be stricly positive");
       CRITICAL_ERROR_POEM
     }
 

@@ -15,7 +15,7 @@ namespace poem {
   bool spec_check(const std::string& filename, int major_version) {
 
     if (!fs::exists(filename)){
-      spdlog::critical("NetCDF file not found: {}", filename);
+      LogCriticalError("NetCDF file not found: {}", filename);
       CRITICAL_ERROR_POEM
     }
 
@@ -28,7 +28,7 @@ namespace poem {
         compliant = check_v1(filename);
         break;
       default:
-        spdlog::critical("POEM specification v{} does not exist", major_version);
+        LogCriticalError("POEM specification v{} does not exist", major_version);
         CRITICAL_ERROR_POEM
     }
 

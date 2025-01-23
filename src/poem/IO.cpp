@@ -50,18 +50,18 @@ namespace poem {
       for (const auto &dimension: *dimension_grid->dimension_set()) {
         // Does the group has this dimension?
         if (!group.getDims().contains(dimension->name())) {
-          spdlog::critical("In group {}, dimension {} has no corresponding CoordVar",
+          LogCriticalError("In group {}, dimension {} has no corresponding CoordVar",
                            group.getName(), dimension->name());
           CRITICAL_ERROR_POEM
         }
         // Does the group has the corresponding variable?
         if (!group.getDims().contains(dimension->name())) {
-          spdlog::critical("Group {} does not have a CoordVar associated to dimension {}",
+          LogCriticalError("Group {} does not have a CoordVar associated to dimension {}",
                            group.getName(), dimension->name());
         }
         // Does the dimension has the correct size?
         if (group.getDim(dimension->name()).getSize() != dimension_grid->size(dimension->name())) {
-          spdlog::critical("Group {} dimension {} has inconsistent dimension size. Found {} expected {}",
+          LogCriticalError("Group {} dimension {} has inconsistent dimension size. Found {} expected {}",
                            group.getName(),
                            dimension->name(),
                            group.getDim(dimension->name()).getSize(),
@@ -74,7 +74,7 @@ namespace poem {
         nc_var.getVar(values.data());
 
         if (dimension_grid->values(dimension->name()) != values) {
-          spdlog::critical("Coord Variable {} of group {} has inconsistent values with specified DimensionGrid",
+          LogCriticalError("Coord Variable {} of group {} has inconsistent values with specified DimensionGrid",
                            nc_var.getName(), group.getName());
           CRITICAL_ERROR_POEM
         }
@@ -83,7 +83,7 @@ namespace poem {
         std::string unit;
         nc_var.getAtt("unit").getValues(unit);
         if (unit != dimension->unit()) {
-          spdlog::critical("Group {} dimension {} has not the same unit as the one of specified DimensionGrid",
+          LogCriticalError("Group {} dimension {} has not the same unit as the one of specified DimensionGrid",
                            group.getName(), dimension->name());
           CRITICAL_ERROR_POEM
         }
@@ -91,7 +91,7 @@ namespace poem {
         std::string description;
         nc_var.getAtt("description").getValues(description);
         if (description != dimension->description()) {
-          spdlog::critical("Group {} dimension {} has not the same description as the one of specified DimensionGrid",
+          LogCriticalError("Group {} dimension {} has not the same description as the one of specified DimensionGrid",
                            group.getName(), dimension->name());
           CRITICAL_ERROR_POEM
         }
@@ -159,7 +159,7 @@ namespace poem {
             to_netcdf(polar_table->as_polar_table_int(), netCDF::ncInt, group);
             break;
           default:
-            spdlog::critical("Type not supported");
+            LogCriticalError("Type not supported");
             CRITICAL_ERROR_POEM
         }
         break;
@@ -169,7 +169,7 @@ namespace poem {
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
-    spdlog::info("Writing file (version v{}): {}",
+    LogNormalInfo("Writing file (version v{}): {}",
                  current_poem_standard_version(),
                  fs::absolute(filename).string());
 
@@ -185,7 +185,7 @@ namespace poem {
 
   int get_version(const std::string &filename) {
     if (!fs::exists(filename)) {
-      spdlog::critical("NetCDF file not found: {}", filename);
+      LogCriticalError("NetCDF file not found: {}", filename);
       CRITICAL_ERROR_POEM
     }
 
@@ -249,7 +249,7 @@ namespace poem {
     }
 
     if (var.getDimCount() != dimension_grid->ndims()) {
-      spdlog::critical("Dimension mismatch between netCDF dataset var and DimensionGrid");
+      LogCriticalError("Dimension mismatch between netCDF dataset var and DimensionGrid");
       CRITICAL_ERROR_POEM
     }
 
@@ -258,7 +258,7 @@ namespace poem {
     std::vector<std::shared_ptr<Dimension>> dimensions(ndim);
     for (size_t idim = 0; idim < ndim; ++idim) {
       if (var.getDim((int) idim).getName() != dimension_grid->dimension_set()->dimension(idim)->name()) {
-        spdlog::critical("Dimension name mismatch between netCDF dataset and DimensionGrid");
+        LogCriticalError("Dimension name mismatch between netCDF dataset and DimensionGrid");
         CRITICAL_ERROR_POEM
       }
     }
@@ -287,7 +287,7 @@ namespace poem {
       }
 
       default:
-        spdlog::critical("Type not supported");
+        LogCriticalError("Type not supported");
         CRITICAL_ERROR_POEM
     }
 
@@ -300,7 +300,7 @@ namespace poem {
     std::string name_;
     if (name == "from-group") {
       if (group.isRootGroup()) {
-        spdlog::critical("While reading PolarNode, when group is root, the polar node name must be specified as"
+        LogCriticalError("While reading PolarNode, when group is root, the polar node name must be specified as"
                          "it cannot be retrieved from group name");
         CRITICAL_ERROR_POEM
       }
@@ -332,12 +332,12 @@ namespace poem {
 //        } else if (vessel_type == "MOTOR") {
 //          polar_mode = MPPP;
 //        } else {
-//          spdlog::critical("While reading file with format v0, vessel_type {} unknown");
+//          LogCriticalError("While reading file with format v0, vessel_type {} unknown");
 //          CRITICAL_ERROR_POEM
 //        }
 //
 //      } else {
-//        spdlog::critical("Cannot infer the POLAR_MODE of group {} while reading Polar", polar_name);
+//        LogCriticalError("Cannot infer the POLAR_MODE of group {} while reading Polar", polar_name);
 //        CRITICAL_ERROR_POEM
 //      }
 //    } else {
@@ -372,7 +372,7 @@ namespace poem {
     std::string polar_set_name_;
     if (polar_set_name == "from-group") {
       if (group.isRootGroup()) {
-        spdlog::critical("While reading PolarSet, if the given group is root, the name must be specified");
+        LogCriticalError("While reading PolarSet, if the given group is root, the name must be specified");
         CRITICAL_ERROR_POEM
       } else {
         polar_set_name_ = group.getName();
@@ -408,7 +408,7 @@ namespace poem {
     std::string polar_node_name;
     if (polar_node_name_ == "from-group") {
       if (group.isRootGroup()) {
-        spdlog::critical("While reading PolarNode, when group is root, the polar node name must be specified as"
+        LogCriticalError("While reading PolarNode, when group is root, the polar node name must be specified as"
                          "it cannot be retrieved from group name");
         CRITICAL_ERROR_POEM
       }
@@ -438,7 +438,7 @@ namespace poem {
         break;
       }
       default:
-        spdlog::critical("Something went wrong, we should never be here...");
+        LogCriticalError("Something went wrong, we should never be here...");
         CRITICAL_ERROR_POEM
     }
 
@@ -454,7 +454,7 @@ namespace poem {
     // PolarNode is root and we set the vessel name as filename as we do not have vessel name in v0
 //    std::string vessel_name = fs::path(filename).stem();
     if (root_name == "from-file") {
-      spdlog::critical("While reading POEM file version v0, root_name must be specified");
+      LogCriticalError("While reading POEM file version v0, root_name must be specified");
       CRITICAL_ERROR_POEM
     }
 
@@ -469,7 +469,7 @@ namespace poem {
     } else if (vessel_type == "MOTOR") {
       polar_mode = MPPP;
     } else {
-      spdlog::critical("While reading file with format v0, vessel_type {} unknown");
+      LogCriticalError("While reading file with format v0, vessel_type {} unknown");
       CRITICAL_ERROR_POEM
     }
 
@@ -511,14 +511,14 @@ namespace poem {
   std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name) {
 
     int major_version = get_version(filename);
-    spdlog::info("Reading file (version v{}): {}", major_version, fs::absolute(filename).string());
+    LogNormalInfo("Reading file (version v{}): {}", major_version, fs::absolute(filename).string());
 
     // Check compliancy with specification
     if (!spec_check(filename, major_version)) {
-      spdlog::critical("File is not compliant with version v{}", major_version);
+      LogCriticalError("File is not compliant with version v{}", major_version);
       CRITICAL_ERROR_POEM
     } else {
-      spdlog::info("File is compliant with version v{}", major_version);
+      LogNormalInfo("File is compliant with version v{}", major_version);
     }
 
     std::shared_ptr<PolarNode> root_group;

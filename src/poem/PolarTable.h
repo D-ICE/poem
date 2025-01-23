@@ -115,7 +115,7 @@ namespace poem {
 
     std::shared_ptr<PolarTable<double>> as_polar_table_double() {
       if (m_type != POEM_DOUBLE) {
-        spdlog::critical("PolarTable {} has no type double", m_name);
+        LogCriticalError("PolarTable {} has no type double", m_name);
         CRITICAL_ERROR_POEM
       }
       return std::dynamic_pointer_cast<PolarTable<double>>(shared_from_this());
@@ -123,7 +123,7 @@ namespace poem {
 
     std::shared_ptr<PolarTable<int>> as_polar_table_int() {
       if (m_type != POEM_INT) {
-        spdlog::critical("PolarTable {} has no type int", m_name);
+        LogCriticalError("PolarTable {} has no type int", m_name);
         CRITICAL_ERROR_POEM
       }
       return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());

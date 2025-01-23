@@ -18,7 +18,7 @@ namespace poem {
 //      std::string polar_name = m_name + "/" + polar_mode_to_string(mode);
     std::string polar_name = polar_mode_to_string(mode);
     if (has_polar(mode)) {
-      spdlog::warn("In PolarSet {}, Polar {} already exists", m_name, polar_name);
+      LogWarningError("In PolarSet {}, Polar {} already exists", m_name, polar_name);
       return child<Polar>(polar_mode_to_string(mode));
     }
 
@@ -29,7 +29,7 @@ namespace poem {
 
   void PolarSet::attach_polar(std::shared_ptr<Polar> polar) {
     if (has_polar(polar->mode())) {
-      spdlog::critical("In PolarSet {}, Polar with mode {} was already existing",
+      LogCriticalError("In PolarSet {}, Polar with mode {} was already existing",
                        m_name, polar_mode_to_string(polar->mode()));
       CRITICAL_ERROR_POEM
     }
@@ -47,7 +47,7 @@ namespace poem {
 
   std::shared_ptr<Polar> PolarSet::polar(POLAR_MODE mode) {
     if (!has_polar(mode)) {
-      spdlog::critical("PolarSet {} has no Polar of type {}", m_name, polar_mode_to_string(mode));
+      LogCriticalError("PolarSet {} has no Polar of type {}", m_name, polar_mode_to_string(mode));
       CRITICAL_ERROR_POEM
     }
     return child<Polar>(polar_mode_to_string(mode));

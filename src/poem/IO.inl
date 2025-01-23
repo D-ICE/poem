@@ -26,7 +26,7 @@ namespace poem {
       nc_var.putAtt("description", polar_table->description());
 
     } else {
-      spdlog::critical("In group {}, attempting to store more than one time a variable with the same name {}",
+      LogCriticalError("In group {}, attempting to store more than one time a variable with the same name {}",
                        group.getName(), polar_name);
       CRITICAL_ERROR_POEM
     }

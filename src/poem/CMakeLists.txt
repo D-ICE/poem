@@ -9,7 +9,7 @@ add_dependencies(_poem check_git_${PROJECT_NAME})
 target_link_libraries(_poem PUBLIC
         MathUtils::MathUtils
         netcdf-cxx4
-        spdlog
+        cools
         nlohmann_json
         dunits
         semver

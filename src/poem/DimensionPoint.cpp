@@ -20,7 +20,7 @@ namespace poem {
 
   void DimensionPoint::operator=(const std::vector<double> &values) {
     if (values.size() != m_values.size()) {
-      spdlog::critical("Attempt to fill a DimensionPoint with bad vector size ({} and {})",
+      LogCriticalError("Attempt to fill a DimensionPoint with bad vector size ({} and {})",
                        values.size(), m_values.size());
       CRITICAL_ERROR_POEM
     }

@@ -17,7 +17,7 @@ namespace poem {
         type_str = "int";
         break;
       default:
-        spdlog::critical("Type not supported");
+        LogCriticalError("Type not supported");
         CRITICAL_ERROR_POEM
     }
     return type_str;
@@ -58,7 +58,7 @@ namespace poem {
     } else if (polar_mode_str == "VPP") {
       polar_mode = VPP;
     } else {
-      spdlog::critical("Polar type \"{}\" unknown", polar_mode);
+      LogCriticalError("Polar type \"{}\" unknown", polar_mode);
       CRITICAL_ERROR_POEM
     }
     return polar_mode;
