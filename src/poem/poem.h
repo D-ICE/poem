@@ -16,5 +16,6 @@
 #include "PolarNode.h"
 #include "IO.h"
 #include "Splitter.h"
+#include "specifications/spec_checkers.h"
 
 #endif //POEM_POEM_H
