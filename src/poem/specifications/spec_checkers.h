@@ -12,7 +12,7 @@
 
 namespace poem {
 
-  bool spec_check(const std::string& filename, int major_version) {
+  inline bool spec_check(const std::string& filename, int major_version) {
 
     if (!fs::exists(filename)){
       LogCriticalError("NetCDF file not found: {}", filename);
