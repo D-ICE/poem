@@ -14,7 +14,7 @@ namespace poem {
 
   }  // v1
 
-  bool check_v1(const std::string &filename) {
+  inline bool check_v1(const std::string &filename) {
     bool compliant = true;
 
     // TODO
