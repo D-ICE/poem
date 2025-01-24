@@ -5,6 +5,7 @@
 #include "IO.h"
 
 #include <semver/semver.hpp>
+#include <datetime.h>
 
 #include "PolarTable.h"
 #include "Polar.h"
@@ -175,7 +176,9 @@ namespace poem {
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);
-    root_group.putAtt("POEM software version", git::GetNormalizedVersionString());
+    root_group.putAtt("POEM_library_version", git::GetNormalizedVersionString());
+    root_group.putAtt("POEM_standard_version", "v" + std::to_string(current_poem_standard_version()));
+    root_group.putAtt("Date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
     root_group.close();
   }
 
