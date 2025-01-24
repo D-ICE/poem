@@ -9,7 +9,7 @@ namespace poem {
                  const netCDF::NcType &nc_type,
                  netCDF::NcGroup &group) {
 
-    auto dims = write_dimension_grid(polar_table->dimension_grid(), group);
+    auto dims = to_netcdf(polar_table->dimension_grid(), group);
 
     // Storing the values
     auto polar_name = polar_table->name();
@@ -31,7 +31,6 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-    to_netcdf(polar_table->attributes(), group);
   }
 
 }  // poem

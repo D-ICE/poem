@@ -6,6 +6,7 @@
 #define POEM_POLARNODE_H
 
 #include <filesystem>
+#include <mutex>
 
 #include <dtree/dtree.h>
 #include <nlohmann/json.hpp>
@@ -68,9 +69,14 @@ namespace poem {
 
     std::shared_ptr<PolarNode> from_path(const fs::path& path);
 
+    std::mutex* mutex() {
+      return &m_mutex;
+    }
+
    protected:
     POLAR_NODE_TYPE m_polar_node_type;
     Attributes m_attributes;
+    std::mutex m_mutex;
 
   };
 

@@ -6,7 +6,6 @@
 #define POEM_POLARTABLE_H
 
 #include <string>
-#include <mutex>
 
 #include <boost/multi_array.hpp>
 #include <MathUtils/RegularGridInterpolator.h>
@@ -130,15 +129,11 @@ namespace poem {
       return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
     }
 
-    std::mutex* mutex() {
-      return &m_mutex;
-    }
-
    protected:
     POEM_DATATYPE m_type;
     std::shared_ptr<DimensionGrid> m_dimension_grid;
     std::unique_ptr<InterpolatorBase> m_interpolator;
-    std::mutex m_mutex;
+
   };
 
 

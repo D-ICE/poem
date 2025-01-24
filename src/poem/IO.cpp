@@ -22,8 +22,8 @@ namespace poem {
     return semver::version::parse(git::LastTag(), false).major();
   }
 
-  std::vector<netCDF::NcDim> write_dimension_grid(std::shared_ptr<DimensionGrid> dimension_grid,
-                                                  netCDF::NcGroup &group) {
+  std::vector<netCDF::NcDim> to_netcdf(std::shared_ptr<DimensionGrid> dimension_grid,
+                                       netCDF::NcGroup &group) {
     // Does the group has already these dimensions (and only these dimensions with the same data)
 
     std::vector<netCDF::NcDim> dims;
@@ -131,48 +131,57 @@ namespace poem {
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
 
-    int major_version = current_poem_standard_version();
-
     switch (polar_node->polar_node_type()) {
+
       case POLAR_NODE: {
-        for (const auto &polar_node_: polar_node->children<PolarNode>()) {
-          auto new_group = group.addGroup(polar_node_->name());
-          to_netcdf(polar_node_, new_group);
+        for (const auto &next_polar_node: polar_node->children<PolarNode>()) {
+          auto new_group = group.addGroup(next_polar_node->name());
+          to_netcdf(next_polar_node, new_group);
         }
         break;
       }
+
       case POLAR_SET: {
         to_netcdf(polar_node->as_polar_set(), group);
         break;
       }
+
       case POLAR: {
         to_netcdf(polar_node->as_polar(), group);
         break;
       }
+
       case POLAR_TABLE: {
         auto polar_table = polar_node->as_polar_table();
         auto type = polar_table->type();
+
+        std::cout << polar_table->name() << std::endl;
+
         switch (type) {
           case POEM_DOUBLE:
             to_netcdf(polar_table->as_polar_table_double(), netCDF::ncDouble, group);
             break;
+
           case POEM_INT:
             to_netcdf(polar_table->as_polar_table_int(), netCDF::ncInt, group);
             break;
+
           default:
             LogCriticalError("Type not supported");
             CRITICAL_ERROR_POEM
         }
         break;
       }
+
     }
 
+    to_netcdf(polar_node->attributes(), group);
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
     LogNormalInfo("Writing file (version v{}): {}",
-                 current_poem_standard_version(),
-                 fs::absolute(filename).string());
+                  current_poem_standard_version(),
+                  fs::absolute(filename).string());
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);

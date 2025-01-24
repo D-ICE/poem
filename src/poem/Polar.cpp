@@ -31,6 +31,10 @@ namespace poem {
     add_child(polar_table);
   }
 
+  bool Polar::contains_polar_table(const std::string& name) const {
+    return m_children.contains(name);
+  }
+
   std::shared_ptr<PolarTableBase> Polar::polar_table(const std::string &name) const {
     return child<PolarTableBase>(name);
   }
