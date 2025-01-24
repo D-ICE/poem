@@ -38,11 +38,15 @@ namespace poem {
 
     const double &operator[](size_t i) const;
 
+    double &get(const std::string &dim_name);
+
+    const double &get(const std::string &dim_name) const;
+
     void operator=(const std::vector<double> &values);
 
-    bool operator==(const DimensionPoint& other) const;
+    bool operator==(const DimensionPoint &other) const;
 
-    bool operator!=(const DimensionPoint& other) const;
+    bool operator!=(const DimensionPoint &other) const;
 
     /*
      * Iterators

@@ -18,6 +18,14 @@ namespace poem {
 
   const double &DimensionPoint::operator[](size_t i) const { return m_values[i]; }
 
+  double &DimensionPoint::get(const std::string &dim_name) {
+    return m_values[m_dimension_set->index(dim_name)];
+  }
+
+  const double &DimensionPoint::get(const std::string &dim_name) const {
+    return m_values[m_dimension_set->index(dim_name)];
+  }
+
   void DimensionPoint::operator=(const std::vector<double> &values) {
     if (values.size() != m_values.size()) {
       LogCriticalError("Attempt to fill a DimensionPoint with bad vector size ({} and {})",
