@@ -25,6 +25,8 @@ namespace poem {
       nc_var.putAtt("unit", polar_table->unit());
       nc_var.putAtt("description", polar_table->description());
 
+      to_netcdf(polar_table->attributes(), nc_var);
+
     } else {
       LogCriticalError("In group {}, attempting to store more than one time a variable with the same name {}",
                        group.getName(), polar_name);

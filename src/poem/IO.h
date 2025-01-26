@@ -56,6 +56,8 @@ namespace poem {
 
   void to_netcdf(const Attributes &attributes, netCDF::NcGroup &group);
 
+  void to_netcdf(const Attributes &attributes, netCDF::NcVar &nc_var);
+
   void to_netcdf(std::shared_ptr<Polar> polar, netCDF::NcGroup &group);
 
   void to_netcdf(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group);

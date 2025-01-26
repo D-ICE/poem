@@ -110,15 +110,21 @@ namespace poem {
     }
   }
 
+  void to_netcdf(const Attributes &attributes, netCDF::NcVar &nc_var) {
+    for (const auto &attribute: attributes) {
+      nc_var.putAtt(attribute.first, attribute.second);
+    }
+  }
+
   void to_netcdf(std::shared_ptr<Polar> polar, netCDF::NcGroup &group) {
     for (const auto &polar_table: polar->children<PolarTableBase>()) {
       to_netcdf(polar_table, group);
     }
-    auto attributes = polar->attributes();
-    if (!attributes.contains("polar_mode")) {
+
+    if (!polar->attributes().contains("polar_mode")) {
       group.putAtt("polar_mode", polar_mode_to_string(polar->mode()));
     }
-    to_netcdf(attributes, group);
+    to_netcdf(polar->attributes(), group);
   }
 
   void to_netcdf(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
@@ -175,7 +181,6 @@ namespace poem {
 
     }
 
-    to_netcdf(polar_node->attributes(), group);
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
