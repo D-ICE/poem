@@ -56,7 +56,7 @@ namespace poem {
           CRITICAL_ERROR_POEM
         }
         // Does the group has the corresponding variable?
-        if (!group.getDims().contains(dimension->name())) {
+        if (!group.getVars().contains(dimension->name())) {
           LogCriticalError("Group {} does not have a CoordVar associated to dimension {}",
                            group.getName(), dimension->name());
         }
@@ -160,8 +160,6 @@ namespace poem {
       case POLAR_TABLE: {
         auto polar_table = polar_node->as_polar_table();
         auto type = polar_table->type();
-
-        std::cout << polar_table->name() << std::endl;
 
         switch (type) {
           case POEM_DOUBLE:
