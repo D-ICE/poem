@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-# smichel: test setup following weval as a 'template'
-
 import os
-import subprocess  
+import subprocess
 import sys
 import platform
 import logging
@@ -10,15 +8,12 @@ logging.basicConfig(level=logging.INFO)
 
 import boto3
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
-from setuptools.command.egg_info import egg_info
 from setuptools_scm import get_version
 
-module_name = "pypoem"
 
-# branch_name = os.environ.get("CI_COMMIT_BRANCH", "dvlp/pywrapper")
-branch_name = "dvlp/pywrapper"
+module_name = "pypoem"
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 class CMakeExtension(Extension):
@@ -68,10 +63,10 @@ class CMakeBuild(build_ext):
             "-DPOEM_BUILD_TOOLS=OFF",
             "-DPOEM_ALLOW_DIRTY=OFF",
             "-DPOEM_BUILD_PYTHON=ON",
+            "-DPOEM_BUILD_POC=OFF",
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir)
         ]
         build_args = []
-
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
@@ -90,36 +85,29 @@ class CMakeBuild(build_ext):
             raise Exception("Pre-build are only available on linux")
 
         version = sys.version_info
-        lib_name = "{}.cpython-{}{}-x86_64-{}.so".format(module_name,
+        lib_name = module_name + ".cpython-{}{}-x86_64-{}.so".format(
             version.major, version.minor, platform_sufix)
 
-        package_version = branch_name # get_version() # smichel for testing 
-        
+        package_version = get_version()
+
         # Download from s3
-        file_key = os.path.join('poem', package_version, lib_name)
+        file_key = os.path.join("pypoem", package_version, lib_name)
         logging.info("Downloading {} from s3".format(file_key))
         s3 = boto3.client('s3')
         s3.download_file(
             'dice-code', file_key, os.path.join(destination, lib_name))
 
 
-class egg_info_ex(egg_info):
-    """Includes license file into `.egg-info` folder."""
-
-    def run(self):
-        # don't duplicate license into `.egg-info` when building a distribution
-        if not self.distribution.have_run.get('install', True):
-            # `install` command is in progress, copy license
-            self.mkpath(self.egg_info)
-            self.copy_file('LICENSE.txt', self.egg_info)
-
-        egg_info.run(self)
-
 setup(
-    name=module_name,
-    ext_modules=[CMakeExtension(module_name)],
-    cmdclass={"build_ext": CMakeBuild,
-              'egg_info': egg_info_ex},
+    name="pypoem",
+    ext_modules=[
+        CMakeExtension(module_name)
+    ],
+    cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    license_files = ('LICENSE.txt',),
+    packages=find_packages(
+        where='.',
+        include=['pypoem'],
+        exclude=['docs', 'dtwin', 'src', 'tests', 'cmake', 'build', "cmake-build-*", ]
+    )
 )
