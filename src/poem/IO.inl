@@ -13,25 +13,22 @@ namespace poem {
 
     // Storing the values
     auto polar_name = polar_table->name();
-    netCDF::NcVar nc_var = group.getVar(polar_name);
 
-    if (nc_var.isNull()) {
-
-      nc_var = group.addVar(polar_name, nc_type, dims);
-
-      nc_var.setCompression(true, true, 5);
-
-      nc_var.putVar(polar_table->values().data());
-      nc_var.putAtt("unit", polar_table->unit());
-      nc_var.putAtt("description", polar_table->description());
-
-      to_netcdf(polar_table->attributes(), nc_var);
-
-    } else {
+    if (group.getVars().contains(polar_name)) {
       LogCriticalError("In group {}, attempting to store more than one time a variable with the same name {}",
                        group.getName(), polar_name);
       CRITICAL_ERROR_POEM
     }
+
+    netCDF::NcVar nc_var = group.addVar(polar_name, nc_type, dims);
+
+    nc_var.setCompression(true, true, 5);
+
+    nc_var.putVar(polar_table->values().data());
+    nc_var.putAtt("unit", polar_table->unit());
+    nc_var.putAtt("description", polar_table->description());
+
+    to_netcdf(polar_table->attributes(), nc_var);
 
   }
 
