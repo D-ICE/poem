@@ -90,7 +90,7 @@ test:
 
 
 build-package-sdist:
-  stage: build
+#  stage: build
   script:
     - pip install build twine
     - USE_CYTHON=true make dist
