@@ -135,9 +135,12 @@ essai:
   image: python:3.12-bullseye
   services:
     - docker:dind # using Docker In Docker as a service
+#      entrypoint: [ "env", "-u", "DOCKER_HOST" ]
+#    - command: [ "dockerd-entrypoint.sh" ]
+
 
   variables:
-    CIBW_BEFORE_ALL: mkdir -p .docker
+    CIBW_BEFORE_ALL: 'echo "COUCOU"'
 #    CIBW_BEFORE_ALL: > # Add SSH config to DIND Docker image
 #      echo "COUCOU"
 
