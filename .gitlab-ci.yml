@@ -139,7 +139,8 @@ essai:
 #    - command: [ "dockerd-entrypoint.sh" ]
 
 
-#  variables:
+  variables:
+    SSH_PRIVATE_KEY: $GITLAB_CI_SSH_PRIVATE_KEY
 #    CIBW_BEFORE_ALL: "ci-ssh.sh"
 #    CIBW_BEFORE_ALL: "'which ssh-agent || ( apt update -y && apt install -y openssh-client )'; eval $(ssh-agent -s);  mkdir -p ~/.ssh; echo $GITLAB_CI_SSH_PRIVATE_KEY | tr -d '\r' > ~/.ssh/id_rsa; "
 

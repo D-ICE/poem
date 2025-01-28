@@ -103,8 +103,7 @@ POEM_BUILD_POC = false
 #    ls ~/.ssh
 #"""
 before-all = """
-    echo "$GITLAB_CI_SSH_PRIVATE_KEY" && \
-    echo COUCOU
+    echo &SSH_PRIVATE_KEY
 """
 
 #[tool.cibuildwheel.linux]
