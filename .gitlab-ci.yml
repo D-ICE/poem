@@ -143,5 +143,5 @@ essai:
     - docker run hello-world
     - python --version
     - pip install --upgrade pip
-    - pip install cibuildwheel
-    - cibuildwheel --output-dir linuxwheels --platorm linux
+    - pip install cibuildwheel=2.22.0
+    - cibuildwheel --output-dir linuxwheels --platform linux
