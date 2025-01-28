@@ -209,7 +209,7 @@ POEM_BUILD_POC = false
 #wheel.license-files = ""
 
 # If set to True (the default), CMake will be run before building the wheel.
-wheel.cmake = true
+#wheel.cmake = true
 
 # Target the platlib or the purelib. If not set, the default is to target the
 # platlib if wheel.cmake is true, and the purelib otherwise.
