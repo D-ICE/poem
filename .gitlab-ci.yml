@@ -63,16 +63,16 @@ test:
 # See example: https://gitlab.com/pytools4dart/gdecomp/-/blob/master/.gitlab-ci.yml
 
 
-stages:
-  - build-pypi
-  - deploy-pypi
+#stages:
+#  - build-pypi
+#  - deploy-pypi
 
 
 linux:
   services:
     - docker:dind
   image: docker:latest
-  stage: build-pypi
+#  stage: build-pypi
   script:
     - docker info
     - apk add python3-dev
