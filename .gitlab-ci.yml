@@ -67,7 +67,7 @@ test:
 # See example: https://codebase.helmholtz.cloud/hcdc/software-templates/demos/gitlab-cibuildwheel-demo/-/blob/main/.gitlab-ci.yml?ref_type=heads
 
 linux:
-  image: python:3.12
+  image: python:3.8
   # make a docker daemon available for cibuildwheel to use
   services:
     - name: docker:dind
@@ -80,7 +80,7 @@ linux:
     DOCKER_TLS_CERTDIR: ""
   script:
     - curl -sSL https://get.docker.com/ | sh
-    - python -m pip install cibuildwheel==2.22.0
+    - python -m pip install cibuildwheel==2.16.5
     - cibuildwheel --output-dir wheelhouse
   artifacts:
     paths:
