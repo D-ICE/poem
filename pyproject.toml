@@ -103,7 +103,7 @@ POEM_BUILD_POC = false
 #    ls ~/.ssh
 #"""
 before-all = """
-    echo &SSH_PRIVATE_KEY
+    echo $SSH_PRIVATE_KEY
 """
 
 #[tool.cibuildwheel.linux]
