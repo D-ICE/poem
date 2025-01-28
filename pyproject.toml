@@ -90,7 +90,8 @@ POEM_BUILD_POC = false
 #    echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 #"""
 before-all = """
-    yum install openssh-client
+    yum install openssh-clients && \
+    eval $(ssh-agent -s)
 """
 
 #[tool.cibuildwheel.linux]
