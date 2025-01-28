@@ -89,6 +89,20 @@ test:
 #      - wheelhouse/
 
 
+build-package-sdist:
+  stage: build
+  script:
+    - pip install build twine
+    - USE_CYTHON=true make dist
+    - twine check dist/*
+  artifacts:
+    name: python-artifacts
+    paths:
+      - "dist/*"
+      - "psy_ugrid/*.c"
+    expire_in: 7 days
+
+
 build-package-linux:
 #  stage: build
   image: docker:20.10
