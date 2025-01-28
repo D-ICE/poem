@@ -139,4 +139,6 @@ essai:
     - curl -sSL https://get.docker.com/ | sh # install docker
 
   script:
+    - docker info
     - python --version
+    - pip install cibuildwheel
