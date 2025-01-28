@@ -97,7 +97,8 @@ before-all = """
     chmod 700 ~/.ssh && \
     chmod 700 ~/.ssh/id_rsa && \
     ssh-add && \
-    echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
+    echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts && \
+    ls ~/.ssh
 """
 
 #[tool.cibuildwheel.linux]
