@@ -1,10 +1,10 @@
 include(Add_pybind11)
 
-pybind11_add_module(pypoem
-        pypoem.cpp
-)
+pybind11_add_module(pypoem pypoem.cpp)
+target_link_libraries(pypoem PRIVATE _poem pybind11::headers)
+#target_compile_definitions(pypoem PRIVATE VERSION_INFO=${NORMALIZED_VERSION})
 
-target_link_libraries(pypoem PRIVATE _poem)
+install(TARGETS pypoem DESTINATION pypoem)
 
 if (POEM_BUILD_TESTS)
     set_target_properties(pypoem

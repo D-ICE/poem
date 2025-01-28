@@ -1,4 +1,0 @@
--r requirements.txt
-plotly
-pytest
-boto3

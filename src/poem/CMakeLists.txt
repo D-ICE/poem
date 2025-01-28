@@ -37,7 +37,7 @@ target_sources(_poem PUBLIC
 )
 
 set_target_properties(_poem PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 if (POEM_ALLOW_DIRTY)
     target_compile_definitions(_poem INTERFACE ALLOW_DIRTY)

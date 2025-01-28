@@ -28,6 +28,7 @@ namespace poem {
    */
   struct InterpolatorBase {
     virtual ~InterpolatorBase() {}
+
     virtual void build() = 0;
   };
 
@@ -338,6 +339,20 @@ namespace poem {
                                                   POEM_DATATYPE type,
                                                   const std::shared_ptr<DimensionGrid> &dimension_grid) {
     return std::make_shared<PolarTable<T>>(name, unit, description, type, dimension_grid);
+  }
+
+  inline std::shared_ptr<PolarTable<double>> make_polar_table_double(const std::string &name,
+                                                                     const std::string &unit,
+                                                                     const std::string &description,
+                                                                     const std::shared_ptr<DimensionGrid> &dimension_grid) {
+    return make_polar_table<double>(name, unit, description, POEM_DOUBLE, dimension_grid);
+  }
+
+  inline std::shared_ptr<PolarTable<int>> make_polar_table_int(const std::string &name,
+                                                               const std::string &unit,
+                                                               const std::string &description,
+                                                               const std::shared_ptr<DimensionGrid> &dimension_grid) {
+    return make_polar_table<int>(name, unit, description, POEM_INT, dimension_grid);
   }
 
 } // namespace poem

@@ -159,6 +159,9 @@ namespace poem {
   }
 
   void DimensionGrid::nested_for_loop(DimensionPoint &dimension_point, size_t index) {
+    // We use row major convention (last dimension varies the fastest) to be directly compliant with NetCDF internal
+    // storage convention (and it is C compliant too...)
+
     size_t idim = dimension_point.size() - index;
     for (const auto &value: m_dimensions_values[idim]) {
       dimension_point[idim] = value;

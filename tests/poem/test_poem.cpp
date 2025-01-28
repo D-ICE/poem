@@ -157,9 +157,9 @@ TEST(poem, Polar) {
   table_int->fill_with(2);
 
   // Writing
-  netCDF::NcFile dataFile(std::string("polar.nc"), netCDF::NcFile::replace);
-  to_netcdf(polar, dataFile);
-  dataFile.close();
+//  netCDF::NcFile dataFile(std::string("polar.nc"), netCDF::NcFile::replace);
+  to_netcdf(polar, "polar.nc");
+//  dataFile.close();
 
   // Reading back
   netCDF::NcFile dataFile_(std::string("polar.nc"), netCDF::NcFile::read);
