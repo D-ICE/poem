@@ -157,14 +157,14 @@ essai:
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
-    - echo "$GITLAB_CI_SSH_PRIVATE_KEY"
+#    - echo "$GITLAB_CI_SSH_PRIVATE_KEY"
     - curl -sSL https://get.docker.com/ | sh # install docker
 
   script:
-    - docker info
-    - docker run hello-world
-    - python --version
+#    - docker info
+#    - docker run hello-world
+#    - python --version
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
-    - cibuildwheel --print-build-identifiers # list wheels
+    - cibuildwheel --print-build-identifiers
     - cibuildwheel --output-dir linuxwheels --platform linux
