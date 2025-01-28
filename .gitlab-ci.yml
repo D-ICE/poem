@@ -140,7 +140,6 @@ essai:
     - curl -sSL https://get.docker.com/ | sh # install docker
 
   script:
-    - apt install openssh-clients
     - docker info
     - docker run hello-world
     - python --version
