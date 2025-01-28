@@ -136,6 +136,7 @@ essai:
   services:
     - docker:dind # using Docker In Docker as a service
   before_script:
+    - !reference [ .add-ssh-key, before_script ]
     - curl -sSL https://get.docker.com/ | sh # install docker
 
   script:
