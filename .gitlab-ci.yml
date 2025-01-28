@@ -149,7 +149,7 @@ essai:
       chmod 700 ~/.ssh &&
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts &&
-      ls ~/.ssh
+      yum install -y graphviz
       
 
   before_script:
