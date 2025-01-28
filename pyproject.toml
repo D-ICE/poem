@@ -90,7 +90,7 @@ POEM_BUILD_POC = false
 #    echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 #"""
 before-all = """
-    yum install openssh-clients && \
+    yum install -y openssh-clients && \
     eval $(ssh-agent -s) && \
     mkdir -p ~/.ssh && \
     echo "$GITLAB_CI_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa && \
