@@ -139,8 +139,8 @@ essai:
 #    - command: [ "dockerd-entrypoint.sh" ]
 
 
-  variables:
-    CIBW_BEFORE_ALL: "sh ci-ssh.sh"
+#  variables:
+#    CIBW_BEFORE_ALL: "ci-ssh.sh"
 #    CIBW_BEFORE_ALL: "'which ssh-agent || ( apt update -y && apt install -y openssh-client )'; eval $(ssh-agent -s);  mkdir -p ~/.ssh; echo $GITLAB_CI_SSH_PRIVATE_KEY | tr -d '\r' > ~/.ssh/id_rsa; "
 
   before_script:
