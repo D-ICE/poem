@@ -79,7 +79,8 @@ POEM_BUILD_POC = false
 #    apt update -y && apt install -y uuid-dev
 #"""
 before-all = """
-    which ssh-agent
+    apt install -y openssh-client && \
+    eval $(ssh-agent -s)
 """
 
 #[tool.cibuildwheel.linux]
