@@ -79,7 +79,7 @@ POEM_BUILD_POC = false
 #    apt update -y && apt install -y uuid-dev
 #"""
 before-all = """
-    apt install -y openssh-client && \
+    apk add -y openssh-client && \
     eval $(ssh-agent -s)
 """
 
