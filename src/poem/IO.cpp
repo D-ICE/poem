@@ -382,7 +382,7 @@ namespace poem {
 
   std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group, const std::string &polar_set_name) {
 
-    NIY_POEM
+//    NIY_POEM
 
     std::string polar_set_name_;
     if (polar_set_name == "from-group") {

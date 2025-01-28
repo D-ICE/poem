@@ -51,7 +51,7 @@ test:
 
   script:
     - !reference [.scripts, cmake]
-    - make pypoem
+    - make pypoem -j6
 
 
 python312:
