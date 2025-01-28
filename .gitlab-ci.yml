@@ -4,155 +4,95 @@ include:
       - '/templates/.add-ssh-key.yml'
       - '/templates/.add-aws-key.yml'
 
-.build:
-
-  before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .add-aws-key, before_script ]
+.scripts:
+  deps:
     - apt update
     - apt remove cmake
-    - apt install -y python3 python3-pip git
+    - apt install -y git build-essential
     - pip install cmake
 
-  script:
+  cmake:
     - mkdir build && cd build
     - cmake ..
-      -DCMAKE_BUILD_TYPE=Release 
-      -DPOEM_BUILD_TESTS=ON 
-      -DPOEM_BUILD_TOOLS=ON 
-      -DPOEM_ALLOW_DIRTY=OFF 
+      -DCMAKE_BUILD_TYPE=Release
+      -DPOEM_BUILD_TESTS=ON
+      -DPOEM_BUILD_TOOLS=ON
+      -DPOEM_ALLOW_DIRTY=OFF
       -DPOEM_BUILD_PYTHON=ON
 
 
-build-testing:
+test:
+#  except:
+#    - tags  # don't run the tests on tags
+  image: "python:$PYTHON_VERSION-bullseye"
 
-  image: ubuntu:20.04
+  variables:
+    PYTHON_VERSION: "3.10"
+    ENABLE_TEST: "ON"
 
   before_script:
-    - !reference [ .build, before_script ]
-
+    - !reference [.add-ssh-key, before_script]
+    - !reference [.scripts, deps]
   script:
-    - !reference [ .build, script ]
+    - !reference [.scripts, cmake]
     - make poem_tests -j6
     - cd bin/tests
     - ./poem_tests
 
 
-## smichel: test ci following weval as a 'template'
-#.scripts:
-#  sshconfig:
-#    # check this out: https://docs.gitlab.com/ee/ci/ssh_keys/
-#    - 'which ssh-agent || ( apt update -y && apt install -y openssh-client )'
-#    - eval $(ssh-agent -s)
-#    - mkdir -p ~/.ssh
-#    - echo "$GITLAB_CI_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-#    - chmod 700 ~/.ssh
-#    - chmod 700 ~/.ssh/id_rsa
-#    - ssh-add
-#    # also add the known hosts so we don't have to accept when connecting to the host
-#    - echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
-#
-#  deps:
-#    - apt update
-#    # - apt install -y git build-essential
-#    - apt remove cmake
-#    - apt install -y python3 python3-pip git build-essential libboost-dev
-#    - pip install cmake
-#    - pip install pybind11[global]
-#    # - apt-get install libz-dev
-#
-#  awscli:
-#    - pip install awscli
-#    - mkdir -p $HOME/.aws
-#    - echo "[default]" > $HOME/.aws/credentials
-#    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
-#    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
-#
-#  cmake:
-#    - mkdir build && cd build
-#    - cmake -DCMAKE_BUILD_TYPE=Release -DPOEM_BUILD_PYTHON=$BUILD_PYPOEM -DPOEM_BUILD_TESTS=$ENABLE_TEST -DPOEM_BUILD_TOOLS=OFF -DPOEM_ALLOW_DIRTY=OFF ..
-#    - make -j6
-#
-#  upload:
-#    - OUTPUT=$(echo "pypoem.cpython-$(echo $PYTHON_VERSION | sed -r 's/[.]//g')-x86_64-linux-gnu.so")
-#    - echo "Uploading $OUTPUT to s3"
-#    - ls src/pypoem
-#    - aws s3 cp src/pypoem/$OUTPUT s3://dice-code/$CI_PROJECT_NAME/$CI_COMMIT_BRANCH/ #$CI_COMMIT_TAG/
-#
-#test:
-#  except:
-#    - tags  # don't run the tests on tags
-#  image: "python:$PYTHON_VERSION-bullseye"
-#
-#  variables:
-#    PYTHON_VERSION: "3.10"
-#    ENABLE_TEST: "ON"
-#    BUILD_PYPOEM: ON
-#  before_script:
-#    - !reference [.scripts, sshconfig]
-#    - !reference [.scripts, deps]
-#    - !reference [.scripts, awscli]
-#    - !reference [.scripts, cmake]
-#  script:
-#    # c++ tests
-#    - make -j6
-#    - ./bin/tests/test_read_poem
-#    - ./bin/tests/test_dimension_point_set
-#    - ./bin/tests/test_performance_polar_set
-#    - ./bin/tests/test_polar_set
-#    # - cd ..
-#    # - pip install -r requirements-dev.txt
-#    # - pip install .
-#    # - pytest --log-level=INFO test/
-#
+.build:
+  only:
+    - tags
+  image: "python:$PYTHON_VERSION-bullseye"
+
+  before_script:
+    - !reference [.scripts, sshconfig]
+    - !reference [.scripts, deps]
+    - !reference [.scripts, awscli]
+  script:
+    - !reference [.scripts, cmake]
+    - make pygools
+    - !reference [.scripts, upload]
+
+python312:
+  variables:
+    PYTHON_VERSION: "3.12"
+    ENABLE_TEST: "OFF"
+  extends:
+    - .build
+
+
+
+
+
 #.build:
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == "dvlp/pywrapper"
-#      when: always
-#  # only:
-#  #   - tags
+#
 #  image: "python:$PYTHON_VERSION-bullseye"
 #
 #  variables:
-#    BUILD_PYPOEM: ON
+#    PYTHON_VERSION:
 #
 #  before_script:
-#    - !reference [.scripts, sshconfig]
-#    - !reference [.scripts, deps]
-#    - !reference [.scripts, awscli]
-#    - !reference [.scripts, cmake]
+#    - !reference [ .add-ssh-key, before_script ]
+#    - !reference [ .script, deps]
+##    - !reference [ .add-aws-key, before_script ]
+#    - apt update
+#    - apt remove cmake
+#    - apt install -y python3 python3-pip git
+#    - pip install cmake
+#
 #  script:
-#    - make pypoem
-#    - !reference [.scripts, upload]
+
+
+#build-testing:
 #
-#python312:
-#  variables:
-#    PYTHON_VERSION: "3.12"
-#    ENABLE_TEST: "OFF"
-#    BUILD_PYPOEM: ON
-#  extends:
-#    - .build
+#  image: ubuntu:20.04
 #
-#python311:
-#  variables:
-#    PYTHON_VERSION: "3.11"
-#    ENABLE_TEST: "OFF"
-#    BUILD_PYPOEM: ON
-#  extends:
-#    - .build
+#  before_script:
+#    - !reference [ .build, before_script ]
 #
-#python310:
-#  variables:
-#    PYTHON_VERSION: "3.10"
-#    ENABLE_TEST: "OFF"
-#    BUILD_PYPOEM: ON
-#  extends:
-#    - .build
-#
-#python39:
-#  variables:
-#    PYTHON_VERSION: "3.9"
-#    ENABLE_TEST: "OFF"
-#    BUILD_PYPOEM: ON
-#  extends:
-#    - .build
+#  script:
+#    - !reference [ .build, script ]
+#    - make poem_tests -j6
+#    - cd bin/tests
+#    - ./poem_tests

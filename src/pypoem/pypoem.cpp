@@ -96,24 +96,19 @@ PYBIND11_MODULE(pypoem, m) {
 
 
 
-
-
-  //  py::class_<PolarNode, std::shared_ptr<PolarNode>> PyPolarNode(m, "PolarNode");
-//  PolarNode.def(py::init<const std::string &>());
-
-
-
-//  py::class_<PolarNode>(m, "PolarNode")
-//      .def(py::init<const std::string &>());
-//  py::class_<Polar, PolarNode>(m, "Polar")
-//      .def(py::init<const std::string &, POLAR_MODE, std::shared_ptr<DimensionGrid>>());
-
-//  py::class_<Polar, std::shared_ptr<Polar>>(m, "Polar");
-//  m.def("make_polar", &make_polar);
-
-//  m.def("to_netcdf", py::overload_cast<PyPolarNode, const std::string &>(&to_netcdf));
-
-
 }
 
-
+/*
+ * On veut pouvoir
+ * - construire arboresence de PolarNode
+ * - construire PolarSet
+ * - construie Polar
+ * - construire PolarTable
+ * - remplir PolarTable
+ * - Specifier des attributs
+ * - Ecrire un PolarNode
+ * - Lire un fichier de Polaire
+ * - effectuer un check de validite sur une polaire
+ * - recuperer version poem d'une polaire
+ * -
+ */

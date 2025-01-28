@@ -1,12 +1,64 @@
 [build-system]
-requires = ["scikit-build-core", "pybind11"]
+#requires = ["scikit-build-core", "pybind11"]
+requires = ["scikit-build-core"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "pypoem"
+description = "Performance pOlar Exchange forMat"
+readme = "README.md"
+maintainers = [{ name = "D-ICE ENGINEERING", email = "francois.rongere@dice-engineering.com" }]
 version = "0.1"
 
+
+requires-python = ">=3.9"
+classifiers = [
+    "Topic :: Scientific/Engineering",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Development Status :: 4 - Beta",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/D-ICE/poem"
+Documentation = "https://dice-poem.readthedocs.io/en/latest/"
+
+#[project.scripts] # Pour ajouter un outil cli...
+#cliapp = "package.__main__:main"
+
+
+
 [tool.scikit-build]
+#metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+#sdist.include = ["src/pypoem/_version.py"]
+
+#wheel.packages = ["src/pypoem"]
+#wheel.license-files = ["LICENSE.txt"]
+#cmake.build-type = "Release"
+
+
+[tool.scikit-build.cmake.define]
+POEM_BUILD_TESTS = false
+POEM_BUILD_TOOLS = false # TODO: voir si on met true pour installer exe...
+POEM_ALLOW_DIRTY = false
+POEM_BUILD_PYTHON = true
+POEM_BUILD_POC = false
+
+#[tool.setuptools_scm]  # Section required
+#write_to = "src/pypoem/_version.py"
+
+
 # The versions of CMake to allow. If CMake is not present on the system or does
 # not pass this specifier, it will be downloaded via PyPI if possible. An empty
 # string will disable this check. The default on 0.10+ is "CMakeLists.txt",
@@ -26,7 +78,7 @@ version = "0.1"
 
 # The build type to use when building the project. Valid options are: "Debug",
 # "Release", "RelWithDebInfo", "MinSizeRel", "", etc.
-cmake.build-type = "Release"
+
 
 # The source directory to use when building the project. Currently only affects
 # the native builder (not the setuptools plugin).
@@ -46,7 +98,7 @@ cmake.build-type = "Release"
 
 # The logging level to display, "DEBUG", "INFO", "WARNING", and "ERROR" are
 # possible options.
-logging.level = "DEBUG"
+#logging.level = "DEBUG"
 
 # Files to include in the SDist even if they are skipped by default. Supports
 # gitignore syntax.
@@ -116,10 +168,10 @@ logging.level = "DEBUG"
 #backport.find-python = "3.26.1"
 
 # Select the editable mode to use. Can be "redirect" (default) or "inplace".
-editable.mode = "inplace"
+#editable.mode = "inplace"
 
 # Turn on verbose output for the editable mode rebuilds.
-editable.verbose = true
+#editable.verbose = true
 
 # Rebuild the project when the package is imported. The build-directory must be
 # set.
@@ -133,7 +185,7 @@ editable.verbose = true
 #build.targets = []
 
 # Verbose printout when building.
-build.verbose = true
+#build.verbose = true
 
 # The components to install. If empty, all default components are installed.
 #install.components = []
@@ -178,7 +230,7 @@ build.verbose = true
 #minimum-version = "0.10"  # current version
 
 # The build directory. Defaults to a temporary directory, but can be set.
-build-dir = "./pypoem_build"
+#build-dir = "./pypoem_build"
 
 # Immediately fail the build. This is only useful in overrides.
 #fail = false
