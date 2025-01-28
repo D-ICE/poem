@@ -102,9 +102,9 @@ POEM_BUILD_POC = false
 #    echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts && \
 #    ls ~/.ssh
 #"""
-before-all = """
-    echo $SSH_PRIVATE_KEY
-"""
+#before-all = """
+#    echo $SSH_PRIVATE_KEY
+#"""
 
 #[tool.cibuildwheel.linux]
 #environment = { SSH_AUTH_SOCK = "/host$SSH_AUTH_SOCK" }
