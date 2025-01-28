@@ -137,3 +137,6 @@ essai:
     - docker:dind # using Docker In Docker as a service
   before_script:
     - curl -sSL https://get.docker.com/ | sh # install docker
+
+  script:
+    - python --version
