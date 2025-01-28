@@ -59,77 +59,33 @@ test:
     - ./poem_tests
 
 
+
+
+
 # See example: https://github.com/wbarnha/pybind_cmake_example_crossbuild/tree/master:
 # See example: https://gitlab.com/pytools4dart/gdecomp/-/blob/master/.gitlab-ci.yml
-
-
-#stages:
-#  - build-pypi
-#  - deploy-pypi
-
+# See example: https://codebase.helmholtz.cloud/hcdc/software-templates/demos/gitlab-cibuildwheel-demo/-/blob/main/.gitlab-ci.yml?ref_type=heads
 
 linux:
+  image: python:3.12
+  # make a docker daemon available for cibuildwheel to use
   services:
-    - docker:dind
-  image: python:3.10
-#  stage: build-pypi
+    - name: docker:dind
+      entrypoint: ["env", "-u", "DOCKER_HOST"]
+      command: ["dockerd-entrypoint.sh"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+    # See https://github.com/docker-library/docker/pull/166
+    DOCKER_TLS_CERTDIR: ""
   script:
-    - docker info
-    - python --version
-    - pip install cibuildwheel
-    - CIBW_BUILD="cp3?-*" cibuildwheel --output-dir linuxwheels --platform linux
-    - ls linuxwheels
+    - curl -sSL https://get.docker.com/ | sh
+    - python -m pip install cibuildwheel==2.22.0
+    - cibuildwheel --output-dir wheelhouse
   artifacts:
     paths:
-      - linuxwheels
+      - wheelhouse/
 
 
 
-
-#python-build:
-#  image: python:3.10
-#  # make a docker daemon available for cibuildwheel to use
-#  services:
-#      - name: docker:dind
-#        entrypoint: [ "env", "-u", "DOCKER_HOST" ]
-#        command: [ "dockerd-entrypoint.sh" ]
-#  variables:
-#    DOCKER_HOST: tcp://docker:2375/
-#    DOCKER_DRIVER: overlay2
-#    # See https://github.com/docker-library/docker/pull/166
-#    DOCKER_TLS_CERTDIR: ""
-#  script:
-#    - curl -sSL https://get.docker.com/ | sh
-#    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-#    - python -m pip install cibuildwheel==2.10.2
-#    - git submodule update --init
-#    - cibuildwheel --output-dir wheelhouse --platform linux --archs aarch64
-#  artifacts:
-#    paths:
-#      - wheelhouse/
-
-
-
-#.python-builds:
-##  only:
-##    - tags
-#  image: "python:$PYTHON_VERSION-bullseye"
-#
-#  before_script:
-#    - !reference [.add-ssh-key, before_script]
-#    - !reference [.scripts, deps]
-##    - !reference [.scripts, ci-build]
-#
-#  script:
-#    - !reference [.scripts, cmake]
-#    - make pypoem -j6
-#    - ls
-#
-#
-#python312:
-#  variables:
-#    PYTHON_VERSION: "3.12"
-#    ENABLE_TEST: "OFF"
-#  extends:
-#    - .python-build
 
