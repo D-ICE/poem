@@ -78,9 +78,11 @@ linux:
     DOCKER_DRIVER: overlay2
     # See https://github.com/docker-library/docker/pull/166
     DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - !reference [ .add-ssh-key, before_script ]
   script:
     - curl -sSL https://get.docker.com/ | sh
-    - python -m pip install cibuildwheel==2.16.5
+    - python -m pip install cibuildwheel
     - cibuildwheel --output-dir wheelhouse
   artifacts:
     paths:
