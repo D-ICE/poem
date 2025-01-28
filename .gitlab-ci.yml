@@ -66,28 +66,52 @@ test:
 # See example: https://gitlab.com/pytools4dart/gdecomp/-/blob/master/.gitlab-ci.yml
 # See example: https://codebase.helmholtz.cloud/hcdc/software-templates/demos/gitlab-cibuildwheel-demo/-/blob/main/.gitlab-ci.yml?ref_type=heads
 
-linux:
-  image: python:3.8
-  # make a docker daemon available for cibuildwheel to use
+#linux:
+#  image: python:3.8
+#  # make a docker daemon available for cibuildwheel to use
+#  services:
+#    - name: docker:dind
+#      entrypoint: ["env", "-u", "DOCKER_HOST"]
+#      command: ["dockerd-entrypoint.sh"]
+#  variables:
+#    DOCKER_HOST: tcp://docker:2375/
+#    DOCKER_DRIVER: overlay2
+#    # See https://github.com/docker-library/docker/pull/166
+#    DOCKER_TLS_CERTDIR: ""
+#  before_script:
+#    - !reference [ .add-ssh-key, before_script ]
+#  script:
+#    - curl -sSL https://get.docker.com/ | sh
+#    - python -m pip install cibuildwheel
+#    - cibuildwheel --output-dir wheelhouse
+#  artifacts:
+#    paths:
+#      - wheelhouse/
+
+
+build-package-linux:
+#  stage: build
+  image: docker:20.10
+  tags:
+    - dind
   services:
-    - name: docker:dind
-      entrypoint: ["env", "-u", "DOCKER_HOST"]
-      command: ["dockerd-entrypoint.sh"]
+    - docker:20.10-dind
   variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_DRIVER: overlay2
-    # See https://github.com/docker-library/docker/pull/166
     DOCKER_TLS_CERTDIR: ""
   before_script:
-    - !reference [ .add-ssh-key, before_script ]
+    - apk add --update --no-cache python3 py3-pip
+    - pip install build Cython twine cibuildwheel==2.16.5
   script:
-    - curl -sSL https://get.docker.com/ | sh
-    - python -m pip install cibuildwheel
+    # build the wheel
     - cibuildwheel --output-dir wheelhouse
   artifacts:
+    name: python-artifacts
     paths:
-      - wheelhouse/
-
-
+      - "wheelhouse/"
+    expire_in: 7 days
+  needs:
+    - build-package-sdist
 
 
