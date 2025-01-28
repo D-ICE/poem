@@ -12,10 +12,6 @@ include:
     - apt install -y git build-essential
     - pip install cmake
 
-#  ci-build:
-#    - pip install cibuildwheel==2.22.0
-#    - cibuildwheel --output-dir wheelhouse
-
 # cibuildwheel SEE: https://cibuildwheel.pypa.io/en/stable/setup/#gitlab-ci
 
   cmake:
@@ -35,6 +31,9 @@ include:
     - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
     - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
 
+stages:
+  - build
+  - deploy
 
 
 test:
@@ -42,6 +41,8 @@ test:
     - tags # TODO: retirer
   #  except:
   #    - tags  # don't run the tests on tags
+  stage: build
+
   image: "python:$PYTHON_VERSION-bullseye" # TODO: on pourra prendre une debian autre...
 
   variables:
@@ -59,88 +60,14 @@ test:
     - ./poem_tests
 
 
+pypoem-linux:
+  stage: build
 
-
-
-# See example: https://github.com/wbarnha/pybind_cmake_example_crossbuild/tree/master:
-# See example: https://gitlab.com/pytools4dart/gdecomp/-/blob/master/.gitlab-ci.yml
-# See example: https://codebase.helmholtz.cloud/hcdc/software-templates/demos/gitlab-cibuildwheel-demo/-/blob/main/.gitlab-ci.yml?ref_type=heads
-
-#linux:
-#  image: python:3.12
-##  image: docker
-#  # make a docker daemon available for cibuildwheel to use
-#  services:
-#    - name: docker:dind
-#      entrypoint: ["env", "-u", "DOCKER_HOST"]
-#      command: ["dockerd-entrypoint.sh"]
-#  variables:
-#    DOCKER_HOST: "tcp://docker:2375/"
-#    DOCKER_DRIVER: overlay2
-#    # See https://github.com/docker-library/docker/pull/166
-#    DOCKER_TLS_CERTDIR: ""
-#  before_script:
-#    - !reference [ .add-ssh-key, before_script ]
-#  script:
-#    - curl -sSL https://get.docker.com/ | sh # install docker
-#    - python -m pip install cibuildwheel
-#    - cibuildwheel --output-dir wheelhouse
-#  artifacts:
-#    paths:
-#      - wheelhouse/
-
-
-#build-package-sdist:
-##  stage: build
-#  script:
-#    - pip install build twine
-#    - USE_CYTHON=true make dist
-#    - twine check dist/*
-#  artifacts:
-#    name: python-artifacts
-#    paths:
-#      - "dist/*"
-#      - "psy_ugrid/*.c"
-#    expire_in: 7 days
-
-
-#build-package-linux:
-##  stage: build
-##  image: docker:20.10
-#  image: docker:dind-rootless
-##  tags:
-##    - dind
-#  services:
-#    - docker:20.10-dind
-#  variables:
-#    DOCKER_HOST: tcp://docker:2375/
-#    DOCKER_DRIVER: overlay2
-#    DOCKER_TLS_CERTDIR: ""
-#  before_script:
-#    - apk add --update --no-cache python3 py3-pip
-#    - pip install build Cython twine cibuildwheel==2.16.5
-#  script:
-#    # build the wheel
-#    - cibuildwheel --output-dir wheelhouse
-#  artifacts:
-#    name: python-artifacts
-#    paths:
-#      - "wheelhouse/"
-#    expire_in: 7 days
-##  needs:
-##    - build-package-sdist
-
-
-essai:
   image: python:3.12-bullseye
   services:
     - docker:dind # using Docker In Docker as a service
-#      entrypoint: [ "env", "-u", "DOCKER_HOST" ]
-#    - command: [ "dockerd-entrypoint.sh" ]
-
 
   variables:
-    SSH_PRIVATE_KEY: $GITLAB_CI_SSH_PRIVATE_KEY
     CIBW_BEFORE_ALL: >
       yum install -y openssh-clients &&
       eval $(ssh-agent -s) &&
@@ -150,18 +77,18 @@ essai:
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts &&
       yum install -y graphviz
-      
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
-    - echo "$GITLAB_CI_SSH_PRIVATE_KEY"
     - curl -sSL https://get.docker.com/ | sh # install docker
-
-  script:
-    - docker info
-    - docker run hello-world
-    - python --version
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
+
+  script:
     - cibuildwheel --print-build-identifiers # list wheels
     - cibuildwheel --output-dir linuxwheels --platform linux
+    - ls linuxwheels
+
+#  artifacts:
+#    paths:
+#      -linuxwheels
