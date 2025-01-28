@@ -15,15 +15,15 @@ include:
     - mkdir build && cd build
     - cmake ..
       -DCMAKE_BUILD_TYPE=Release
-      -DPOEM_BUILD_TESTS=ON
+      -DPOEM_BUILD_TESTS=$ENABLE_TEST
       -DPOEM_BUILD_TOOLS=ON
       -DPOEM_ALLOW_DIRTY=OFF
       -DPOEM_BUILD_PYTHON=ON
 
 
 test:
-#  except:
-#    - tags  # don't run the tests on tags
+  #  except:
+  #    - tags  # don't run the tests on tags
   image: "python:$PYTHON_VERSION-bullseye"
 
   variables:
@@ -46,13 +46,13 @@ test:
   image: "python:$PYTHON_VERSION-bullseye"
 
   before_script:
-    - !reference [.scripts, sshconfig]
+    - !reference [.add-ssh-key, before_script]
     - !reference [.scripts, deps]
-    - !reference [.scripts, awscli]
+
   script:
     - !reference [.scripts, cmake]
-    - make pygools
-    - !reference [.scripts, upload]
+    - make pypoem
+
 
 python312:
   variables:
