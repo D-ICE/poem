@@ -140,5 +140,7 @@ essai:
 
   script:
     - docker info
+    - docker run hello-world
     - python --version
+    - pip install --upgrade pip
     - pip install cibuildwheel
