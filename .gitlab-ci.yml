@@ -105,7 +105,8 @@ test:
 
 build-package-linux:
 #  stage: build
-  image: docker:20.10
+#  image: docker:20.10
+  image: docker:latest
 #  tags:
 #    - dind
   services:
