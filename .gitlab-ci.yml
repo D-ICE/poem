@@ -140,9 +140,7 @@ essai:
 
 
   variables:
-    CIBW_BEFORE_ALL: "echo COUCOU"
-#    CIBW_BEFORE_ALL: > # Add SSH config to DIND Docker image
-#      echo "COUCOU"
+    CIBW_BEFORE_ALL: "echo $GITLAB_CI_SSH_PRIVATE_KEY"
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
