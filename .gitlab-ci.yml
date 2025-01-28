@@ -78,6 +78,8 @@ pypoem-linux:
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts &&
       yum install -y graphviz
 
+    CIBW_BUILD: cp3*-manylinux_x86_64
+
   before_script:
     - !reference [ .add-ssh-key, before_script ]
     - curl -sSL https://get.docker.com/ | sh # install docker
@@ -86,7 +88,7 @@ pypoem-linux:
 
   script:
     - cibuildwheel --print-build-identifiers # list wheels
-    - cibuildwheel --output-dir linuxwheels --platform linux
+    - cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
     - ls linuxwheels
 
 #  artifacts:
