@@ -6,7 +6,7 @@ include:
 
 .scripts:
   deps:
-    - apt update
+    - apt update && apt upgrade
     - apt remove cmake
     - apt install -y git build-essential
     - pip install cmake
@@ -19,6 +19,15 @@ include:
       -DPOEM_BUILD_TOOLS=ON
       -DPOEM_ALLOW_DIRTY=OFF
       -DPOEM_BUILD_PYTHON=ON
+      -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
+
+  awscli:
+    - pip install awscli
+    - mkdir -p $HOME/.aws
+    - echo "[default]" > $HOME/.aws/credentials
+    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
+    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
+
 
 
 test:
@@ -33,6 +42,7 @@ test:
   before_script:
     - !reference [.add-ssh-key, before_script]
     - !reference [.scripts, deps]
+    - !reference [ .scripts, awscli ]
   script:
     - !reference [.scripts, cmake]
     - make poem_tests -j6
@@ -52,6 +62,7 @@ test:
   script:
     - !reference [.scripts, cmake]
     - make pypoem -j6
+    - ls
 
 
 python312:
