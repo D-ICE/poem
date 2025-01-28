@@ -68,20 +68,21 @@ test:
 
 linux:
   image: python:3.12
+#  image: docker
   # make a docker daemon available for cibuildwheel to use
   services:
     - name: docker:dind
       entrypoint: ["env", "-u", "DOCKER_HOST"]
       command: ["dockerd-entrypoint.sh"]
   variables:
-    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_HOST: "tcp://docker:2375/"
     DOCKER_DRIVER: overlay2
     # See https://github.com/docker-library/docker/pull/166
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - !reference [ .add-ssh-key, before_script ]
   script:
-    - curl -sSL https://get.docker.com/ | sh
+    - curl -sSL https://get.docker.com/ | sh # install docker
     - python -m pip install cibuildwheel
     - cibuildwheel --output-dir wheelhouse
   artifacts:
