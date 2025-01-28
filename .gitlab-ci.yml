@@ -140,14 +140,13 @@ essai:
 
 
   variables:
-    CIBW_BEFORE_ALL: 'echo "COUCOU"'
+    CIBW_BEFORE_ALL: "echo COUCOU"
 #    CIBW_BEFORE_ALL: > # Add SSH config to DIND Docker image
 #      echo "COUCOU"
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
     - curl -sSL https://get.docker.com/ | sh # install docker
-    - export CIBW_BEFORE_ALL ""
 
   script:
     - docker info
