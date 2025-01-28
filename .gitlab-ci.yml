@@ -89,18 +89,18 @@ test:
 #      - wheelhouse/
 
 
-build-package-sdist:
-#  stage: build
-  script:
-    - pip install build twine
-    - USE_CYTHON=true make dist
-    - twine check dist/*
-  artifacts:
-    name: python-artifacts
-    paths:
-      - "dist/*"
-      - "psy_ugrid/*.c"
-    expire_in: 7 days
+#build-package-sdist:
+##  stage: build
+#  script:
+#    - pip install build twine
+#    - USE_CYTHON=true make dist
+#    - twine check dist/*
+#  artifacts:
+#    name: python-artifacts
+#    paths:
+#      - "dist/*"
+#      - "psy_ugrid/*.c"
+#    expire_in: 7 days
 
 
 build-package-linux:
@@ -125,7 +125,7 @@ build-package-linux:
     paths:
       - "wheelhouse/"
     expire_in: 7 days
-  needs:
-    - build-package-sdist
+#  needs:
+#    - build-package-sdist
 
 
