@@ -41,8 +41,8 @@ test:
 
 
 .build:
-  only:
-    - tags
+#  only:
+#    - tags
   image: "python:$PYTHON_VERSION-bullseye"
 
   before_script:
