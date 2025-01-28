@@ -6,7 +6,8 @@ include:
 
 .scripts:
   deps:
-    - apt update && apt upgrade
+    - apt update
+    - apt upgrade -y
     - apt remove cmake
     - apt install -y git build-essential
     - pip install cmake
