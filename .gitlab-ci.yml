@@ -71,13 +71,12 @@ test:
 linux:
   services:
     - docker:dind
-  image: docker:latest
+  image: python:3.10
 #  stage: build-pypi
   script:
     - docker info
-    - apk add python3-dev
-    - python3 --version
-    - pip3 install cibuildwheel
+    - python --version
+    - pip install cibuildwheel
     - CIBW_BUILD="cp3?-*" cibuildwheel --output-dir linuxwheels --platform linux
     - ls linuxwheels
   artifacts:
