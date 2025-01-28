@@ -92,8 +92,8 @@ test:
 build-package-linux:
 #  stage: build
   image: docker:20.10
-  tags:
-    - dind
+#  tags:
+#    - dind
   services:
     - docker:20.10-dind
   variables:
