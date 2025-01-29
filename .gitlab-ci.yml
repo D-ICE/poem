@@ -80,8 +80,8 @@ pypoem-linux:
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts &&
       yum install -y graphviz
 
-#    CIBW_BUILD: cp3*-manylinux_x86_64
-    CIBW_BUILD: cp312-manylinux_x86_64
+    CIBW_BUILD: cp3*-manylinux_x86_64
+#    CIBW_BUILD: cp312-manylinux_x86_64
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
