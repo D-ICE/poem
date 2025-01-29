@@ -182,9 +182,10 @@ namespace poem {
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
-    LogNormalInfo("Writing file (version v{}): {}",
-                  current_poem_standard_version(),
-                  fs::absolute(filename).string());
+//    LogNormalInfo("Writing file (version v{}): {}",
+//                  current_poem_standard_version(),
+//                  fs::absolute(filename).string());
+    LogNormalInfo("Writing file: {}", fs::absolute(filename).string());
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);
