@@ -111,4 +111,5 @@ deploy:
     - ls linuxwheels
 
   script:
+    # TODO: trouver un moyen de recuperer les versions de pipy
     - twine upload linuxwheels/*
