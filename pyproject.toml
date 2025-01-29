@@ -8,7 +8,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pypoem"
-version = "0.1-1"
+version = "0.1-2"
 description = "Performance pOlar Exchange forMat"
 readme = "README.md"
 maintainers = [{ name = "D-ICE ENGINEERING", email = "francois.rongere@dice-engineering.com" }]
