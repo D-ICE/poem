@@ -1,3 +1,6 @@
+# TODO: retirer le CMakeLists.txt et le pypoem.cpp du packaging
+
+
 [build-system]
 #requires = ["scikit-build-core", "pybind11"]
 requires = ["scikit-build-core"]
@@ -5,7 +8,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pypoem"
-version = "0.1"
+version = "0.1-1"
 description = "Performance pOlar Exchange forMat"
 readme = "README.md"
 maintainers = [{ name = "D-ICE ENGINEERING", email = "francois.rongere@dice-engineering.com" }]
