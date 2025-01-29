@@ -1,5 +1,3 @@
+from .pypoem import __doc__
 
-from .pypoem import __doc__, coucou
-
-__all__ = ["__doc__", "coucou"]
-
+__all__ = ["__doc__"]
