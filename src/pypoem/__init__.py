@@ -1,7 +1,7 @@
 from .pypoem import __doc__
 
 __all__ = ["__doc__",
-           "current_standard_poem_version",
+           # "current_standard_poem_version",
            "make_dimension",
            "make_dimension_set",
            "DimensionPoint",
