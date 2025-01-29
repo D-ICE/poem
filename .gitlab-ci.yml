@@ -68,6 +68,8 @@ pypoem-linux:
     - docker:dind # using Docker In Docker as a service
 
   variables:
+#    CIBW_ENVIRONMENT: TWINE_USERNAME="$TWINE_USERNAME" TWINE_PASSWORD="$TWINE_PASSWORD"
+
     CIBW_BEFORE_ALL: >
       yum install -y openssh-clients &&
       eval $(ssh-agent -s) &&
@@ -78,7 +80,8 @@ pypoem-linux:
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts &&
       yum install -y graphviz
 
-    CIBW_BUILD: cp3*-manylinux_x86_64
+#    CIBW_BUILD: cp3*-manylinux_x86_64 # TODO: reactiver
+    CIBW_BUILD: cp312-manylinux_x86_64
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
@@ -91,6 +94,16 @@ pypoem-linux:
     - cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
     - ls linuxwheels
 
-#  artifacts:
-#    paths:
-#      -linuxwheels
+  artifacts:
+    paths:
+      - linuxwheels
+
+deploy:
+  stage: deploy
+  image: python:3.12-bullseye
+  before_script:
+    - pip install twine
+    - ls linuxwheels
+
+  script:
+    - twine upload -u $TWINE_USERNAME -p $TWINE_PASSWORD linuxwheels/*
