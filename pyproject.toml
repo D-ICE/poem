@@ -8,7 +8,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pypoem"
-version = "0.1-2" # TODO: gerer dynamiquement les versions a partir des tags git -> only tags dans la ci pour le deploy
+version = "0.1-3" # TODO: gerer dynamiquement les versions a partir des tags git -> only tags dans la ci pour le deploy
 description = "Performance pOlar Exchange forMat"
 readme = "README.md"
 maintainers = [{ name = "D-ICE ENGINEERING", email = "francois.rongere@dice-engineering.com" }]
