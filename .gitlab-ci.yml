@@ -97,6 +97,7 @@ pypoem-linux:
   artifacts:
     paths:
       - linuxwheels
+    expire_in: 3 hours
 
 deploy:
   stage: deploy
