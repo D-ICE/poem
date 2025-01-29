@@ -19,7 +19,8 @@ namespace poem {
   // ===================================================================================================================
 
   int current_poem_standard_version() {
-    return semver::version::parse(git::LastTag(), false).major();
+    std::cout << git::LastTag() << std::endl;
+    return (int) semver::version::parse(git::LastTag(), false).major();
   }
 
   std::vector<netCDF::NcDim> to_netcdf(std::shared_ptr<DimensionGrid> dimension_grid,

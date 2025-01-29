@@ -1,9 +1,9 @@
-import pypoem
+from pypoem import pypoem
 import numpy as np
 
 
 if __name__ == '__main__':
-    print(pypoem.current_standard_poem_version())
+    # print(pypoem.current_standard_poem_version())
 
     STW = pypoem.make_dimension("STW", "kt", "Speed Through Water")
     TWS = pypoem.make_dimension("TWS", "kt", "True Wind Speed")
