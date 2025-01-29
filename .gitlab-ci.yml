@@ -101,9 +101,14 @@ pypoem-linux:
 deploy:
   stage: deploy
   image: python:3.12-bullseye
+
+  variables:
+    TWINE_USERNAME: $TWINE_USERNAME
+    TWINE_PASSWORD: $TWINE_PASSWORD
+
   before_script:
     - pip install twine
     - ls linuxwheels
 
   script:
-    - twine upload -u $TWINE_USERNAME -p $TWINE_PASSWORD linuxwheels/*
+    - twine upload linuxwheels/*
