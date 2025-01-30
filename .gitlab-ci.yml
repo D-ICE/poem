@@ -78,6 +78,8 @@ pypoem-linux:
 
     CIBW_DEBUG_TRACEBACK: True
 
+    CIBW_BUILD_VERBOSITY: 3
+
     CIBW_BEFORE_ALL: >
       yum install -y openssh-clients &&
       yum install -y graphviz git &&
@@ -99,7 +101,7 @@ pypoem-linux:
     - cibuildwheel --output-dir linuxwheels
     - ls linuxwheels
     - pwd
-    - ls /
+    - ls /builds
 #    - cat build/src/poem/version.h
 
   artifacts:
