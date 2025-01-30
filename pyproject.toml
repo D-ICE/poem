@@ -51,4 +51,4 @@ cmake.args = [
 ]
 build-dir = "build"
 build.targets = ["pypoem"]
-build.tool-args = ["-j6"]
+#build.tool-args = ["-j6"]

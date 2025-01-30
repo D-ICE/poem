@@ -99,7 +99,7 @@ pypoem-linux:
     - cibuildwheel --output-dir linuxwheels
     - ls linuxwheels
     - pwd
-    - ls /project
+    - ls /
 #    - cat build/src/poem/version.h
 
   artifacts:
