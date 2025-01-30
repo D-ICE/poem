@@ -68,7 +68,6 @@ pypoem-linux:
     - docker:dind # using Docker In Docker as a service
 
   variables:
-#    CIBW_ENVIRONMENT: TWINE_USERNAME="$TWINE_USERNAME" TWINE_PASSWORD="$TWINE_PASSWORD"
 
     CIBW_BEFORE_ALL: >
       yum install -y openssh-clients &&
@@ -80,8 +79,8 @@ pypoem-linux:
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
-    CIBW_BUILD: cp3*-manylinux_x86_64
-#    CIBW_BUILD: cp312-manylinux_x86_64
+#    CIBW_BUILD: cp3*-manylinux_x86_64
+    CIBW_BUILD: cp312-manylinux_x86_64
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
