@@ -8,7 +8,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pypoem"
-version = "0.1-6" # TODO: gerer dynamiquement les versions a partir des tags git -> only tags dans la ci pour le deploy
+version = "0.1-7" # TODO: gerer dynamiquement les versions a partir des tags git -> only tags dans la ci pour le deploy
 description = "Performance pOlar Exchange forMat"
 readme = "README.md"
 maintainers = [{ name = "D-ICE ENGINEERING", email = "francois.rongere@dice-engineering.com" }]
@@ -39,11 +39,13 @@ Documentation = "https://dice-poem.readthedocs.io/en/latest/"
 #cliapp = "package.__main__:main"
 
 [tool.scikit-build]
+cmake.version = ">=3.20"
+cmake.verbose = true
 cmake.build-type = "Release"
-
-[tool.scikit-build.cmake.define]
-POEM_BUILD_TESTS = false
-POEM_BUILD_TOOLS = false # TODO: voir si on met true pour installer exe...
-POEM_ALLOW_DIRTY = false
-POEM_BUILD_PYTHON = true
-POEM_BUILD_POC = false
+cmake.args = [
+    "-DPOEM_BUILD_TESTS=OFF",
+    "-DPOEM_BUILD_TOOLS=OFF", # TODO: voir pour installer exe ?
+    "-DPOEM_ALLOW_DIRTY=OFF",
+    "-DPOEM_BUILD_PYTHON=ON",
+    "-DPOEM_BUILD_POC=OFF",
+]

@@ -16,7 +16,7 @@ using namespace poem;
 
 PYBIND11_MODULE(pypoem, m) {
   m.doc() = R"pbdoc(Performance pOlar Exchange forMat)pbdoc";
-//  m.def("current_standard_poem_version", &current_poem_standard_version);
+  m.def("current_standard_poem_version", &current_poem_standard_version);
 
   // Dimension
   py::class_<Dimension, std::shared_ptr<Dimension>>(m, "Dimension");

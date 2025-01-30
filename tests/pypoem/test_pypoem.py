@@ -20,16 +20,19 @@ if __name__ == '__main__':
 
     # polar_table = pypoem.make_polar_table_double("VAR", "-", "VAR", dimension_grid)
 
-    polar = pypoem.make_polar("MPPP", pypoem.MPPP, dimension_grid)
-    BrakePower = polar.create_polar_table_double("BrakePower", "kW", "Brake Power", pypoem.POEM_DOUBLE)
+    polar_MPPP = pypoem.make_polar("MPPP", pypoem.MPPP, dimension_grid)
+    BrakePower = polar_MPPP.create_polar_table_double("BrakePower", "kW", "Brake Power", pypoem.POEM_DOUBLE)
 
     BrakePower.fill_with(1.)
 
-    polar_set = pypoem.make_polar_set("polar_set")
-    polar_set.attach_polar(polar)
 
-    pypoem.to_netcdf(polar, "Polar.nc")
-    pypoem.to_netcdf(BrakePower, "BrakePower.nc")
+    polar_set = pypoem.make_polar_set("polar_set")
+    polar_set.attach_polar(polar_MPPP)
+
+    # pypoem.to_netcdf(polar_MPPP, "Polar.nc")
+    # pypoem.to_netcdf(BrakePower, "BrakePower.nc")
     pypoem.to_netcdf(polar_set, "polar_set.nc")
 
-    print("END")
+    # print("END")
+
+
