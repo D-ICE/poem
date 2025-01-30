@@ -90,6 +90,8 @@ pypoem-linux:
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
+    CIBW_REPAIR_WHEEL_COMMAND: "ls"
+
   before_script:
     - !reference [ .add-ssh-key, before_script ]
     - curl -sSL https://get.docker.com/ | sh # install docker

@@ -17,8 +17,7 @@ export CIBW_BEFORE_ALL=$(cat <<-EOM
   chmod 700 ~/.ssh
   chmod 700 ~/.ssh/id_rsa
   echo "$SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
-EOM
-)
+EOM)
 
 export CIBW_BUILD="cp312-manylinux_x86_64"
 #export CIBW_BUILD="cp3*-manylinux_x86_64"
