@@ -72,13 +72,13 @@ pypoem-linux:
 
     CIBW_BEFORE_ALL: >
       yum install -y openssh-clients &&
-      yum install -y graphviz git
+      yum install -y graphviz git &&
       eval $(ssh-agent -s) &&
       mkdir -p ~/.ssh &&
       echo "$GITLAB_CI_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa &&
       chmod 700 ~/.ssh &&
       chmod 700 ~/.ssh/id_rsa &&
-      echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts &&
+      echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
     CIBW_BUILD: cp3*-manylinux_x86_64
 #    CIBW_BUILD: cp312-manylinux_x86_64

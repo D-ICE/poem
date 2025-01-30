@@ -49,3 +49,5 @@ cmake.args = [
     "-DPOEM_BUILD_PYTHON=ON",
     "-DPOEM_BUILD_POC=OFF",
 ]
+build.targets = ["pypoem"]
+build.tool-args = ["-j6"]
