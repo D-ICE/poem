@@ -69,6 +69,15 @@ pypoem-linux:
 
   variables:
 
+    CIBW_PLATFORM: linux
+
+#    CIBW_BUILD: cp3*-manylinux_x86_64
+    CIBW_BUILD: cp312-manylinux_x86_64
+
+    CIBW_ALLOW_EMPTY: True
+
+    CIBW_DEBUG_TRACEBACK: True
+
     CIBW_BEFORE_ALL: >
       yum install -y openssh-clients &&
       yum install -y graphviz git &&
@@ -79,9 +88,6 @@ pypoem-linux:
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
-#    CIBW_BUILD: cp3*-manylinux_x86_64
-    CIBW_BUILD: cp312-manylinux_x86_64
-
   before_script:
     - !reference [ .add-ssh-key, before_script ]
     - curl -sSL https://get.docker.com/ | sh # install docker
@@ -90,8 +96,10 @@ pypoem-linux:
 
   script:
     - cibuildwheel --print-build-identifiers # list wheels
-    - cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
+    - cibuildwheel --output-dir linuxwheels
     - ls linuxwheels
+    - ls build/src/poem
+    - cat build/src/poem/version.h
 
   artifacts:
     paths:
