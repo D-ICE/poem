@@ -98,7 +98,8 @@ pypoem-linux:
     - cibuildwheel --print-build-identifiers # list wheels
     - cibuildwheel --output-dir linuxwheels
     - ls linuxwheels
-    - ls .
+    - pwd
+    - ls /project
 #    - cat build/src/poem/version.h
 
   artifacts:
