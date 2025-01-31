@@ -214,6 +214,14 @@ namespace poem {
     void set_value(size_t idx, const T &value);
 
     /**
+     * Set a particular value of the table at specified coordinates given by indices
+     *
+     * @param idx index of the value to set
+     * @param value value to set
+     */
+    void set_value(std::vector<size_t> grid_indices, const T &value);
+
+    /**
      * Get the whole data vector of the table.
      */
     [[nodiscard]] const std::vector<T> &values() const;

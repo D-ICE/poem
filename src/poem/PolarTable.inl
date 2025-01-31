@@ -81,6 +81,11 @@ namespace poem {
   }
 
   template<typename T>
+  void PolarTable<T>::set_value(std::vector<size_t> grid_indices, const T &value) {
+    m_values[m_dimension_grid->grid_to_index(grid_indices)] = value;
+  }
+
+  template<typename T>
   const vector<T> &PolarTable<T>::values() const {
     return m_values;
   }

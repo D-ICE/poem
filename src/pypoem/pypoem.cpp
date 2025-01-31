@@ -4,132 +4,250 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
+#include <pybind11/numpy.h>
 #include <poem/poem.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-//using namespace poem;
+using namespace pybind11::literals;
 
+// https://stackoverflow.com/questions/76235970/pybind11-convert-arbitrary-numpy-arrays-to-vectors
+
+// ===================================================================================================================
+// Utility functions
+// ===================================================================================================================
+
+template<typename T>
+inline std::vector<T> ndarray2stdvector(const py::array_t<double, py::array::c_style | py::array::forcecast> &array) {
+  std::vector<T> vector(array.size());
+  std::memcpy(vector.data(), array.data(), array.size() * sizeof(T));
+  return vector;
+}
+
+template<typename T>
+inline py::memoryview vector2memoryview(std::vector<T> &vector, const std::vector<size_t> &shape) {
+  size_t ndims = shape.size();
+  std::vector<py::ssize_t> strides(ndims);
+  strides[ndims - 1] = sizeof(double);
+
+  size_t n = 0;
+  for (size_t i = 2; i <= ndims; ++i) {
+    strides[ndims - i] = py::ssize_t_cast(shape[ndims - i + 1] * strides[ndims - i + 1]);
+    n++;
+  }
+
+  return py::memoryview::from_buffer(
+      vector.data(),
+      shape,
+      strides
+  );
+}
+
+
+// ===================================================================================================================
+// Python module definition
+// ===================================================================================================================
 
 PYBIND11_MODULE(pypoem, m) {
 
+  // ===================================================================================================================
+  // Module level
+  // ===================================================================================================================
   m.doc() = R"pbdoc(Performance pOlar Exchange forMat)pbdoc";
 
   m.def("current_standard_poem_version", &poem::current_poem_standard_version,
         R"pbdoc(Get the current specifications number of the library)pbdoc");
 
+  // ===================================================================================================================
   // Dimension
+  // ===================================================================================================================
   py::class_<poem::Dimension, std::shared_ptr<poem::Dimension>> Dimension(m, "Dimension");
-  Dimension.doc() = R"pbdoc("")pbdoc";
+  Dimension.doc() = R"pbdoc(A Dimension is a named coordinate for a DimensionGrid)pbdoc";
   Dimension.def(py::init<const std::string &, const std::string &, const std::string &>());
-  Dimension.def("name", &poem::Dimension::name);
-
+  Dimension.def("name", &poem::Dimension::name, R"pbdoc(Get the name of the Dimension)pbdoc");
 
   m.def("make_dimension", &poem::make_dimension,
-        R"pbdoc("Build a Dimension")pbdoc");
+        R"pbdoc(Build a Dimension)pbdoc",
+        "name"_a, "unit"_a, "description"_a);
 
-
+  // ===================================================================================================================
   // DimensionSet
-  py::class_<poem::DimensionSet, std::shared_ptr<poem::DimensionSet>>(m, "DimensionSet")
-      .def(py::init<std::vector<std::shared_ptr<poem::Dimension>>>());
+  // ===================================================================================================================
+  py::class_<poem::DimensionSet, std::shared_ptr<poem::DimensionSet>> DimensionSet(m, "DimensionSet");
+  DimensionSet.doc() =
+      R"pbdoc(A DimensionSet is an ordered set of Dimensions that define the Coordinate system for a DimensionGrid)pbdoc";
+  DimensionSet.def(py::init<std::vector<std::shared_ptr<poem::Dimension>>>());
+
   m.def("make_dimension_set", &poem::make_dimension_set,
-        R"pbdoc(Build a DimensionSet)pbdoc");
+        R"pbdoc(Build a DimensionSet)pbdoc",
+        "dimension_vector"_a);
 
-  // DimensionPoint
-  py::class_<poem::DimensionPoint>(m, "DimensionPoint")
-      .def(py::init<std::shared_ptr<poem::DimensionSet>>(),
-           R"pbdoc()pbdoc")
-      .def("get", py::overload_cast<const std::string &>(&poem::DimensionPoint::get),
-           R"pbdoc()pbdoc");
-
+  // ===================================================================================================================
   // DimensionGrid
-  py::class_<poem::DimensionGrid, std::shared_ptr<poem::DimensionGrid>>(m, "DimensionGrid")
-      .def("set_values", &poem::DimensionGrid::set_values,
-           R"pbdoc()pbdoc")
-      .def("values", py::overload_cast<const std::string &>(&poem::DimensionGrid::values, py::const_),
-           R"pbdoc()pbdoc")
-      .def("dimension_points", &poem::DimensionGrid::dimension_points,
-           R"pbdoc()pbdoc");
+  // ===================================================================================================================
+  py::class_<poem::DimensionGrid, std::shared_ptr<poem::DimensionGrid>> DimensionGrid(m, "DimensionGrid");
+  DimensionGrid.doc() = R"pbdoc("A DimensionGrid is a numerical realisation of a DimensionSet.
+Each Dimension of the associated DimensionSet is given a numerical sampling.
+")pbdoc";
+  DimensionGrid.def("set_values", &poem::DimensionGrid::set_values,
+                    R"pbdoc()pbdoc",
+                    "dimension_name"_a, "sampling_vector"_a);
+  DimensionGrid.def("values",
+                    py::overload_cast<const std::string &>(&poem::DimensionGrid::values, py::const_),
+                    R"pbdoc()pbdoc",
+                    "dimension_name"_a);
+  DimensionGrid.def("dimension_points", &poem::DimensionGrid::dimension_points,
+                    R"pbdoc()pbdoc");
+  DimensionGrid.def("size",
+                    py::overload_cast<const std::string &>(&poem::DimensionGrid::size, py::const_),
+                    R"pbdoc()pbdoc");
+  DimensionGrid.def("shape", &poem::DimensionGrid::shape,
+                    R"pbdoc(Returns an ordered list of Dimension Sizes)pbdoc");
 
   m.def("make_dimension_grid", &poem::make_dimension_grid,
         R"pbdoc()pbdoc");
 
+  // ===================================================================================================================
+  // DimensionPoint
+  // ===================================================================================================================
+  py::class_<poem::DimensionPoint> DimensionPoint(m, "DimensionPoint");
+  DimensionPoint.doc() = R"pbdoc("A DimensionPoint is a point inside a DimensinoGrid with cartesian coordinates")pbdoc";
+  DimensionPoint.def(py::init<std::shared_ptr<poem::DimensionSet>>(),
+                     R"pbdoc()pbdoc");
+  DimensionPoint.def("get",
+                     py::overload_cast<const std::string &>(&poem::DimensionPoint::get),
+                     R"pbdoc()pbdoc");
 
-  py::enum_<poem::POEM_DATATYPE>(m, "POEM_DATATYPE")
-      .value("POEM_DOUBLE", poem::POEM_DOUBLE,
-             R"pbdoc()pbdoc")
-      .value("POEM_INT", poem::POEM_INT,
-             R"pbdoc()pbdoc")
-      .export_values();
+  // ===================================================================================================================
+  // Enums
+  // ===================================================================================================================
 
+  py::enum_<poem::POEM_DATATYPE> POEM_DATATYPE(m, "POEM_DATATYPE");
+//  POEM_DATATYPE.doc() = R"pbdoc("Datatype for PolarTables")pbdoc";
+  POEM_DATATYPE.value("POEM_DOUBLE", poem::POEM_DOUBLE,
+                      R"pbdoc(double datatype)pbdoc");
+  POEM_DATATYPE.value("POEM_INT", poem::POEM_INT,
+                      R"pbdoc(int datatype)pbdoc");
+  POEM_DATATYPE.export_values();
 
+  py::enum_<poem::POLAR_MODE> POLAR_MODE(m, "POLAR_MODE");
+//  POLAR_MODE.doc() =
+//      R"pbdoc("A POLAR_MODE is a specific type of POLAR that define the type prediction used to build the polar data")pbdoc";
+  POLAR_MODE.value("MPPP", poem::MPPP,
+                   R"pbdoc(Motor only, Power Prediction Program)pbdoc");
+  POLAR_MODE.value("HPPP", poem::HPPP,
+                   R"pbdoc(Hybrid motor and wind propulsion, Power Prediction Program)pbdoc");
+  POLAR_MODE.value("MVPP", poem::MVPP,
+                   R"pbdoc(Motor only, Velocity Prediction Program)pbdoc");
+  POLAR_MODE.value("HVPP", poem::HVPP,
+                   R"pbdoc(Hybrid motor and wind propulsion, Velocity Prediction Program)pbdoc");
+  POLAR_MODE.value("VPP", poem::VPP,
+                   R"pbdoc(wind propulsion only, Velocity Prediction Program)pbdoc");
+  POLAR_MODE.export_values();
+
+  // ===================================================================================================================
   // PolarNode
-  // TODO
+  // ===================================================================================================================
+  py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
+  PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
+  PolarNode.def(py::init<const std::string &>());
 
-  py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>>(m, "PolarNode")
-      .def(py::init<const std::string &>(),
-           R"pbdoc()pbdoc");
-
-  // PolarTable
-//  py::class_<PolarTableBase, std::shared_ptr<PolarTableBase>, PolarNode>(m, "PolarTable");
-//      .def(py::init<const std::string &, const std::string &, const std::string &,
-//          POEM_DATATYPE, std::shared_ptr<DimensionGrid>>()); // FIXME: PolarTableBase is abstract
-
-  py::class_<poem::PolarTable<double>, std::shared_ptr<poem::PolarTable<double>>, poem::PolarNode>(m, "PolarTableDouble")
-      .def("fill_with", &poem::PolarTable<double>::fill_with,
-           R"pbdoc()pbdoc");
-  py::class_<poem::PolarTable<int>, std::shared_ptr<poem::PolarTable<int>>, poem::PolarNode>(m, "PolarTableInt")
-      .def("fill_with", &poem::PolarTable<int>::fill_with,
-           R"pbdoc()pbdoc");
-
-  m.def("make_polar_table_double", &poem::make_polar_table_double,
-        R"pbdoc()pbdoc");
-  m.def("make_polar_table_int", &poem::make_polar_table_int,
-        R"pbdoc()pbdoc");
-
-  // Polar
-  py::enum_<poem::POLAR_MODE>(m, "POLAR_MODE")
-      .value("MPPP", poem::MPPP,
-             R"pbdoc()pbdoc")
-      .value("HPPP", poem::HPPP,
-             R"pbdoc()pbdoc")
-      .value("MVPP", poem::MVPP,
-             R"pbdoc()pbdoc")
-      .value("HVPP", poem::HVPP,
-             R"pbdoc()pbdoc")
-      .value("VPP", poem::VPP,
-             R"pbdoc()pbdoc")
-      .export_values();
-
-  py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>, poem::PolarNode>(m, "PolarSet")
-      .def(py::init<const std::string &>())
-      .def("attach_polar", &poem::PolarSet::attach_polar,
-           R"pbdoc()pbdoc");
+  // ===================================================================================================================
+  // PolarSet
+  // ===================================================================================================================
+  py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>, poem::PolarNode> PolarSet(m, "PolarSet");
+  PolarSet.doc() = R"pbdoc("A PolarSet is a special PolarNode used to group a set of Polar")pbdoc";
+  PolarSet.def(py::init<const std::string &>());
+  PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
+               R"pbdoc()pbdoc");
 
   m.def("make_polar_set", &poem::make_polar_set,
         R"pbdoc()pbdoc");
 
-
-  py::class_<poem::Polar, std::shared_ptr<poem::Polar>, poem::PolarNode>(m, "Polar")
-      .def(py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>(),
-           R"pbdoc()pbdoc")
-      .def("create_polar_table_double", &poem::Polar::create_polar_table<double>,
-           R"pbdoc()pbdoc")
-      .def("create_polar_table_int", &poem::Polar::create_polar_table<int>,
-           R"pbdoc()pbdoc");
+  // ===================================================================================================================
+  // Polar
+  // ===================================================================================================================
+  py::class_<poem::Polar, std::shared_ptr<poem::Polar>, poem::PolarNode> Polar(m, "Polar");
+  Polar.doc() = R"pbdoc("A Polar is a special PolarNode used to group PolarTables relative to a specific POLAR_MODE")pbdoc";
+  Polar.def(py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>(),
+            R"pbdoc()pbdoc");
+  Polar.def("create_polar_table_double", &poem::Polar::create_polar_table<double>,
+            R"pbdoc()pbdoc");
+  Polar.def("create_polar_table_int", &poem::Polar::create_polar_table<int>,
+            R"pbdoc()pbdoc");
 
   m.def("make_polar", &poem::make_polar,
         R"pbdoc()pbdoc");
 
+  // ===================================================================================================================
+  // PolarTable<T>
+  // ===================================================================================================================
 
+  // -------------------------------------------- PolarTableDouble -----------------------------------------------------
+  py::class_<poem::PolarTable<double>, std::shared_ptr<poem::PolarTable<double>>, poem::PolarNode>
+      PolarTableDouble(m, "PolarTableDouble");
+  PolarTableDouble.doc() =
+      R"pbdoc("A PolarTableDouble is a special PolarNode used to represent a specific variable
+               stored in a multidimensional array. Double version.")pbdoc";
+  PolarTableDouble.def("fill_with", &poem::PolarTable<double>::fill_with,
+                       R"pbdoc()pbdoc", "value"_a);
+  PolarTableDouble.def("set_values",
+                       [](poem::PolarTable<double> &self,
+                          const py::array_t<double, py::array::c_style | py::array::forcecast> &array) -> void {
+                         self.set_values(ndarray2stdvector<double>(array));
+                       },
+                       R"pbdoc()pbdoc");
+  PolarTableDouble.def("set_value",
+                       py::overload_cast<std::vector<size_t>, const double &>(&poem::PolarTable<double>::set_value));
+
+//
+  PolarTableDouble.def("array",
+                       [](poem::PolarTable<double> &self) -> py::array_t<double> {
+                         return vector2memoryview(self.values(), self.dimension_grid()->shape());
+                       },
+                       R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
+  PolarTableDouble.def("dimension_grid", &poem::PolarTable<double>::dimension_grid,
+                       R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
+
+
+  m.def("make_polar_table_double", &poem::make_polar_table_double,
+        R"pbdoc()pbdoc",
+        "name"_a, "unit"_a, "description"_a, "dimension_grid"_a);
+
+  // -------------------------------------------- PolarTableInt -----------------------------------------------------
+  py::class_<poem::PolarTable<int>, std::shared_ptr<poem::PolarTable<int>>, poem::PolarNode>
+      PolarTableInt(m, "PolarTableInt");
+  PolarTableInt.doc() = R"pbdoc("A PolarTableInt is a special PolarNode used to represent a specific variable
+stored in a multidimensional array. Int version.")pbdoc";
+  PolarTableInt.def("fill_with", &poem::PolarTable<int>::fill_with,
+                    R"pbdoc()pbdoc", "value"_a);
+  PolarTableDouble.def("set_values",
+                       [](poem::PolarTable<int> &self,
+                          const py::array_t<int, py::array::c_style | py::array::forcecast> &array) -> void {
+                         self.set_values(ndarray2stdvector<int>(array));
+                       },
+                       R"pbdoc()pbdoc");
+  PolarTableDouble.def("array",
+                       [](poem::PolarTable<int> &self) -> py::array_t<int> {
+                         return vector2memoryview(self.values(), self.dimension_grid()->shape());
+                       },
+                       R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
+
+
+  m.def("make_polar_table_int", &poem::make_polar_table_int,
+        R"pbdoc()pbdoc"
+        "name"_a, "unit"_a, "description"_a, "dimension_grid"_a);
+
+  // ===================================================================================================================
+  // Writer
+  // ===================================================================================================================
   m.def("to_netcdf", [](std::shared_ptr<poem::PolarNode> polar_node, const std::string &filename) -> void {
           to_netcdf(polar_node, filename);
         },
-        R"pbdoc()pbdoc");
-
+        R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
+        "polar_node"_a, "filename"_a);
 
 }
 

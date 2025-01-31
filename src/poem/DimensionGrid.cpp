@@ -128,6 +128,13 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
+    for (size_t idx = 0; idx<ndims(); ++idx) {
+      if (grid_indices[idx] < 0 || grid_indices[idx]>= size(idx)) {
+        LogCriticalError("Coordinate index {} out of DimensionGrid range", idx);
+        CRITICAL_ERROR_POEM
+      }
+    }
+
     size_t index = 0;
     size_t stride = 1;
     for (int i = ndims() - 1; i >= 0; --i) {

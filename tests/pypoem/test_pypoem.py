@@ -1,7 +1,6 @@
-from pypoem import pypoem
-# import pypoem
+# from pypoem import pypoem
+import pypoem
 import numpy as np
-
 
 if __name__ == '__main__':
     # print(pypoem.current_standard_poem_version())
@@ -23,16 +22,54 @@ if __name__ == '__main__':
     polar_MPPP = pypoem.make_polar("MPPP", pypoem.MPPP, dimension_grid)
     BrakePower = polar_MPPP.create_polar_table_double("BrakePower", "kW", "Brake Power", pypoem.POEM_DOUBLE)
 
-    BrakePower.fill_with(1.)
+    # Filling with test data
+    data = np.ones(dimension_grid.shape())
+    val = 0
+    for i in range(dimension_grid.size("STW")):
+        for j in range(dimension_grid.size("TWS")):
+            for k in range(dimension_grid.size("TWA")):
+                data[i][j][k] = val
+                val += 1
 
+    # Set PolarTable data using NDArray
+    BrakePower.set_values(data)
 
-    polar_set = pypoem.make_polar_set("polar_set")
-    polar_set.attach_polar(polar_MPPP)
+    # Get back data from PolarTable
+    data_back = BrakePower.array()  # This is a view (directly data inside the PolarTable, no copy)
+    assert np.all(data == data_back)  # data layout has been respected back and forth between python and poem
 
-    # pypoem.to_netcdf(polar_MPPP, "Polar.nc")
-    # pypoem.to_netcdf(BrakePower, "BrakePower.nc")
-    pypoem.to_netcdf(polar_set, "polar_set.nc")
+    assert data_back[0, 0, 0] == 0.  # value is currently 0
 
-    # print("END")
+    data_back[0, 0, 0] = 999.  # change value
+    assert data_back[0, 0, 0] == 999.  # yes changed
 
+    assert BrakePower.array()[0, 0, 0] == 999.  # This is really a view, not a copy
 
+    array_copy = BrakePower.array().copy()  # This is a copy
+    array_copy[0, 0, 0] = 0.
+    assert array_copy[0, 0, 0] == 0.
+    assert BrakePower.array()[0, 0, 0] == 999. # array_copy was really a copy
+
+    pypoem.to_netcdf(BrakePower, "BrakePower.nc")
+
+    # # Set one values using indices
+    # BrakePower.set_value((0, 0, 0), 999.)
+    # assert(BrakePower.array()[0, 0, 0] == 999)
+    #
+    # data_back[0, 0, 0] = 888
+    # assert (BrakePower.array()[0, 0, 0] == 888)
+    #
+    #
+    # BrakePower.array().fill(0.)
+
+    BrakePowerDimensionGrid = BrakePower.dimension_grid()
+    # print(BrakePower.array())
+
+    # polar_set = pypoem.make_polar_set("polar_set")
+    # polar_set.attach_polar(polar_MPPP)
+    #
+    # # pypoem.to_netcdf(polar_MPPP, "Polar.nc")
+    # # pypoem.to_netcdf(BrakePower, "BrakePower.nc")
+    # pypoem.to_netcdf(polar_set, "polar_set.nc")
+    #
+    print("END")
