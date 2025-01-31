@@ -82,7 +82,7 @@ pypoem-linux:
 
     CIBW_BEFORE_ALL: >
       ls &&
-      git fetch --all &&
+      git fetch origin &&
       git describe --tags &&
       yum install -y openssh-clients &&
       yum install -y graphviz git &&
