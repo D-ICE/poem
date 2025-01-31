@@ -70,6 +70,12 @@ include(Add_netcdf-cxx4)
 add_subdirectory(src/poem)
 
 if (POEM_BUILD_PYTHON)
+    # _version.py may not have been populated in source yet, use a dummy file for the build environment
+    if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/python/pypoem/_version.py)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/python/_version.py.in
+                ${CMAKE_CURRENT_SOURCE_DIR}/python/pypoem/_version.py)
+    endif ()
+
     add_subdirectory(python)
 endif ()
 
