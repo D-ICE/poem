@@ -4,7 +4,7 @@ add_library(_poem STATIC)
 target_include_directories(_poem PUBLIC ..)
 target_include_directories(_poem PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/..)
 
-#add_dependencies(_poem check_git_${PROJECT_NAME})
+add_dependencies(_poem check_git_${PROJECT_NAME})
 
 target_link_libraries(_poem PUBLIC
         MathUtils::MathUtils
