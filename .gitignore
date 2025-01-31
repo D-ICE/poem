@@ -22,3 +22,7 @@ tests/*/*.so
 
 docs/API/cpp/build
 docs/API/cpp/Doxyfile
+
+src/pypoem/_version.py
+
+dist

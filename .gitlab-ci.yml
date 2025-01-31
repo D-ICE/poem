@@ -81,10 +81,7 @@ pypoem-linux:
     CIBW_BUILD_VERBOSITY: 0
 
     CIBW_BEFORE_ALL: >
-      ls &&
-      git fetch origin &&
-      git describe --tags &&
-      git branch &&
+      yum update &&
       yum install -y openssh-clients &&
       eval $(ssh-agent -s) &&
       mkdir -p ~/.ssh &&
@@ -93,9 +90,9 @@ pypoem-linux:
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
-    CIBW_REPAIR_WHEEL_COMMAND: >
-      cat build/src/poem/version.h
-      cat src/pypoem/_version.py
+#    CIBW_REPAIR_WHEEL_COMMAND: >
+#      cat build/src/poem/version.h
+#      cat src/pypoem/_version.py
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
@@ -107,9 +104,6 @@ pypoem-linux:
     - cibuildwheel --print-build-identifiers # list wheels
     - cibuildwheel --output-dir linuxwheels
     - ls linuxwheels
-    - pwd
-    - ls /builds
-#    - cat build/src/poem/version.h
 
   artifacts:
     paths:
