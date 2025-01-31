@@ -81,7 +81,7 @@ pypoem-linux:
     CIBW_BUILD_VERBOSITY: 3
 
     CIBW_BEFORE_ALL: >
-      git fetch --all
+      git fetch --all &&
       yum install -y openssh-clients &&
       yum install -y graphviz git &&
       eval $(ssh-agent -s) &&
