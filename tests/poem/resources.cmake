@@ -1,5 +1,4 @@
 # Defining a resource dir for POEM
-#set(POEM_RESOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources)
 set(POEM_RESOURCE_DIR ${PROJECT_BINARY_DIR}/bin/tests)
 file(MAKE_DIRECTORY ${POEM_RESOURCE_DIR})
 

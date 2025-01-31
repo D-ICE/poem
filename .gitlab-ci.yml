@@ -12,8 +12,6 @@ include:
     - apt install -y git build-essential
     - pip install cmake
 
-# cibuildwheel SEE: https://cibuildwheel.pypa.io/en/stable/setup/#gitlab-ci
-
   cmake:
     - mkdir build && cd build
     - cmake ..
@@ -37,10 +35,8 @@ stages:
 
 
 cpp-tests:
-#  only:
-#    - tags # TODO: retirer
   except:
-    - tags  # don't run the tests on tags
+    - tags
 
   stage: build
 
@@ -62,9 +58,8 @@ cpp-tests:
 
 
 pypoem-linux:
-
-#  only:
-#    - main
+  only:
+    - main
 
   stage: build
 
@@ -76,8 +71,7 @@ pypoem-linux:
 
     CIBW_PLATFORM: linux
 
-#    CIBW_BUILD: cp3*-manylinux_x86_64
-    CIBW_BUILD: cp312-manylinux_x86_64
+    CIBW_BUILD: cp3*-manylinux_x86_64
 
     CIBW_ALLOW_EMPTY: True
 
@@ -116,7 +110,7 @@ pypoem-linux:
     expire_in: 3 hours
 
 
-deploy:
+pypi-deploy:
   stage: deploy
   image: python:3.12-bullseye
 

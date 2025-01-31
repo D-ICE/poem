@@ -39,8 +39,10 @@ classifiers = [
 Homepage = "https://github.com/D-ICE/poem"
 Documentation = "https://dice-poem.readthedocs.io/en/latest/"
 
-#[project.scripts] # Pour ajouter un outil cli...
-#cliapp = "package.__main__:main"
+#[project.scripts] # CLI tools
+#cliapp = [
+#    "pypoem.__main__:main"
+#]
 
 [tool.scikit-build]
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"

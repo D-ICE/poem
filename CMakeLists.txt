@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-
 project(poem LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
@@ -78,7 +77,6 @@ if (${POEM_BUILD_TESTS})
     add_subdirectory(tests)
 endif ()
 
-## smichel: has to be fixed, for now: commented
 # if (POEM_BUILD_TOOLS)
 #     include(Add_argparse)
 #     add_subdirectory(tools)

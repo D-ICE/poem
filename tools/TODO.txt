@@ -1,0 +1,13 @@
+On a besoin des outils suivants:
+
+>> tous ces outils devront fonctionner a partir de l'API Python pypoem. Pas de C++ ici
+
+* Merge de deux polaires v0 PPP et HPPP en une seule au format v1
+* dump métier de la structure d'une polaire
+* nettoyage d'un fichier de polaire (supression des tables inutiles pour la production)
+    -> correspond au script de creation d'une version de fichier de production
+* ajout rapide d'un numéro de version a une polaire
+* calcul du hash d'un fichier de polaire
+* reechantillonage d'un fichier de polaire (au travers de l'arborescence ?)
+* renommage rapide en masse de certaines variables (au travers de l'arborescence)
+* changement d'unités de certaines variables en masse (au travers de l'arborescence)
