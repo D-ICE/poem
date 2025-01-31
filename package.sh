@@ -22,7 +22,6 @@ export SSH_KNOWN_HOST=`cat ~/.ssh/ci-dice/known_hosts_ci_dice`
 
 # Essai sans install de graphviz et git
 export CIBW_BEFORE_ALL=$(cat <<-EOM
-  git describe
   yum update
   yum install -y openssh-clients
   eval $(ssh-agent -s)

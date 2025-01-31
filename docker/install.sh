@@ -37,3 +37,5 @@ sudo rm /var/run/docker.sock
 dockerd-rootless-setuptool.sh install
 
 docker run hello-world
+
+pip install cibuildwheel==2.22.0
