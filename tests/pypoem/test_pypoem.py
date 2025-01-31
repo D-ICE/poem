@@ -1,5 +1,5 @@
-# from pypoem import pypoem
-import pypoem
+from pypoem import pypoem
+# import pypoem
 import numpy as np
 
 if __name__ == '__main__':
