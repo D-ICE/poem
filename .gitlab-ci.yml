@@ -81,7 +81,6 @@ pypoem-linux:
     CIBW_BUILD_VERBOSITY: 3
 
     CIBW_BEFORE_ALL: >
-      git describe --tags &&
       yum install -y openssh-clients &&
       yum install -y graphviz git &&
       eval $(ssh-agent -s) &&

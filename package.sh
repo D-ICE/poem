@@ -22,7 +22,7 @@ export SSH_KNOWN_HOST=`cat ~/.ssh/ci-dice/known_hosts_ci_dice`
 
 # Essai sans install de graphviz et git
 export CIBW_BEFORE_ALL=$(cat <<-EOM
-  git describe --tags
+  git describe
   yum update
   yum install -y openssh-clients
   eval $(ssh-agent -s)
@@ -37,11 +37,11 @@ EOM
 export CIBW_BUILD="cp312-manylinux_x86_64"
 #export CIBW_BUILD="cp3*-manylinux_x86_64"
 
-#export CIBW_REPAIR_WHEEL_COMMAND=$(cat <<-EOM
-#  cat build/src/poem/version.h
-#  cat src/pypoem/_version.py
-#EOM
-#)
+export CIBW_REPAIR_WHEEL_COMMAND=$(cat <<-EOM
+  cat build/src/poem/version.h
+  cat src/pypoem/_version.py
+EOM
+)
 
 cibuildwheel --print-build-identifiers
 cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
