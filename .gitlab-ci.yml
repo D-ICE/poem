@@ -91,7 +91,7 @@ pypoem-linux:
       chmod 700 ~/.ssh/id_rsa &&
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
-#    CIBW_REPAIR_WHEEL_COMMAND: "cat build/src/poem/version.h"
+    CIBW_REPAIR_WHEEL_COMMAND: "cat build/src/poem/version.h"
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
