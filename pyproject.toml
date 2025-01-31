@@ -50,7 +50,7 @@ Documentation = "https://dice-poem.readthedocs.io/en/latest/"
 [tool.scikit-build]
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 sdist.include = ["src/pypoem/_version.py"]
-build.verbose = true
+build.verbose = false
 
 cmake.version = ">=3.20"
 cmake.build-type = "Release"
