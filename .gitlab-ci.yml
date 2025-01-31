@@ -40,10 +40,9 @@ cpp-tests:
 
   stage: build
 
-  image: "python:$PYTHON_VERSION-bullseye" # TODO: on pourra prendre une debian autre...
+  image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
 
   variables:
-    PYTHON_VERSION: "3.10"
     ENABLE_TEST: "ON"
 
   before_script:
@@ -90,8 +89,8 @@ pypoem-linux:
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
 #    CIBW_REPAIR_WHEEL_COMMAND: >
-#      cat scikit-build/src/poem/version.h
-#      cat src/pypoem/_version.py
+#      cat build/src/poem/version.h
+#      cat python/pypoem/_version.py
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]

@@ -70,7 +70,7 @@ include(Add_netcdf-cxx4)
 add_subdirectory(src/poem)
 
 if (POEM_BUILD_PYTHON)
-    add_subdirectory(src/pypoem)
+    add_subdirectory(python)
 endif ()
 
 if (${POEM_BUILD_TESTS})

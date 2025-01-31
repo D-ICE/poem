@@ -9,7 +9,7 @@ install(TARGETS pypoem DESTINATION pypoem)
 if (POEM_BUILD_TESTS)
     set_target_properties(pypoem
             PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/tests/pypoem
+            LIBRARY_OUTPUT_DIRECTORY ../tests/pypoem
     )
 endif()
 

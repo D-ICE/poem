@@ -23,7 +23,7 @@ tests/*/*.so
 docs/API/cpp/build
 docs/API/cpp/Doxyfile
 
-src/pypoem/_version.py
+python/pypoem/_version.py
 
 dist
 linuxwheels
