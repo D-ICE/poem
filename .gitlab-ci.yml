@@ -78,10 +78,12 @@ pypoem-linux:
 
     CIBW_DEBUG_TRACEBACK: True
 
-    CIBW_BUILD_VERBOSITY: 3
+    CIBW_BUILD_VERBOSITY: 1
 
     CIBW_BEFORE_ALL: >
+      ls &&
       git fetch --all &&
+      git describe --tags &&
       yum install -y openssh-clients &&
       yum install -y graphviz git &&
       eval $(ssh-agent -s) &&
