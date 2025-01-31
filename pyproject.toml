@@ -35,12 +35,17 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+dependencies = [
+    "argparse",
+    "hashlib"
+]
+
 [project.urls]
 Homepage = "https://github.com/D-ICE/poem"
 Documentation = "https://dice-poem.readthedocs.io/en/latest/"
 
 [project.scripts] # CLI tools
-poem_hash = "tools.poem_hash:main"
+poem_hash = "pypoem.tools.poem_hash:main"
 
 [tool.scikit-build]
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
