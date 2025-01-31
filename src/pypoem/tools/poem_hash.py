@@ -3,7 +3,7 @@
 
 import argparse
 import os
-import hashlib
+import sha256
 
 def get_parser():
     parser = argparse.ArgumentParser(
@@ -21,7 +21,7 @@ def main():
 
     if os.path.isfile(args.infilename):
         print("Generating hash for file %s" % args.infilename)
-        hasher = hashlib.sha256()
+        hasher = sha256.sha256()
         with open(args.infilename, 'rb') as f:
             buf = f.read()
             hasher.update(buf)

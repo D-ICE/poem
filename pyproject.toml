@@ -37,7 +37,7 @@ classifiers = [
 
 dependencies = [
     "argparse",
-    "hashlib"
+    "sha256"
 ]
 
 [project.urls]
