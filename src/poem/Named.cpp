@@ -14,9 +14,9 @@ namespace poem {
     check_unit();
 
     #ifndef ALLOW_DIRTY
-    if (git::AnyUncommittedChanges()) {
+    if (git::is_dirty()) {
         LogCriticalError("Using POEM with uncommitted code modifications is forbidden. Current POEM version: {}",
-                         git::GetNormalizedVersionString());
+                         git::version_full());
         CRITICAL_ERROR_POEM
       }
     #endif

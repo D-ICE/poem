@@ -13,9 +13,11 @@
 using namespace poem;
 
 TEST(poem, version) {
-  bool pop = git::IsPopulated();
-  std::cout << git::IsPopulated() << std::endl;
-  std::cout << poem_GIT_AUTHOR_EMAIL << std::endl;
+  std::cout << "IS DIRTY: " << git::is_dirty() << std::endl;
+  std::cout << "FULL VERSION: " << git::version_full() << std::endl;
+  std::cout << "LAST TAG: " << git::last_tag() << std::endl;
+  std::cout << "LAST COMMIT DATE: " << git::last_commit_date() << std::endl;
+  std::cout << "CURRENT BRANCH: " << git::current_branch() << std::endl;
 
 }
 
