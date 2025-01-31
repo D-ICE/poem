@@ -1,0 +1,34 @@
+
+## Build de pypoem en local, sans cibuildwheel
+
+Utilise scikit-build-core qui build juste pour la version courante de python
+Le fichier de config est le pyproject.toml
+
+pour build et installer, depuis la racine du depot:
+pip install .
+
+
+## Build de pypoem avec cibuildwheel
+
+L'outil a pour objet de permettre de build pour differentes versions de python, differentes plateformes etc...
+Utilise Docker pour faire le build des differentes versions de Python
+Repose directement sur le fichier de config pyproject.toml et utilise le backend de build qui est specifie (scikit-build-core ici)
+La finalite de l'outil est
+
+# Testing en local
+
+On peut utiliser le script package.sh
+Cela permet de ne pas reoser sur le seul mecanisme de la CI pour tester le build via cibuildwheel
+Il est nécessaire d'avoir docker en mode rootless. On peut l'installer avec le script docker/install.sh
+On peut désinstaller Docker avec docker/uninstall.sh
+
+Ensuite, on peut lancer le script package.sh qui s'il reussit genere les wheels dans le repertoire linuxwheels
+
+
+
+# Testing en CI
+
+Tout est géré par la CI gitlab automatiquement
+Le build ne s'effectue que si on est sur un tag
+
+
