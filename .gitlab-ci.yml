@@ -59,6 +59,7 @@ cpp-tests:
 pypoem-linux:
   only:
     - main
+    - tags
 
   stage: build
 
@@ -110,7 +111,11 @@ pypoem-linux:
 
 
 pypi-deploy:
+  only:
+    - tags
+
   stage: deploy
+
   image: python:3.12-bullseye
 
   variables:
@@ -124,6 +129,3 @@ pypi-deploy:
   script:
     # TODO: trouver un moyen de recuperer les versions de pipy
     - twine upload linuxwheels/*
-
-  only:
-    - tags
