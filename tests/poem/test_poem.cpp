@@ -19,7 +19,12 @@ TEST(poem, version) {
   std::cout << "LAST COMMIT DATE: " << git::last_commit_date() << std::endl;
   std::cout << "CURRENT BRANCH: " << git::current_branch() << std::endl;
 
+  std::cout << "MAJOR: " << git::version_major() << std::endl;
+  std::cout << "MINOR: " << git::version_minor() << std::endl;
+  std::cout << "PATCH: " << git::version_patch() << std::endl;
+
   std::cout << "CURRENT POEM SPEC VERSION: " << current_poem_standard_version() << std::endl;
+
 }
 
 TEST(poem, PolarTable) {

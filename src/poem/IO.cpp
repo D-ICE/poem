@@ -19,13 +19,7 @@ namespace poem {
   // ===================================================================================================================
 
   int current_poem_standard_version() {
-    std::cout << "IS DIRTY: " << git::is_dirty() << std::endl;
-    std::cout << "FULL VERSION: " << git::version_full() << std::endl;
-    std::cout << "LAST TAG: " << git::last_tag() << std::endl;
-    std::cout << "LAST COMMIT DATE: " << git::last_commit_date() << std::endl;
-    std::cout << "CURRENT BRANCH: " << git::current_branch() << std::endl;
-
-    return (int) semver::version::parse(git::last_tag(), false).major();
+    return git::version_major();
   }
 
   std::vector<netCDF::NcDim> to_netcdf(std::shared_ptr<DimensionGrid> dimension_grid,

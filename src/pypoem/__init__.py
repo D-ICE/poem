@@ -1,7 +1,8 @@
 from .pypoem import __doc__
+from ._version import __version__, __version_tuple__
 
 __all__ = ["__doc__",
-           # "current_standard_poem_version",
+           "current_standard_poem_version",
            "make_dimension",
            "make_dimension_set",
            "DimensionPoint",

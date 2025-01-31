@@ -36,11 +36,12 @@ stages:
   - deploy
 
 
-test:
-  only:
-    - tags # TODO: retirer
-  #  except:
-  #    - tags  # don't run the tests on tags
+cpp-tests:
+#  only:
+#    - tags # TODO: retirer
+  except:
+    - tags  # don't run the tests on tags
+
   stage: build
 
   image: "python:$PYTHON_VERSION-bullseye" # TODO: on pourra prendre une debian autre...
@@ -61,6 +62,10 @@ test:
 
 
 pypoem-linux:
+
+#  only:
+#    - main
+
   stage: build
 
   image: python:3.12-bullseye
@@ -91,7 +96,7 @@ pypoem-linux:
       echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
 
 #    CIBW_REPAIR_WHEEL_COMMAND: >
-#      cat build/src/poem/version.h
+#      cat scikit-build/src/poem/version.h
 #      cat src/pypoem/_version.py
 
   before_script:
@@ -110,6 +115,7 @@ pypoem-linux:
       - linuxwheels
     expire_in: 3 hours
 
+
 deploy:
   stage: deploy
   image: python:3.12-bullseye
@@ -125,3 +131,6 @@ deploy:
   script:
     # TODO: trouver un moyen de recuperer les versions de pipy
     - twine upload linuxwheels/*
+
+  only:
+    - tags
