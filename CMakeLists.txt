@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(poem LANGUAGES CXX)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Add_cmake_ref.cmake)
+list(APPEND CMAKE_MODULE_PATH ${cmake-ref_SOURCE_DIR}/cmake)
+include(Add_CMakeExtraUtils)
+include(DynamicVersion)
+dynamic_version(PROJECT_PREFIX poem_)
+
+message(STATUS PROJECT: pypoem)
+message(STATUS VERSION: ${PROJECT_VERSION_FULL})
+
+project(poem LANGUAGES CXX VERSION ${PROJECT_VERSION_FULL})
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -30,19 +39,22 @@ cmake_policy(SET CMP0167 NEW) # Boost
 #=============================================================================
 # Retrieving the current Git revision
 #=============================================================================
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Add_cmake_ref.cmake)
-list(APPEND CMAKE_MODULE_PATH ${cmake-ref_SOURCE_DIR}/cmake)
+#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Add_cmake_ref.cmake)
+#list(APPEND CMAKE_MODULE_PATH ${cmake-ref_SOURCE_DIR}/cmake)
+#
+#set(PRE_CONFIGURE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/poem/version.h.in CACHE FILEPATH "" FORCE)
+#set(POST_CONFIGURE_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/poem/version.h CACHE FILEPATH "" FORCE)
+#set(GIT_WORKING_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE FILEPATH "" FORCE)
+#set(GIT_STATE_FILE ${CMAKE_CURRENT_BINARY_DIR}/git-state-hash CACHE FILEPATH "" FORCE)
+#
+#if (NOT EXISTS ${POST_CONFIGURE_FILE})
+#    configure_file(${PRE_CONFIGURE_FILE} ${POST_CONFIGURE_FILE})
+#endif ()
+#
+#include(git_watcher)
 
-set(PRE_CONFIGURE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/poem/version.h.in CACHE FILEPATH "" FORCE)
-set(POST_CONFIGURE_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/poem/version.h CACHE FILEPATH "" FORCE)
-set(GIT_WORKING_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE FILEPATH "" FORCE)
-set(GIT_STATE_FILE ${CMAKE_CURRENT_BINARY_DIR}/git-state-hash CACHE FILEPATH "" FORCE)
 
-if (NOT EXISTS ${POST_CONFIGURE_FILE})
-    configure_file(${PRE_CONFIGURE_FILE} ${POST_CONFIGURE_FILE})
-endif ()
 
-include(git_watcher)
 
 #=============================================================================
 # Dependencies

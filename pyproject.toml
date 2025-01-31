@@ -4,13 +4,20 @@
 [build-system]
 #requires = ["scikit-build-core", "pybind11"]
 requires = ["scikit-build-core"]
+#requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "pypoem"
+# For dynamic version:
+# https://scikit-build-core.readthedocs.io/en/latest/configuration.html#dynamic-metadata
+# https://github.com/pypa/setuptools-scm/blob/fb261332d9b46aa5a258042d85baa5aa7b9f4fa2/README.rst#git-archives
+
 #metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 
 version = "0.1-7" # TODO: gerer dynamiquement les versions a partir des tags git -> only tags dans la ci pour le deploy
+dynamic = ["version"]
+
 description = "Performance pOlar Exchange forMat"
 readme = "README.md"
 maintainers = [{ name = "D-ICE ENGINEERING", email = "francois.rongere@dice-engineering.com" }]
@@ -41,8 +48,11 @@ Documentation = "https://dice-poem.readthedocs.io/en/latest/"
 #cliapp = "package.__main__:main"
 
 [tool.scikit-build]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["src/pypoem/_version.py"]
+build.verbose = true
+
 cmake.version = ">=3.20"
-cmake.verbose = true
 cmake.build-type = "Release"
 cmake.args = [
     "-DPOEM_BUILD_TESTS=OFF",
@@ -54,3 +64,6 @@ cmake.args = [
 build-dir = "build"
 build.targets = ["pypoem"]
 #build.tool-args = ["-j6"]
+
+[tool.setuptools_scm]  # Section required
+write_to = "src/pypoem/_version.py"
