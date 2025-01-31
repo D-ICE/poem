@@ -13,7 +13,10 @@
 using namespace poem;
 
 TEST(poem, version) {
-  std::cout << "Poem Version: " << git::GetNormalizedVersionString() << std::endl;
+  bool pop = git::IsPopulated();
+  std::cout << git::IsPopulated() << std::endl;
+  std::cout << poem_GIT_AUTHOR_EMAIL << std::endl;
+
 }
 
 TEST(poem, PolarTable) {
@@ -436,3 +439,4 @@ TEST(poem, read_poem_v0_example) {
 //  read_poem_nc_file("poem_v0_example_no_sails_v0_to_v1.nc");
 
 }
+

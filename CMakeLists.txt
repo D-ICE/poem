@@ -34,7 +34,7 @@ cmake_policy(SET CMP0167 NEW) # Boost
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Add_cmake_ref.cmake)
 list(APPEND CMAKE_MODULE_PATH ${cmake-ref_SOURCE_DIR}/cmake)
 
-set(PRE_CONFIGURE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/poem/version.h.in CACHE FILEPATH "" FORCE)
+set(PRE_CONFIGURE_FILE ${cmake-ref_SOURCE_DIR}/cmake/version.h.in CACHE FILEPATH "" FORCE)
 set(POST_CONFIGURE_FILE ${CMAKE_CURRENT_BINARY_DIR}/src/poem/version.h CACHE FILEPATH "" FORCE)
 set(GIT_WORKING_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE FILEPATH "" FORCE)
 set(GIT_STATE_FILE ${CMAKE_CURRENT_BINARY_DIR}/git-state-hash CACHE FILEPATH "" FORCE)
@@ -48,7 +48,6 @@ include(git_watcher)
 #=============================================================================
 # Dependencies
 #=============================================================================
-
 include(Add_cools)
 include(Add_Boost)
 include(Add_mathutils)
@@ -85,5 +84,3 @@ endif ()
 #     include(Add_argparse)
 #     add_subdirectory(tools)
 # endif ()
-
-

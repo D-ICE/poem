@@ -182,15 +182,15 @@ namespace poem {
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
-//    LogNormalInfo("Writing file (version v{}): {}",
-//                  current_poem_standard_version(),
-//                  fs::absolute(filename).string());
+    LogNormalInfo("Writing file (version v{}): {}",
+                  current_poem_standard_version(),
+                  fs::absolute(filename).string());
     LogNormalInfo("Writing file: {}", fs::absolute(filename).string());
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);
     root_group.putAtt("POEM_library_version", git::GetNormalizedVersionString());
-//    root_group.putAtt("POEM_standard_version", "v" + std::to_string(current_poem_standard_version()));
+    root_group.putAtt("POEM_standard_version", "v" + std::to_string(current_poem_standard_version()));
     root_group.putAtt("Date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
     root_group.close();
   }

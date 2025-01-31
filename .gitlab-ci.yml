@@ -84,8 +84,8 @@ pypoem-linux:
       ls &&
       git fetch origin &&
       git describe --tags &&
+      git branch &&
       yum install -y openssh-clients &&
-      yum install -y graphviz git &&
       eval $(ssh-agent -s) &&
       mkdir -p ~/.ssh &&
       echo "$GITLAB_CI_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa &&
