@@ -2,22 +2,24 @@
 
 **Performance pOlar Exchange forMat**
 
-C++ library and exchange format for performance polar in marine engineering
+C++ library and exchange format for performance polar in marine engineering, wind assisted vessels performance prediction,
+weather routing optimisation, embedded control systems, training simulators.
 
 <!-- TOC -->
 
-- [POEM](#poem)
-  - [Links](#links)
-  - [POEM in a nuttshell](#poem-in-a-nuttshel)
-  - [Python interface](#python-interface)
-    - [Requirements](#requirements)
-    - [Install from Pypi](#install-from-pypi)
-    - [Install from sources](#install-from-sources)
-    - [Basic usage](#basic-usage)
-  - [Integrating the C++ library](#integrating-the-c-library)
-    - [Requirements](#requirements-1)
-    - [CMake](#cmake)
-    - [Basic usage](#basic-usage-1)
+- [Links](#links)
+- [Introduction](#introduction)
+- [POEM in a nuttshell](#poem-in-a-nuttshel)
+- [Python interface](#python-interface)
+  - [Requirements](#requirements)
+  - [Install from Pypi](#install-from-pypi)
+  - [Install from sources](#install-from-sources)
+  - [Basic usage](#basic-usage)
+- [Integrating the C++ library](#integrating-the-c-library)
+  - [Requirements](#requirements-1)
+  - [CMake](#cmake)
+  - [Basic usage](#basic-usage-1)
+- [Current limitations](#current-limitations)
 
 [//]: # (    - [How to cite poem]&#40;#how-to-cite-poem&#41;)
 
@@ -29,14 +31,24 @@ C++ library and exchange format for performance polar in marine engineering
 
 ## Links
 
-* Github repository: https://github.com/D-ICE/poem
-* API Documentation: 
-* POEM Specifications: 
-* D-ICE ENGINEERING: https://www.dice-engineering.com/en
+* **Github repository:** https://github.com/D-ICE/poem
+* **API Documentation:** 
+* **POEM Specifications:** https://dice-poem.readthedocs.io/en/latest/
+* **D-ICE ENGINEERING:** https://www.dice-engineering.com/en
+
+## Introduction
+
+* what is a VPP
+* what is a digital twin
+* what is a performance polar
+* the different type of polars
+* how a polar is used
 
 ## POEM in a nuttshel
 
-TODO
+* why poem
+* what is poem
+* is poem for me
 
 
 ## Python interface
@@ -67,20 +79,27 @@ $ pip install .
 
 ### Basic usage
 
-TODO
+Work In Progress
 
 ## Integrating the C++ library
 
-TODO
+Work In Progress
 
 ### Requirements
 
-TODO
+Work In Progress
+
 ### CMake
-TODO
+Work In Progress
+
 ### Basic usage
 
-TODO
+Work In Progress
+
+## Current limitations
+
+POEM has been primarily developed under Linux OS. Port to other platforms is expected to come in the future but is not
+a current top priority. Contributors for a Windows port are welcome :)
 
 [//]: # (## How to cite poem)
 
