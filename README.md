@@ -1,52 +1,54 @@
 # POEM
 
-Performance pOlar Exchange forMat
+**Performance pOlar Exchange forMat**
 
 C++ library and exchange format for performance polar in marine engineering
 
 <!-- TOC -->
 
-- [POEM](#spglib)
-    - [What does poem do?](#what-does-poem-do)
-    - [Documentation](#documentation)
-        - [API Documentation](#api-dodumentation)
-        - [poem file format specifications](#poem-file-format-specifications)
+- [POEM](#poem)
+  - [Links](#links)
+  - [POEM in a nuttshell](#poem-in-a-nuttshel)
+  - [Python interface](#python-interface)
     - [Requirements](#requirements)
-    - [How to use poem](#how-to-use-poem)
-        - [How to include lib_poem into your C++ project](#how-to-include-lib_poem-into-your-c-project)
-        - [How to run the tests](#how-to-run-the-tests)
-        - [How to install the python library](#how-to-install-the-python-libray)
-            - [Install from PYPI](#install-from-pypi)
-            - [Install from sources](#install-from-sources)
-    - [How to cite poem](#how-to-cite-poem)
-    - [Contributing](#contributing)
+    - [Install from Pypi](#install-from-pypi)
+    - [Install from sources](#install-from-sources)
+    - [Basic usage](#basic-usage)
+  - [Integrating the C++ library](#integrating-the-c-library)
+    - [Requirements](#requirements-1)
+    - [CMake](#cmake)
+    - [Basic usage](#basic-usage-1)
+
+[//]: # (    - [How to cite poem]&#40;#how-to-cite-poem&#41;)
+
+[//]: # (    - [Contributing]&#40;#contributing&#41;)
     
 
 <!-- TOC -->
 
-Github repository: https://github.com/D-ICE/poem
 
-## What does poem do?
+## Links
 
-## Documentation
+* Github repository: https://github.com/D-ICE/poem
+* API Documentation: 
+* POEM Specifications: 
+* D-ICE ENGINEERING: https://www.dice-engineering.com/en
 
-### API Dodumentation
+## POEM in a nuttshel
 
-### poem file format specifications
+TODO
 
-## Requirements
 
-## How to use poem
+## Python interface
 
-### How to include lib_poem into your C++ project
+The pypoem package that wraps poem is pypoem. It does not currently give acces to the whole C++ API but feature are 
+progressively ported to Python.
 
-### How to run the tests
+### Requirements
 
-### How to install the python libray
+pypoem is tested with Python version >= 3.9.
 
-The pypoem package that wraps poem is pypoem.
-
-#### Install from PYPI
+### Install from Pypi
 
 pypoem is available on Pypi, so it can be installed as:
 
@@ -54,32 +56,35 @@ pypoem is available on Pypi, so it can be installed as:
 $ pip install pypoem
 ```
 
-#### Install from sources
+### Install from sources
 
 pypoem relies on [scikit-build-core](https://scikit-build-core.readthedocs.io/en/latest/index.html) for the packaging.
-To install from sources, clone this repository as:
-
-```console
-$ git clone https://github.com/D-ICE/poem.git
-```
-
-Then checkout to the version you want.
-
-```console
-$ git checkout <version>
-```
-
-Installation can be made using pip by running the following command at the root of the repository:
+Source installation is realised by running the following command int the repository root directory:
 
 ```console
 $ pip install .
 ```
 
+### Basic usage
 
+TODO
 
-## How to cite poem
+## Integrating the C++ library
 
-## Contributing
+TODO
+
+### Requirements
+
+TODO
+### CMake
+TODO
+### Basic usage
+
+TODO
+
+[//]: # (## How to cite poem)
+
+[//]: # (## Contributing)
 
 
 
