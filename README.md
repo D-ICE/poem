@@ -104,12 +104,13 @@ dimension_grid.set_values("TWA", np.linspace(0, 180, 13))
 polar_MPPP = pypoem.make_polar("MPPP", pypoem.MPPP, dimension_grid)
 
 # Creating a PolarTable from the MPPP Polar
-BrakePower = polar_MPPP.create_polar_table_double("BrakePower", "kW", "Brake Power", pypoem.POEM_DOUBLE)
+BrakePower = polar_MPPP.create_polar_table_double("BrakePower", "kW", "Brake Power", 
+                                                  pypoem.POEM_DOUBLE)
 
 # Generating a dummy NDArray with ones and the same shape as the DimensionGrid
-# Note that NDArrays must be arranged in a row major order with respect the DimensionSet of the DimensionGrid
-# If you think in terms of nested for loop with Dimensions, the last Dimension (here TWA) is moving fastest (most inner 
-# loop).
+# Note that NDArrays must be arranged in a row major order with respect the DimensionSet
+# of the DimensionGrid. If you think in terms of nested for loop with Dimensions, 
+# the last Dimension (here TWA) is moving fastest (most inner loop).
 brake_power_data = np.ones(dimension_grid.shape())
 
 # Setting the BrakePower PolarTable with the array

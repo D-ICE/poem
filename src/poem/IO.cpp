@@ -181,17 +181,18 @@ namespace poem {
 
   }
 
-  void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &filename) {
-    LogNormalInfo("Writing file (version v{}): {}",
+  void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &vessel_name, const std::string &filename) {
+    LogNormalInfo("Writing file <specification v{}>: {}",
                   current_poem_standard_version(),
                   fs::absolute(filename).string());
-    LogNormalInfo("Writing file: {}", fs::absolute(filename).string());
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);
-    root_group.putAtt("POEM_library_version", git::version_full());
-    root_group.putAtt("POEM_standard_version", "v" + std::to_string(current_poem_standard_version()));
-    root_group.putAtt("Date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
+    root_group.putAtt("POEM_LIBRARY_VERSION", git::version_full());
+    root_group.putAtt("POEM_SPECIFICATION_VERSION", "v" + std::to_string(current_poem_standard_version()));
+    root_group.putAtt("date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
+    root_group.putAtt("vessel_name", vessel_name);
+
     root_group.close();
   }
 
@@ -208,9 +209,9 @@ namespace poem {
     netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
 
     int major_version;
-    if (datafile.getAtts().contains("poem_file_format_version")) {
+    if (datafile.getAtts().contains("POEM_SPECIFICATION_VERSION")) {
       std::string spec_version;
-      datafile.getAtt("poem_file_format_version").getValues(spec_version);
+      datafile.getAtt("POEM_SPECIFICATION_VERSION").getValues(spec_version);
       major_version = (int) semver::version::parse(spec_version, false).major();
 
     } else {
@@ -222,7 +223,9 @@ namespace poem {
     return major_version;
   }
 
-  std::shared_ptr<DimensionGrid> read_dimension_grid_from_var(const netCDF::NcVar &var) {
+  // TODO: ne conserver que des read, renvoyer void et passer les shared_ptr... (sauf pour read_dimension_grid)
+
+  void read_dimension_grid_from_var(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> dimension_grid) {
 
     size_t ndim = var.getDimCount();
 
@@ -241,7 +244,7 @@ namespace poem {
     }
 
     auto dimension_set = make_dimension_set(dimensions);
-    auto dimension_grid = make_dimension_grid(dimension_set);
+    dimension_grid = make_dimension_grid(dimension_set);
 
     for (size_t idim = 0; idim < ndim; ++idim) {
       auto name = dimension_set->dimension(idim)->name();
@@ -253,15 +256,15 @@ namespace poem {
 
     }
 
-    return dimension_grid;
   }
 
-  std::shared_ptr<PolarTableBase> read_polar_table(const netCDF::NcVar &var,
-                                                   std::shared_ptr<DimensionGrid> &dimension_grid,
-                                                   bool dimension_grid_from_var) {
+  void read_polar_table(const netCDF::NcVar &var,
+                        std::shared_ptr<PolarTableBase> polar_table,
+                        std::shared_ptr<DimensionGrid> &dimension_grid,
+                        bool dimension_grid_from_var) {
 
     if (dimension_grid_from_var) {
-      dimension_grid = read_dimension_grid_from_var(var);
+      read_dimension_grid_from_var(var, dimension_grid);
     }
 
     if (var.getDimCount() != dimension_grid->ndims()) {
@@ -285,7 +288,7 @@ namespace poem {
     std::string description;
     var.getAtt("description").getValues(description);
 
-    std::shared_ptr<PolarTableBase> polar_table;
+//    std::shared_ptr<PolarTableBase> polar_table;
 
     switch (var.getType().getTypeClass()) {
       case netCDF::NcType::nc_DOUBLE: {
@@ -307,11 +310,15 @@ namespace poem {
         CRITICAL_ERROR_POEM
     }
 
-    return polar_table;
+    // TODO: lire les attributs
+
+//    return polar_table;
 
   }
 
-  std::shared_ptr<Polar> read_polar(const netCDF::NcGroup &group, const std::string &name) {
+  void read_polar(const netCDF::NcGroup &group,
+                  std::shared_ptr<Polar> polar,
+                  const std::string &name) {
 
     std::string name_;
     if (name == "from-group") {
@@ -363,12 +370,14 @@ namespace poem {
     POLAR_MODE polar_mode = string_to_polar_mode(name_);
 
     std::shared_ptr<DimensionGrid> dimension_grid;
-    auto polar = make_polar(name, polar_mode, dimension_grid);
+    polar = make_polar(name, polar_mode, dimension_grid);
 
     bool dimension_grid_from_var = true;
     for (const auto &nc_var: group.getVars()) {
       if (group.getCoordVars().contains(nc_var.first)) continue;
-      auto polar_table = read_polar_table(nc_var.second, dimension_grid, dimension_grid_from_var);
+
+      std::shared_ptr<PolarTableBase> polar_table;
+      read_polar_table(nc_var.second, polar_table, dimension_grid, dimension_grid_from_var);
 
       if (dimension_grid_from_var) {
         polar->dimension_grid() = dimension_grid;
@@ -378,10 +387,13 @@ namespace poem {
       polar->attach_polar_table(polar_table);
     }
 
-    return polar;
+    // TODO: lire les attributs
+
   }
 
-  std::shared_ptr<PolarSet> read_polar_set(const netCDF::NcGroup &group, const std::string &polar_set_name) {
+  void read_polar_set(const netCDF::NcGroup &group,
+                      std::shared_ptr<PolarSet> polar_set,
+                      const std::string &polar_set_name) {
 
 //    NIY_POEM
 
@@ -397,21 +409,25 @@ namespace poem {
       polar_set_name_ = polar_set_name;
     }
 
-    auto polar_set = std::make_shared<PolarSet>(polar_set_name_);
+    polar_set = std::make_shared<PolarSet>(polar_set_name_);
 
     for (const auto &subgroup: group.getGroups()) {
       if (!is_polar_mode(subgroup.first)) continue; // Group name for Polar MUST be a POLAR_MODE string representation
 
-      auto polar = read_polar(subgroup.second);
+      std::shared_ptr<Polar> polar;
+      read_polar(subgroup.second, polar);
 
       polar_set->attach_polar(polar);
 
     }
 
-    return polar_set;
+    // TODO: lire les attributs
+
   }
 
-  std::shared_ptr<PolarNode> read_polar_node(const netCDF::NcGroup &group, const std::string &polar_node_name_) {
+  void read_polar_node(const netCDF::NcGroup &group,
+                       std::shared_ptr<PolarNode> polar_node,
+                       const std::string &polar_node_name) {
 
     // FIXME: c'est a priori plus sioux que ca is root ou pas... surtout quand on itere en recursif
 
@@ -421,36 +437,46 @@ namespace poem {
      * group !is_root & from-group
      */
 
-    std::string polar_node_name;
-    if (polar_node_name_ == "from-group") {
-      if (group.isRootGroup()) {
-        LogCriticalError("While reading PolarNode, when group is root, the polar node name must be specified as"
-                         "it cannot be retrieved from group name");
-        CRITICAL_ERROR_POEM
-      }
-      polar_node_name = group.getName();
-    } else {
-      polar_node_name = polar_node_name_;
-    }
+//    std::string polar_node_name;
+//    if (polar_node_name_ == "from-file") {
+//      if (group.isRootGroup()) {
+//        LogCriticalError("While reading PolarNode, when group is root, the polar node name must be specified as"
+//                         "it cannot be retrieved from group name");
+//        CRITICAL_ERROR_POEM
+//      }
+//      polar_node_name = group.getName();
+//    } else {
+//      polar_node_name = polar_node_name_;
+//    }
 
-    std::shared_ptr<PolarNode> polar_node;
+//    std::shared_ptr<PolarNode> polar_node;
+
+//    if (group.isRootGroup()) {
+//
+//    }
+    // FIXME: il faut lire les attributs... notamment vessel_name
 
     auto polar_mode_type = guess_polar_node_type(group);
     switch (polar_mode_type) {
       case POLAR_NODE: {
         polar_node = make_polar_node(polar_node_name);
         for (const auto &subgroup: group.getGroups()) {
-          auto new_polar_node = read_polar_node(subgroup.second);
+          std::shared_ptr<PolarNode> new_polar_node;
+          read_polar_node(subgroup.second, new_polar_node);
           new_polar_node->attach_to(polar_node);
         }
         break;
       }
       case POLAR_SET: {
-        polar_node = read_polar_set(group, polar_node_name);
+        std::shared_ptr<PolarSet> polar_set;
+        read_polar_set(group, polar_set, polar_node_name);
+        polar_node = polar_set;
         break;
       }
       case POLAR: {
-        polar_node = read_polar(group, polar_node_name);
+        std::shared_ptr<Polar> polar;
+        read_polar(group, polar, polar_node_name);
+        polar_node = polar;
         break;
       }
       default:
@@ -458,28 +484,34 @@ namespace poem {
         CRITICAL_ERROR_POEM
     }
 
-    if (group.isRootGroup()) {
-      polar_node->attributes().add_attribute("vessel_name", polar_node_name);
-    }
-    return polar_node;
+    // FIXME: voir si on fait ca...
+//    if (group.isRootGroup()) {
+//      polar_node->attributes().add_attribute("vessel_name", polar_node_name);
+//    }
+
+    // TODO: lire les attributs
+
   }
 
 
-  std::shared_ptr<PolarNode> read_v0(const std::string &filename, const std::string &root_name) {
+  void read_v0(const netCDF::NcGroup &root_group,
+               std::shared_ptr<PolarNode> root_node,
+               const std::string &root_name) {
 
     // PolarNode is root and we set the vessel name as filename as we do not have vessel name in v0
 //    std::string vessel_name = fs::path(filename).stem();
     if (root_name == "from-file") {
-      LogCriticalError("While reading POEM file version v0, root_name must be specified");
+      LogCriticalError("While reading POEM file version v0, "
+                       "root_name must be specified and must be vessel_name");
       CRITICAL_ERROR_POEM
     }
 
     // Get the polar_name
-    netCDF::NcFile datafile(filename, netCDF::NcFile::read);
+//    netCDF::NcFile datafile(filename, netCDF::NcFile::read);
 
     POLAR_MODE polar_mode;
     std::string vessel_type;
-    datafile.getAtt("vessel_type").getValues(vessel_type);
+    root_group.getAtt("vessel_type").getValues(vessel_type);
     if (vessel_type == "HYBRID") {
       polar_mode = HPPP;
     } else if (vessel_type == "MOTOR") {
@@ -492,28 +524,35 @@ namespace poem {
     // On voudrait avoir /vessel/MPPP/polar_tables...
     // /PolarSet/Polar/PolarTables...
 
-    auto root_node = make_polar_set(root_name);
-    auto polar = read_polar(datafile, polar_mode_to_string(polar_mode));
-    datafile.close();
+    root_node = make_polar_set(root_name);
+    std::shared_ptr<Polar> polar;
+    read_polar(root_group, polar, polar_mode_to_string(polar_mode));
+//    datafile.close();
 
-    polar->attach_to(root_node);
+    polar->attach_to(root_node); // FIXME: on doit forcement avoir un PolarSet dans la lecture v0 ???
 
-    return root_node;
+    root_node->attributes().add_attribute("vessel_name", root_name);
 
   }
 
-  std::shared_ptr<PolarNode> read_v1(const std::string &filename, const std::string &root_name) {
-    netCDF::NcFile datafile(filename, netCDF::NcFile::read);
+  void read_v1(const netCDF::NcGroup &root_group,
+               std::shared_ptr<PolarNode> root_node,
+               const std::string &root_name) {
+//    root_group, root_name, root_node
 
     std::string vessel_name;
-    if (root_name == "from_group") {
-      datafile.getAtt("vessel_name").getValues(vessel_name);
+    if (root_name == "from-file") {
+      root_group.getAtt("vessel_name").getValues(vessel_name);
     } else {
       vessel_name = root_name;
     }
 
-    auto root_node = read_polar_node(datafile, root_name);
-    datafile.close();
+    read_polar_node(root_group, root_node, vessel_name);
+
+
+//    for ()
+
+//    datafile.close();
 
     NIY_POEM
     // vessel_name
@@ -521,13 +560,13 @@ namespace poem {
 //    auto operation_mode = std::make_shared<PolarNode>("");
 //    NIY_POEM
 //    return operation_mode;
-    return root_node;
   }
 
   std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name) {
 
+    LogNormalInfo("Reading file: {}", fs::absolute(filename).string());
     int major_version = get_version(filename);
-    LogNormalInfo("Reading file (version v{}): {}", major_version, fs::absolute(filename).string());
+    LogNormalInfo("POEM specification v{} detected in file", major_version);
 
     // Check compliancy with specification
     if (!spec_check(filename, major_version)) {
@@ -537,17 +576,22 @@ namespace poem {
       LogNormalInfo("File is compliant with version v{}", major_version);
     }
 
-    std::shared_ptr<PolarNode> root_group;
+    netCDF::NcFile root_group(filename, netCDF::NcFile::read);
+    std::shared_ptr<PolarNode> root_node;
     switch (major_version) {
       case 0:
-        root_group = read_v0(filename, root_name);
+        read_v0(root_group, root_node, root_name);
         break;
       case 1:
-        root_group = read_v1(filename, root_name);
+        read_v1(root_group, root_node, root_name);
         break;
+      default:
+        LogCriticalError("Specification version v{} not known", major_version);
+        CRITICAL_ERROR_POEM
     }
+    root_group.close();
 
-    return root_group;
+    return root_node;
   }
 
   POLAR_NODE_TYPE guess_polar_node_type(const netCDF::NcGroup &group) {

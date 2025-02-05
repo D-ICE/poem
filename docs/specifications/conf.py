@@ -100,8 +100,26 @@ exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
+html_logo = '_static/D-ICE-blanc.png'
+html_favicon = '_static/dice-favicon.png'
+
 html_theme_options = {
-    'navigation_depth': 5,
+#     # 'analytics_id': 'G-XXXXXXXXXX',  #  Provided by Google in your dashboard
+#     # 'analytics_anonymize_ip': False,
+#     # 'logo_only': False,
+#     'prev_next_buttons_location': 'bottom',
+    'style_external_links': True,
+#     'vcs_pageview_mode': '',
+#     # 'style_nav_header_background': 'white',
+#     # 'flyout_display': 'hidden',
+#     # 'version_selector': True,
+#     # 'language_selector': True,
+#     # Toc options
+    'collapse_navigation': False,
+#     'sticky_navigation': False,
+    'navigation_depth': 3,
+#     'includehidden': True,
+#     'titles_only': True
 }
 
 # Numbering of figures, tables, etc.

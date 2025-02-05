@@ -148,40 +148,6 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.
   POLAR_MODE.export_values();
 
   // ===================================================================================================================
-  // PolarNode
-  // ===================================================================================================================
-  py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
-  PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
-  PolarNode.def(py::init<const std::string &>());
-
-  // ===================================================================================================================
-  // PolarSet
-  // ===================================================================================================================
-  py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>, poem::PolarNode> PolarSet(m, "PolarSet");
-  PolarSet.doc() = R"pbdoc("A PolarSet is a special PolarNode used to group a set of Polar")pbdoc";
-  PolarSet.def(py::init<const std::string &>());
-  PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
-               R"pbdoc()pbdoc");
-
-  m.def("make_polar_set", &poem::make_polar_set,
-        R"pbdoc()pbdoc");
-
-  // ===================================================================================================================
-  // Polar
-  // ===================================================================================================================
-  py::class_<poem::Polar, std::shared_ptr<poem::Polar>, poem::PolarNode> Polar(m, "Polar");
-  Polar.doc() = R"pbdoc("A Polar is a special PolarNode used to group PolarTables relative to a specific POLAR_MODE")pbdoc";
-  Polar.def(py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>(),
-            R"pbdoc()pbdoc");
-  Polar.def("create_polar_table_double", &poem::Polar::create_polar_table<double>,
-            R"pbdoc()pbdoc");
-  Polar.def("create_polar_table_int", &poem::Polar::create_polar_table<int>,
-            R"pbdoc()pbdoc");
-
-  m.def("make_polar", &poem::make_polar,
-        R"pbdoc()pbdoc");
-
-  // ===================================================================================================================
   // PolarTable<T>
   // ===================================================================================================================
 
@@ -239,6 +205,54 @@ stored in a multidimensional array. Int version.")pbdoc";
   m.def("make_polar_table_int", &poem::make_polar_table_int,
         R"pbdoc()pbdoc"
         "name"_a, "unit"_a, "description"_a, "dimension_grid"_a);
+
+
+  // ===================================================================================================================
+  // Polar
+  // ===================================================================================================================
+  py::class_<poem::Polar, std::shared_ptr<poem::Polar>, poem::PolarNode> Polar(m, "Polar");
+  Polar.doc() = R"pbdoc("A Polar is a special PolarNode used to group PolarTables relative to a specific POLAR_MODE")pbdoc";
+  Polar.def(py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>(),
+            R"pbdoc()pbdoc"); // &poem::Polar::create_polar_table<double>
+  Polar.def("create_polar_table_double", [](poem::Polar &self,
+                                            const std::string &name,
+                                            const std::string &unit,
+                                            const std::string &description) -> std::shared_ptr<poem::PolarTable<double>> {
+              return self.create_polar_table<double>(name, unit, description, poem::POEM_DOUBLE);
+            },
+            R"pbdoc()pbdoc");
+  Polar.def("create_polar_table_int", [](poem::Polar &self,
+                                         const std::string &name,
+                                         const std::string &unit,
+                                         const std::string &description) -> std::shared_ptr<poem::PolarTable<int>> {
+              return self.create_polar_table<int>(name, unit, description, poem::POEM_INT);
+            },
+            R"pbdoc()pbdoc");
+
+  m.def("make_polar", &poem::make_polar,
+        R"pbdoc()pbdoc");
+
+  // ===================================================================================================================
+  // PolarSet
+  // ===================================================================================================================
+  py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>, poem::PolarNode> PolarSet(m, "PolarSet");
+  PolarSet.doc() = R"pbdoc("A PolarSet is a special PolarNode used to group a set of Polar")pbdoc";
+  PolarSet.def(py::init<const std::string &>());
+  PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
+               R"pbdoc()pbdoc");
+
+  m.def("make_polar_set", &poem::make_polar_set,
+        R"pbdoc()pbdoc");
+
+
+  // ===================================================================================================================
+  // PolarNode
+  // ===================================================================================================================
+  py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
+  PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
+  PolarNode.def(py::init<const std::string &>());
+
+
 
   // ===================================================================================================================
   // Writer
