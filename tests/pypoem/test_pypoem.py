@@ -1,5 +1,4 @@
 from pypoem import pypoem
-# import pypoem
 import numpy as np
 
 if __name__ == '__main__':
@@ -51,25 +50,3 @@ if __name__ == '__main__':
     assert BrakePower.array()[0, 0, 0] == 999. # array_copy was really a copy
 
     pypoem.to_netcdf(BrakePower, "BrakePower.nc")
-
-    # # Set one values using indices
-    # BrakePower.set_value((0, 0, 0), 999.)
-    # assert(BrakePower.array()[0, 0, 0] == 999)
-    #
-    # data_back[0, 0, 0] = 888
-    # assert (BrakePower.array()[0, 0, 0] == 888)
-    #
-    #
-    # BrakePower.array().fill(0.)
-
-    BrakePowerDimensionGrid = BrakePower.dimension_grid()
-    # print(BrakePower.array())
-
-    # polar_set = pypoem.make_polar_set("polar_set")
-    # polar_set.attach_polar(polar_MPPP)
-    #
-    # # pypoem.to_netcdf(polar_MPPP, "Polar.nc")
-    # # pypoem.to_netcdf(BrakePower, "BrakePower.nc")
-    # pypoem.to_netcdf(polar_set, "polar_set.nc")
-    #
-    print("END")

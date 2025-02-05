@@ -33,7 +33,7 @@ weather routing optimisation, embedded control systems, training simulators.
 
 * **Github repository:** https://github.com/D-ICE/poem
 * **API Documentation:** 
-* **POEM Specifications:** https://dice-poem.readthedocs.io/en/latest/
+* **POEM Documentation:** https://dice-poem.readthedocs.io/en/latest/
 * **D-ICE ENGINEERING:** https://www.dice-engineering.com/en
 
 ## Introduction
