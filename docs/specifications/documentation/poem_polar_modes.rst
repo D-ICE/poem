@@ -1,16 +1,16 @@
-.. _poem_polar_types:
+.. _poem_polar_modes:
 
-POEM Polar Types
+POEM Polar Modes
 ================
 
-A **Polar** can be of 5 different types, following the presence or not of mechanical propulsion, of wind assistance devices,
+A **Polar** can have 5 different modes, following the presence or not of mechanical propulsion, of wind assistance devices,
 and the type of prediction of the performance Polar.
 
-.. list-table:: POEM Polar Types
+.. list-table:: POEM Polar Modes
     :widths: 25 25 25 25 25
     :header-rows: 1
 
-    * - Type
+    * - Mode
       - Prediction
       - Control
       - Motor
@@ -57,5 +57,5 @@ Wind Propulsion
     Do we have a wind propulsion
 
 .. note::
-    There is no PPP polar type as it would mean that we would like to predict power to reach a prescribed speed without
+    There is no PPP polar mode as it would mean that we would like to predict power to reach a prescribed speed without
     having a Motor, which is a nonsense.

@@ -285,17 +285,17 @@ TEST(poem, PolarSet) {
 void fill(std::shared_ptr<PolarSet> polar_set) {
 
   // Dimensions
-  auto STW = make_dimension("STW", "kt", "Speed Through Water");
-  auto TWS = make_dimension("TWS", "kt", "True Wind Speed");
-  auto TWA = make_dimension("TWA", "deg", "True Wind Angle");
-  auto WA = make_dimension("WA", "deg", "Waves Angle");
-  auto Hs = make_dimension("Hs", "m", "Waves Significant Height");
-  auto BrakePower = make_dimension("BrakePower", "kW", "Brake Power");
+  auto STW_Coord = make_dimension("STW_Coord", "kt", "Speed Through Water");
+  auto TWS_Coord = make_dimension("TWS_Coord", "kt", "True Wind Speed");
+  auto TWA_Coord = make_dimension("TWA_Coord", "deg", "True Wind Angle");
+  auto WA_Coord = make_dimension("WA_Coord", "deg", "Waves Angle");
+  auto Hs_Coord = make_dimension("Hs_Coord", "m", "Waves Significant Height");
+  auto Power_Coord = make_dimension("Power_Coord", "kW", "Brake Power");
 
   // DimensionSet
-  auto dimension_set_speed_control = make_dimension_set({STW, TWS, TWA, WA, Hs});
-  auto dimension_set_power_control = make_dimension_set({BrakePower, TWS, TWA, WA, Hs});
-  auto dimension_set_no_control = make_dimension_set({TWS, TWA, WA, Hs});
+  auto dimension_set_speed_control = make_dimension_set({STW_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord});
+  auto dimension_set_power_control = make_dimension_set({Power_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord});
+  auto dimension_set_no_control = make_dimension_set({TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord});
 
   // DimensionGrid
   auto STW_values = mathutils::linspace<double>(8, 20, 13);
@@ -303,49 +303,53 @@ void fill(std::shared_ptr<PolarSet> polar_set) {
   auto TWA_values = mathutils::linspace<double>(0, 180, 13);
   auto WA_values = mathutils::linspace<double>(0, 180, 13);
   auto Hs_values = mathutils::linspace<double>(0, 8, 9);
-  auto BrakePower_values = mathutils::linspace<double>(1000, 6500, 12);
+  auto Power_values = mathutils::linspace<double>(1000, 6500, 12);
 
   auto dimension_grid_speed_control = make_dimension_grid(dimension_set_speed_control);
-  dimension_grid_speed_control->set_values("STW", STW_values);
-  dimension_grid_speed_control->set_values("TWS", TWS_values);
-  dimension_grid_speed_control->set_values("TWA", TWA_values);
-  dimension_grid_speed_control->set_values("WA", WA_values);
-  dimension_grid_speed_control->set_values("Hs", Hs_values);
+  dimension_grid_speed_control->set_values("STW_Coord", STW_values);
+  dimension_grid_speed_control->set_values("TWS_Coord", TWS_values);
+  dimension_grid_speed_control->set_values("TWA_Coord", TWA_values);
+  dimension_grid_speed_control->set_values("WA_Coord", WA_values);
+  dimension_grid_speed_control->set_values("Hs_Coord", Hs_values);
 
   auto dimension_grid_power_control = make_dimension_grid(dimension_set_power_control);
-  dimension_grid_power_control->set_values("BrakePower", BrakePower_values);
-  dimension_grid_power_control->set_values("TWS", TWS_values);
-  dimension_grid_power_control->set_values("TWA", TWA_values);
-  dimension_grid_power_control->set_values("WA", WA_values);
-  dimension_grid_power_control->set_values("Hs", Hs_values);
+  dimension_grid_power_control->set_values("Power_Coord", Power_values);
+  dimension_grid_power_control->set_values("TWS_Coord", TWS_values);
+  dimension_grid_power_control->set_values("TWA_Coord", TWA_values);
+  dimension_grid_power_control->set_values("WA_Coord", WA_values);
+  dimension_grid_power_control->set_values("Hs_Coord", Hs_values);
 
   auto dimension_grid_no_control = make_dimension_grid(dimension_set_no_control);
-  dimension_grid_no_control->set_values("TWS", TWS_values);
-  dimension_grid_no_control->set_values("TWA", TWA_values);
-  dimension_grid_no_control->set_values("WA", WA_values);
-  dimension_grid_no_control->set_values("Hs", Hs_values);
+  dimension_grid_no_control->set_values("TWS_Coord", TWS_values);
+  dimension_grid_no_control->set_values("TWA_Coord", TWA_values);
+  dimension_grid_no_control->set_values("WA_Coord", WA_values);
+  dimension_grid_no_control->set_values("Hs_Coord", Hs_values);
 
 // Create some tables into the different Polar
   polar_set->create_polar(MPPP, dimension_grid_speed_control);
-  polar_set->polar(MPPP)->create_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
-  polar_set->polar(MPPP)->create_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
-
+  polar_set->polar(MPPP)->create_polar_table<double>("TOTAL_POWER", "kW", "Total Power", POEM_DOUBLE)->fill_with(1000.);
+  polar_set->polar(MPPP)->create_polar_table<double>("LEEWAY", "deg", "LEEWAY", POEM_DOUBLE)->fill_with(90.);
+  polar_set->polar(MPPP)->create_polar_table<int>("SOLVER_STATUS", "-", "Solver Status", POEM_INT)->fill_with(1);
 
   polar_set->create_polar(HPPP, dimension_grid_speed_control);
-  polar_set->polar(HPPP)->create_polar_table<double>("BrakePower", "kW", "BrakePower", POEM_DOUBLE)->fill_with(1000.);
-  polar_set->polar(HPPP)->create_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+  polar_set->polar(HPPP)->create_polar_table<double>("TOTAL_POWER", "kW", "Total Power", POEM_DOUBLE)->fill_with(1000.);
+  polar_set->polar(HPPP)->create_polar_table<double>("LEEWAY", "deg", "LEEWAY", POEM_DOUBLE)->fill_with(90.);
+  polar_set->polar(HPPP)->create_polar_table<int>("SOLVER_STATUS", "-", "Solver Status", POEM_INT)->fill_with(1);
 
   polar_set->create_polar(MVPP, dimension_grid_power_control);
   polar_set->polar(MVPP)->create_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
-  polar_set->polar(MVPP)->create_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+  polar_set->polar(MVPP)->create_polar_table<double>("LEEWAY", "deg", "LEEWAY", POEM_DOUBLE)->fill_with(90.);
+  polar_set->polar(MVPP)->create_polar_table<int>("SOLVER_STATUS", "-", "Solver Status", POEM_INT)->fill_with(1);
 
   polar_set->create_polar(HVPP, dimension_grid_power_control);
   polar_set->polar(HVPP)->create_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
-  polar_set->polar(HVPP)->create_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+  polar_set->polar(HVPP)->create_polar_table<double>("LEEWAY", "deg", "LEEWAY", POEM_DOUBLE)->fill_with(90.);
+  polar_set->polar(HVPP)->create_polar_table<int>("SOLVER_STATUS", "-", "Solver Status", POEM_INT)->fill_with(1);
 
   polar_set->create_polar(VPP, dimension_grid_no_control);
   polar_set->polar(VPP)->create_polar_table<double>("STW", "kt", "Speed Through Water", POEM_DOUBLE)->fill_with(10.);
-  polar_set->polar(VPP)->create_polar_table<int>("SolverStatus", "-", "Solver Status", POEM_INT)->fill_with(1);
+  polar_set->polar(VPP)->create_polar_table<double>("LEEWAY", "deg", "LEEWAY", POEM_DOUBLE)->fill_with(90.);
+  polar_set->polar(VPP)->create_polar_table<int>("SOLVER_STATUS", "-", "Solver Status", POEM_INT)->fill_with(1);
 
 }
 
@@ -388,8 +392,8 @@ TEST(poem, PolarNode) {
 
   ASSERT_EQ(ballast_one_engine->polar(MPPP)->name(), "MPPP");
   ASSERT_EQ(ballast_one_engine->polar(MPPP)->full_name(), "/vessel/ballast_load/ballast_one_engine/MPPP");
-  ASSERT_EQ(ballast_one_engine->polar(MPPP)->polar_table("BrakePower")->full_name(),
-            "/vessel/ballast_load/ballast_one_engine/MPPP/BrakePower");
+  ASSERT_EQ(ballast_one_engine->polar(MPPP)->polar_table("TOTAL_POWER")->full_name(),
+            "/vessel/ballast_load/ballast_one_engine/MPPP/TOTAL_POWER");
 
 
   // Writing

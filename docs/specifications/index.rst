@@ -21,8 +21,8 @@ POEM Documentation
 :doc:`documentation/poem_data_model`
     How data is organized in **POEM Files** and **POEM Library**
 
-:doc:`documentation/poem_polar_types`
-    Different Polar type in POEM
+:doc:`documentation/poem_polar_modes`
+    Different Polar modes in POEM
 
 :doc:`documentation/poem_specifications`
     Specifications of a **POEM File**
@@ -58,7 +58,7 @@ API
     documentation/poem_in_a_nuttshell
     documentation/poem_features
     documentation/poem_data_model
-    documentation/poem_polar_types
+    documentation/poem_polar_modes
     documentation/poem_specifications
 
 .. toctree::

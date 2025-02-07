@@ -27,6 +27,7 @@ namespace poem {
     nc_var.putVar(polar_table->values().data());
     nc_var.putAtt("unit", polar_table->unit());
     nc_var.putAtt("description", polar_table->description());
+    nc_var.putAtt("POEM_NODE_TYPE","POLAR_TABLE");
 
     to_netcdf(polar_table->attributes(), nc_var);
 

@@ -44,6 +44,7 @@ namespace poem {
 
         nc_var.putAtt("unit", dimension->unit());
         nc_var.putAtt("description", dimension->description());
+        nc_var.putAtt("POEM_NODE_TYPE", "POLAR_DIMENSION");
       }
 
     } else {
@@ -121,10 +122,11 @@ namespace poem {
       to_netcdf(polar_table, group);
     }
 
-    if (!polar->attributes().contains("polar_mode")) {
-      group.putAtt("polar_mode", polar_mode_to_string(polar->mode()));
-    }
+//    if (!polar->attributes().contains("POLAR_MODE")) {
+//      group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
+//    }
     to_netcdf(polar->attributes(), group);
+    group.putAtt("POEM_NODE_TYPE", "POLAR");
   }
 
   void to_netcdf(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
@@ -133,6 +135,7 @@ namespace poem {
       to_netcdf(polar, new_group);
     }
     to_netcdf(polar_set->attributes(), group);
+    group.putAtt("POEM_NODE_TYPE", "POLAR_SET");
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
@@ -144,6 +147,7 @@ namespace poem {
           auto new_group = group.addGroup(next_polar_node->name());
           to_netcdf(next_polar_node, new_group);
         }
+        group.putAtt("POEM_NODE_TYPE", "POLAR_NODE");
         break;
       }
 
@@ -191,7 +195,7 @@ namespace poem {
     root_group.putAtt("POEM_LIBRARY_VERSION", git::version_full());
     root_group.putAtt("POEM_SPECIFICATION_VERSION", "v" + std::to_string(current_poem_standard_version()));
     root_group.putAtt("date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
-    root_group.putAtt("vessel_name", vessel_name);
+    root_group.putAtt("VESSEL_NAME", vessel_name);
 
     root_group.close();
   }
@@ -542,7 +546,7 @@ namespace poem {
 
     std::string vessel_name;
     if (root_name == "from-file") {
-      root_group.getAtt("vessel_name").getValues(vessel_name);
+      root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
     } else {
       vessel_name = root_name;
     }

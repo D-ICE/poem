@@ -12,15 +12,29 @@ namespace poem {
 
   namespace v1 {
 
-  }  // v1
+    bool check_R1(const netCDF::NcGroup &group);
 
-  inline bool check_v1(const std::string &filename) {
-    bool compliant = true;
+    bool check_R2(const netCDF::NcGroup &group);
 
-    // TODO
+    bool check_R3(const netCDF::NcGroup &group);
 
-    return compliant;
-  }
+    bool check_R4(const netCDF::NcGroup &group);
+
+    bool check_R5(const netCDF::NcGroup &group);
+
+    bool check_R6(const netCDF::NcGroup &group);
+
+    bool check_R7(const netCDF::NcGroup &group);
+
+//    bool check_R8(const netCDF::NcGroup &group);
+//
+//    bool check_R9(const netCDF::NcGroup &group);
+//
+//    bool check_R10(const netCDF::NcGroup &group);
+
+  }  // poem::v1
+
+  bool check_v1(const std::string &filename);
 
 }  // poem
 

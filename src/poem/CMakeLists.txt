@@ -34,6 +34,9 @@ target_sources(_poem PUBLIC
         Polar.cpp
         PolarSet.cpp
         Splitter.cpp
+
+        specifications/check_v0.cpp
+        specifications/check_v1.cpp
 )
 
 set_target_properties(_poem PROPERTIES

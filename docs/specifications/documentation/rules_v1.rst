@@ -30,10 +30,10 @@ Groups and Variables attributes to be identified as a POEM PolarNode
 
 RULE V1/R3
 ----------
-
+// TODO: remplacer cette regle par le fait qu'un groupe de type POLAR DOIT avoir un nom dans MPPP, HPPP etc...
 Polar groups mandatory attribute
-    * Groups whose ``POEM_NODE_TYPE`` is set to POLAR MUST have an additional attribute ``POLAR_TYPE`` with value to
-      be taken in {MPPP, HPPP, MVPP, HVPP, VPP}. See :ref:`poem_polar_types`.
+    * Groups whose ``POEM_NODE_TYPE`` is set to POLAR MUST have an additional attribute ``POLAR_MODE`` with value to
+      be taken in {MPPP, HPPP, MVPP, HVPP, VPP}. See :ref:`poem_polar_modes`.
 
 RULE V1/R4
 ----------
@@ -50,7 +50,7 @@ Variables and Coordinate Variables
 RULE V1/R5
 ----------
 
-Variables in a common group
+Variables in a common group // FIXME: le groupe en question doit etre de type POLAR !
     * Any Variable inside the same group and having the attribute ``POEM_NODE_TYPE`` set to POLAR_TABLE defined MUST
       have the same Dimension dependency, in the same order.
 
@@ -58,23 +58,22 @@ RULE V1/R6
 ----------
 
 Coordinate Variables
-    * Coordinate Variables having the attribute ``POEM_NODE_TYPE`` set to POLAR_TABLE MUST stricly increasing values.
-      Regular spacing is not mandatory.
+    * Coordinate Variables having the attribute ``POEM_NODE_TYPE`` set to POLAR_TABLE MUST positive stricly increasing values.
+      Regular spacing is not mandatory
+    * Angular Coordinate variables (seen from their unit attribute) must have values between 0 and 180
+      degrees.
 
+.. note::
+    Currently, the only accepted Angular Coordinate Variable accepted is deg. This limitation could be removed in the
+    future if needed
 
 RULE V1/R7
 ----------
 
-Angular Coordinate variables and polar symmetry assumption
-    * Coordinate variables corresponding to angles (seen from their unit attribute) must have values between 0 and 180
-      degrees.
-
-
-RULE V1/R8
-----------
+// TODO: merger R7, R8 et R9
 
 Speed controlled Polars dimensions
-    * MPPP and HPPP Polars MUST have the following dimensions and Coordinate Variables defined, in that order:
+    * MPPP and HPPP Polars MUST have the following dimensions and Coordinate Variables defined, in that order: // FIXME: c'est pas la qu'on doit donner l'ordre mais dans les variables
 
     .. list-table::
         :widths: 30 30 120
@@ -111,7 +110,7 @@ Speed controlled Polars Variables
           - Unit
           - Data Type
           - Description
-        * - TotalPower
+        * - TOTAL_POWER
           - kW
           - double
           - Total Power
@@ -130,7 +129,7 @@ Speed controlled Polars Variables
       converged whereas any other value is considered as not converged. You may adopt some numbering scheme if you need
       to track type of non convergence.
 
-RULE V1/R9
+RULE V1/R8
 ----------
 
 Power Controlled Polars dimensions and Variables
@@ -189,8 +188,8 @@ Power controlled Polars Variables
       converged whereas any other value is considered as not converged. You may adopt some numbering scheme if you need
       to track type of non convergence.
 
-RULE V1/R10
------------
+RULE V1/R9
+----------
 
 VPP (uncontrolled) Polars dimensions and Variables
     * VPP Polars MUST have the following dimensions and Coordinate Variables defined, in that order:
