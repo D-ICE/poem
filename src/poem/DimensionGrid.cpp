@@ -11,7 +11,12 @@ namespace poem {
   void poem::DimensionGrid::set_values(const std::string &name, const std::vector<double> &values) {
 
     if (!m_dimension_set->contains(name)) {
-      LogCriticalError("Unknown dimension name {}", name);
+      std::string available_dimensions;
+      for (const auto &dim: *m_dimension_set) {
+        available_dimensions += " " + dim->name();
+      }
+      LogCriticalError("In DimensionGrid, attempting to set values of an unknown dimension name {}. "
+                       "Available Dimensions are ({})", name, available_dimensions);
       CRITICAL_ERROR_POEM
     }
 
@@ -49,7 +54,7 @@ namespace poem {
     return m_dimensions_values.at(idx).size();
   }
 
-  size_t DimensionGrid::size(const std::string& dim_name) const {
+  size_t DimensionGrid::size(const std::string &dim_name) const {
     return size(m_dimension_set->index(dim_name));
   }
 
@@ -83,7 +88,7 @@ namespace poem {
 
   bool DimensionGrid::operator==(const DimensionGrid &other) const {
     bool equal = *m_dimension_set == *(other.m_dimension_set);
-    for (size_t i=0; i < ndims(); ++i) {
+    for (size_t i = 0; i < ndims(); ++i) {
       auto this_values = m_dimensions_values[i];
       auto other_values = other.m_dimensions_values[i];
       equal &= this_values == other_values;
@@ -128,8 +133,8 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-    for (size_t idx = 0; idx<ndims(); ++idx) {
-      if (grid_indices[idx] < 0 || grid_indices[idx]>= size(idx)) {
+    for (size_t idx = 0; idx < ndims(); ++idx) {
+      if (grid_indices[idx] < 0 || grid_indices[idx] >= size(idx)) {
         LogCriticalError("Coordinate index {} out of DimensionGrid range", idx);
         CRITICAL_ERROR_POEM
       }

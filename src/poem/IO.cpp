@@ -107,13 +107,36 @@ namespace poem {
 
   void to_netcdf(const Attributes &attributes, netCDF::NcGroup &group) {
     for (const auto &attribute: attributes) {
-      group.putAtt(attribute.first, attribute.second);
+      if (group.getAtts().contains(attribute.first)) {
+        // Check that we do have the same value for this attribute!
+        std::string att_value;
+        group.getAtt(attribute.first).getValues(att_value);
+        if (att_value != attribute.second) {
+          LogWarningError("In group {}, identical attribute {} with different values {} and {}",
+                          group.getName(true), attribute.first, att_value, attribute.second);
+        }
+      } else {
+        group.putAtt(attribute.first, attribute.second);
+      }
     }
   }
 
   void to_netcdf(const Attributes &attributes, netCDF::NcVar &nc_var) {
     for (const auto &attribute: attributes) {
-      nc_var.putAtt(attribute.first, attribute.second);
+      if (nc_var.getAtts().contains(attribute.first)) {
+        // Check that we do have the same value for this attribute!
+        std::string att_value;
+        nc_var.getAtt(attribute.first).getValues(att_value);
+        if (att_value != attribute.second) {
+          LogWarningError("In group {}, Variable {}, identical attribute {} with different values {} and {}",
+                          nc_var.getParentGroup().getName(true),
+                          nc_var.getName(),
+                          attribute.first,
+                          att_value, attribute.second);
+        }
+      } else {
+        nc_var.putAtt(attribute.first, attribute.second);
+      }
     }
   }
 
@@ -127,6 +150,7 @@ namespace poem {
 //    }
     to_netcdf(polar->attributes(), group);
     group.putAtt("POEM_NODE_TYPE", "POLAR");
+    group.putAtt("POEM_MODE", polar_mode_to_string(polar->mode()));
   }
 
   void to_netcdf(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
@@ -186,7 +210,7 @@ namespace poem {
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &vessel_name, const std::string &filename) {
-    LogNormalInfo("Writing file <specification v{}>: {}",
+    LogNormalInfo("Writing file <v{}>: {}",
                   current_poem_standard_version(),
                   fs::absolute(filename).string());
 
@@ -291,8 +315,6 @@ namespace poem {
     var.getAtt("unit").getValues(unit);
     std::string description;
     var.getAtt("description").getValues(description);
-
-//    std::shared_ptr<PolarTableBase> polar_table;
 
     switch (var.getType().getTypeClass()) {
       case netCDF::NcType::nc_DOUBLE: {

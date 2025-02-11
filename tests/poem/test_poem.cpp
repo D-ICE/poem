@@ -413,7 +413,7 @@ TEST(poem, PolarNode) {
 //  auto root_ = read_operation_mode(dataFile_root_);
 
   auto root_ = read_poem_nc_file("vessel.nc");
-//
+
 //  ASSERT_EQ(*root, *root_);
 
 }

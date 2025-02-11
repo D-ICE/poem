@@ -89,20 +89,20 @@ PYBIND11_MODULE(pypoem, m) {
   // ===================================================================================================================
   py::class_<poem::DimensionGrid, std::shared_ptr<poem::DimensionGrid>> DimensionGrid(m, "DimensionGrid");
   DimensionGrid.doc() = R"pbdoc("A DimensionGrid is a numerical realisation of a DimensionSet.
-Each Dimension of the associated DimensionSet is given a numerical sampling.
-")pbdoc";
+Each Dimension of the associated DimensionSet is given a numerical sampling.")pbdoc";
   DimensionGrid.def("set_values", &poem::DimensionGrid::set_values,
-                    R"pbdoc()pbdoc",
+                    R"pbdoc("Set a values vector for the specified Dimension")pbdoc",
                     "dimension_name"_a, "sampling_vector"_a);
   DimensionGrid.def("values",
                     py::overload_cast<const std::string &>(&poem::DimensionGrid::values, py::const_),
-                    R"pbdoc()pbdoc",
+                    R"pbdoc("Get the values vector for the specified Dimension")pbdoc",
                     "dimension_name"_a);
   DimensionGrid.def("dimension_points", &poem::DimensionGrid::dimension_points,
-                    R"pbdoc()pbdoc");
+                    R"pbdoc("Get the DimensionPoint vector for the DimensionGrid")pbdoc");
   DimensionGrid.def("size",
                     py::overload_cast<const std::string &>(&poem::DimensionGrid::size, py::const_),
-                    R"pbdoc()pbdoc");
+                    R"pbdoc("Get the size of the specified Dimension")pbdoc",
+                    "name"_a);
   DimensionGrid.def("shape", &poem::DimensionGrid::shape,
                     R"pbdoc(Returns an ordered list of Dimension Sizes)pbdoc");
 
@@ -146,6 +146,13 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.
   POLAR_MODE.value("VPP", poem::VPP,
                    R"pbdoc(wind propulsion only, Velocity Prediction Program)pbdoc");
   POLAR_MODE.export_values();
+
+  // ===================================================================================================================
+  // PolarNode
+  // ===================================================================================================================
+  py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
+  PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
+  PolarNode.def(py::init<const std::string &>());
 
   // ===================================================================================================================
   // PolarTable<T>
@@ -220,17 +227,18 @@ stored in a multidimensional array. Int version.")pbdoc";
                                             const std::string &description) -> std::shared_ptr<poem::PolarTable<double>> {
               return self.create_polar_table<double>(name, unit, description, poem::POEM_DOUBLE);
             },
-            R"pbdoc()pbdoc");
+            R"pbdoc("Create a new PolarTable with type double from a Polar")pbdoc");
   Polar.def("create_polar_table_int", [](poem::Polar &self,
                                          const std::string &name,
                                          const std::string &unit,
                                          const std::string &description) -> std::shared_ptr<poem::PolarTable<int>> {
               return self.create_polar_table<int>(name, unit, description, poem::POEM_INT);
             },
-            R"pbdoc()pbdoc");
+            R"pbdoc("Create a new PolarTable with type int from a Polar")pbdoc");
 
   m.def("make_polar", &poem::make_polar,
-        R"pbdoc()pbdoc");
+        R"pbdoc("Make a Polar")pbdoc",
+        "name"_a, "polar_mode"_a, "dimension_grid"_a);
 
   // ===================================================================================================================
   // PolarSet
@@ -239,29 +247,35 @@ stored in a multidimensional array. Int version.")pbdoc";
   PolarSet.doc() = R"pbdoc("A PolarSet is a special PolarNode used to group a set of Polar")pbdoc";
   PolarSet.def(py::init<const std::string &>());
   PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
-               R"pbdoc()pbdoc");
+               R"pbdoc()pbdoc",
+               "polar"_a);
 
   m.def("make_polar_set", &poem::make_polar_set,
-        R"pbdoc()pbdoc");
-
-
-  // ===================================================================================================================
-  // PolarNode
-  // ===================================================================================================================
-  py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
-  PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
-  PolarNode.def(py::init<const std::string &>());
-
-
+        R"pbdoc()pbdoc",
+        "name"_a);
 
   // ===================================================================================================================
   // Writer
   // ===================================================================================================================
-  m.def("to_netcdf", [](std::shared_ptr<poem::PolarNode> polar_node, const std::string &filename) -> void {
-          to_netcdf(polar_node, filename);
+  m.def("to_netcdf", [](std::shared_ptr<poem::PolarNode> polar_node,
+                        const std::string &vessel_name,
+                        const std::string &filename) -> void {
+          poem::to_netcdf(polar_node, vessel_name, filename);
         },
         R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
-        "polar_node"_a, "filename"_a);
+        "polar_node"_a, "vessel_name"_a, "filename"_a);
+
+  // ===================================================================================================================
+  // Checker
+  // ===================================================================================================================
+
+  m.def("spec_check", [](const std::string &filename) -> bool {
+          auto version = poem::get_version(filename);
+          return poem::spec_check(filename, version);
+        },
+        R"pbdoc(Returns true if the file follows the specification number found in the file)pbdoc",
+        "filename"_a
+  );
 
 }
 

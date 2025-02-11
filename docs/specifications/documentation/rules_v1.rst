@@ -8,7 +8,7 @@ A *NetCDF-4 file* is a said a valid *POEM File* with version 1 if it complies wi
 RULE V1/R0
 ----------
 
-Freedom to enrich a POEM File
+Freedom to enrich a POEM File with any user data
     * Any Attributes for groups or Variables that are not part of the RULES **MAY** be added for user convenience
     * Any Variables that are not part of the RULES **MAY** be added to groups for user convenience
     * Any subgroup **MAY** be added to groups for user convenience
@@ -74,12 +74,7 @@ Required hierarchy elements
     * A Polar **ALWAYS** owns at least a PolarTable with associated Dimensions (see also :ref:`RULE V1/R7 <rule_v1_r7>`)
     * Every of the PolarTables owned by a same Polar **MUST** have the same Dimension dependency (i.e. same DimensionSet
       in :ref:`POEM Data Model <poem_data_model>`), with the exact same order
-    * A POEM File **ALWAYS** owns at least a Polar
-
-
-.. Common Dimension dependency for PolarTables in a Polar
-..     * Every of the PolarTable owned by a specific Polar **MUST** have the same Dimension dependency (i.e. same DimensionSet
-..       in POEM Data Model), with the exact same order
+    * A POEM File **ALWAYS** owns at least one Polar
 
 
 .. _rule_v1_r4:
@@ -87,10 +82,11 @@ Required hierarchy elements
 RULE V1/R4
 ----------
 
-Polar group names
-    * A Polar (NetCDF-4 group with attribute ``POEM_NODE_TYPE`` set to *POLAR*) **MUST** have the name of the POLAR MODE
-      that it represents (*MPPP*, *HPPP*, *MVPP*, *HVPP* or *VPP*). See :ref:`poem_polar_modes`
-    * Case for the name **MUST** be respected
+Polar group names and ``POEM_MODE`` attribute
+    * A Polar group **MUST** own a ``POEM_MODE`` attribute with value corresponding to the :ref:`POLAR MODE <poem_polar_modes>`
+      it represents
+    * If a Polar group is not the root group, its name **MUST** be the same as the attribute ``POEM_MODE``
+    * The case for ``POEM_MODE`` **MUST** be respected
 
 
 .. _rule_v1_r5:
@@ -106,26 +102,6 @@ Variables and Coordinate Variables mandatory attibutes
 
     * Units values set in ``unit`` attribute for Dimension and PolarTable **MUST** comply with d-units library recognized
       units
-
-
-.. .. _rule_v1_r6:
-..
-.. RULE V1/R6
-.. ----------
-..
-.. Valid units
-..     * Units values set in ``unit`` attribute for Dimension and PolarTable **MUST** comply with d-units library recognized units
-..
-
-
-.. .. _rule_v1_r6:
-..
-.. RULE V1/R6
-.. ----------
-..
-.. Common Dimension dependency for PolarTables in a Polar
-..     * Every of the PolarTable owned by a specific Polar **MUST** have the same Dimension dependency (i.e. same DimensionSet
-..       in POEM Data Model), with the exact same order
 
 
 .. _rule_v1_r6:
