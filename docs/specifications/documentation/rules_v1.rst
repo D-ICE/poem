@@ -1,245 +1,197 @@
 Rules v1
 ========
 
-A *NetCDF-4 file* is a said a valid *POEM File* with version 1 if it complies with the following set of RULES:
+A *NetCDF-4 file* is a said a valid *POEM File* with version 1 if it complies with the following set of RULES
+
+.. _rule_v1_r0:
 
 RULE V1/R0
 ----------
 
-Freedom to enrich the POEM File
-    * Any Attributes for groups or Variables that are not part of the RULES may be added for convenience
-    * Any Variables may be added to groups that are not part of the RULES may be added for convenience
-    * Any subgroup may be added for convenience
+Freedom to enrich a POEM File
+    * Any Attributes for groups or Variables that are not part of the RULES **MAY** be added for user convenience
+    * Any Variables that are not part of the RULES **MAY** be added to groups for user convenience
+    * Any subgroup **MAY** be added to groups for user convenience
+
+
+.. _rule_v1_r1:
 
 RULE V1/R1
 ----------
 
-Root Group mandatory global attributes
-    * Root group MUST have the global attribute ``POEM_SPECIFICATION_VERSION`` with POEM File Format Specification set to 1
-    * Root group MUST have the global attribute ``VESSEL_NAME`` filled with the vessel name
+The special ``POEM_NODE_TYPE`` attribute
+    * Any NetCDF-4 Group, Coordinate Variable or Variable that own a ``POEM_NODE_TYPE`` attribute is understood as a
+      POEM object and **MUST** comply with the associated POEM specification rules when it applies [#]_. We call it a
+      *POEM group* in the following.
+    * The parent of a POEM group **MUST** be a POEM group (except for root group)
+    * The ``POEM_NODE_TYPE`` attribute **MUST** have one of the following values:
+
+.. csv-table:: Valid values for ``POEM_NODE_TYPE`` attribute and mapping between NetCDF-4 Data Model et POEM Data Model
+    :header: "``POEM_NODE_TYPE``", "NetCDF-4 object type", "POEM object type"
+    :widths: 40, 60, 100
+
+    "*POLAR_NODE*", "group", "PolarNode (and not PolarSet or Polar)"
+    "*POLAR_SET*","group", "PolarSet"
+    "*POLAR*", "group", "Polar"
+    "*POLAR_DIMENSION*", "Coordinate Variable", "Dimension"
+    "*POLAR_TABLE*", "Variable", "PolarTable"
+
+.. note::
+    The intent of the ``POEM_NODE_TYPE`` is to allow :ref:`RULE V1/R0 <rule_v1_r0>` and guarantee the robustness of the
+    mapping between NetCDF-4 Data Model and POEM Data Model (see :ref:`POEM DATA MODEL <poem_data_model_header>`).
+
+.. note::
+    Although the rules of the specification are about NetCDF-4 objects (groups, Coordinate Variables or Variables),
+    in the following we will talk about POEM objects instead of the NetCDF-4 counterpart, to avoid overloading the text.
+
+    So for example, if we talk about a PolarSet, we are talking about a NetCDF-4 group with an attribute  ``POEM_NODE_TYPE``
+    with the value *POLAR_SET*
+
+
+.. [#] Conversely, any NetCDF-4 group, Coordinate Variable or Variable that DO NOT own the ``POEM_NODE_TYPE`` attribute
+       is not read by the POEM Library
+
+
+.. _rule_v1_r2:
 
 RULE V1/R2
 ----------
 
-Groups and Variables attributes to be identified as a POEM PolarNode
-    * Groups and subgroups that are part of the POEM hierarchical tree structure must have an attribute ``POEM_NODE_TYPE``
-      with value to be taken in {POLAR_NODE, POLAR_SET, POLAR} following the usage intended for the group respectively as
-      a PolarNode, a PolarSet or a Polar. Groups without this attribute are not read by the POEM Library.
-    * Variables that are part of the POEM hierarchical tree structure must have an attribute ``POEM_NODE_TYPE`` set to the
-      value POLAR_TABLE. Variables without this attribute are not read by the POEM Library.
+Root Group mandatory global attributes
+    * Root group **MUST** have the global attribute ``POEM_SPECIFICATION_VERSION`` with POEM File Format Specification set 
+      to *1*
+    * Root group **MUST** have the global attribute ``VESSEL_NAME`` filled with the vessel name
+    * Root group **MUST** have the global attribute ``POEM_NODE_TYPE``. Value of this attribute depends on the context
+
+
+.. _rule_v1_r3:
 
 RULE V1/R3
 ----------
-// TODO: remplacer cette regle par le fait qu'un groupe de type POLAR DOIT avoir un nom dans MPPP, HPPP etc...
-Polar groups mandatory attribute
-    * Groups whose ``POEM_NODE_TYPE`` is set to POLAR MUST have an additional attribute ``POLAR_MODE`` with value to
-      be taken in {MPPP, HPPP, MVPP, HVPP, VPP}. See :ref:`poem_polar_modes`.
+
+Required hierarchy elements
+    * A PolarSet **ALWAYS** owns at least a Polar
+    * A Polar **ALWAYS** owns at least a PolarTable with associated Dimensions (see also :ref:`RULE V1/R7 <rule_v1_r7>`)
+    * Every of the PolarTables owned by a same Polar **MUST** have the same Dimension dependency (i.e. same DimensionSet
+      in :ref:`POEM Data Model <poem_data_model>`), with the exact same order
+    * A POEM File **ALWAYS** owns at least a Polar
+
+
+.. Common Dimension dependency for PolarTables in a Polar
+..     * Every of the PolarTable owned by a specific Polar **MUST** have the same Dimension dependency (i.e. same DimensionSet
+..       in POEM Data Model), with the exact same order
+
+
+.. _rule_v1_r4:
 
 RULE V1/R4
 ----------
 
-Variables and Coordinate Variables
-    * Any Variables and Coordinate Variables with attribute ``POEM_NODE_TYPE`` set to POLAR_TABLE MUST also have an
-      attribute ``unit`` filled with unit of the physical quantity and ``description`` filled with a brief description of the
-      physical quantity.
+Polar group names
+    * A Polar (NetCDF-4 group with attribute ``POEM_NODE_TYPE`` set to *POLAR*) **MUST** have the name of the POLAR MODE
+      that it represents (*MPPP*, *HPPP*, *MVPP*, *HVPP* or *VPP*). See :ref:`poem_polar_modes`
+    * Case for the name **MUST** be respected
 
-.. todo::
-    Add a link to normalized unit from dunits
 
+.. _rule_v1_r5:
 
 RULE V1/R5
 ----------
 
-Variables in a common group // FIXME: le groupe en question doit etre de type POLAR !
-    * Any Variable inside the same group and having the attribute ``POEM_NODE_TYPE`` set to POLAR_TABLE defined MUST
-      have the same Dimension dependency, in the same order.
+Variables and Coordinate Variables mandatory attibutes
+    * Any Dimension or PolarTable of a Polar **MUST** have the two following attributes
+
+      * ``unit``: specifies the unit of the Variable
+      * ``description``: a one small sentence description of the variable
+
+    * Units values set in ``unit`` attribute for Dimension and PolarTable **MUST** comply with d-units library recognized
+      units
+
+
+.. .. _rule_v1_r6:
+..
+.. RULE V1/R6
+.. ----------
+..
+.. Valid units
+..     * Units values set in ``unit`` attribute for Dimension and PolarTable **MUST** comply with d-units library recognized units
+..
+
+
+.. .. _rule_v1_r6:
+..
+.. RULE V1/R6
+.. ----------
+..
+.. Common Dimension dependency for PolarTables in a Polar
+..     * Every of the PolarTable owned by a specific Polar **MUST** have the same Dimension dependency (i.e. same DimensionSet
+..       in POEM Data Model), with the exact same order
+
+
+.. _rule_v1_r6:
 
 RULE V1/R6
 ----------
 
-Coordinate Variables
-    * Coordinate Variables having the attribute ``POEM_NODE_TYPE`` set to POLAR_TABLE MUST positive stricly increasing values.
-      Regular spacing is not mandatory
-    * Angular Coordinate variables (seen from their unit attribute) must have values between 0 and 180
-      degrees.
+Dimensions values
+    * Dimensions values vectors **MUST** be list of positive, strictly increasing numbers
+    * Angular Dimension values **MUST** be between 0 and 180 degrees
+    * Dimensions values **MAY** have non-uniform value vectors
 
 .. note::
-    Currently, the only accepted Angular Coordinate Variable accepted is deg. This limitation could be removed in the
+    Currently, the only accepted Angular Dimension unit accepted is deg. This limitation could be removed in the
     future if needed
+
+
+.. _rule_v1_r7:
 
 RULE V1/R7
 ----------
 
-// TODO: merger R7, R8 et R9
+Minimal mandatory Dimensions and PolarTables in Polar
+    * The following Dimensions and PolarTables **MUST** be present in Polar, with list depending on the POLAR mode that is
+      encoded in the Polar name
 
-Speed controlled Polars dimensions
-    * MPPP and HPPP Polars MUST have the following dimensions and Coordinate Variables defined, in that order: // FIXME: c'est pas la qu'on doit donner l'ordre mais dans les variables
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+|                      | MPPP   | HPPP   | MVPP   | HVPP   | VPP    |  Unit    | Description                       |
++======================+========+========+========+========+========+==========+===================================+
+|         **Mandatory Dimensions**                                                                                 |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| STW_dim              |   X    |   X    |        |        |        |   kt     | Speed Through Water dimension     |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| Power_dim [#]_       |        |        |    X   |   X    |        |   kW     | Power dimension                   |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| TWS_dim              |   X    |   X    |   X    |   X    |   X    |   kt     | True Wind Speed dimension         |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| TWA_dim              |   X    |   X    |   X    |   X    |   X    |   deg    | True Wind Angle dimension         |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| WA_dim               |   X    |   X    |   X    |   X    |   X    |   deg    | Mean Waves Angle dimension        |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| Hs_dim               |   X    |   X    |   X    |   X    |   X    |   m      | Wave Significant Height           |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+|         **Minimal Mandatory PolarTables**                                                                        |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| STW                  |        |        |   X    |   X    |   X    |   kt     | Speed Through Water               |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| TOTAL_POWER [#]_     |   X    |   X    |        |        |        |   kW     | Total Power Consumption           |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| LEEWAY               |   X    |   X    |   X    |   X    |   X    |   deg    | Leeway Angle                      |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
+| SOLVER_STATUS [#]_   |   X    |   X    |   X    |   X    |   X    |    --    | Solver Status                     |
++----------------------+--------+--------+--------+--------+--------+----------+-----------------------------------+
 
-    .. list-table::
-        :widths: 30 30 120
-        :header-rows: 1
+  * Case for the Dimension and PolarTables **MUST** be respected
 
-        * - Name
-          - Unit
-          - Description
-        * - STW_Coord
-          - kt
-          - Speed Through Water
-        * - TWS_Coord
-          - kt
-          - True Wind Speed
-        * - TWA_Coord
-          - deg
-          - True Wind Angle
-        * - WA_Coord
-          - deg
-          - Waves Angle
-        * - Hs_Coord
-          - m
-          - Waves Significant Height
+.. [#] Power_dim dimension is most of the time the Power associated to propulsion, i.e. BrakePower. But other convention can
+       be used but it must documented.
 
+.. [#] TOTAL_POWER PolarTable is the total consummed power onboard (propulsion power, power consummed by sails, hotel load etc...).
+       What is accounted for must be documented
 
-Speed controlled Polars Variables
-    * MPPP and HPPP Polars MUST have the following Variables defined:
-
-    .. list-table::
-        :widths: 30 30 30 120
-        :header-rows: 1
-
-        * - Name
-          - Unit
-          - Data Type
-          - Description
-        * - TOTAL_POWER
-          - kW
-          - double
-          - Total Power
-        * - LEEWAY
-          - def
-          - double
-          - Leeway angle
-        * - SOLVER_STATUS
-          - -
-          - int
-          - Solver status
-
-.. note::
-    * The case for all names MUST be respected
-    * SOLVER_STATUS is a variable to specify if the solver that generated the table converged or not. A value of 0 means
-      converged whereas any other value is considered as not converged. You may adopt some numbering scheme if you need
-      to track type of non convergence.
-
-RULE V1/R8
-----------
-
-Power Controlled Polars dimensions and Variables
-    * MVPP and HVPP Polars MUST have the following dimensions and Coordinate Variables defined, in that order:
-
-    .. list-table::
-        :widths: 30 30 120
-        :header-rows: 1
-
-        * - Name
-          - Unit
-          - Description
-        * - Power_Coord
-          - kW
-          - Power
-        * - TWS_Coord
-          - kt
-          - True Wind Speed
-        * - TWA_Coord
-          - deg
-          - True Wind Angle
-        * - WA_Coord
-          - deg
-          - Waves Angle
-        * - Hs_Coord
-          - m
-          - Waves Significant Height
-
-Power controlled Polars Variables
-    * MVPP and HVPP Polars MUST have the following Variables defined:
-
-    .. list-table::
-        :widths: 30 30 30 120
-        :header-rows: 1
-
-        * - Name
-          - Unit
-          - Data Type
-          - Description
-        * - STW
-          - kt
-          - double
-          - Speed Through Water
-        * - LEEWAY
-          - def
-          - double
-          - Leeway angle
-        * - SOLVER_STATUS
-          - -
-          - int
-          - Solver status
-
-.. note::
-    * The case for all names MUST be respected
-    * SOLVER_STATUS is a variable to specify if the solver that generated the table converged or not. A value of 0 means
-      converged whereas any other value is considered as not converged. You may adopt some numbering scheme if you need
-      to track type of non convergence.
-
-RULE V1/R9
-----------
-
-VPP (uncontrolled) Polars dimensions and Variables
-    * VPP Polars MUST have the following dimensions and Coordinate Variables defined, in that order:
-
-    .. list-table::
-        :widths: 30 30 120
-        :header-rows: 1
-
-        * - Name
-          - Unit
-          - Description
-        * - TWS_Coord
-          - kt
-          - True Wind Speed
-        * - TWA_Coord
-          - deg
-          - True Wind Angle
-        * - WA_Coord
-          - deg
-          - Waves Angle
-        * - Hs_Coord
-          - m
-          - Waves Significant Height
-
-VPP (uncontrolled) Polars Variables
-    * VPP Polars MUST have the following Variables defined:
-
-    .. list-table::
-        :widths: 30 30 30 120
-        :header-rows: 1
-
-        * - Name
-          - Unit
-          - Data Type
-          - Description
-        * - STW
-          - kt
-          - double
-          - Speed Through Water
-        * - LEEWAY
-          - def
-          - double
-          - Leeway angle
-        * - SOLVER_STATUS
-          - -
-          - int
-          - Solver status
-
-.. note::
-    * The case for all names MUST be respected
-    * SOLVER_STATUS is a variable to specify if the solver that generated the table converged or not. A value of 0 means
-      converged whereas any other value is considered as not converged. You may adopt some numbering scheme if you need
-      to track type of non convergence.
+.. [#] SOLVER_STATUS is a special PolarTable whose data are integers. It is used to specify if a polar point comes from
+       a successful computation (e.g. convergence of solver, constraints satisfied) or not.
+       0 means success, i.e. it can be used. Any other value means not successful.
+       Other PolarTable values corresponding to a PolarPoint for which the SOLVER_STATUS is non zero can have any
+       value such as 0 or NaN.
+       SOLVER_STATUS value should be used as the main source of information about quality of data.
+       User can use its own non zero values to specify special cases of non-convergence of the solvers.

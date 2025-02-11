@@ -46,7 +46,7 @@ of a Specifications version N is said to be a POEM File.
     on the data model provided by the POEM Library. This allow to get tools to verify that a NetCDF file is compliant
     with a POEM Specification before trying to load its data into POEM data structures. Concepts used to define rules
     are those of the NetCDF-4 data model. Anyway, rules are defined to ensure correct mapping between both data models
-    with a maximum of flexibility for specific extensions by users. Links to POEM data model are this exhibited.
+    with a maximum of flexibility for specific extensions by users. Links to POEM data model are specified where needed.
 
 .. toctree::
     :maxdepth: 1

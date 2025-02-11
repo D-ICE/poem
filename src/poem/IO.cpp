@@ -574,7 +574,7 @@ namespace poem {
 
     // Check compliancy with specification
     if (!spec_check(filename, major_version)) {
-      LogCriticalError("File is not compliant with version v{}", major_version);
+      LogCriticalError("File is not compliant POEM Specification version {}", major_version);
       CRITICAL_ERROR_POEM
     } else {
       LogNormalInfo("File is compliant with version v{}", major_version);
@@ -622,6 +622,5 @@ namespace poem {
 
     return polar_node_type;
   }
-
 
 }  // poem

@@ -21,40 +21,109 @@ namespace poem::v1 {
         rule, rule);
   }
 
-  std::vector<std::string> known_poem_node_types = {"POLAR_NODE", "POLAR_SET", "POLAR", "POLAR_TABLE"};
+  std::vector<std::string> known_poem_node_types_groups = {"POLAR_NODE", "POLAR_SET", "POLAR"};
+
   std::vector<std::string> known_polar_modes = {"MPPP", "HPPP", "MVPP", "HVPP", "VPP"};
 
-  void not_root_group_error(const netCDF::NcGroup &group) {
-    if (!group.isRootGroup()) {
-      LogCriticalError("Specification checks must start at root group");
-      CRITICAL_ERROR_POEM
-    }
+//  void not_root_group_error(const netCDF::NcGroup &group) {
+//    if (!group.isRootGroup()) {
+//      LogCriticalError("Specification checks must start at root group");
+//      CRITICAL_ERROR_POEM
+//    }
+//  }
+
+  template<class T>
+  inline bool is_poem_object(const T &object) {
+    return object.getAtts().contains("POEM_NODE_TYPE");
   }
 
-  bool check_R1(const netCDF::NcGroup &group) {
-    not_root_group_error(group);
+  template<class T>
+  inline std::string get_attribute(const T &object, const std::string &att_name) {
+    // Warning, check of existence of attribute must be done outside of this function
+    std::string att;
+    object.getAtt(att_name).getValues(att);
+    return att;
+  }
 
+  bool has_at_least_one_polar(const netCDF::NcGroup &group) {
+    bool has_polar = false;
+    if (is_poem_object(group)) {
+      auto node_type = get_attribute(group, "POEM_NODE_TYPE");
+      if (node_type == "POLAR") {
+        has_polar = true;
+      }
+    }
+    // Keep searching
+    if (!has_polar) {
+      for (const auto &group_: group.getGroups()) {
+        has_polar = has_at_least_one_polar(group_.second);
+        if (has_polar) break;
+      }
+    }
+
+    return has_polar;
+  }
+
+
+  bool check_R1(const netCDF::NcGroup &group) {
     bool compliant = true;
-    if (group.getAtts().contains("POEM_SPECIFICATION_VERSION")) {
-      std::string version_;
-      group.getAtt("POEM_SPECIFICATION_VERSION").getValues(version_);
-      auto version = semver::version::parse(version_, false).major();
-      if (version != 1) {
-        LogWarningError("POEM file version 1 and POEM_SPECIFICATION_VERSION mismatch ({})", version);
+
+    if (group.getAtts().contains("POEM_NODE_TYPE")) {
+
+      // Parent of this group MUST be a POEM group
+      if (!group.isRootGroup()) {
+        if (!is_poem_object(group.getParentGroup())) {
+          LogWarningError("In group {}, POEM_NODE_TYPE attribute found but not in parent group."
+                          "Continuous POEM group is mandatory",
+                          group.getName(true));
+          compliant = false;
+        }
+      }
+
+      // Check group POEM_NODE_TYPE value
+      std::string node_type = get_attribute(group, "POEM_NODE_TYPE");
+      if (std::find(known_poem_node_types_groups.begin(), known_poem_node_types_groups.end(), node_type) ==
+          known_poem_node_types_groups.end()) {
+        LogWarningError("In group {}, POEM_NODE_TYPE attribute found but with bad value. "
+                        "Excepted on of POLAR_NODE, POLAR_SET or POLAR. Found {}",
+                        group.getName(true), node_type);
         compliant = false;
       }
 
-    } else {
-      compliant = false;
+      // Variables
+      for (const auto &nc_var: group.getVars()) {
+        if (is_poem_object(nc_var.second)) {
+          // Check that PolarTable and Dimension are in a Polar group
+          if (node_type !=
+              "POLAR") { // TODO: ajouter cette règle (pas de PolarTable ou Dimension in group other thant Polar)
+            LogWarningError("In group {}, found Variable with attribute POEM_NODE_TYPE set to {}, "
+                            "but group is not a POLAR.");
+            compliant = false;
+          }
+
+          // Check Dimension and PolarTable POEM_NODE_TYPE value
+          std::string var_node_type = get_attribute(nc_var.second, "POEM_NODE_TYPE");
+          if (group.getCoordVars().contains(nc_var.second.getName())) {
+            if (var_node_type != "POLAR_DIMENSION") {
+              LogWarningError("In group {}, Coordinate Variable {} seen as a Dimension has incorrect "
+                              "POEM_NODE_TYPE attribute. Expected POLAR_DIMENSION, found {}.",
+                              group.getName(true), nc_var.second.getName(), var_node_type);
+              compliant = false;
+            }
+          } else {
+            if (var_node_type != "POLAR_TABLE") {
+              LogWarningError("In group {}, Variable {} seen as a PolarTable has incorrect "
+                              "POEM_NODE_TYPE attribute. Expected POLAR_TABLE, found {}",
+                              group.getName(true), nc_var.second.getName(), var_node_type);
+              compliant = false;
+            }
+          }
+        }
+      }
     }
 
-    if (!group.getAtts().contains("VESSEL_NAME")) {
-      LogWarningError("VESSEL_NAME not found in root group");
-      compliant = false;
-    }
-
-    if (!compliant) {
-      not_compliant_warning(1);
+    for (const auto &group_: group.getGroups()) {
+      compliant &= check_R1(group_.second);
     }
 
     return compliant;
@@ -64,62 +133,36 @@ namespace poem::v1 {
 
     bool compliant = true;
 
-    // Are we in a POEM group
-    if (group.getAtts().contains("POEM_NODE_TYPE")) {
-
-      std::string node_type;
-      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
-
-      if (std::find(known_poem_node_types.begin(), known_poem_node_types.end(), node_type) ==
-          known_poem_node_types.end()) {
-        LogWarningError("In {}, unknown POEM_NODE_TYPE: {}", group.getName(true), node_type);
-        compliant = false;
-      }
-
-      // POEM group
-
-      for (const auto &group_: group.getGroups()) {
-        compliant &= check_R2(group_.second);
-      }
-
-      if (node_type == "POLAR") {
-        for (const auto &var: group.getVars()) {
-          if (var.second.getAtts().contains("POEM_NODE_TYPE")) {
-            std::string var_node_type;
-            var.second.getAtt("POEM_NODE_TYPE").getValues(var_node_type);
-            if (group.getCoordVars().contains(var.first)) {
-              // Coordinate Variable // FIXME: introduire POLAR_DIMENSION
-              if (var_node_type != "POLAR_DIMENSION") {
-                LogWarningError(
-                    "Coordinate Variable {} has attribute POEM_NODE_TYPE set to {}, expected is POLAR_DIMENSION",
-                    var.first, var_node_type); // FIXME: MANQUANT
-                compliant = false;
-              }
-            } else {
-              // PolarTable
-              if (var_node_type != "POLAR_TABLE") {
-                LogWarningError("Variable {} has attribute POEM_NODE_TYPE set to {}, expected is POLAR_TABLE",
-                                var.first, var_node_type); // FIXME: MANQUANT
-                compliant = false;
-              }
-            }
-          }
-        }
-      }
-
-    } else {
-      // Not a POEM group
-
-      if (group.isRootGroup()) {
-        // A POEM root group MUST have POEM_NODE_TYPE defined! TODO: ajouter dans la rule...
-        LogWarningError("POEM File root group MUST always have an attribute POEM_NODE_TYPE");
-        compliant = false;
-      }
-
+    if (!group.isRootGroup()) {
+      LogCriticalError("check_R2 function is expecting root group");
+      CRITICAL_ERROR_POEM
     }
 
-    if (!compliant) {
-      not_compliant_warning(2);
+    // Root group mandatory attribute POEM_SPECIFICATION_VERSION
+    if (group.getAtts().contains("POEM_SPECIFICATION_VERSION")) {
+      std::string version_str = get_attribute(group, "POEM_SPECIFICATION_VERSION");
+      int version = (int) semver::version::parse(version_str, false).major();
+      if (version != 1) {
+        LogWarningError("In root group, POEM_SPECIFICATION_VERSION attribute found but version number is {}."
+                        "Version expected to check against is 1",
+                        version);
+        compliant = false;
+      }
+    } else {
+      LogWarningError("In root group, POEM_SPECIFICATION_VERSION attribute not found.");
+      compliant = false;
+    }
+
+    // Root group mandatory attribute VESSEL_NAME
+    if (!group.getAtts().contains("VESSEL_NAME")) {
+      LogWarningError("In root group, VESSEL_NAME attribute not found");
+      compliant = false;
+    }
+
+    // Root group mandatory attribute POEM_NODE_TYPE
+    if (!group.getAtts().contains("POEM_NODE_TYPE")) {
+      LogWarningError("In root group, POEM_NODE_TYPE attribute not found");
+      compliant = false;
     }
 
     return compliant;
@@ -129,91 +172,111 @@ namespace poem::v1 {
 
     bool compliant = true;
 
-    if (group.getAtts().contains("POEM_NODE_TYPE")) {
-      std::string node_type;
-      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
-      if (node_type == "POLAR") {
-        if (std::find(known_polar_modes.begin(), known_polar_modes.end(), group.getName()) == known_polar_modes.end()) {
-          LogWarningError("Group {} has attribute POEM_NODE_TYPE set to POLAR thus its name must be either "
-                          "MPPP, HPPP, MVPP, HVPP or VPP. Its current name is {}",
-                          group.getName(true), group.getName(false));
+    if (is_poem_object(group)) {
+      std::string node_type = get_attribute(group, "POEM_NODE_TYPE");
+
+      // A PolarSet ALWAYS owns at least a Polar -> TODO: changer la regle en un PolarSet ne doit contenir que des Polar
+      if (node_type == "POLAR_SET") {
+        bool has_polar = false;
+        for (const auto &group_: group.getGroups()) {
+          if (is_poem_object(group_.second)) {
+            has_polar = true;
+
+            // A subgroup of a PolarSet MUST be a Polar
+            auto node_type_ = get_attribute(group_.second, "POEM_NODE_TYPE");
+            if (node_type_ != "POLAR") {
+              LogWarningError("In group {} seen as a PolarSet, POEM subgroups must be of type Polar. "
+                              "Found subgroup {} of type {}",
+                              group.getName(true), group_.second.getName(true), node_type_);
+              compliant = false;
+            }
+          }
         }
-//        if (group.getAtts().contains("POLAR_MODE")) {
-//          std::string polar_mode;
-//          group.getAtt("POLAR_MODE").getValues(polar_mode);
-//          if (std::find(known_polar_types.begin(), known_polar_types.end(), polar_mode) == known_polar_types.end()) {
-//            LogWarningError("In group {}, POLAR_MODE attibute must be either "
-//                            "MPPP, HPPP, MVPP, HVPP or VPP. Found {}", group.getName(true), polar_mode);
-//            compliant = false;
-//          }
-//        } else {
-//          LogWarningError("In group {}, POLAR_MODE attribute not found", group.getName(true));
-//          compliant = false;
-//        }
+        if (!has_polar) {
+          LogWarningError("In group {} seen as a PolarSet, no Polar subgroup found", group.getName(true));
+          compliant = false;
+        }
       }
 
+      // A Polar ALWAYS owns at least a PolarTable with associated Dimensions
+      if (node_type == "POLAR") {
+        bool has_polar_table = false;
+        std::vector<netCDF::NcDim> dims;
+        std::string table_ref_name;
+        for (const auto &nc_var: group.getVars()) {
+          if (!group.getCoordVars().contains(nc_var.second.getName()) &&
+              is_poem_object(nc_var.second)) {
+            // This is a Variable representing a PolarTable
+
+            // First PolarTable found, registering its name and dimensions for later comparison
+            if (!has_polar_table) {
+              dims = nc_var.second.getDims();
+              table_ref_name = nc_var.first;
+              has_polar_table = true;
+
+              // Check that Dimensions are well present into the group
+              for (const auto &dim: dims) {
+                if (!group.getCoordVars().contains(dim.getName())) {
+                  LogWarningError("In group {}, PolarTable {}'s Dimension {} not found in the group",
+                                  group.getName(true), nc_var.first, dim.getName());
+                  compliant = false;
+                }
+              }
+            }
+
+            // Check Dimension consistency against ref PolarTable
+            auto dims_ = nc_var.second.getDims();
+            if (dims_ != dims) {
+              LogWarningError("In group {}, enclosed PolarTables {} and {} have inconsistent "
+                              "Dimensions definitions",
+                              group.getName(true), table_ref_name, nc_var.second.getName());
+              compliant = false;
+            }
+          }
+        }
+        if (!has_polar_table) {
+          LogWarningError("In group {}, seen as a Polar, no PolarTable found");
+          compliant = false;
+        }
+      }
+
+      // Iterating on subgroups
       for (const auto &group_: group.getGroups()) {
         compliant &= check_R3(group_.second);
       }
 
     }
 
-    if (!compliant) {
-      not_compliant_warning(3);
+    if (group.isRootGroup()) {
+      // Checking that we have at least one Polar in the file
+      if (!has_at_least_one_polar(group)) {
+        LogWarningError("No Polar found in the file");
+        compliant = false;
+      }
     }
 
     return compliant;
   }
 
-  // FIXME: si on trouve un POLAR_SET, on doit trouver au moins un POLAR dedans -> add
-  // FIXME: si on trouve un POLAR, on doit trouver au moins un POLAR_TABLE dedans -> add
-  // FIXME: on doit trouver au moins un groupe POLAR dans un fichier
-
   bool check_R4(const netCDF::NcGroup &group) {
     bool compliant = true;
 
-    if (group.getAtts().contains("POEM_NODE_TYPE")) {
-      std::string node_type;
-      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
-
-      if (node_type == "POLAR") { // Ajouter le fait qu'on ne peut trouver des POLAR_TABLE que dans POLAR
-        for (const auto &var: group.getVars()) {
-          if (var.second.getAtts().contains("POEM_NODE_TYPE")) {
-            if (var.second.getAtts().contains("unit")) {
-              std::string unit;
-              var.second.getAtt("unit").getValues(unit);
-              auto is_known_unit = dunits::UnitsChecker::getInstance().is_valid_unit(unit, true);
-              if (!is_known_unit) { // FIXME: check unite manquant dans spec
-                LogWarningError(
-                    "In group {}, variable {} unit {} is not known by dunits", // TODO: faire lien dans la doc vers dunits
-                    group.getName(true),
-                    var.second.getName(),
-                    unit);
-              }
-            } else {
-              LogWarningError("In group {}, variable {} does not have a unit attribute",
-                              group.getName(true), var.second.getName());
-              compliant = false;
-            }
-            if (!var.second.getAtts().contains("description")) {
-              LogWarningError("In group {}, variable {} does not have a description attribute",
-                              group.getName(true), var.second.getName());
-              compliant = false;
-            }
-
-          }
-        }
-      } else {
-        for (const auto &group_: group.getGroups()) {
-          compliant &= check_R4(group_.second);
+    if (is_poem_object(group)) {
+      auto node_type = get_attribute(group, "POEM_NODE_TYPE");
+      if (node_type == "POLAR") {
+        if (std::find(known_polar_modes.begin(), known_polar_modes.end(), group.getName()) ==
+            known_polar_modes.end()) {
+          LogWarningError("In group {}, seen as a Polar, group name must be a valid POEM mode. "
+                          "Expected either MPPP, HPPP, MVPP, HVPP or VPP. Found {}",
+                          group.getName(true), group.getName());
+          compliant = false;
         }
       }
 
-    }
-
-    if (!compliant) {
-      LogWarningError(
-          "----->> Not compliant with V1/R4 (https://dice-poem.readthedocs.io/en/latest/documentation/rules_v1.html#rule-v1-r4)");
+      // Iterating on subgroups
+      for (const auto &group_: group.getGroups()) {
+        compliant &= check_R4(group_.second);
+      }
     }
 
     return compliant;
@@ -222,33 +285,32 @@ namespace poem::v1 {
   bool check_R5(const netCDF::NcGroup &group) {
     bool compliant = true;
 
-    if (group.getAtts().contains("POEM_NODE_TYPE")) { // TODO: changer en POEM_NODE_TYPE
-      std::string node_type;
-      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
+    if (is_poem_object(group)) {
+      auto node_type = get_attribute(group, "POEM_NODE_TYPE");
       if (node_type == "POLAR") {
-        // TODO: verifier que les dims ont bien des Coord Vars associees qui ont POEM_NODE_TYPE a POLAR_DIMENSION -> add
-        for (const auto &var: group.getVars()) {
-          std::vector<netCDF::NcDim> dims;
-          if (var.second.getAtts().contains("POEM_NODE_TYPE")) {
-            auto dims_ = var.second.getDims();
-            if (dims.empty()) dims = dims_;
-            if (dims_ != dims) {
-              LogWarningError("In group {}, variables with POEM_NODE_TYPE=POLAR_TABLE "
-                              "defined must all have the same dimensions", group.getName(true));
+        for (const auto nc_var : group.getVars()) {
+          if (is_poem_object(nc_var.second)) {
+            if (!nc_var.second.getAtts().contains("unit")) {
+              LogWarningError("In group {}, Variable {} doe not have unit attribute",
+                              group.getName(true), nc_var.first);
+              compliant = false;
+            }
+            if (!nc_var.second.getAtts().contains("description")) {
+              LogWarningError("In group {}, Variable {} doe not have description attribute",
+                              group.getName(true), nc_var.first);
               compliant = false;
             }
           }
         }
 
-      } else {
-        for (const auto &group_: group.getGroups()) {
-          compliant &= check_R5(group_.second);
-        }
+        return compliant;
       }
-    }
 
-    if (!compliant) {
-      not_compliant_warning(5);
+      // Iterating on subgroups
+      for (const auto& group_ : group.getGroups()) {
+        compliant &= check_R5(group_.second);
+      }
+
     }
 
     return compliant;
@@ -257,66 +319,59 @@ namespace poem::v1 {
   bool check_R6(const netCDF::NcGroup &group) {
     bool compliant = true;
 
-    if (group.getAtts().contains("POEM_NODE_TYPE")) { // TODO: changer en POEM_NODE_TYPE
-      std::string node_type;
-      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
+    if (is_poem_object(group)) {
+      auto node_type = get_attribute(group, "POEM_NODE_TYPE");
       if (node_type == "POLAR") {
-        for (const auto &coord_var: group.getCoordVars()) {
-          auto nc_var = group.getVar(coord_var.first);
+        for (const auto& coord_var : group.getCoordVars()) {
+          auto var = group.getVar(coord_var.first);
+          if (!is_poem_object(var)) continue;
 
-          // FIXME: Coord Vars must have POEM_NODE_TYPE set to POLAR_DIMENSION (voir ou mettre dans une regle precedente) -> add
-          if (nc_var.getAtts().contains("POEM_NODE_TYPE")) {
-            if (nc_var.getDims().size() != 1) {
-              LogCriticalError("In {}, Coordinate Variable {} has more than 1 dimension",
-                               group.getName(true), nc_var.getName());
-              CRITICAL_ERROR_POEM
+          std::vector<double> values(var.getDim(0).getSize());
+          var.getVar(values.data());
+          double front_value = values.front();
+
+          // Positive values
+          if (front_value < 0.) {
+            LogWarningError("In group {}, values for Dimension {} MUST be positive. Found {}",
+                            group.getName(true), var.getName(), front_value);
+            compliant = false;
+          }
+
+          // Strictly increasing values
+          front_value -= 1.;
+          for (const auto &val : values) {
+            if (val <= front_value) {
+              LogWarningError("In group {}, values for Dimension {} MUST be strictly increasing. "
+                              "Found {} <= {}.", group.getName(true), var.getName(), val, front_value);
+              compliant = false;
             }
-            std::vector<double> values(nc_var.getDim(0).getSize());
-            nc_var.getVar(values.data());
+            front_value = val;
+          }
 
-            double prec = values[0] - 1.;
-            for (const auto &val: values) {
-              if (val < 0 || val <= prec) {
-                LogWarningError("In {}, Coordinate Variable {} must have positive stricly increasing values",
-                                group.getName(true), nc_var.getName());
-                compliant = false;
-              }
-              prec = val;
-            }
-
-            std::string unit;
-            nc_var.getAtt("unit").getValues(unit);
-            if (unit == "deg") {
-              // FIXME: voir si on peut pas demander a dunits de donner les valeurs d'unites d'un certain type
-              //  Pour le moment, on dit que la seule valeur pour les angles c'est le deg -> add
-              // Angular variable
-
-              if (values.back() > 180.) {
-                LogWarningError("In {}, Angular Coordinate Variable {} values must be between 0 and 180. Found {}",
-                                group.getName(true), nc_var.getName(), values.back());
-                compliant = false;
-              }
+          // Not higher than 180 for angular values
+          auto unit = get_attribute(var, "unit");
+          if (unit == "deg") {
+            if (values.back() > 180.) {
+              LogWarningError("In group {}, values for angular Dimension {} MUST be between 0 and 180 deg. "
+                              "Found {}",
+                              group.getName(true), var.getName(), values.back());
+              compliant = false;
             }
           }
+
         }
 
       } else {
-        for (const auto &group_: group.getGroups()) {
+        for (const auto& group_ : group.getGroups()) {
           compliant &= check_R6(group_.second);
         }
       }
-    }
 
-    if (!compliant) {
-      not_compliant_warning(6);
     }
 
     return compliant;
-  }
 
-  // FIXME: est-ce qu'on garde la regle POLAR doit avoir un attribut POLAR_MODE ?
-  //  En fait un groupe POLAR est un groupe dans lequel on trouve des POLAR_TABLE et des POLAR_DIMENSION...
-  //  ca devrait suffire pour determiner qu'on est dans un POLAR !!
+  }
 
   bool has_coord_var(const netCDF::NcGroup &group, const std::string &name) {
     bool compliant = true;
@@ -346,8 +401,6 @@ namespace poem::v1 {
       }
       // TODO: verifier qu'on a bien POEM_NODE_TYPE qui est DIMENSION_NODE
     } else {
-//      std::string polar_mode;
-//      group.getAtt("POLAR_MODE").getValues(polar_mode);
       LogWarningError("In {} ({} mode), Coordinate Variable {} not found",
                       group.getName(true), group.getName(false), name);
       compliant = false;
@@ -412,42 +465,39 @@ namespace poem::v1 {
   bool check_R7(const netCDF::NcGroup &group) {
     bool compliant = true;
 
-    if (group.getAtts().contains("POEM_NODE_TYPE")) {
-      std::string node_type;
-      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
+    if (is_poem_object(group)) {
+      std::string node_type = get_attribute(group, "POEM_NODE_TYPE");
       if (node_type == "POLAR") {
-//        std::string polar_mode;
-//        group.getAtt("POLAR_MODE").getValues(polar_mode);
         auto polar_mode = group.getName(false);
         if (polar_mode == "MPPP" || polar_mode == "HPPP") {
-          compliant &= has_coord_var(group, "STW_Coord");
-          compliant &= has_coord_var(group, "TWS_Coord");
-          compliant &= has_coord_var(group, "TWA_Coord");
-          compliant &= has_coord_var(group, "WA_Coord");
-          compliant &= has_coord_var(group, "Hs_Coord");
-          compliant &= has_var(group, "TOTAL_POWER", {"STW_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
-          compliant &= has_var(group, "LEEWAY", {"STW_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
-          compliant &= has_var(group, "SOLVER_STATUS", {"STW_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
+          compliant &= has_coord_var(group, "STW_dim");
+          compliant &= has_coord_var(group, "TWS_dim");
+          compliant &= has_coord_var(group, "TWA_dim");
+          compliant &= has_coord_var(group, "WA_dim");
+          compliant &= has_coord_var(group, "Hs_dim");
+          compliant &= has_var(group, "TOTAL_POWER", {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+          compliant &= has_var(group, "LEEWAY", {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+          compliant &= has_var(group, "SOLVER_STATUS", {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
         }
         if (polar_mode == "MVPP" || polar_mode == "HVPP") {
-          compliant &= has_coord_var(group, "Power_Coord");
-          compliant &= has_coord_var(group, "TWS_Coord");
-          compliant &= has_coord_var(group, "TWA_Coord");
-          compliant &= has_coord_var(group, "WA_Coord");
-          compliant &= has_coord_var(group, "Hs_Coord");
-          compliant &= has_var(group, "STW", {"Power_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
-          compliant &= has_var(group, "LEEWAY", {"Power_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
+          compliant &= has_coord_var(group, "Power_dim");
+          compliant &= has_coord_var(group, "TWS_dim");
+          compliant &= has_coord_var(group, "TWA_dim");
+          compliant &= has_coord_var(group, "WA_dim");
+          compliant &= has_coord_var(group, "Hs_dim");
+          compliant &= has_var(group, "STW", {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+          compliant &= has_var(group, "LEEWAY", {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
           compliant &= has_var(group, "SOLVER_STATUS",
-                               {"Power_Coord", "TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
+                               {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
         }
         if (polar_mode == "VPP") {
-          compliant &= has_coord_var(group, "TWS_Coord");
-          compliant &= has_coord_var(group, "TWA_Coord");
-          compliant &= has_coord_var(group, "WA_Coord");
-          compliant &= has_coord_var(group, "Hs_Coord");
-          compliant &= has_var(group, "STW", {"TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
-          compliant &= has_var(group, "LEEWAY", {"TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
-          compliant &= has_var(group, "SOLVER_STATUS", {"TWS_Coord", "TWA_Coord", "WA_Coord", "Hs_Coord"});
+          compliant &= has_coord_var(group, "TWS_dim");
+          compliant &= has_coord_var(group, "TWA_dim");
+          compliant &= has_coord_var(group, "WA_dim");
+          compliant &= has_coord_var(group, "Hs_dim");
+          compliant &= has_var(group, "STW", {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+          compliant &= has_var(group, "LEEWAY", {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+          compliant &= has_var(group, "SOLVER_STATUS", {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
         }
 
       } else {
@@ -457,24 +507,8 @@ namespace poem::v1 {
       }
     }
 
-    if (!compliant) {
-      not_compliant_warning(7);
-    }
-
     return compliant;
   }
-
-//  bool check_R8(const netCDF::NcGroup &group) {
-//    NIY_POEM
-//  }
-//
-//  bool check_R9(const netCDF::NcGroup &group) {
-//    NIY_POEM
-//  }
-//
-//  bool check_R10(const netCDF::NcGroup &group) {
-//    NIY_POEM
-//  }
 
 }
 
@@ -488,19 +522,44 @@ bool poem::check_v1(const std::string &filename) {
   netCDF::NcFile root_group(filename, netCDF::NcFile::read);
 
   bool compliant = true;
-  compliant &= v1::check_R1(root_group);
-  compliant &= v1::check_R2(root_group);
-  compliant &= v1::check_R3(root_group);
-  compliant &= v1::check_R4(root_group);
-  compliant &= v1::check_R5(root_group);
-  compliant &= v1::check_R6(root_group);
-  compliant &= v1::check_R7(root_group);
-//  compliant &= v1::check_R8(root_group);
-//  compliant &= v1::check_R9(root_group);
-//  compliant &= v1::check_R10(root_group);
+
+  if (!v1::check_R1(root_group)) {
+    v1::not_compliant_warning(1);
+    compliant = false;
+  }
+
+  if (!v1::check_R2(root_group)) {
+    v1::not_compliant_warning(2);
+    compliant = false;
+  }
+
+  if (!v1::check_R3(root_group)) {
+    v1::not_compliant_warning(3);
+    compliant = false;
+  }
+
+  if (!v1::check_R4(root_group)) {
+    v1::not_compliant_warning(4);
+    compliant = false;
+  }
+
+  if (!v1::check_R5(root_group)) {
+    v1::not_compliant_warning(5);
+    compliant = false;
+  }
+
+  if (!v1::check_R6(root_group)) {
+    v1::not_compliant_warning(6);
+    compliant = false;
+  }
+
+  if (!v1::check_R7(root_group)) {
+    v1::not_compliant_warning(7);
+    compliant = false;
+  }
 
   root_group.close();
 
   return compliant;
-}
-// poem::v1
+
+}  // poem::v1

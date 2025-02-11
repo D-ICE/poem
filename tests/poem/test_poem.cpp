@@ -285,17 +285,17 @@ TEST(poem, PolarSet) {
 void fill(std::shared_ptr<PolarSet> polar_set) {
 
   // Dimensions
-  auto STW_Coord = make_dimension("STW_Coord", "kt", "Speed Through Water");
-  auto TWS_Coord = make_dimension("TWS_Coord", "kt", "True Wind Speed");
-  auto TWA_Coord = make_dimension("TWA_Coord", "deg", "True Wind Angle");
-  auto WA_Coord = make_dimension("WA_Coord", "deg", "Waves Angle");
-  auto Hs_Coord = make_dimension("Hs_Coord", "m", "Waves Significant Height");
-  auto Power_Coord = make_dimension("Power_Coord", "kW", "Brake Power");
+  auto STW_dim = make_dimension("STW_dim", "kt", "Speed Through Water");
+  auto TWS_dim = make_dimension("TWS_dim", "kt", "True Wind Speed");
+  auto TWA_dim = make_dimension("TWA_dim", "deg", "True Wind Angle");
+  auto WA_dim = make_dimension("WA_dim", "deg", "Waves Angle");
+  auto Hs_dim = make_dimension("Hs_dim", "m", "Waves Significant Height");
+  auto Power_dim = make_dimension("Power_dim", "kW", "Brake Power");
 
   // DimensionSet
-  auto dimension_set_speed_control = make_dimension_set({STW_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord});
-  auto dimension_set_power_control = make_dimension_set({Power_Coord, TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord});
-  auto dimension_set_no_control = make_dimension_set({TWS_Coord, TWA_Coord, WA_Coord, Hs_Coord});
+  auto dimension_set_speed_control = make_dimension_set({STW_dim, TWS_dim, TWA_dim, WA_dim, Hs_dim});
+  auto dimension_set_power_control = make_dimension_set({Power_dim, TWS_dim, TWA_dim, WA_dim, Hs_dim});
+  auto dimension_set_no_control = make_dimension_set({TWS_dim, TWA_dim, WA_dim, Hs_dim});
 
   // DimensionGrid
   auto STW_values = mathutils::linspace<double>(8, 20, 13);
@@ -306,24 +306,24 @@ void fill(std::shared_ptr<PolarSet> polar_set) {
   auto Power_values = mathutils::linspace<double>(1000, 6500, 12);
 
   auto dimension_grid_speed_control = make_dimension_grid(dimension_set_speed_control);
-  dimension_grid_speed_control->set_values("STW_Coord", STW_values);
-  dimension_grid_speed_control->set_values("TWS_Coord", TWS_values);
-  dimension_grid_speed_control->set_values("TWA_Coord", TWA_values);
-  dimension_grid_speed_control->set_values("WA_Coord", WA_values);
-  dimension_grid_speed_control->set_values("Hs_Coord", Hs_values);
+  dimension_grid_speed_control->set_values("STW_dim", STW_values);
+  dimension_grid_speed_control->set_values("TWS_dim", TWS_values);
+  dimension_grid_speed_control->set_values("TWA_dim", TWA_values);
+  dimension_grid_speed_control->set_values("WA_dim", WA_values);
+  dimension_grid_speed_control->set_values("Hs_dim", Hs_values);
 
   auto dimension_grid_power_control = make_dimension_grid(dimension_set_power_control);
-  dimension_grid_power_control->set_values("Power_Coord", Power_values);
-  dimension_grid_power_control->set_values("TWS_Coord", TWS_values);
-  dimension_grid_power_control->set_values("TWA_Coord", TWA_values);
-  dimension_grid_power_control->set_values("WA_Coord", WA_values);
-  dimension_grid_power_control->set_values("Hs_Coord", Hs_values);
+  dimension_grid_power_control->set_values("Power_dim", Power_values);
+  dimension_grid_power_control->set_values("TWS_dim", TWS_values);
+  dimension_grid_power_control->set_values("TWA_dim", TWA_values);
+  dimension_grid_power_control->set_values("WA_dim", WA_values);
+  dimension_grid_power_control->set_values("Hs_dim", Hs_values);
 
   auto dimension_grid_no_control = make_dimension_grid(dimension_set_no_control);
-  dimension_grid_no_control->set_values("TWS_Coord", TWS_values);
-  dimension_grid_no_control->set_values("TWA_Coord", TWA_values);
-  dimension_grid_no_control->set_values("WA_Coord", WA_values);
-  dimension_grid_no_control->set_values("Hs_Coord", Hs_values);
+  dimension_grid_no_control->set_values("TWS_dim", TWS_values);
+  dimension_grid_no_control->set_values("TWA_dim", TWA_values);
+  dimension_grid_no_control->set_values("WA_dim", WA_values);
+  dimension_grid_no_control->set_values("Hs_dim", Hs_values);
 
 // Create some tables into the different Polar
   polar_set->create_polar(MPPP, dimension_grid_speed_control);

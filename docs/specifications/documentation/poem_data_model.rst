@@ -1,8 +1,13 @@
+.. _poem_data_model_header:
+
 POEM Data Model
 ===============
 
 POEM Library is built over NetCDF-4 library and POEM Files are NetCDF-4 files. As such, POEM Library directly uses NetCDF-4
 data model but provides its own data model specially adapted to vessels Performance Polar data storage and manipulation.
+
+
+.. _netcdf_data_model:
 
 NetCDF-4 Data Model
 -------------------
@@ -36,8 +41,13 @@ Attributes
     a group, or the entire dataset, as a whole. Variable attributes provide information about one of the variables in a group.
 
 
+.. _poem_data_model:
+
 POEM Data Model
 ---------------
+
+.. todo::
+    Mettre un schéma pour illustrer la hiérachie
 
 The POEM data model has different concepts that are introduced herafter. One important point to understant is that
 the POEM data model is built as a hierarchical tree structure starting at a root node. Root nodes of this tree are named
@@ -73,33 +83,32 @@ PolarPoint
 
 PolarNode
     A PolarNode is a generic node of the POEM hierarchical tree structure. It is normally associated to a special
-    operational mode of a ship. An operational mode is a special configuration of a ship. By example, ballast and laden
-    loading cases for a ship can be seen as different operational modes. But ballas and laden can also be divided into
-    two child operational mode if we consider the usage of one or two engines. Everything case is a PolarNode.
-    It is almost directly equivalent to NetCDF-4 groups, except for PolarTable that are even more special PolarNodes
-    (see below).
+    operational mode of a ship. An operational mode is a special configuration of a ship. For example, ballast and laden
+    loading cases for a ship can be seen as different operational modes. But ballast and laden can also be divided into
+    two child operational modes if we consider the usage of one or two engines.
+    The concept of PolarNode is almost directly equivalent to NetCDF-4 groups, except for PolarTable that is a
+    somewhat special case of PolarNode not mapped to a group bu to a Variable in NetCDF-4 (see below).
 
 PolarSet
-    A PolarSet is a special node of the POEM hierarchical tree structure. Those are nodes that represent a leaf Operational
-    mode in the tree structure where the configuration of the ship is totally defined. A PolarSet serve as container
-    for different Polar (see below). A PolarSet is a group in a NetCDF-4 file. A PolarSet can be the root group of a
+    A PolarSet is a special node of the POEM hierarchical tree structure. It represents a leaf Operational
+    mode in the tree structure where the configuration of the ship is totally defined. A PolarSet serve as a container
+    for different Polars (see below). A PolarSet is a group in a NetCDF-4 file. A PolarSet can be the root group of a
     POEM File.
 
 Polar
-    A Polar is a special node of the POEM hierarchical tree structure. In POEM, there exist 5 type of Polar which are
-    defined in :ref:`poem_polar_types`. The POEM polar types are the different type of performance predictions that can
-    be done with a wind assisted vessel. A polar serve as container for PolarTables. A Polar has a DimensionGrid that is
-    shared with every PolarTables that it contains. A Polar is a group in the NetCDF-4 data model.
+    A Polar is a special node of the POEM hierarchical tree structure. In POEM, there exists 5 modes of Polar which are
+    defined in :ref:`poem_polar_modes`. The POEM polar modes are the different type of performance predictions that can
+    be calculated with a wind assisted vessel. A polar serves as a container for PolarTables.
+    A Polar has a DimensionGrid that is shared with every PolarTables that it contains.
+    A Polar is a group in the NetCDF-4 data model.
 
 PolarTable
     A PolarTable is a special node of the POEM hierarchical tree structure. It represents a physical variable in a
     multidimensional data array. It has a unit and a description. It shares a DimensionGrid with its parent Polar and
     every of the other PolarTables in this Polar. It can contain data ot type double or int.
-    Unlike Polar and PolarSet, a Polar is not associated to a group in the NetCDF-4 data model but to a Variable with
+    Unlike Polar and PolarSet, a PolarTable is not associated to a group in the NetCDF-4 data model but to a Variable with
     mandatory Attributes (unit and description).
 
 Attributes
     POEM data model copies its concept of attributes from NetCDF-4. Any PolarNode (PolarSet, Polar and PolarTable)
-    has a set of attributes that can be defined. Thus it maps indifferently to groups attributes and Variables attributes
-    as for the POEM data model, groups and Variables always map to PolarNodes. Attributes are a powerful mean to store
-    metadata along with data.
+    has a set of attributes that can be defined. Attributes are a powerful mean to store metadata along with data.

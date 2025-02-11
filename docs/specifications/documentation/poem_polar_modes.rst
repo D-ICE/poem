@@ -51,10 +51,10 @@ Control
     Which type of control is used, i.e. which physical quantity is used as a physical coordinate in the performance tables
 
 Motor
-    Do we have a mechanical propulsion
+    Is there a mechanical propulsion active?
 
 Wind Propulsion
-    Do we have a wind propulsion
+    Is there a wind propulsion active?
 
 .. note::
     There is no PPP polar mode as it would mean that we would like to predict power to reach a prescribed speed without
