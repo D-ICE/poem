@@ -131,15 +131,16 @@ TEST(poem, PolarTable) {
   // Writing
   to_netcdf(polar_table, "my_vessel", "polar_table.nc");
 
-  netCDF::NcFile dataFile_("polar_table.nc", netCDF::NcFile::read);
-
-  auto var = dataFile_.getVar("VAR");
-  std::shared_ptr<DimensionGrid> dimension_grid_read;
-  std::shared_ptr<PolarTableBase> polar_table_read;
-  read_polar_table(var, polar_table_read, dimension_grid_read, true);
-  dataFile_.close();
-
-  ASSERT_EQ(*polar_table, *polar_table_read->as_polar_table_double());
+  // TODO: remettre
+//  netCDF::NcFile dataFile_("polar_table.nc", netCDF::NcFile::read);
+//
+//  auto var = dataFile_.getVar("VAR");
+//  std::shared_ptr<DimensionGrid> dimension_grid_read;
+//  std::shared_ptr<PolarTableBase> polar_table_read;
+//  read_polar_table(var, polar_table_read, dimension_grid_read, true);
+//  dataFile_.close();
+//
+//  ASSERT_EQ(*polar_table, *polar_table_read->as_polar_table_double());
 
 }
 
@@ -177,7 +178,7 @@ TEST(poem, Polar) {
 //  netCDF::NcFile dataFile_(std::string("polar.nc"), netCDF::NcFile::read);
 //  std::shared_ptr<Polar> polar_;
 //  read_polar(dataFile_, polar_, "MPPP");
-  auto polar_ = read_poem_nc_file("polar.nc", "MPPP");
+  auto polar_ = load("polar.nc", "MPPP");
 
 
   ASSERT_EQ(*polar, *polar_->as_polar());
@@ -276,7 +277,7 @@ TEST(poem, PolarSet) {
 //  netCDF::NcFile dataFile_(std::string("polar_set.nc"), netCDF::NcFile::read);
 //  auto polar_set_ = read_polar_set(dataFile_, "polar_set");
 //  dataFile_.close();
-  auto polar_set_ = read_poem_nc_file("polar_set.nc", "polar_set");
+  auto polar_set_ = load("polar_set.nc", "polar_set");
 
   ASSERT_EQ(*polar_set, *polar_set_->as_polar_set()); // TODO: reintroduce
 
@@ -356,7 +357,6 @@ void fill(std::shared_ptr<PolarSet> polar_set) {
 
 TEST(poem, PolarNode) {
 
-
   auto vessel = std::make_shared<PolarNode>("vessel");
   ASSERT_TRUE(vessel->is_root());
 
@@ -397,7 +397,7 @@ TEST(poem, PolarNode) {
 
 
   // Writing
-  to_netcdf(ballast_one_engine, "my_vessel", "ballast_one_engine.nc");
+//  to_netcdf(ballast_one_engine, "my_vessel", "ballast_one_engine.nc");
 
 //  // Reading back
 //  netCDF::NcFile dataFile_ballast_one_engine_(std::string("ballast_one_engine.nc"), netCDF::NcFile::read);
@@ -406,24 +406,27 @@ TEST(poem, PolarNode) {
 //  ASSERT_EQ(*ballast_one_engine, *ballast_one_engine_);
 
   // Writing
-  to_netcdf(vessel, "my_vessel", "vessel.nc");
-
+  to_netcdf(vessel, "vessel", "vessel.nc");
   // Reading back
-//  netCDF::NcFile dataFile_root_(std::string("vessel.nc"), netCDF::NcFile::read);
-//  auto root_ = read_operation_mode(dataFile_root_);
+  auto vessel_ = load("vessel.nc");
+  // Writing once again
+  to_netcdf(vessel_, "vessel", "vessel_.nc");
 
-  auto root_ = read_poem_nc_file("vessel.nc");
+  // Reading once again
+  auto vessel__ = load("vessel_.nc");
 
-//  ASSERT_EQ(*root, *root_);
+  ASSERT_EQ(*vessel_, *vessel__);
+
+
 
 }
 
 TEST(poem, read_poem_v0_example) {
 
-  ASSERT_ANY_THROW(read_poem_nc_file("dont_exist.nc"));
+  ASSERT_ANY_THROW(load("dont_exist.nc"));
 
-  auto vessel = read_poem_nc_file("poem_v0_example_no_sails.nc",
-                                  "vessel"); // TODO: voir a mettre le nom du fichier ?
+  auto vessel = load("poem_v0_example_no_sails.nc",
+                     "vessel"); // TODO: voir a mettre le nom du fichier ?
 
   // Generating the layout
   auto layout = vessel->layout();

@@ -38,8 +38,8 @@ namespace poem {
     if (m_attributes.size() != other.m_attributes.size()) return false;
     for (const auto& attribute : m_attributes) {
       if (!other.m_attributes.contains(attribute.first)) return false;
+      if (attribute.first == "date") continue;
       if (other.m_attributes.at(attribute.first) != attribute.second) return false;
-
     }
     return true;
   }

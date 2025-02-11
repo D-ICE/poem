@@ -145,9 +145,6 @@ namespace poem {
       to_netcdf(polar_table, group);
     }
 
-//    if (!polar->attributes().contains("POLAR_MODE")) {
-//      group.putAtt("POLAR_MODE", polar_mode_to_string(polar->mode()));
-//    }
     to_netcdf(polar->attributes(), group);
     group.putAtt("POEM_NODE_TYPE", "POLAR");
     group.putAtt("POEM_MODE", polar_mode_to_string(polar->mode()));
@@ -251,278 +248,8 @@ namespace poem {
     return major_version;
   }
 
-  // TODO: ne conserver que des read, renvoyer void et passer les shared_ptr... (sauf pour read_dimension_grid)
-
-  void read_dimension_grid_from_var(const netCDF::NcVar &var, std::shared_ptr<DimensionGrid> dimension_grid) {
-
-    size_t ndim = var.getDimCount();
-
-    auto group = var.getParentGroup();
-
-    std::vector<std::shared_ptr<Dimension>> dimensions(ndim);
-    for (size_t idim = 0; idim < ndim; ++idim) {
-      auto dim = var.getDim((int) idim);
-      std::string name = dim.getName();
-      auto dim_var = group.getVar(name);
-      std::string unit, description;
-      dim_var.getAtt("unit").getValues(unit);
-      dim_var.getAtt("description").getValues(description);
-
-      dimensions[idim] = std::make_shared<Dimension>(name, unit, description);
-    }
-
-    auto dimension_set = make_dimension_set(dimensions);
-    dimension_grid = make_dimension_grid(dimension_set);
-
-    for (size_t idim = 0; idim < ndim; ++idim) {
-      auto name = dimension_set->dimension(idim)->name();
-      auto dim_var = group.getVar(name);
-      std::vector<double> values(dim_var.getDim(0).getSize());
-      dim_var.getVar(values.data());
-
-      dimension_grid->set_values(name, values);
-
-    }
-
-  }
-
-  void read_polar_table(const netCDF::NcVar &var,
-                        std::shared_ptr<PolarTableBase> polar_table,
-                        std::shared_ptr<DimensionGrid> &dimension_grid,
-                        bool dimension_grid_from_var) {
-
-    if (dimension_grid_from_var) {
-      read_dimension_grid_from_var(var, dimension_grid);
-    }
-
-    if (var.getDimCount() != dimension_grid->ndims()) {
-      LogCriticalError("Dimension mismatch between netCDF dataset var and DimensionGrid");
-      CRITICAL_ERROR_POEM
-    }
-
-    size_t ndim = dimension_grid->ndims();
-
-    std::vector<std::shared_ptr<Dimension>> dimensions(ndim);
-    for (size_t idim = 0; idim < ndim; ++idim) {
-      if (var.getDim((int) idim).getName() != dimension_grid->dimension_set()->dimension(idim)->name()) {
-        LogCriticalError("Dimension name mismatch between netCDF dataset and DimensionGrid");
-        CRITICAL_ERROR_POEM
-      }
-    }
-
-    std::string name = var.getName();
-    std::string unit;
-    var.getAtt("unit").getValues(unit);
-    std::string description;
-    var.getAtt("description").getValues(description);
-
-    switch (var.getType().getTypeClass()) {
-      case netCDF::NcType::nc_DOUBLE: {
-        auto polar_table_ = make_polar_table<double>(name, unit, description, POEM_DOUBLE, dimension_grid);
-        var.getVar(polar_table_->values().data());
-        polar_table = polar_table_;
-        break;
-      }
-
-      case netCDF::NcType::nc_INT: {
-        auto polar_table_ = make_polar_table<int>(name, unit, description, POEM_INT, dimension_grid);
-        var.getVar(polar_table_->values().data());
-        polar_table = polar_table_;
-        break;
-      }
-
-      default:
-        LogCriticalError("Type not supported");
-        CRITICAL_ERROR_POEM
-    }
-
-    // TODO: lire les attributs
-
-//    return polar_table;
-
-  }
-
-  void read_polar(const netCDF::NcGroup &group,
-                  std::shared_ptr<Polar> polar,
-                  const std::string &name) {
-
-    std::string name_;
-    if (name == "from-group") {
-      if (group.isRootGroup()) {
-        LogCriticalError("While reading PolarNode, when group is root, the polar node name must be specified as"
-                         "it cannot be retrieved from group name");
-        CRITICAL_ERROR_POEM
-      }
-      name_ = group.getName();
-    } else {
-      name_ = name;
-    }
-
-    // C'est dans le read_v0 qu'on doit gerer le nom en HPPP ou MPPP
-
-//
-//    NIY_POEM
-////    auto polar_name = group.getName();
-//
-//    POLAR_MODE polar_mode;
-//    if (!is_polar_mode(polar_name)) {
-//      // Trying to infer polar_mode from group name
-//
-//      if (group.getAtts().contains("polar_mode")) {
-//        group.getAtt("polar_mode").getValues(polar_name);
-//        polar_mode = string_to_polar_mode(polar_name);
-//
-//      } else if (group.getAtts().contains("vessel_type")) {
-//        // For v0...
-//        std::string vessel_type;
-//        group.getAtt("vessel_type").getValues(vessel_type);
-//        if (vessel_type == "HYBRID") {
-//          polar_mode = HPPP;
-//        } else if (vessel_type == "MOTOR") {
-//          polar_mode = MPPP;
-//        } else {
-//          LogCriticalError("While reading file with format v0, vessel_type {} unknown");
-//          CRITICAL_ERROR_POEM
-//        }
-//
-//      } else {
-//        LogCriticalError("Cannot infer the POLAR_MODE of group {} while reading Polar", polar_name);
-//        CRITICAL_ERROR_POEM
-//      }
-//    } else {
-//      polar_mode = string_to_polar_mode(polar_name);
-//    }
-
-    POLAR_MODE polar_mode = string_to_polar_mode(name_);
-
-    std::shared_ptr<DimensionGrid> dimension_grid;
-    polar = make_polar(name, polar_mode, dimension_grid);
-
-    bool dimension_grid_from_var = true;
-    for (const auto &nc_var: group.getVars()) {
-      if (group.getCoordVars().contains(nc_var.first)) continue;
-
-      std::shared_ptr<PolarTableBase> polar_table;
-      read_polar_table(nc_var.second, polar_table, dimension_grid, dimension_grid_from_var);
-
-      if (dimension_grid_from_var) {
-        polar->dimension_grid() = dimension_grid;
-        dimension_grid_from_var = false;
-      }
-
-      polar->attach_polar_table(polar_table);
-    }
-
-    // TODO: lire les attributs
-
-  }
-
-  void read_polar_set(const netCDF::NcGroup &group,
-                      std::shared_ptr<PolarSet> polar_set,
-                      const std::string &polar_set_name) {
-
-//    NIY_POEM
-
-    std::string polar_set_name_;
-    if (polar_set_name == "from-group") {
-      if (group.isRootGroup()) {
-        LogCriticalError("While reading PolarSet, if the given group is root, the name must be specified");
-        CRITICAL_ERROR_POEM
-      } else {
-        polar_set_name_ = group.getName();
-      }
-    } else {
-      polar_set_name_ = polar_set_name;
-    }
-
-    polar_set = std::make_shared<PolarSet>(polar_set_name_);
-
-    for (const auto &subgroup: group.getGroups()) {
-      if (!is_polar_mode(subgroup.first)) continue; // Group name for Polar MUST be a POLAR_MODE string representation
-
-      std::shared_ptr<Polar> polar;
-      read_polar(subgroup.second, polar);
-
-      polar_set->attach_polar(polar);
-
-    }
-
-    // TODO: lire les attributs
-
-  }
-
-  void read_polar_node(const netCDF::NcGroup &group,
-                       std::shared_ptr<PolarNode> polar_node,
-                       const std::string &polar_node_name) {
-
-    // FIXME: c'est a priori plus sioux que ca is root ou pas... surtout quand on itere en recursif
-
-    /*
-     * group is_root & from-group -> non
-     * group is_root & name -> utilise name
-     * group !is_root & from-group
-     */
-
-//    std::string polar_node_name;
-//    if (polar_node_name_ == "from-file") {
-//      if (group.isRootGroup()) {
-//        LogCriticalError("While reading PolarNode, when group is root, the polar node name must be specified as"
-//                         "it cannot be retrieved from group name");
-//        CRITICAL_ERROR_POEM
-//      }
-//      polar_node_name = group.getName();
-//    } else {
-//      polar_node_name = polar_node_name_;
-//    }
-
-//    std::shared_ptr<PolarNode> polar_node;
-
-//    if (group.isRootGroup()) {
-//
-//    }
-    // FIXME: il faut lire les attributs... notamment vessel_name
-
-    auto polar_mode_type = guess_polar_node_type(group);
-    switch (polar_mode_type) {
-      case POLAR_NODE: {
-        polar_node = make_polar_node(polar_node_name);
-        for (const auto &subgroup: group.getGroups()) {
-          std::shared_ptr<PolarNode> new_polar_node;
-          read_polar_node(subgroup.second, new_polar_node);
-          new_polar_node->attach_to(polar_node);
-        }
-        break;
-      }
-      case POLAR_SET: {
-        std::shared_ptr<PolarSet> polar_set;
-        read_polar_set(group, polar_set, polar_node_name);
-        polar_node = polar_set;
-        break;
-      }
-      case POLAR: {
-        std::shared_ptr<Polar> polar;
-        read_polar(group, polar, polar_node_name);
-        polar_node = polar;
-        break;
-      }
-      default:
-        LogCriticalError("Something went wrong, we should never be here...");
-        CRITICAL_ERROR_POEM
-    }
-
-    // FIXME: voir si on fait ca...
-//    if (group.isRootGroup()) {
-//      polar_node->attributes().add_attribute("vessel_name", polar_node_name);
-//    }
-
-    // TODO: lire les attributs
-
-  }
-
-
-  void read_v0(const netCDF::NcGroup &root_group,
-               std::shared_ptr<PolarNode> root_node,
-               const std::string &root_name) {
+  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group,
+                                     const std::string &root_name) {
 
     // PolarNode is root and we set the vessel name as filename as we do not have vessel name in v0
 //    std::string vessel_name = fs::path(filename).stem();
@@ -533,7 +260,6 @@ namespace poem {
     }
 
     // Get the polar_name
-//    netCDF::NcFile datafile(filename, netCDF::NcFile::read);
 
     POLAR_MODE polar_mode;
     std::string vessel_type;
@@ -547,24 +273,150 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-    // On voudrait avoir /vessel/MPPP/polar_tables...
-    // /PolarSet/Polar/PolarTables...
+    NIY_POEM
 
-    root_node = make_polar_set(root_name);
-    std::shared_ptr<Polar> polar;
-    read_polar(root_group, polar, polar_mode_to_string(polar_mode));
-//    datafile.close();
+//    // On voudrait avoir /vessel/MPPP/polar_tables...
+//    // /PolarSet/Polar/PolarTables...
+//
+//    auto root_node = make_polar_set(root_name);
+//    std::shared_ptr<Polar> polar;
+//    read_polar(root_group, polar, polar_mode_to_string(polar_mode));
+////    datafile.close();
+//
+//    polar->attach_to(root_node); // FIXME: on doit forcement avoir un PolarSet dans la lecture v0 ???
+//
+//    root_node->attributes().add_attribute("vessel_name", root_name);
+//
+//    return root_node;
+  }
 
-    polar->attach_to(root_node); // FIXME: on doit forcement avoir un PolarSet dans la lecture v0 ???
 
-    root_node->attributes().add_attribute("vessel_name", root_name);
+  template <class T>
+  void read_attributes(const T& nc_object, std::shared_ptr<PolarNode> polar_node) {
+    for (const auto& att : nc_object.getAtts()) {
+      std::string val;
+      nc_object.getAtt(att.first).getValues(val);
+      polar_node->attributes().add_attribute(att.first, val);
+    }
+  }
+
+  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup& group,
+                                        std::string group_name="from-group") {
+
+    std::shared_ptr<PolarNode> polar_node;
+
+    if (group.getAtts().contains("POEM_NODE_TYPE")) {
+
+      if (group_name == "from-group") {
+        if (group.isRootGroup()) {
+          LogCriticalError("In load_group, group_name must be explicitly specified for root group");
+          CRITICAL_ERROR_POEM
+        }
+        group_name = group.getName();
+      }
+
+      std::string node_type;
+      group.getAtt("POEM_NODE_TYPE").getValues(node_type);
+
+      if (node_type == "POLAR") {
+
+        std::shared_ptr<DimensionGrid> dimension_grid;
+        std::vector<std::shared_ptr<PolarTableBase>> polar_tables;
+        for (const auto &nc_var : group.getVars()) {
+          if (!nc_var.second.getAtts().contains("POEM_NODE_TYPE")) continue;
+
+          if (!group.getCoordVars().contains(nc_var.first)) {
+            // This is not a Coordinate Variable
+
+            if (!dimension_grid) {
+              // Dimension grid not built, building it!
+              auto nc_dims = nc_var.second.getDims();
+              std::vector<std::shared_ptr<Dimension>> dimensions;
+              dimensions.reserve(nc_dims.size());
+
+              for (const auto &nc_dim : nc_dims) {
+                auto var_dim = group.getVar(nc_dim.getName());
+                std::string unit;
+                var_dim.getAtt("unit").getValues(unit);
+                std::string description;
+                var_dim.getAtt("description").getValues(description);
+                auto dim_ = make_dimension(nc_dim.getName(), unit, description);
+                dimensions.push_back(dim_);
+              }
+              auto dimension_set = make_dimension_set(dimensions);
+              dimension_grid = make_dimension_grid(dimension_set);
+
+              for (const auto &nc_dim : nc_dims) {
+                auto var_dim = group.getVar(nc_dim.getName());
+                std::vector<double> values(nc_dim.getSize());
+                var_dim.getVar(values.data());
+                dimension_grid->set_values(nc_dim.getName(), values);
+              }
+
+            }  // end building DimensionGrid
+
+            std::string unit;
+            nc_var.second.getAtt("unit").getValues(unit);
+            std::string description;
+            nc_var.second.getAtt("description").getValues(description);
+
+            std::shared_ptr<PolarTableBase> polar_table;
+            switch (nc_var.second.getType().getTypeClass()) {
+              case netCDF::NcType::nc_DOUBLE:
+                polar_table = make_polar_table_double(nc_var.first, unit, description, dimension_grid);
+                break;
+              case netCDF::NcType::nc_INT:
+                polar_table = make_polar_table_int(nc_var.first, unit, description, dimension_grid);
+                break;
+              default:
+                LogWarningError("In group {}, PolarTable {} of type {} not managed by POEM. Skip...",
+                                group.getName(true), nc_var.first, nc_var.second.getType().getTypeClassName());
+                continue;
+            }
+            polar_tables.push_back(polar_table);
+
+          }
+        }
+
+        std::string polar_mode_str;
+        group.getAtt("POEM_MODE").getValues(polar_mode_str);
+        POLAR_MODE polar_mode = string_to_polar_mode(polar_mode_str);
+        polar_node = make_polar(group_name, polar_mode, dimension_grid);
+
+        // Attaching every PolarTable to the Polar
+        for (const auto& polar_table : polar_tables) {
+          polar_node->add_child(polar_table, false);
+        }
+
+        // END group is POLAR
+      } else if (node_type == "POLAR_SET") {
+        polar_node = make_polar_set(group_name);
+
+      } else if (node_type == "POLAR_NODE") {
+        polar_node = make_polar_node(group_name);
+
+      }
+
+      for (const auto& group_ : group.getGroups()) {
+        auto polar_node_ = load_group(group_.second);
+        polar_node->add_child(polar_node_);
+      }
+
+    }
+
+    read_attributes(group, polar_node);
+
+    return polar_node;
 
   }
 
-  void read_v1(const netCDF::NcGroup &root_group,
-               std::shared_ptr<PolarNode> root_node,
-               const std::string &root_name) {
-//    root_group, root_name, root_node
+  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group,
+                                     const std::string &root_name) {
+
+    if (!root_group.isRootGroup()) {
+      LogCriticalError("In load_v1, not a root group");
+      CRITICAL_ERROR_POEM
+    }
 
     std::string vessel_name;
     if (root_name == "from-file") {
@@ -573,44 +425,46 @@ namespace poem {
       vessel_name = root_name;
     }
 
-    read_polar_node(root_group, root_node, vessel_name);
-
-
-//    for ()
-
-//    datafile.close();
-
-    NIY_POEM
-    // vessel_name
-
-//    auto operation_mode = std::make_shared<PolarNode>("");
-//    NIY_POEM
-//    return operation_mode;
+    return load_group(root_group, vessel_name);
   }
 
-  std::shared_ptr<PolarNode> read_poem_nc_file(const std::string &filename, const std::string &root_name) {
+  std::shared_ptr<PolarNode> load(const std::string &filename,
+                                  const std::string &root_name,
+                                  bool spec_checking) {
 
     LogNormalInfo("Reading file: {}", fs::absolute(filename).string());
     int major_version = get_version(filename);
     LogNormalInfo("POEM specification v{} detected in file", major_version);
 
     // Check compliancy with specification
-    if (!spec_check(filename, major_version)) {
-      LogCriticalError("File is not compliant POEM Specification version {}", major_version);
-      CRITICAL_ERROR_POEM
-    } else {
-      LogNormalInfo("File is compliant with version v{}", major_version);
+    if (spec_checking) {
+      if (!spec_check(filename, major_version)) {
+        LogCriticalError("File is not compliant POEM Specification version {}", major_version);
+        CRITICAL_ERROR_POEM
+      } else {
+        LogNormalInfo("File is compliant with version v{}", major_version);
+      }
     }
+
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::read);
     std::shared_ptr<PolarNode> root_node;
     switch (major_version) {
       case 0:
-        read_v0(root_group, root_node, root_name);
+        root_node = load_v0(root_group, root_name);
         break;
-      case 1:
-        read_v1(root_group, root_node, root_name);
-        break;
+      case 1: {
+        try {
+          root_node = load_v1(root_group, root_name);
+          break;
+        } catch (const PoemException &e) {
+          LogCriticalError("Error while reading POEM File using specification v{}: {}",
+                           major_version, fs::absolute(filename).string());
+          LogCriticalError("Please spec check the file to get insight on the problem");
+          throw e;
+        }
+      }
+
       default:
         LogCriticalError("Specification version v{} not known", major_version);
         CRITICAL_ERROR_POEM
@@ -618,31 +472,6 @@ namespace poem {
     root_group.close();
 
     return root_node;
-  }
-
-  POLAR_NODE_TYPE guess_polar_node_type(const netCDF::NcGroup &group) {
-    POLAR_NODE_TYPE polar_node_type = POLAR_NODE;
-
-    // Is this a PolarSet?
-    if (group.getGroups().contains("MPPP")
-        || group.getGroups().contains("HPPP")
-        || group.getGroups().contains("MVPP")
-        || group.getGroups().contains("HVPP")
-        || group.getGroups().contains("VPP")) {
-      polar_node_type = POLAR_SET;
-
-    } else if (group.getName() == "MPPP"
-               || group.getName() == "HPPP"
-               || group.getName() == "MVPP"
-               || group.getName() == "HVPP"
-               || group.getName() == "VPP") {
-      polar_node_type = POLAR;
-
-    } else {
-      polar_node_type = POLAR_NODE;
-    }
-
-    return polar_node_type;
   }
 
 }  // poem
