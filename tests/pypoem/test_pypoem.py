@@ -71,9 +71,12 @@ if __name__ == '__main__':
     polar_set.attach_polar(polar_MPPP)
 
 
-    pypoem.to_netcdf(polar_set, "my_vessel", "PolarSet.nc")
+    pypoem.to_netcdf(polar_set, "my_vessel", "my_vessel.nc")
 
-    if pypoem.spec_check("PolarSet.nc"):
-        print("PolarSet.nc COMPLIANT with POEM specs version 1")
+    if pypoem.spec_check("my_vessel.nc"):
+        print("my_vessel.nc COMPLIANT with POEM specs version 1")
     else:
-        warnings.warn("PolarSet.nc NOT COMPLIANT with POEM specs version 1")
+        warnings.warn("my_vessel.nc NOT COMPLIANT with POEM specs version 1")
+
+
+    pypoem.load("my_vessel.nc", "my_vessel")

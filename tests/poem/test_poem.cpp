@@ -275,8 +275,7 @@ TEST(poem, read_poem_v0_example) {
 
   ASSERT_ANY_THROW(load("dont_exist.nc"));
 
-  auto vessel = load("poem_v0_example_no_sails.nc",
-                     "vessel"); // TODO: voir a mettre le nom du fichier ?
+  auto vessel = load("poem_v0_example_no_sails.nc","vessel");
 
   // Generating the layout
   auto layout = vessel->layout();
