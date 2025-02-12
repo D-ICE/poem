@@ -25,13 +25,6 @@ namespace poem::v1 {
 
   std::vector<std::string> known_polar_modes = {"MPPP", "HPPP", "MVPP", "HVPP", "VPP"};
 
-//  void not_root_group_error(const netCDF::NcGroup &group) {
-//    if (!group.isRootGroup()) {
-//      LogCriticalError("Specification checks must start at root group");
-//      CRITICAL_ERROR_POEM
-//    }
-//  }
-
   template<class T>
   inline bool is_poem_object(const T &object) {
     return object.getAtts().contains("POEM_NODE_TYPE");
@@ -300,18 +293,6 @@ namespace poem::v1 {
           compliant = false;
         }
 
-
-
-//        if (group.isRootGroup()) {
-//          // Polar name MUST be MPPP, HPPP, etc...
-//          if (std::find(known_polar_modes.begin(), known_polar_modes.end(), group.getName()) ==
-//              known_polar_modes.end()) {
-//            LogWarningError("In group {}, seen as a Polar, group name must be a valid POEM mode. "
-//                            "Expected either MPPP, HPPP, MVPP, HVPP or VPP. Found {}",
-//                            group_name(group), group.getName());
-//            compliant = false;
-//          }
-//        }
       }
 
       // Iterating on subgroups

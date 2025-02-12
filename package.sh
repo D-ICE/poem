@@ -19,6 +19,10 @@ export CIBW_BEFORE_ALL=$(cat <<-EOM
 EOM
 )
 
+# Get the python version
+PYTHON_VERSION=
+
+
 export CIBW_BUILD="cp312-manylinux_x86_64"  # Since this is for testing before CI, only one python version to be tested
 #export CIBW_BUILD="cp3*-manylinux_x86_64"
 
@@ -28,5 +32,10 @@ export CIBW_BUILD="cp312-manylinux_x86_64"  # Since this is for testing before C
 #EOM
 #)
 
+pip uninstall -y pypoem
+rm linuxwheels/*
 cibuildwheel --print-build-identifiers
 cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
+
+OUTPUT=$(echo `ls linuxwheels`)
+pip install linuxwheels/$OUTPUT

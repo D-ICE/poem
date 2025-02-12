@@ -7,7 +7,7 @@ import sha256
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description=""" -- polar_hash --""",
+        description="""Get the SHA256 hash of a POEM File""",
         formatter_class=argparse.RawTextHelpFormatter
     )
     # Please define this argument. We need to have a way to check the version of a tool from command line

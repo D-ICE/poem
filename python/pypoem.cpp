@@ -153,6 +153,20 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
   py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
   PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
   PolarNode.def(py::init<const std::string &>());
+  PolarNode.def("name", &poem::PolarNode::name,
+                R"pbdoc(Get the name of the PolarNode)pbdoc");
+//  PolarNode.def("children", [](const poem::PolarNode &self) {
+//    return self.children<poem::PolarNode>();
+//                },
+//                R"pbdoc(Returns a list of children of current PolarNode)pbdoc"
+//  );
+  PolarNode.def("children", &poem::PolarNode::children<poem::PolarNode>,
+                R"pbdoc(Returns a list of children of current PolarNode)pbdoc");
+  PolarNode.def("layout", [](const poem::PolarNode &self) -> std::string {
+                  json json_node = self.layout();
+                  return json_node.dump(2);
+                },
+                R"pbdoc(Returns a json string as a layout for the tree starting at current PolarNode)pbdoc");
 
   // ===================================================================================================================
   // PolarTable<T>
@@ -196,17 +210,17 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
 stored in a multidimensional array. Int version.")pbdoc";
   PolarTableInt.def("fill_with", &poem::PolarTable<int>::fill_with,
                     R"pbdoc()pbdoc", "value"_a);
-  PolarTableDouble.def("set_values",
-                       [](poem::PolarTable<int> &self,
-                          const py::array_t<int, py::array::c_style | py::array::forcecast> &array) -> void {
-                         self.set_values(ndarray2stdvector<int>(array));
-                       },
-                       R"pbdoc()pbdoc");
-  PolarTableDouble.def("array",
-                       [](poem::PolarTable<int> &self) -> py::array_t<int> {
-                         return vector2memoryview(self.values(), self.dimension_grid()->shape());
-                       },
-                       R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
+  PolarTableInt.def("set_values",
+                    [](poem::PolarTable<int> &self,
+                       const py::array_t<int, py::array::c_style | py::array::forcecast> &array) -> void {
+                      self.set_values(ndarray2stdvector<int>(array));
+                    },
+                    R"pbdoc()pbdoc");
+  PolarTableInt.def("array",
+                    [](poem::PolarTable<int> &self) -> py::array_t<int> {
+                      return vector2memoryview(self.values(), self.dimension_grid()->shape());
+                    },
+                    R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
 
 
   m.def("make_polar_table_int", &poem::make_polar_table_int,
@@ -268,6 +282,9 @@ stored in a multidimensional array. Int version.")pbdoc";
   // ===================================================================================================================
   // Checker
   // ===================================================================================================================
+  m.def("get_version", &poem::get_version,
+        R"pbdoc(Get the version of a POEM File)pbdoc",
+        "filename"_a);
 
   m.def("spec_check", [](const std::string &filename) -> bool {
           auto version = poem::get_version(filename);

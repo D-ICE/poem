@@ -37,7 +37,8 @@ classifiers = [
 
 dependencies = [
     "argparse",
-    "sha256"
+    "sha256",
+    "pydot"
 ]
 
 [project.urls]
@@ -60,7 +61,7 @@ cmake.build-type = "Release"
 cmake.args = [
     "-DPOEM_BUILD_TESTS=OFF",
     "-DPOEM_BUILD_TOOLS=OFF", # TODO: voir pour installer exe ?
-    "-DPOEM_ALLOW_DIRTY=OFF",
+    "-DPOEM_ALLOW_DIRTY=ON",
     "-DPOEM_BUILD_PYTHON=ON",
     "-DPOEM_BUILD_POC=OFF",
 ]

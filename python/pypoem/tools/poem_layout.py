@@ -4,10 +4,9 @@
 import argparse
 from pypoem import pypoem
 
-
 def get_parser():
     parser = argparse.ArgumentParser(
-        description="""Check a POEM File against POEM Specifications""",
+        description="""Get a json layout of a POEM File""",
         formatter_class=argparse.RawTextHelpFormatter
     )
     # Please define this argument. We need to have a way to check the version of a tool from command line
@@ -21,8 +20,8 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    if pypoem.spec_check(args.infilename):
-        print("Specification version {} OK" % pypoem.get_version(args.infilename))
+    polar_node = pypoem.load(args.infilename, "vessel")
+    print(polar_node.layout())
 
 
 if __name__ == '__main__':

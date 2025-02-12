@@ -24,6 +24,7 @@ __all__ = ["__doc__",
            "Polar",
            "make_polar",
            "to_netcdf",
+           "get_version",
            "spec_check",
            "load",
            ]
