@@ -1,5 +1,5 @@
-# from pypoem import pypoem
-import pypoem
+from pypoem import pypoem
+# import pypoem
 
 import warnings
 import numpy as np
