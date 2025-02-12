@@ -245,7 +245,7 @@ namespace poem::v1 {
           }
         }
         if (!has_polar_table) {
-          LogWarningError("In group {}, seen as a Polar, no PolarTable found");
+          LogWarningError("In group {}, seen as a Polar, no PolarTable found", group_name(group));
           compliant = false;
         }
       }
@@ -441,12 +441,6 @@ namespace poem::v1 {
       }
       // TODO: verifier qu'on a bien POEM_NODE_TYPE qui est DIMENSION_NODE
     } else {
-//      std::string group_name;
-//      if (group.isRootGroup()) {
-//        group_name = "root";
-//      } else {
-//        group_name = group_name(group);
-//      }
       auto polar_mode = get_attribute(group, "POEM_MODE");
       LogWarningError("In group {} (with mode {}), mandatory Coordinate Variable {} not found",
                       group_name(group), polar_mode, name);
@@ -458,13 +452,6 @@ namespace poem::v1 {
 
   bool has_var(const netCDF::NcGroup &group, const std::string &name, const std::vector<std::string> &dims) {
     bool compliant = true;
-
-//    std::string group_name;
-//    if (group.isRootGroup()) {
-//      group_name = "root";
-//    } else {
-//      group_name = group_name(group);
-//    }
 
     if (group.getVars().contains(name)) {
       if (group.getCoordVars().contains(name)) {

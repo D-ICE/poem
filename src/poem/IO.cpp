@@ -248,60 +248,146 @@ namespace poem {
     return major_version;
   }
 
-  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group,
-                                     const std::string &root_name) {
+  std::vector<std::string> excluded_attributes = {
+      "unit",
+      "description",
+      "POEM_NODE_TYPE",
+      "POEM_MODE",
+      "POEM_LIBRARY_VERSION",
+      "POEM_SPECIFICATION_VERSION",
+      "VESSEL_NAME",
+      "date"
+  };
 
-    // PolarNode is root and we set the vessel name as filename as we do not have vessel name in v0
-//    std::string vessel_name = fs::path(filename).stem();
-    if (root_name == "from-file") {
-      LogCriticalError("While reading POEM file version v0, "
-                       "root_name must be specified and must be vessel_name");
-      CRITICAL_ERROR_POEM
-    }
-
-    // Get the polar_name
-
-    POLAR_MODE polar_mode;
-    std::string vessel_type;
-    root_group.getAtt("vessel_type").getValues(vessel_type);
-    if (vessel_type == "HYBRID") {
-      polar_mode = HPPP;
-    } else if (vessel_type == "MOTOR") {
-      polar_mode = MPPP;
-    } else {
-      LogCriticalError("While reading file with format v0, vessel_type {} unknown");
-      CRITICAL_ERROR_POEM
-    }
-
-    NIY_POEM
-
-//    // On voudrait avoir /vessel/MPPP/polar_tables...
-//    // /PolarSet/Polar/PolarTables...
-//
-//    auto root_node = make_polar_set(root_name);
-//    std::shared_ptr<Polar> polar;
-//    read_polar(root_group, polar, polar_mode_to_string(polar_mode));
-////    datafile.close();
-//
-//    polar->attach_to(root_node); // FIXME: on doit forcement avoir un PolarSet dans la lecture v0 ???
-//
-//    root_node->attributes().add_attribute("vessel_name", root_name);
-//
-//    return root_node;
-  }
-
-
-  template <class T>
-  void read_attributes(const T& nc_object, std::shared_ptr<PolarNode> polar_node) {
-    for (const auto& att : nc_object.getAtts()) {
+  template<class T>
+  void read_attributes(const T &nc_object, std::shared_ptr<PolarNode> polar_node) {
+    for (const auto &att: nc_object.getAtts()) {
+      if (std::find(excluded_attributes.begin(), excluded_attributes.end(), att.first) !=
+          excluded_attributes.end())
+        continue;
       std::string val;
       nc_object.getAtt(att.first).getValues(val);
       polar_node->attributes().add_attribute(att.first, val);
     }
   }
 
-  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup& group,
-                                        std::string group_name="from-group") {
+  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group,
+                                     const std::string &root_name) {
+
+    std::unordered_map<std::string, std::string> dimension_map{
+        {"STW_kt",  "STW_dim"},
+        {"TWS_kt",  "TWS_dim"},
+        {"TWA_deg", "TWA_dim"},
+        {"WA_deg",  "WA_dim"},
+        {"Hs_m",    "Hs_dim"},
+    };
+
+    std::unordered_map<std::string, std::string> polar_tables_map{
+        {"BrakePower", "TOTAL_POWER"},
+        {"SolverStatus", "SOLVER_STATUS"}
+    };
+
+    if (!root_group.isRootGroup()) {
+      LogCriticalError("In load_v0, not a root group");
+      CRITICAL_ERROR_POEM
+    }
+
+    std::string vessel_name;
+    if (vessel_name == "from-file") {
+      root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
+    } else {
+      vessel_name = root_name;
+    }
+
+    // Getting polar mode
+    std::string vessel_type;
+    root_group.getAtt("vessel_type").getValues(vessel_type);
+    POLAR_MODE polar_mode;
+    if (vessel_type == "HYBRID") {
+      polar_mode = HPPP;
+    } else if (vessel_type == "MOTOR") {
+      polar_mode = MPPP;
+    }
+
+    // Load variables
+    std::shared_ptr<DimensionGrid> dimension_grid;
+    std::vector<std::shared_ptr<PolarTableBase>> polar_tables;
+    for (const auto &nc_var: root_group.getVars()) {
+//      if (!nc_var.second.getAtts().contains("POEM_NODE_TYPE")) continue;
+
+      if (!root_group.getCoordVars().contains(nc_var.first)) {
+        // This is not a Coordinate Variable
+
+        if (!dimension_grid) {
+          // Dimension grid not built, building it!
+          auto nc_dims = nc_var.second.getDims();
+          std::vector<std::shared_ptr<Dimension>> dimensions;
+          dimensions.reserve(nc_dims.size());
+
+          for (const auto &nc_dim: nc_dims) {
+            auto var_dim = root_group.getVar(nc_dim.getName());
+            std::string unit;
+            var_dim.getAtt("unit").getValues(unit);
+            std::string description;
+            var_dim.getAtt("description").getValues(description);
+            auto dim_ = make_dimension(nc_dim.getName(), unit, description);
+            if (dimension_map.contains(dim_->name())) {
+              dim_->change_name(dimension_map[dim_->name()]);
+            }
+            dimensions.push_back(dim_);
+          }
+          auto dimension_set = make_dimension_set(dimensions);
+          dimension_grid = make_dimension_grid(dimension_set);
+
+          for (const auto &nc_dim: nc_dims) {
+            auto var_dim = root_group.getVar(nc_dim.getName());
+            std::vector<double> values(nc_dim.getSize());
+            var_dim.getVar(values.data());
+            dimension_grid->set_values(dimension_map[nc_dim.getName()], values);
+          }
+
+        }  // end building DimensionGrid
+
+        std::string unit;
+        nc_var.second.getAtt("unit").getValues(unit);
+        std::string description;
+        nc_var.second.getAtt("description").getValues(description);
+
+        std::shared_ptr<PolarTableBase> polar_table;
+        switch (nc_var.second.getType().getTypeClass()) {
+          case netCDF::NcType::nc_DOUBLE:
+            polar_table = make_polar_table_double(nc_var.first, unit, description, dimension_grid);
+            break;
+          case netCDF::NcType::nc_INT:
+            polar_table = make_polar_table_int(nc_var.first, unit, description, dimension_grid);
+            break;
+          default:
+            LogWarningError("In group {}, PolarTable {} of type {} not managed by POEM. Skip...",
+                            root_group.getName(true), nc_var.first, nc_var.second.getType().getTypeClassName());
+            continue;
+        }
+        read_attributes(nc_var.second, polar_table);
+
+        if (polar_tables_map.contains(polar_table->name())) {
+          polar_table->change_name(polar_tables_map[polar_table->name()]);
+        }
+        polar_tables.push_back(polar_table);
+
+      }
+
+    }
+
+    auto polar = make_polar(vessel_name, polar_mode, dimension_grid);
+
+    for (const auto &polar_table: polar_tables) {
+      polar->add_child(polar_table);
+    }
+
+    return polar;
+  }
+
+  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup &group,
+                                        std::string group_name = "from-group") {
 
     std::shared_ptr<PolarNode> polar_node;
 
@@ -322,7 +408,7 @@ namespace poem {
 
         std::shared_ptr<DimensionGrid> dimension_grid;
         std::vector<std::shared_ptr<PolarTableBase>> polar_tables;
-        for (const auto &nc_var : group.getVars()) {
+        for (const auto &nc_var: group.getVars()) {
           if (!nc_var.second.getAtts().contains("POEM_NODE_TYPE")) continue;
 
           if (!group.getCoordVars().contains(nc_var.first)) {
@@ -334,7 +420,7 @@ namespace poem {
               std::vector<std::shared_ptr<Dimension>> dimensions;
               dimensions.reserve(nc_dims.size());
 
-              for (const auto &nc_dim : nc_dims) {
+              for (const auto &nc_dim: nc_dims) {
                 auto var_dim = group.getVar(nc_dim.getName());
                 std::string unit;
                 var_dim.getAtt("unit").getValues(unit);
@@ -346,7 +432,7 @@ namespace poem {
               auto dimension_set = make_dimension_set(dimensions);
               dimension_grid = make_dimension_grid(dimension_set);
 
-              for (const auto &nc_dim : nc_dims) {
+              for (const auto &nc_dim: nc_dims) {
                 auto var_dim = group.getVar(nc_dim.getName());
                 std::vector<double> values(nc_dim.getSize());
                 var_dim.getVar(values.data());
@@ -373,6 +459,7 @@ namespace poem {
                                 group.getName(true), nc_var.first, nc_var.second.getType().getTypeClassName());
                 continue;
             }
+            read_attributes(nc_var.second, polar_table);
             polar_tables.push_back(polar_table);
 
           }
@@ -384,7 +471,7 @@ namespace poem {
         polar_node = make_polar(group_name, polar_mode, dimension_grid);
 
         // Attaching every PolarTable to the Polar
-        for (const auto& polar_table : polar_tables) {
+        for (const auto &polar_table: polar_tables) {
           polar_node->add_child(polar_table, false);
         }
 
@@ -397,7 +484,7 @@ namespace poem {
 
       }
 
-      for (const auto& group_ : group.getGroups()) {
+      for (const auto &group_: group.getGroups()) {
         auto polar_node_ = load_group(group_.second);
         polar_node->add_child(polar_node_);
       }
@@ -419,7 +506,7 @@ namespace poem {
     }
 
     std::string vessel_name;
-    if (root_name == "from-file") {
+    if (vessel_name == "from-file") {
       root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
     } else {
       vessel_name = root_name;
