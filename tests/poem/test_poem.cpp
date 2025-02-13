@@ -219,16 +219,31 @@ void fill(std::shared_ptr<PolarSet> polar_set) {
 
 TEST(poem, PolarNode) {
 
-  auto vessel = std::make_shared<PolarNode>("vessel");
+  auto vessel = std::make_shared<PolarNode>("vessel", "my vessel");
   ASSERT_TRUE(vessel->is_root());
 
-  auto ballast_load = vessel->new_child<PolarNode>("ballast_load");
-  auto ballast_one_engine = ballast_load->new_child<PolarSet>("ballast_one_engine");
-  auto ballast_two_engines = ballast_load->new_child<PolarSet>("ballast_two_engines");
 
-  auto laden_load = vessel->new_child<PolarNode>("laden_load");
-  auto laden_one_engine = laden_load->new_child<PolarSet>("laden_one_engine");
-  auto laden_two_engines = laden_load->new_child<PolarSet>("laden_two_engines");
+  auto ballast_load = make_polar_node("ballast_load", "Ballast load case");
+  vessel->add_child(ballast_load);
+
+  auto ballast_one_engine = make_polar_set("ballast_one_engine",
+                                           "Ballast load case with one engine");
+  ballast_load->add_child(ballast_one_engine);
+
+  auto ballast_two_engines = make_polar_set("ballast_two_engines",
+                                            "Ballast load case with two engines");
+  ballast_load->add_child(ballast_two_engines);
+
+  auto laden_load = make_polar_node("laden_load", "Laden load case");
+  vessel->add_child(laden_load);
+
+  auto laden_one_engine = make_polar_set("laden_one_engine",
+                                         "Laden load case with one engine");
+  laden_load->add_child(laden_one_engine);
+
+  auto laden_two_engines = make_polar_set("laden_two_engines",
+                                          "Laden load case with two engines");
+  laden_load->add_child(laden_two_engines);
 
   /*
    * vessel_name ->ballast_load -> ballast_one_engine
@@ -275,7 +290,7 @@ TEST(poem, read_poem_v0_example) {
 
   ASSERT_ANY_THROW(load("dont_exist.nc"));
 
-  auto vessel = load("poem_v0_example_no_sails.nc","vessel");
+  auto vessel = load("poem_v0_example_no_sails.nc", "vessel");
 
   // Generating the layout
   auto layout = vessel->layout();

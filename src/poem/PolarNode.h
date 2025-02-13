@@ -39,9 +39,13 @@ namespace poem {
   class PolarNode : public dtree::Node {
    public:
 
-    explicit PolarNode(const std::string &name);
+    explicit PolarNode(const std::string &name, const std::string &description);
 
     void change_name(const std::string &new_name);
+
+    const std::string &description() const;
+
+    void change_description(const std::string &new_description);
 
     POLAR_NODE_TYPE polar_node_type() const;
 
@@ -63,20 +67,21 @@ namespace poem {
 
     void polar_tables_paths(std::vector<std::string> &paths) const;
 
-    std::shared_ptr<PolarNode> from_path(const fs::path& path);
+    std::shared_ptr<PolarNode> from_path(const fs::path &path);
 
-    std::mutex* mutex() {
+    std::mutex *mutex() {
       return &m_mutex;
     }
 
    protected:
     POLAR_NODE_TYPE m_polar_node_type;
+    std::string m_description;
     Attributes m_attributes;
     std::mutex m_mutex;
 
   };
 
-  std::shared_ptr<PolarNode> make_polar_node(const std::string& name);
+  std::shared_ptr<PolarNode> make_polar_node(const std::string &name, const std::string &description);
 
 }  // poem
 

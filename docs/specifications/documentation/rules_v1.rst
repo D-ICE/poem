@@ -1,3 +1,5 @@
+.. https://dice-poem.readthedocs.io/en/latest/documentation/rules_v1.html
+
 Rules v1
 ========
 
@@ -94,14 +96,16 @@ Polar group names and ``POEM_MODE`` attribute
 RULE V1/R5
 ----------
 
-Variables and Coordinate Variables mandatory attibutes
-    * Any Dimension or PolarTable of a Polar **MUST** have the two following attributes
+Mandatory attributes
+    * Any POEM object **MUST** have the following attribute
 
-      * ``unit``: specifies the unit of the Variable
       * ``description``: a one small sentence description of the variable
 
-    * Units values set in ``unit`` attribute for Dimension and PolarTable **MUST** comply with d-units library recognized
-      units
+    * Any Dimension and PolarTable **MUST** also have the following attribute
+
+      * ``unit``: specifies the unit of the Variable
+
+    * The ``unit`` attribute **MUST** comply with d-units library recognized units (TODO: TO BE DOCUMENTED...)
 
 
 .. _rule_v1_r6:

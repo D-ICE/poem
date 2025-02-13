@@ -13,7 +13,7 @@
 #include "Dimension.h"
 #include "DimensionPoint.h"
 #include "DimensionGrid.h"
-#include "Named.h"
+#include "Dimensional.h"
 #include "PolarNode.h"
 
 
@@ -91,15 +91,15 @@ namespace poem {
   /**
    * Non template base class for PolarTable
    */
-  struct PolarTableBase : public PolarNode, public Named {
+  struct PolarTableBase : public PolarNode, public Dimensional {
 
     PolarTableBase(const std::string &name,
                    const std::string &unit,
                    const std::string &description,
                    POEM_DATATYPE type,
                    std::shared_ptr<DimensionGrid> dimension_grid) :
-        PolarNode(name),
-        Named(unit, description),
+        PolarNode(name, description),
+        Dimensional(unit),
         m_type(type),
         m_dimension_grid(dimension_grid),
         m_interpolator(nullptr) {

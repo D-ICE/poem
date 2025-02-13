@@ -13,8 +13,9 @@
 
 namespace poem {
 
-  PolarNode::PolarNode(const std::string &name) :
+  PolarNode::PolarNode(const std::string &name, const std::string &description) :
       dtree::Node(name),
+      m_description(description),
       m_polar_node_type(POLAR_NODE) {
 
     // Ensure name is correct
@@ -35,6 +36,10 @@ namespace poem {
   void PolarNode::change_name(const std::string &new_name) {
     rename(new_name);
   }
+
+  const std::string &PolarNode::description() const { return m_description; }
+
+  void PolarNode::change_description(const std::string &new_description) { m_description = new_description; }
 
   POLAR_NODE_TYPE PolarNode::polar_node_type() const {
     return m_polar_node_type;
@@ -119,7 +124,7 @@ namespace poem {
     } else {
       auto next_node_name = (*iter).string();
       fs::path next_path;
-      for (; iter!=path_.end(); ++iter) {
+      for (; iter != path_.end(); ++iter) {
         next_path = next_path / *iter;
       }
       polar_node = child<PolarNode>(next_node_name)->from_path(next_path);
@@ -134,9 +139,9 @@ namespace poem {
     std::vector<std::string> paths;
     polar_tables_paths(paths);
 
-    for (const auto &path : paths) {
+    for (const auto &path: paths) {
 
-      auto polar_table = const_cast<PolarNode*>(this)->from_path(path)->as_polar_table();
+      auto polar_table = const_cast<PolarNode *>(this)->from_path(path)->as_polar_table();
 
       // Register DimensionGrid from parent
       auto parent = polar_table->parent<Polar>();
@@ -149,7 +154,7 @@ namespace poem {
 
         std::vector<std::string> dimensions;
         dimensions.reserve(dimension_grid->dimension_set()->size());
-        for (const auto &dimension : *dimension_grid->dimension_set()) {
+        for (const auto &dimension: *dimension_grid->dimension_set()) {
           dimensions.push_back(dimension->name());
           node["dimension_grids"][parent_full_name][dimension->name()]["unit"] = dimension->unit();
           node["dimension_grids"][parent_full_name][dimension->name()]["description"] = dimension->description();
@@ -175,8 +180,8 @@ namespace poem {
     return node;
   }
 
-  std::shared_ptr<PolarNode> make_polar_node(const std::string &name) {
-    return std::make_shared<PolarNode>(name);
+  std::shared_ptr<PolarNode> make_polar_node(const std::string &name, const std::string &description) {
+    return std::make_shared<PolarNode>(name, description);
   }
 
 }  // poem

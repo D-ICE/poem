@@ -29,7 +29,7 @@ target_sources(_poem PUBLIC
         DimensionSet.cpp
         enums.cpp
         IO.cpp
-        Named.cpp
+        Dimensional.cpp
         PolarNode.cpp
         Polar.cpp
         PolarSet.cpp

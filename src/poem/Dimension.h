@@ -8,14 +8,14 @@
 #include <string>
 #include <memory>
 
-#include "Named.h"
+#include "Dimensional.h"
 
 namespace poem {
 
   /**
    * Declares a polar table dimension with name, unit and description
    */
-  class Dimension : public Named {
+  class Dimension : public Dimensional {
    public:
     Dimension(const std::string &name,
               const std::string &unit,
@@ -25,7 +25,12 @@ namespace poem {
 
     void change_name(const std::string &name);
 
+    const std::string &description() const;
+
+    void change_description(const std::string &description);
+
    private:
+    std::string m_description;
     std::string m_name;
   };
 

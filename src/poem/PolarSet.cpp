@@ -7,8 +7,8 @@
 
 namespace poem {
 
-  PolarSet::PolarSet(const std::string &name) :
-      PolarNode(name) {
+  PolarSet::PolarSet(const std::string &name, const std::string& description) :
+      PolarNode(name, description) {
     m_polar_node_type = POLAR_SET;
   }
 
@@ -68,8 +68,8 @@ namespace poem {
     return !(other == *this);
   }
 
-  std::shared_ptr<PolarSet> make_polar_set(const std::string &name) {
-    return std::make_shared<PolarSet>(name);
+  std::shared_ptr<PolarSet> make_polar_set(const std::string &name, const std::string& description) {
+    return std::make_shared<PolarSet>(name, description);
   }
 
 }  // poem

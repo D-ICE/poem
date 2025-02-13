@@ -25,7 +25,7 @@ namespace poem {
   class PolarSet : public PolarNode {
 
    public:
-    explicit PolarSet(const std::string &name);
+    PolarSet(const std::string &name, const std::string& description);
 
     std::shared_ptr<Polar> create_polar(POLAR_MODE mode,
                                         std::shared_ptr<DimensionGrid> dimension_grid);
@@ -44,7 +44,7 @@ namespace poem {
 
   };
 
-  std::shared_ptr<PolarSet> make_polar_set(const std::string &name);
+  std::shared_ptr<PolarSet> make_polar_set(const std::string &name, const std::string& description);
 
 }  // poem
 

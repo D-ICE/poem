@@ -148,6 +148,7 @@ namespace poem {
     to_netcdf(polar->attributes(), group);
     group.putAtt("POEM_NODE_TYPE", "POLAR");
     group.putAtt("POEM_MODE", polar_mode_to_string(polar->mode()));
+    group.putAtt("description", polar->description());
   }
 
   void to_netcdf(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
@@ -157,6 +158,7 @@ namespace poem {
     }
     to_netcdf(polar_set->attributes(), group);
     group.putAtt("POEM_NODE_TYPE", "POLAR_SET");
+    group.putAtt("description", polar_set->description());
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
@@ -169,6 +171,7 @@ namespace poem {
           to_netcdf(next_polar_node, new_group);
         }
         group.putAtt("POEM_NODE_TYPE", "POLAR_NODE");
+        group.putAtt("description", polar_node->description());
         break;
       }
 
@@ -477,10 +480,14 @@ namespace poem {
 
         // END group is POLAR
       } else if (node_type == "POLAR_SET") {
-        polar_node = make_polar_set(group_name);
+        std::string description;
+        group.getAtt("description").getValues(description);
+        polar_node = make_polar_set(group_name, description);
 
       } else if (node_type == "POLAR_NODE") {
-        polar_node = make_polar_node(group_name);
+        std::string description;
+        group.getAtt("description").getValues(description);
+        polar_node = make_polar_node(group_name, description);
 
       }
 

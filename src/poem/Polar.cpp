@@ -9,11 +9,10 @@
 namespace poem {
 
   Polar::Polar(const std::string &name, POLAR_MODE mode, std::shared_ptr<DimensionGrid> dimension_grid) :
-      PolarNode(name),
+      PolarNode(name, polar_mode_to_string(mode) + " polar"),
       m_mode(mode),
       m_dimension_grid(dimension_grid) {
     m_polar_node_type = POLAR;
-//    m_attributes.add_attribute("polar_mode", polar_mode_to_string(mode));
   }
 
   const POLAR_MODE &Polar::mode() const { return m_mode; }
