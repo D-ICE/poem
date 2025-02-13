@@ -54,11 +54,7 @@ cpp-tests:
     - make poem_tests -j6
     - cd bin/tests
     - ./poem_tests
-#    FIXME package.sh ne peut pas fonctionner en l'état sur la CI pour des raisons de cle ssh...
-#    - cd ../../../scripts
-#    - sh package.sh
-#    - cd ../tests/pypoem
-#    - python test_pypoem.py
+
 
 pypoem-linux-tests:
   except:
@@ -101,6 +97,7 @@ pypoem-linux-tests:
     - curl -sSL https://get.docker.com/ | sh # install docker
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
+    - pip install numpy
 
   script:
     - python --version
@@ -111,15 +108,9 @@ pypoem-linux-tests:
     - cd tests/pypoem
     - python test_pypoem.py
 
-#  artifacts:
-#    paths:
-#      - linuxwheels
-#    expire_in: 3 hours
-
 
 pypoem-linux-multiversion:
   only:
-#    - main
     - tags
 
   stage: build
