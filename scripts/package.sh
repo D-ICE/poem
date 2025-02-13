@@ -1,5 +1,7 @@
 #/bin/bash
 
+cd ..
+
 # Here, we need "id_rsa_ci_dice" and "known_hosts_ci_dice" fles to be present in  ~/.ssh/ci-dice/
 # with private ssh key and known host of CI
 # Please ask francois.rongere@dice-engineering.com if needed
@@ -19,12 +21,11 @@ export CIBW_BEFORE_ALL=$(cat <<-EOM
 EOM
 )
 
-# Get the python version
-PYTHON_VERSION=
-
-
-export CIBW_BUILD="cp312-manylinux_x86_64"  # Since this is for testing before CI, only one python version to be tested
+#export CIBW_BUILD="cp312-manylinux_x86_64"  # Since this is for testing before CI, only one python version to be tested
 #export CIBW_BUILD="cp3*-manylinux_x86_64"
+
+# Targeting the current environment Python version
+export CIBW_BUILD=`python -c 'import sys; version=sys.version_info[:3]; print("cp{0}{1}-manylinux_x86_64".format(*version))'`
 
 #export CIBW_REPAIR_WHEEL_COMMAND=$(cat <<-EOM
 #  cat build/src/poem/version.h
@@ -39,3 +40,5 @@ cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow
 
 OUTPUT=$(echo `ls linuxwheels`)
 pip install linuxwheels/$OUTPUT
+
+cd scripts

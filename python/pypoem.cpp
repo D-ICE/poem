@@ -152,9 +152,11 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
   // ===================================================================================================================
   py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
   PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
-  PolarNode.def(py::init<const std::string &>());
+  PolarNode.def(py::init<const std::string &, const std::string &>());
   PolarNode.def("name", &poem::PolarNode::name,
                 R"pbdoc(Get the name of the PolarNode)pbdoc");
+  PolarNode.def("description", &poem::PolarNode::description,
+                R"pbdoc(Get the description of the PolarNode)pbdoc");
   PolarNode.def("children", &poem::PolarNode::children<poem::PolarNode>,
                 R"pbdoc(Returns a list of children of current PolarNode)pbdoc");
   PolarNode.def("is_polar_set", [](const poem::PolarNode &self) -> bool {
@@ -177,6 +179,10 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
                   return json_node.dump(2);
                 },
                 R"pbdoc(Returns a json string as a layout for the tree starting at current PolarNode)pbdoc");
+
+  m.def("make_polar_node", &poem::make_polar_node,
+        R"pbdoc("Build a PolarNode")pbdoc",
+        "name"_a, "description"_a);
 
   // ===================================================================================================================
   // PolarTable<T>
@@ -208,7 +214,7 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
 
 
   m.def("make_polar_table_double", &poem::make_polar_table_double,
-        R"pbdoc()pbdoc",
+        R"pbdoc("Build a PolarTable containing double values")pbdoc",
         "name"_a, "unit"_a, "description"_a, "dimension_grid"_a);
 
   // -------------------------------------------- PolarTableInt -----------------------------------------------------
@@ -235,7 +241,7 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
                     R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
 
   m.def("make_polar_table_int", &poem::make_polar_table_int,
-        R"pbdoc()pbdoc"
+        R"pbdoc(Build a PolarTable containing int values)pbdoc"
         "name"_a, "unit"_a, "description"_a, "dimension_grid"_a);
 
 
@@ -270,14 +276,14 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
   // ===================================================================================================================
   py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>, poem::PolarNode> PolarSet(m, "PolarSet");
   PolarSet.doc() = R"pbdoc("A PolarSet is a special PolarNode used to group a set of Polar")pbdoc";
-  PolarSet.def(py::init<const std::string &>());
+  PolarSet.def(py::init<const std::string &, const std::string &>());
   PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
                R"pbdoc()pbdoc",
                "polar"_a);
 
   m.def("make_polar_set", &poem::make_polar_set,
-        R"pbdoc()pbdoc",
-        "name"_a);
+        R"pbdoc("Build a PolarSet")pbdoc",
+        "name"_a, "description"_a);
 
   // ===================================================================================================================
   // Writer

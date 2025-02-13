@@ -67,7 +67,7 @@ if __name__ == '__main__':
         warnings.warn("Polar_MPPP.nc NOT COMPLIANT with POEM specs version 1")
 
     # TEST PolarSet
-    polar_set = pypoem.make_polar_set("polar_set")
+    polar_set = pypoem.make_polar_set("polar_set", "Description of this PolarSet")
     polar_set.attach_polar(polar_MPPP)
 
 
