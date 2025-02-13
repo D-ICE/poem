@@ -54,7 +54,7 @@ cpp-tests:
     - make poem_tests -j6
     - cd bin/tests
     - ./poem_tests
-    - cd ../../scripts
+    - cd ../../../scripts
     - sh package.sh
     - cd ../tests/pypoem
     - python test_pypoem.py
