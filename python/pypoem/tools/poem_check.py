@@ -22,7 +22,7 @@ def main():
     args = parser.parse_args()
 
     if pypoem.spec_check(args.infilename):
-        print("Specification version {} OK" % pypoem.get_version(args.infilename))
+        print("Specification version %i OK" % pypoem.get_version(args.infilename))
 
 
 if __name__ == '__main__':
