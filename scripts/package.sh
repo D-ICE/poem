@@ -33,8 +33,9 @@ export CIBW_BUILD=`python -c 'import sys; version=sys.version_info[:3]; print("c
 #EOM
 #)
 
+pip install cibuildwheel
 pip uninstall -y pypoem
-rm linuxwheels/*
+rm -f linuxwheels/*
 cibuildwheel --print-build-identifiers
 cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
 
