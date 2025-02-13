@@ -72,6 +72,7 @@ if __name__ == '__main__':
 
 
     pypoem.to_netcdf(polar_set, "my_vessel", "my_vessel.nc")
+    # pypoem.to_netcdf(polar_set, "S2Z_OWx6INTAVG_vG", "my_vessel.nc")
 
     if pypoem.spec_check("my_vessel.nc"):
         print("my_vessel.nc COMPLIANT with POEM specs version 1")

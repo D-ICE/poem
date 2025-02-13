@@ -20,10 +20,6 @@ using json = nlohmann::json;
 
 namespace poem {
 
-  /// Replaces spaces by _
-  /// Removes special characters
-  std::string clean_name(const std::string &str);
-
   // Forward declarations
   class PolarSet;
 

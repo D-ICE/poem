@@ -506,7 +506,7 @@ namespace poem {
     }
 
     std::string vessel_name;
-    if (vessel_name == "from-file") {
+    if (root_name == "from-file") {
       root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
     } else {
       vessel_name = root_name;

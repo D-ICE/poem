@@ -70,8 +70,6 @@ namespace poem {
   std::string polar_mode_to_string(const POLAR_MODE &polar_mode_);
 
   enum POLAR_NODE_TYPE {
-//    /// Root node (generally vessel)
-//    POLAR_ROOT_NODE,
     /// Regular PolarNode
     POLAR_NODE,
     /// PolarSet

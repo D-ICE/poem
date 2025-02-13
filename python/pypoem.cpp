@@ -155,13 +155,23 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
   PolarNode.def(py::init<const std::string &>());
   PolarNode.def("name", &poem::PolarNode::name,
                 R"pbdoc(Get the name of the PolarNode)pbdoc");
-//  PolarNode.def("children", [](const poem::PolarNode &self) {
-//    return self.children<poem::PolarNode>();
-//                },
-//                R"pbdoc(Returns a list of children of current PolarNode)pbdoc"
-//  );
   PolarNode.def("children", &poem::PolarNode::children<poem::PolarNode>,
                 R"pbdoc(Returns a list of children of current PolarNode)pbdoc");
+  PolarNode.def("is_polar_set", [](const poem::PolarNode &self) -> bool {
+                  return self.polar_node_type() == poem::POLAR_SET;
+                },
+                R"pbdoc(Returns True if the PolarNode is a PolarSet)pbdoc");
+  PolarNode.def("is_polar", [](const poem::PolarNode &self) -> bool {
+                  return self.polar_node_type() == poem::POLAR;
+                },
+                R"pbdoc(Returns True if the PolarNode is a PolarSet)pbdoc");
+  PolarNode.def("is_polar_table", [](const poem::PolarNode &self) -> bool {
+                  return self.polar_node_type() == poem::POLAR_TABLE;
+                },
+                R"pbdoc(Returns True if the PolarNode is a PolarSet)pbdoc");
+//  PolarNode.def("as_polar_set", &poem::PolarNode::as_polar_set);
+//  PolarNode.def("as_polar", &poem::PolarNode::as_polar);
+
   PolarNode.def("layout", [](const poem::PolarNode &self) -> std::string {
                   json json_node = self.layout();
                   return json_node.dump(2);
@@ -188,8 +198,6 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
                        R"pbdoc()pbdoc");
   PolarTableDouble.def("set_value",
                        py::overload_cast<std::vector<size_t>, const double &>(&poem::PolarTable<double>::set_value));
-
-//
   PolarTableDouble.def("array",
                        [](poem::PolarTable<double> &self) -> py::array_t<double> {
                          return vector2memoryview(self.values(), self.dimension_grid()->shape());
@@ -207,7 +215,7 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
   py::class_<poem::PolarTable<int>, std::shared_ptr<poem::PolarTable<int>>, poem::PolarNode>
       PolarTableInt(m, "PolarTableInt");
   PolarTableInt.doc() = R"pbdoc("A PolarTableInt is a special PolarNode used to represent a specific variable
-stored in a multidimensional array. Int version.")pbdoc";
+                                 stored in a multidimensional array. Int version.")pbdoc";
   PolarTableInt.def("fill_with", &poem::PolarTable<int>::fill_with,
                     R"pbdoc()pbdoc", "value"_a);
   PolarTableInt.def("set_values",
@@ -216,12 +224,15 @@ stored in a multidimensional array. Int version.")pbdoc";
                       self.set_values(ndarray2stdvector<int>(array));
                     },
                     R"pbdoc()pbdoc");
+  PolarTableInt.def("set_value",
+                    py::overload_cast<std::vector<size_t>, const int &>(&poem::PolarTable<int>::set_value));
   PolarTableInt.def("array",
                     [](poem::PolarTable<int> &self) -> py::array_t<int> {
                       return vector2memoryview(self.values(), self.dimension_grid()->shape());
                     },
                     R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
-
+  PolarTableInt.def("dimension_grid", &poem::PolarTable<int>::dimension_grid,
+                    R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
 
   m.def("make_polar_table_int", &poem::make_polar_table_int,
         R"pbdoc()pbdoc"

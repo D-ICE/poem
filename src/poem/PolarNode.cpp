@@ -4,6 +4,8 @@
 
 #include "PolarNode.h"
 
+#include <cools/string/StringUtils.h>
+
 #include "Dimension.h"
 #include "PolarSet.h"
 #include "Polar.h"
@@ -11,33 +13,24 @@
 
 namespace poem {
 
-  std::string clean_name(const std::string &str) {
-    // FIXME: semblerait que la fonctionnalite soit aussi dans cools...
-    // FIXME: removes also numeric characters
-
-    std::string s = str;
-    for (size_t i = 0; i < s.size(); i++) {
-      if (s[i] == ' ') {
-        s[i] = '_';
-        continue;
-      }
-      if (s[i] == '_') continue;
-
-      if (s[i] < 'A' || s[i] > 'Z' && s[i] < 'a' || s[i] > 'z') {
-        s.erase(i, 1);
-        i--;
-      }
-    }
-    if (str != s) {
-      LogWarningError("Name \"{}\" has been changed in \"{}\"", str, s);
-    }
-
-    return s;
-  }
-
   PolarNode::PolarNode(const std::string &name) :
       dtree::Node(name),
-      m_polar_node_type(POLAR_NODE) {}
+      m_polar_node_type(POLAR_NODE) {
+
+    // Ensure name is correct
+    std::string name_(name);
+    cools::string::MakeItAValidVariableName(name_);
+
+    if (name_ != name) {
+      change_name(name_);
+      LogWarningError(R"(Name "{}" was not compliant and has been replaced by "{}")", name, name_);
+    }
+
+    if (name_.empty()) {
+      LogCriticalError("Empty name for PolarNode is forbidden");
+      CRITICAL_ERROR_POEM
+    }
+  }
 
   void PolarNode::change_name(const std::string &new_name) {
     rename(new_name);
