@@ -2,8 +2,15 @@
 
 **Performance pOlar Exchange forMat**
 
+
+![PyPI - License](https://img.shields.io/pypi/l/pypoem)
+
+[![C++](https://img.shields.io/badge/C++-%2300599C.svg?logo=c%2B%2B&logoColor=white)](#)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pypoem)
 [![PyPI version](https://badge.fury.io/py/pypoem.svg)](https://badge.fury.io/py/pypoem)
+
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pypoem)
+
 
 C++ library and Python bindings defining an exchange format for performance polar in marine engineering, 
 wind assisted vessels performance prediction, weather routing optimisation, embedded control systems, 
@@ -35,8 +42,7 @@ training simulators.
 
 ## Links
 
-* **Github repository:** https://github.com/D-ICE/poem
-* **API Documentation:** 
+* **GitHub repository:** https://github.com/D-ICE/poem
 * **POEM Documentation:** https://dice-poem.readthedocs.io/en/latest/
 * **D-ICE ENGINEERING:** https://www.dice-engineering.com/en
 
