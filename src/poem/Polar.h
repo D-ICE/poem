@@ -53,6 +53,8 @@ namespace poem {
 
     std::shared_ptr<PolarTableBase> polar_table(const std::string &name) const;
 
+    void remove_polar_table(const std::string &name);
+
     bool operator==(const Polar &other) const;
 
     bool operator!=(const Polar &other) const;

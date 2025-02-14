@@ -66,6 +66,13 @@ PYBIND11_MODULE(pypoem, m) {
   m.def("poem_library_status", &poem::git::development_status,
         R"pbdoc(Get the development status POEM Library)pbdoc");
 
+  m.def("mandatory_polar_tables",
+        [](const std::string &polar_mode) -> std::unordered_map<std::string, std::vector<std::string>> {
+          return poem::mandatory_polar_tables(poem::string_to_polar_mode(polar_mode),
+                                              poem::current_poem_standard_version());
+        },
+        R"pbdoc(Get mandatory PolarTables for the current POEM Specification)pbdoc");
+
   // ===================================================================================================================
   // Dimension
   // ===================================================================================================================
@@ -299,6 +306,9 @@ PYBIND11_MODULE(pypoem, m) {
               return self.create_polar_table<int>(name, unit, description, poem::POEM_INT);
             },
             R"pbdoc("Create a new PolarTable with type int from a Polar")pbdoc");
+  Polar.def("remove_polar_table", &poem::Polar::remove_polar_table,
+            R"pbdoc("Remove a PolarTable for the Polar")pbdoc",
+            "name"_a);
 
   m.def("make_polar", &poem::make_polar,
         R"pbdoc("Make a Polar")pbdoc",

@@ -19,7 +19,12 @@ def get_parser():
 
 def clean(polar_node):
     if polar_node.is_polar():
-        pass
+        polar = polar_node.as_polar()
+        mandatory_polar_tables = [pt for pt in pypoem.mandatory_polar_tables(polar.mode())]
+        for polar_table in polar.children():
+            if polar_table.name() not in mandatory_polar_tables:
+                polar.remove_polar_table(polar_table.name())
+
     else:
         for polar_node_ in polar_node.children():
             clean(polar_node_)
@@ -32,9 +37,6 @@ def main():
     polar_node = pypoem.load(args.infilename, "vessel")
     clean(polar_node)
     pypoem.to_netcdf(polar_node, polar_node.name(), args.outfilename)
-
-    import poem_tree
-    poem_tree.execute(args.outfilename)
 
 
 if __name__ == '__main__':

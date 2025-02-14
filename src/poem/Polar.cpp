@@ -38,6 +38,10 @@ namespace poem {
     return child<PolarTableBase>(name);
   }
 
+  void Polar::remove_polar_table(const std::string &name) {
+    remove_child(polar_table(name));
+  }
+
   bool Polar::operator==(const Polar &other) const {
     bool equal = true;
     equal &= PolarNode::operator==(other);
