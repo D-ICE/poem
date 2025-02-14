@@ -23,6 +23,10 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
+#    "Operating System :: Microsoft :: Windows",
+#    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C++",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
@@ -32,7 +36,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Development Status :: 4 - Beta",
-    "Typing :: Typed",
+#    "Development Status :: 5 - Production/Stable",
+#    "Typing :: Typed",
 ]
 
 dependencies = [

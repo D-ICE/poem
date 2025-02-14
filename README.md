@@ -1,3 +1,4 @@
+![PyPI - Status](https://img.shields.io/pypi/status/pypoem)
 ![PyPI - License](https://img.shields.io/pypi/l/pypoem)
 
 [![C++](https://img.shields.io/badge/C++-%2300599C.svg?logo=c%2B%2B&logoColor=white)](#)

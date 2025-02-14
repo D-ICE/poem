@@ -59,6 +59,12 @@ PYBIND11_MODULE(pypoem, m) {
 
   m.def("current_standard_poem_version", &poem::current_poem_standard_version,
         R"pbdoc(Get the current specifications number of the library)pbdoc");
+  m.def("poem_lib_version", &poem::git::version_full,
+        R"pbdoc(Get the POEM Library version)pbdoc");
+  m.def("poem_lib_last_commit_date", &poem::git::last_commit_date,
+        R"pbdoc(Get the POEM Library last revision date)pbdoc");
+  m.def("poem_library_status", &poem::git::development_status,
+        R"pbdoc(Get the development status POEM Library)pbdoc");
 
   // ===================================================================================================================
   // Dimension
