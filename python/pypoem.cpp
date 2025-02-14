@@ -198,11 +198,12 @@ PYBIND11_MODULE(pypoem, m) {
 //  PolarNode.def("as_polar_set", &poem::PolarNode::as_polar_set);
 //  PolarNode.def("as_polar", &poem::PolarNode::as_polar);
 
-  PolarNode.def("layout", [](const poem::PolarNode &self) -> std::string {
+  PolarNode.def("layout", [](const poem::PolarNode &self, const int indent) -> std::string {
                   json json_node = self.layout();
-                  return json_node.dump(2);
+                  return json_node.dump(indent);
                 },
-                R"pbdoc(Returns a json string as a layout for the tree starting at current PolarNode)pbdoc");
+                R"pbdoc(Returns a json string as a layout for the tree starting at current PolarNode)pbdoc",
+                "indent"_a = -1);
 
   m.def("make_polar_node", &poem::make_polar_node,
         R"pbdoc("Build a PolarNode")pbdoc",
@@ -322,11 +323,12 @@ PYBIND11_MODULE(pypoem, m) {
   // ===================================================================================================================
   m.def("to_netcdf", [](std::shared_ptr<poem::PolarNode> polar_node,
                         const std::string &vessel_name,
-                        const std::string &filename) -> void {
-          poem::to_netcdf(polar_node, vessel_name, filename);
+                        const std::string &filename,
+                        bool verbose) -> void {
+          poem::to_netcdf(polar_node, vessel_name, filename, verbose);
         },
         R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
-        "polar_node"_a, "vessel_name"_a, "filename"_a);
+        "polar_node"_a, "vessel_name"_a, "filename"_a, "verbose"_a = true);
 
   // ===================================================================================================================
   // Checker
@@ -349,7 +351,7 @@ PYBIND11_MODULE(pypoem, m) {
 
   m.def("load", &poem::load,
         R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
-        "filename"_a, "vessel_name"_a, "spec_checking"_a = true);
+        "filename"_a, "vessel_name"_a, "spec_checking"_a = true, "versbose"_a = true);
 
 }
 

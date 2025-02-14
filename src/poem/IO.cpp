@@ -209,10 +209,14 @@ namespace poem {
 
   }
 
-  void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &vessel_name, const std::string &filename) {
-    LogNormalInfo("Writing file <v{}>: {}",
-                  current_poem_standard_version(),
-                  fs::absolute(filename).string());
+  void to_netcdf(std::shared_ptr<PolarNode> polar_node,
+                 const std::string &vessel_name,
+                 const std::string &filename,
+                 bool verbose) {
+    if (verbose)
+      LogNormalInfo("Writing file <v{}>: {}",
+                    current_poem_standard_version(),
+                    fs::absolute(filename).string());
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
     to_netcdf(polar_node, root_group);
@@ -286,7 +290,7 @@ namespace poem {
     };
 
     std::unordered_map<std::string, std::string> polar_tables_map{
-        {"BrakePower", "TOTAL_POWER"},
+        {"BrakePower",   "TOTAL_POWER"},
         {"SolverStatus", "SOLVER_STATUS"}
     };
 
@@ -524,11 +528,14 @@ namespace poem {
 
   std::shared_ptr<PolarNode> load(const std::string &filename,
                                   const std::string &root_name,
-                                  bool spec_checking) {
+                                  bool spec_checking,
+                                  bool verbose) {
 
-    LogNormalInfo("Reading file: {}", fs::absolute(filename).string());
+    if (verbose)
+      LogNormalInfo("Reading file: {}", fs::absolute(filename).string());
     int major_version = get_version(filename);
-    LogNormalInfo("POEM specification v{} detected in file", major_version);
+    if (verbose)
+      LogNormalInfo("POEM specification v{} detected in file", major_version);
 
     // Check compliancy with specification
     if (spec_checking) {
@@ -536,7 +543,8 @@ namespace poem {
         LogCriticalError("File is not compliant POEM Specification version {}", major_version);
         CRITICAL_ERROR_POEM
       } else {
-        LogNormalInfo("File is compliant with version v{}", major_version);
+        if (verbose)
+          LogNormalInfo("File is compliant with version v{}", major_version);
       }
     }
 

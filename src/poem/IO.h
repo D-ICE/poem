@@ -55,7 +55,10 @@ namespace poem {
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group);
 
-  void to_netcdf(std::shared_ptr<PolarNode> polar_node, const std::string &vessel_name, const std::string &filename);
+  void to_netcdf(std::shared_ptr<PolarNode> polar_node,
+                 const std::string &vessel_name,
+                 const std::string &filename,
+                 bool verbose = true);
 
   // ===================================================================================================================
   // READERS
@@ -71,7 +74,8 @@ namespace poem {
 
   std::shared_ptr<PolarNode> load(const std::string &filename,
                                   const std::string &root_name = "from-file",
-                                  bool spec_checking = true);
+                                  bool spec_checking = true,
+                                  bool verbose = true);
 
 }  // poem
 
