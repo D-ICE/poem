@@ -12,7 +12,7 @@ def get_parser():
     )
     # Please define this argument. We need to have a way to check the version of a tool from command line
     parser.add_argument('infilename',
-                        help='The file we want to check against POEM specifications')
+                        help='Input File')
     parser.add_argument("-i2", action="store_true",
                         help="The indent for the json string representation of the layout is set to 2")
 
