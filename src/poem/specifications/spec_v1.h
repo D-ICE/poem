@@ -2,15 +2,21 @@
 // Created by frongere on 17/01/25.
 //
 
-#ifndef POEM_CHECK_V1_H
-#define POEM_CHECK_V1_H
+#ifndef POEM_SPEC_V1_H
+#define POEM_SPEC_V1_H
 
 #include <string>
 #include <netcdf>
+#include <unordered_map>
+#include "poem/enums.h"
 
 namespace poem {
 
   namespace v1 {
+
+    std::vector<std::string> mandatory_dimensions(POLAR_MODE polar_mode);
+
+    std::unordered_map<std::string, std::vector<std::string>> mandatory_polar_tables(POLAR_MODE polar_mode);
 
     bool check_R1(const netCDF::NcGroup &group);
 
@@ -26,16 +32,10 @@ namespace poem {
 
     bool check_R7(const netCDF::NcGroup &group);
 
-//    bool check_R8(const netCDF::NcGroup &group);
-//
-//    bool check_R9(const netCDF::NcGroup &group);
-//
-//    bool check_R10(const netCDF::NcGroup &group);
-
   }  // poem::v1
 
   bool check_v1(const std::string &filename);
 
 }  // poem
 
-#endif //POEM_CHECK_V1_H
+#endif //POEM_SPEC_V1_H

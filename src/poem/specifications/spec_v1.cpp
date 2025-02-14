@@ -2,7 +2,7 @@
 // Created by frongere on 07/02/25.
 //
 
-#include "check_v1.h"
+#include "spec_v1.h"
 
 #include <filesystem>
 #include <dunits/dunits.h>
@@ -14,16 +14,80 @@ namespace fs = std::filesystem;
 
 namespace poem::v1 {
 
+  std::vector<std::string> known_poem_node_types_groups = {"POLAR_NODE", "POLAR_SET", "POLAR"};
+
+  std::vector<std::string> known_polar_modes = {"MPPP", "HPPP", "MVPP", "HVPP", "VPP"};
+
+  std::vector<std::string> mandatory_dimensions(POLAR_MODE polar_mode) {
+    std::vector<std::string> mandatory_dimensions;
+    switch (polar_mode) {
+      case MPPP:
+        mandatory_dimensions = {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"};
+        break;
+      case HPPP:
+        mandatory_dimensions = {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"};
+        break;
+      case MVPP:
+        mandatory_dimensions = {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"};
+        break;
+      case HVPP:
+        mandatory_dimensions = {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"};
+        break;
+      case VPP:
+        mandatory_dimensions = {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"};
+        break;
+    }
+    return mandatory_dimensions;
+  }
+
+  std::unordered_map<std::string, std::vector<std::string>> mandatory_polar_tables(POLAR_MODE polar_mode) {
+    std::unordered_map<std::string, std::vector<std::string>> mandatory_polar_tables;
+    switch (polar_mode) {
+      case MPPP:
+        mandatory_polar_tables = {
+            {"TOTAL_POWER", mandatory_dimensions(MPPP)},
+            {"LEEWAY", mandatory_dimensions(MPPP)},
+            {"SOLVER_STATUS", mandatory_dimensions(MPPP)}
+        };
+        break;
+      case HPPP:
+        mandatory_polar_tables = {
+            {"TOTAL_POWER", mandatory_dimensions(HPPP)},
+            {"LEEWAY", mandatory_dimensions(HPPP)},
+            {"SOLVER_STATUS", mandatory_dimensions(HPPP)}
+        };
+        break;
+      case MVPP:
+        mandatory_polar_tables = {
+            {"STW", mandatory_dimensions(MVPP)},
+            {"LEEWAY", mandatory_dimensions(MVPP)},
+            {"SOLVER_STATUS", mandatory_dimensions(MVPP)}
+        };
+        break;
+      case HVPP:
+        mandatory_polar_tables = {
+            {"STW", mandatory_dimensions(HVPP)},
+            {"LEEWAY", mandatory_dimensions(HVPP)},
+            {"SOLVER_STATUS", mandatory_dimensions(HVPP)}
+        };
+        break;
+      case VPP:
+        mandatory_polar_tables = {
+            {"STW", mandatory_dimensions(VPP)},
+            {"LEEWAY", mandatory_dimensions(VPP)},
+            {"SOLVER_STATUS", mandatory_dimensions(VPP)}
+        };
+        break;
+    }
+    return mandatory_polar_tables;
+  }
+
   void not_compliant_warning(int rule) {
     LogUnsualWarningError(
         "----->> Not compliant with V1/R{}. "
         "See: https://dice-poem.readthedocs.io/en/latest/documentation/rules_v1.html#rule-v1-r{}",
         rule, rule);
   }
-
-  std::vector<std::string> known_poem_node_types_groups = {"POLAR_NODE", "POLAR_SET", "POLAR"};
-
-  std::vector<std::string> known_polar_modes = {"MPPP", "HPPP", "MVPP", "HVPP", "VPP"};
 
   template<class T>
   inline bool is_poem_object(const T &object) {
@@ -493,37 +557,14 @@ namespace poem::v1 {
       std::string node_type = get_attribute(group, "POEM_NODE_TYPE");
 
       if (node_type == "POLAR") {
-        auto polar_mode = get_attribute(group, "POEM_MODE");
+        auto polar_mode = string_to_polar_mode(get_attribute(group, "POEM_MODE"));
 
-        if (polar_mode == "MPPP" || polar_mode == "HPPP") {
-          compliant &= has_coord_var(group, "STW_dim");
-          compliant &= has_coord_var(group, "TWS_dim");
-          compliant &= has_coord_var(group, "TWA_dim");
-          compliant &= has_coord_var(group, "WA_dim");
-          compliant &= has_coord_var(group, "Hs_dim");
-          compliant &= has_var(group, "TOTAL_POWER", {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-          compliant &= has_var(group, "LEEWAY", {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-          compliant &= has_var(group, "SOLVER_STATUS", {"STW_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+        for (const auto& dimension_name : mandatory_dimensions(polar_mode)) {
+          compliant &= has_coord_var(group, dimension_name);
         }
-        if (polar_mode == "MVPP" || polar_mode == "HVPP") {
-          compliant &= has_coord_var(group, "Power_dim");
-          compliant &= has_coord_var(group, "TWS_dim");
-          compliant &= has_coord_var(group, "TWA_dim");
-          compliant &= has_coord_var(group, "WA_dim");
-          compliant &= has_coord_var(group, "Hs_dim");
-          compliant &= has_var(group, "STW", {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-          compliant &= has_var(group, "LEEWAY", {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-          compliant &= has_var(group, "SOLVER_STATUS",
-                               {"Power_dim", "TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-        }
-        if (polar_mode == "VPP") {
-          compliant &= has_coord_var(group, "TWS_dim");
-          compliant &= has_coord_var(group, "TWA_dim");
-          compliant &= has_coord_var(group, "WA_dim");
-          compliant &= has_coord_var(group, "Hs_dim");
-          compliant &= has_var(group, "STW", {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-          compliant &= has_var(group, "LEEWAY", {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
-          compliant &= has_var(group, "SOLVER_STATUS", {"TWS_dim", "TWA_dim", "WA_dim", "Hs_dim"});
+
+        for (const auto& polar_table : mandatory_polar_tables(polar_mode)) {
+          compliant &= has_var(group, polar_table.first, polar_table.second);
         }
 
       } else {

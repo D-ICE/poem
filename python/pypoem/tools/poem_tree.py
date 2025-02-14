@@ -49,11 +49,8 @@ def generate_ascii_tree(tree_dict: dict, ascii_tree: list, prefix='', level=0):
     return ascii_tree
 
 
-def main():
-    parser = get_parser()
-    args = parser.parse_args()
-
-    polar_node = pypoem.load(args.infilename, "vessel")
+def execute(filename):
+    polar_node = pypoem.load(filename, "vessel")
 
     tree_dict = dict()
     generate_tree_dict(tree_dict, polar_node)
@@ -63,6 +60,13 @@ def main():
 
     for item in ascii_tree:
         print(item)
+
+
+def main():
+    parser = get_parser()
+    args = parser.parse_args()
+
+    execute(args.infilename)
 
 
 if __name__ == '__main__':

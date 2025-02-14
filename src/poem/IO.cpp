@@ -10,7 +10,7 @@
 #include "PolarTable.h"
 #include "Polar.h"
 #include "PolarSet.h"
-#include "specifications/spec_checkers.h"
+#include "specifications/specs.h"
 
 namespace poem {
 
