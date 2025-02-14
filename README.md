@@ -1,8 +1,3 @@
-# POEM
-
-**Performance pOlar Exchange forMat**
-
-
 ![PyPI - License](https://img.shields.io/pypi/l/pypoem)
 
 [![C++](https://img.shields.io/badge/C++-%2300599C.svg?logo=c%2B%2B&logoColor=white)](#)
@@ -11,6 +6,9 @@
 
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/pypoem)
 
+# POEM
+
+**Performance pOlar Exchange forMat**
 
 C++ library and Python bindings defining an exchange format for performance polar in marine engineering, 
 wind assisted vessels performance prediction, weather routing optimisation, embedded control systems, 
