@@ -89,10 +89,21 @@ PYBIND11_MODULE(pypoem, m) {
   // ===================================================================================================================
   py::class_<poem::DimensionGrid, std::shared_ptr<poem::DimensionGrid>> DimensionGrid(m, "DimensionGrid");
   DimensionGrid.doc() = R"pbdoc("A DimensionGrid is a numerical realisation of a DimensionSet.
-Each Dimension of the associated DimensionSet is given a numerical sampling.")pbdoc";
+                                 Each Dimension of the associated DimensionSet is given a numerical sampling.")pbdoc";
   DimensionGrid.def("set_values", &poem::DimensionGrid::set_values,
                     R"pbdoc("Set a values vector for the specified Dimension")pbdoc",
                     "dimension_name"_a, "sampling_vector"_a);
+  DimensionGrid.def("ndims", &poem::DimensionGrid::ndims,
+                    R"pbdoc("Get the number of Dimensions in the DimensionGrid")pbdoc");
+  DimensionGrid.def("dimensions", [](const poem::DimensionGrid &self) -> std::vector<std::string> {
+                      std::vector<std::string> dimensions;
+                      dimensions.reserve(self.ndims());
+                      for (const auto &dimension: *self.dimension_set()) {
+                        dimensions.push_back(dimension->name());
+                      }
+                      return dimensions;
+                    },
+                    R"pbdoc("Get a list of Dimensions")pbdoc");
   DimensionGrid.def("values",
                     py::overload_cast<const std::string &>(&poem::DimensionGrid::values, py::const_),
                     R"pbdoc("Get the values vector for the specified Dimension")pbdoc",
@@ -103,22 +114,24 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
                     py::overload_cast<const std::string &>(&poem::DimensionGrid::size, py::const_),
                     R"pbdoc("Get the size of the specified Dimension")pbdoc",
                     "name"_a);
+  DimensionGrid.def("size",
+                    py::overload_cast<>(&poem::DimensionGrid::size, py::const_),
+                    R"pbdoc("Get the size of the DimensionGrid")pbdoc");
   DimensionGrid.def("shape", &poem::DimensionGrid::shape,
                     R"pbdoc(Returns an ordered list of Dimension Sizes)pbdoc");
 
   m.def("make_dimension_grid", &poem::make_dimension_grid,
-        R"pbdoc()pbdoc");
+        R"pbdoc("Build a DimensionGrid)pbdoc");
 
   // ===================================================================================================================
   // DimensionPoint
   // ===================================================================================================================
   py::class_<poem::DimensionPoint> DimensionPoint(m, "DimensionPoint");
   DimensionPoint.doc() = R"pbdoc("A DimensionPoint is a point inside a DimensinoGrid with cartesian coordinates")pbdoc";
-  DimensionPoint.def(py::init<std::shared_ptr<poem::DimensionSet>>(),
-                     R"pbdoc()pbdoc");
+  DimensionPoint.def(py::init<std::shared_ptr<poem::DimensionSet>>());
   DimensionPoint.def("get",
                      py::overload_cast<const std::string &>(&poem::DimensionPoint::get),
-                     R"pbdoc()pbdoc");
+                     R"pbdoc("Get the component value of the DimensionPoint from named Dimension")pbdoc");
 
   // ===================================================================================================================
   // Enums
@@ -157,6 +170,10 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
                 R"pbdoc(Get the name of the PolarNode)pbdoc");
   PolarNode.def("description", &poem::PolarNode::description,
                 R"pbdoc(Get the description of the PolarNode)pbdoc");
+  PolarNode.def("full_name", [](const poem::PolarNode &self) -> std::string {
+                  return self.full_name();
+                },
+                R"pbdoc(Get the full name of the PolarNode)pbdoc");
   PolarNode.def("children", &poem::PolarNode::children<poem::PolarNode>,
                 R"pbdoc(Returns a list of children of current PolarNode)pbdoc");
   PolarNode.def("is_polar_set", [](const poem::PolarNode &self) -> bool {
@@ -167,6 +184,7 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
                   return self.polar_node_type() == poem::POLAR;
                 },
                 R"pbdoc(Returns True if the PolarNode is a PolarSet)pbdoc");
+  PolarNode.def("as_polar", &poem::PolarNode::as_polar, R"pbdoc(Returns the associated Polar)pbdoc");
   PolarNode.def("is_polar_table", [](const poem::PolarNode &self) -> bool {
                   return self.polar_node_type() == poem::POLAR_TABLE;
                 },
@@ -250,8 +268,16 @@ Each Dimension of the associated DimensionSet is given a numerical sampling.")pb
   // ===================================================================================================================
   py::class_<poem::Polar, std::shared_ptr<poem::Polar>, poem::PolarNode> Polar(m, "Polar");
   Polar.doc() = R"pbdoc("A Polar is a special PolarNode used to group PolarTables relative to a specific POLAR_MODE")pbdoc";
-  Polar.def(py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>(),
-            R"pbdoc()pbdoc"); // &poem::Polar::create_polar_table<double>
+  Polar.def(
+      py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>()); // &poem::Polar::create_polar_table<double>
+  Polar.def("mode", [](const poem::Polar &self) -> std::string {
+              return poem::polar_mode_to_string(self.mode());
+            },
+            R"pbdoc(Get the mode of the Polar)pbdoc");
+  Polar.def("dimension_grid", [](const poem::Polar &self) -> std::shared_ptr<poem::DimensionGrid> {
+              return self.dimension_grid();
+            },
+            R"pbdoc(Get the DimensionGrid of the Polar)pbdoc");
   Polar.def("create_polar_table_double", [](poem::Polar &self,
                                             const std::string &name,
                                             const std::string &unit,

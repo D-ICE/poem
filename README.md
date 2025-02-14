@@ -2,8 +2,12 @@
 
 **Performance pOlar Exchange forMat**
 
-C++ library and exchange format for performance polar in marine engineering, wind assisted vessels performance prediction,
-weather routing optimisation, embedded control systems, training simulators.
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pypoem)
+[![PyPI version](https://badge.fury.io/py/pypoem.svg)](https://badge.fury.io/py/pypoem)
+
+C++ library and Python bindings defining an exchange format for performance polar in marine engineering, 
+wind assisted vessels performance prediction, weather routing optimisation, embedded control systems, 
+training simulators.
 
 <!-- TOC -->
 
