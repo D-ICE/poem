@@ -47,38 +47,44 @@ TEST(poem, PolarTable) {
   ASSERT_NO_THROW(dimension_grid->dimension_points());
 
   // PolarTable
-  auto polar_table = make_polar_table<double>("VAR", "-", "VAR", POEM_DOUBLE, dimension_grid);
+  auto polar_table_double = make_polar_table<double>("VAR", "-", "VAR", POEM_DOUBLE, dimension_grid);
+  auto polar_table_int = make_polar_table<int>("VAR_INT", "-", "in PolarTable", POEM_INT, dimension_grid);
+
   ASSERT_ANY_THROW(make_polar_table<double>("a", "unknown_to_dunits", "", POEM_DOUBLE, dimension_grid));
   ASSERT_ANY_THROW(make_polar_table<int>("b", "-", "", POEM_DOUBLE, dimension_grid));
 
-  auto dimension_points = polar_table->dimension_points();
+  auto dimension_points = polar_table_double->dimension_points();
 
   // Filling the polar with values
   size_t idx = 0;
-  for (const auto &dimension_point: polar_table->dimension_points()) {
+  for (const auto &dimension_point: polar_table_double->dimension_points()) {
     double val = 1.;
     for (const auto coord: dimension_point) {
       val *= coord;
     }
 
-    polar_table->set_value(idx, val);
+    polar_table_double->set_value(idx, val);
+    polar_table_int->set_value(idx, idx);
     idx++;
   }
 
   // Interpolation
   DimensionPoint dimension_point(dimension_set, {1.2, 1.9, 2.8});
 
-  auto val_interp = polar_table->interp(dimension_point, true);
+  auto val_interp = polar_table_double->interp(dimension_point, ERROR);
   double val_calc = 1.2 * 1.9 * 2.8;
+  auto shape = polar_table_double->shape();
 
-  auto shape = polar_table->shape();
+  auto val_interp_int = polar_table_int->interp(dimension_point, ERROR);
 
 
   // Slicing
   std::unordered_map<std::string, double> slice{{"STW", 1.2},
                                                 {"TWS", 2.05}};
+//  std::unordered_map<std::string, double> slice{{"STW", 4},
+//                                                {"TWS", 2.05}};
 
-  auto sliced_polar_table = polar_table->slice(slice);
+  auto sliced_polar_table = polar_table_double->slice(slice, ERROR);
 
   // <Check that the sliced Polar is ok
   for (const auto &dimension_point_: sliced_polar_table->dimension_points()) {
@@ -86,7 +92,7 @@ TEST(poem, PolarTable) {
     for (const auto &coord: dimension_point_) {
       val_calculated *= coord;
     }
-    double val_from_sliced_polar = sliced_polar_table->interp(dimension_point_, false);
+    double val_from_sliced_polar = sliced_polar_table->interp(dimension_point_, ERROR);
 
     ASSERT_EQ(val_from_sliced_polar, val_calculated);
   }
@@ -97,12 +103,12 @@ TEST(poem, PolarTable) {
 
 
   // Copy
-  auto polar_table_copy = polar_table->copy();
+  auto polar_table_copy = polar_table_double->copy();
 
   // Resampling
-  auto new_dimension_grid = polar_table->dimension_grid()->copy();
+  auto new_dimension_grid = polar_table_double->dimension_grid()->copy();
   new_dimension_grid->set_values("STW", {1, 1.5, 2, 2.5, 3});
-  auto resampled_polar_table = polar_table->resample(new_dimension_grid);
+  auto resampled_polar_table = polar_table_double->resample(new_dimension_grid, ERROR);
   resampled_polar_table->change_name("VAR_resampled");
 
 
@@ -111,7 +117,7 @@ TEST(poem, PolarTable) {
     for (const auto &coord: dimension_point_) {
       val_calculated *= coord;
     }
-    double val_from_polar = resampled_polar_table->interp(dimension_point_, false);
+    double val_from_polar = resampled_polar_table->interp(dimension_point_, ERROR);
 
     ASSERT_EQ(val_from_polar, val_calculated);
   }
@@ -119,17 +125,17 @@ TEST(poem, PolarTable) {
   shape = resampled_polar_table->shape();
 
   // grid to index
-  ASSERT_EQ(polar_table->dimension_grid()->grid_to_index({0, 1, 2}), 5);
+  ASSERT_EQ(polar_table_double->dimension_grid()->grid_to_index({0, 1, 2}), 5);
 
   // Nearest
   dimension_point = {1.2, 2.1, 2.8};
-  auto nearest_val = polar_table->nearest(dimension_point);
+  auto nearest_val = polar_table_double->nearest(dimension_point, ERROR);
   ASSERT_EQ(nearest_val, 6.);
 
-  polar_table->sum(polar_table);
+  polar_table_double->sum(polar_table_double);
 
   // Writing
-  to_netcdf(polar_table, "my_vessel", "polar_table.nc");
+  to_netcdf(polar_table_double, "my_vessel", "polar_table.nc");
 
   // TODO: remettre
 //  netCDF::NcFile dataFile_("polar_table.nc", netCDF::NcFile::read);

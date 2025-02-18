@@ -223,9 +223,14 @@ PYBIND11_MODULE(pypoem, m) {
   // -------------------------------------------- PolarTableDouble -----------------------------------------------------
   py::class_<poem::PolarTable<double>, std::shared_ptr<poem::PolarTable<double>>, poem::PolarNode>
       PolarTableDouble(m, "PolarTableDouble");
-  PolarTableDouble.doc() =
-      R"pbdoc("A PolarTableDouble is a special PolarNode used to represent a specific variable
-               stored in a multidimensional array. Double version.")pbdoc";
+  PolarTableDouble.doc() = R"pbdoc("A PolarTableDouble is a special PolarNode used to represent a specific variable
+                                    stored in a multidimensional array. Double version.")pbdoc";
+  PolarTableDouble.def("name", &poem::PolarTable<double>::name,
+                       R"pbdoc(Get the name of the PolarTableDouble)pbdoc");
+  PolarTableDouble.def("unit", &poem::PolarTable<double>::unit,
+                       R"pbdoc(Get the unit of the PolarTableDouble)pbdoc");
+  PolarTableDouble.def("description", &poem::PolarTable<double>::description,
+                       R"pbdoc(Get the description of the PolarTableDouble)pbdoc");
   PolarTableDouble.def("fill_with", &poem::PolarTable<double>::fill_with,
                        R"pbdoc()pbdoc", "value"_a);
   PolarTableDouble.def("set_values",
@@ -241,13 +246,66 @@ PYBIND11_MODULE(pypoem, m) {
                          return vector2memoryview(self.values(), self.dimension_grid()->shape());
                        },
                        R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
+  PolarTableDouble.def("copy", &poem::PolarTable<double>::copy,
+                       R"pbdoc(Get a copy of the PolarTableDouble)pbdoc");
   PolarTableDouble.def("dimension_grid", &poem::PolarTable<double>::dimension_grid,
                        R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
-  PolarTableDouble.def("slice", &poem::PolarTable<double>::slice,
+  PolarTableDouble.def("slice", [](const poem::PolarTable<double> &self,
+                                   const std::unordered_map<std::string, double> &prescribed_values,
+                                   const std::string &oob_method)
+                           -> std::shared_ptr<poem::PolarTable<double>> {
+                         return self.slice(prescribed_values, poem::string_to_outofbound_method(oob_method));
+                       },
                        R"pbdoc(Returns a sliced PolarTableDouble)pbdoc",
-                       "prescribed_values"_a);
+                       "prescribed_values"_a, "oob_method"_a = "error");
   PolarTableDouble.def("squeeze", py::overload_cast<>(&poem::PolarTable<double>::squeeze),
                        R"pbdoc(Removes singleton dimensions from PolarTable (inplace))pbdoc");
+  PolarTableDouble.def("nearest", [](const poem::PolarTable<double> &self,
+                                     const std::unordered_map<std::string, double> &point_dict,
+                                     const std::string &oob_method) -> double {
+                         // TODO: tester les bornes des valeurs
+                         if (point_dict.size() != self.dim()) {
+                           LogCriticalError("In PolarTableDouble {} of dimension {}, "
+                                            "nearest function called with incorrect number of values {}",
+                                            self.name(), self.dim(), point_dict.size());
+                           CRITICAL_ERROR_POEM
+                         }
+
+                         auto dimension_set = self.dimension_grid()->dimension_set();
+                         std::vector<double> array(self.dim());
+                         size_t i = 0;
+                         for (const auto &dimension: *dimension_set) {
+                           array[i] = point_dict.at(dimension->name());
+                           i++;
+                         }
+                         return self.nearest(poem::DimensionPoint(dimension_set, array),
+                                             poem::string_to_outofbound_method(oob_method));
+                       },
+                       R"pbdoc("Get the nearest value for the ")pbdoc",
+                       "point_dict"_a, "oob_method"_a = "error");
+  PolarTableDouble.def("interp", [](const poem::PolarTable<double> &self,
+                                    const std::unordered_map<std::string, double> &point_dict,
+                                    const std::string &oob_method) -> double {
+                         // TODO: tester les bornes des valeurs
+                         if (point_dict.size() != self.dim()) {
+                           LogCriticalError("In PolarTableDouble {} of dimension {}, "
+                                            "interp function called with incorrect number of values {}",
+                                            self.name(), self.dim(), point_dict.size());
+                           CRITICAL_ERROR_POEM
+                         }
+
+                         auto dimension_set = self.dimension_grid()->dimension_set();
+                         std::vector<double> array(self.dim());
+                         size_t i = 0;
+                         for (const auto &dimension: *dimension_set) {
+                           array[i] = point_dict.at(dimension->name());
+                           i++;
+                         }
+                         return self.interp(poem::DimensionPoint(dimension_set, array),
+                                            poem::string_to_outofbound_method(oob_method));
+                       },
+                       R"pbdoc("Get an interpolated value at point_dict")pbdoc",
+                       "point_dict"_a, "oob_method"_a = "error");
 
   m.def("make_polar_table_double", &poem::make_polar_table_double,
         R"pbdoc("Build a PolarTable containing double values")pbdoc",
@@ -258,6 +316,12 @@ PYBIND11_MODULE(pypoem, m) {
       PolarTableInt(m, "PolarTableInt");
   PolarTableInt.doc() = R"pbdoc("A PolarTableInt is a special PolarNode used to represent a specific variable
                                  stored in a multidimensional array. Int version.")pbdoc";
+  PolarTableInt.def("name", &poem::PolarTable<int>::name,
+                    R"pbdoc(Get the name of the PolarTableInt)pbdoc");
+  PolarTableInt.def("unit", &poem::PolarTable<int>::unit,
+                    R"pbdoc(Get the unit of the PolarTableInt)pbdoc");
+  PolarTableInt.def("description", &poem::PolarTable<int>::description,
+                    R"pbdoc(Get the description of the PolarTableInt)pbdoc");
   PolarTableInt.def("fill_with", &poem::PolarTable<int>::fill_with,
                     R"pbdoc()pbdoc", "value"_a);
   PolarTableInt.def("set_values",
@@ -273,8 +337,67 @@ PYBIND11_MODULE(pypoem, m) {
                       return vector2memoryview(self.values(), self.dimension_grid()->shape());
                     },
                     R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
+  PolarTableInt.def("copy", &poem::PolarTable<int>::copy,
+                    R"pbdoc(Get a copy of the PolarTableInt)pbdoc");
   PolarTableInt.def("dimension_grid", &poem::PolarTable<int>::dimension_grid,
                     R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
+//  PolarTableInt.def("slice", [](const poem::PolarTable<int> &self,
+//                                   const std::unordered_map<std::string, double> &prescribed_values,
+//                                   const std::string &oob_method)
+//                           -> std::shared_ptr<poem::PolarTable<int>> {
+//                         return self.slice(prescribed_values, poem::string_to_outofbound_method(oob_method));
+//                       },
+//                       R"pbdoc(Returns a sliced PolarTableInt)pbdoc",
+//                       "prescribed_values"_a, "oob_method"_a = "error");
+//  PolarTableInt.def("squeeze", py::overload_cast<>(&poem::PolarTable<double>::squeeze),
+//                       R"pbdoc(Removes singleton dimensions from PolarTable (inplace))pbdoc")
+//  PolarTableInt.def("nearest", [](const poem::PolarTable<double> &self,
+//                                     const std::unordered_map<std::string, double> &point_dict,
+//                                     const std::string &oob_method) -> double {
+//                         // TODO: tester les bornes des valeurs
+//                         if (point_dict.size() != self.dim()) {
+//                           LogCriticalError("In PolarTableDouble {} of dimension {}, "
+//                                            "nearest function called with incorrect number of values {}",
+//                                            self.name(), self.dim(), point_dict.size());
+//                           CRITICAL_ERROR_POEM
+//                         }
+//
+//                         auto dimension_set = self.dimension_grid()->dimension_set();
+//                         std::vector<double> array(self.dim());
+//                         size_t i = 0;
+//                         for (const auto &dimension: *dimension_set) {
+//                           array[i] = point_dict.at(dimension->name());
+//                           i++;
+//                         }
+//                         return self.nearest(poem::DimensionPoint(dimension_set, array),
+//                                             poem::string_to_outofbound_method(oob_method));
+//                       },
+//                       R"pbdoc("Get the nearest value for the ")pbdoc",
+//                       "point_dict"_a, "oob_method"_a = "error")
+//  PolarTableInt.def("interp", [](const poem::PolarTable<double> &self,
+//                                    const std::unordered_map<std::string, double> &point_dict,
+//                                    const std::string &oob_method) -> double {
+//                         // TODO: tester les bornes des valeurs
+//                         if (point_dict.size() != self.dim()) {
+//                           LogCriticalError("In PolarTableDouble {} of dimension {}, "
+//                                            "interp function called with incorrect number of values {}",
+//                                            self.name(), self.dim(), point_dict.size());
+//                           CRITICAL_ERROR_POEM
+//                         }
+//
+//                         auto dimension_set = self.dimension_grid()->dimension_set();
+//                         std::vector<double> array(self.dim());
+//                         size_t i = 0;
+//                         for (const auto &dimension: *dimension_set) {
+//                           array[i] = point_dict.at(dimension->name());
+//                           i++;
+//                         }
+//                         return self.interp(poem::DimensionPoint(dimension_set, array),
+//                                            poem::string_to_outofbound_method(oob_method));
+//                       },
+//                       R"pbdoc("Get an interpolated value at point_dict")pbdoc",
+//                       "point_dict"_a, "oob_method"_a = "error")
+
 
   m.def("make_polar_table_int", &poem::make_polar_table_int,
         R"pbdoc(Build a PolarTable containing int values)pbdoc"
@@ -286,8 +409,11 @@ PYBIND11_MODULE(pypoem, m) {
   // ===================================================================================================================
   py::class_<poem::Polar, std::shared_ptr<poem::Polar>, poem::PolarNode> Polar(m, "Polar");
   Polar.doc() = R"pbdoc("A Polar is a special PolarNode used to group PolarTables relative to a specific POLAR_MODE")pbdoc";
-  Polar.def(
-      py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>()); // &poem::Polar::create_polar_table<double>
+  Polar.def(py::init<const std::string &, poem::POLAR_MODE, std::shared_ptr<poem::DimensionGrid>>());
+  Polar.def("name", &poem::Polar::description,
+            R"pbdoc(Get the name of the Polar)pbdoc");
+  Polar.def("description", &poem::Polar::description,
+            R"pbdoc(Get the description of the Polar)pbdoc");
   Polar.def("mode", [](const poem::Polar &self) -> std::string {
               return poem::polar_mode_to_string(self.mode());
             },
@@ -324,6 +450,10 @@ PYBIND11_MODULE(pypoem, m) {
   py::class_<poem::PolarSet, std::shared_ptr<poem::PolarSet>, poem::PolarNode> PolarSet(m, "PolarSet");
   PolarSet.doc() = R"pbdoc("A PolarSet is a special PolarNode used to group a set of Polar")pbdoc";
   PolarSet.def(py::init<const std::string &, const std::string &>());
+  PolarSet.def("name", &poem::PolarSet::description,
+               R"pbdoc(Get the name of the PolarSet)pbdoc");
+  PolarSet.def("description", &poem::PolarSet::description,
+               R"pbdoc(Get the description of the PolarSet)pbdoc");
   PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
                R"pbdoc()pbdoc",
                "polar"_a);
@@ -367,19 +497,4 @@ PYBIND11_MODULE(pypoem, m) {
         R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
         "filename"_a, "spec_checking"_a = true, "verbose"_a = true);
 
-}
-
-/*
- * On veut pouvoir
- * - construire arboresence de PolarNode
- * - construire PolarSet
- * - construie Polar
- * - construire PolarTable
- * - remplir PolarTable
- * - Specifier des attributs
- * - Ecrire un PolarNode
- * - Lire un fichier de Polaire
- * - effectuer un check de validite sur une polaire
- * - recuperer version poem d'une polaire
- * -
- */
+}  // PYBIND11_MODULE(pypoem, m)

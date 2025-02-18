@@ -137,6 +137,44 @@ namespace poem {
 
   };
 
+  enum OUT_OF_BOUND_METHOD {
+    ERROR,
+    SATURATE,
+    EXTRAPOLATE
+  };
+
+  inline OUT_OF_BOUND_METHOD string_to_outofbound_method(const std::string &oob_str) {
+    OUT_OF_BOUND_METHOD method;
+    if (oob_str == "error") {
+      method = ERROR;
+    } else if (oob_str == "saturate") {
+      method = SATURATE;
+    } else if (oob_str == "extrapolate") {
+      method = EXTRAPOLATE;
+    } else {
+      LogCriticalError("Unknown out of bound method {}. "
+                       "Available values are error, saturate or extrapolate", oob_str);
+      CRITICAL_ERROR_POEM
+    }
+    return method;
+  }
+
+  inline std::string outofbound_method_to_string(OUT_OF_BOUND_METHOD method) {
+    std::string oob_str;
+    switch (method) {
+      case ERROR:
+        oob_str = "error";
+        break;
+      case SATURATE:
+        oob_str = "saturate";
+        break;
+      case EXTRAPOLATE:
+        oob_str = "extrapolate";
+        break;
+    }
+    return oob_str;
+  }
+
 
   /**
    * A multidimensional numerical table representing a variable
@@ -294,12 +332,12 @@ namespace poem {
      * Get the value corresponding to the nearest DimensionPoint from given dimension_point in the associated
      * DimensionGrid
      */
-    [[nodiscard]] T nearest(const DimensionPoint &dimension_point) const;
+    [[nodiscard]] T nearest(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const;
 
     /**
      * Get the value of the interpolation to dimension_point
      */
-    [[nodiscard]] T interp(const DimensionPoint &dimension_point, bool bound_check) const;
+    [[nodiscard]] T interp(const DimensionPoint &dimension_point_, OUT_OF_BOUND_METHOD oob_method) const;
 
     /**
      * Get a slice in the table given values for different dimensions
@@ -308,7 +346,7 @@ namespace poem {
      * of the associated DimensionSet) and value is the prescribed value for this dimension
      */
     [[nodiscard]] std::shared_ptr<PolarTable<T>>
-    slice(std::unordered_map<std::string, double> prescribed_values) const;
+    slice(std::unordered_map<std::string, double> prescribed_values, OUT_OF_BOUND_METHOD oob_method) const;
 
     /**
      * Removes Dimension if it is a singleton (only one associated value in the associated DimensionGrid for a Dimension)
@@ -327,12 +365,15 @@ namespace poem {
      */
     [[nodiscard]] std::shared_ptr<PolarTable<T>> squeeze() const;
 
-    [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const;
+    [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid,
+                                                          OUT_OF_BOUND_METHOD oob_method) const;
 
    private:
     void reset();
 
     void build_interpolator();
+
+
 
    private:
     std::vector<T> m_values;

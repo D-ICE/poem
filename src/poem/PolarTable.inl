@@ -179,7 +179,7 @@ namespace poem {
   }
 
   template<typename T>
-  T PolarTable<T>::nearest(const DimensionPoint &dimension_point) const {
+  T PolarTable<T>::nearest(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method_) const {
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::nearest] DimensionPoint has not the same DimensionSet as the PolarTable");
@@ -189,14 +189,31 @@ namespace poem {
     std::vector<size_t> indices(dim());
     size_t index = 0;
     for (const auto &coord: dimension_point) {
-      if (coord < m_dimension_grid->min(index) || coord > m_dimension_grid->max(index)) {
-        LogCriticalError("[PolarTable::nearest] dimension_point is out of bound of DimensionGrid");
-        CRITICAL_ERROR_POEM
+      double coord_ = coord;
+
+      // Out of Bound management
+      if (coord_ < m_dimension_grid->min(index) || coord_ > m_dimension_grid->max(index)) {
+        switch (oob_method_) {
+          case ERROR: {
+            LogCriticalError("In PolarTable {}, while calling nearest, out of bound value found for"
+                             "dimension {}. Min: {}, Max: {}, Value: {}",
+                             m_name, m_dimension_grid->dimension_set()->name(index),
+                             m_dimension_grid->min(index), m_dimension_grid->max(index),
+                             coord);
+            CRITICAL_ERROR_POEM
+          }
+          default: {
+            coord_ = coord_ < m_dimension_grid->min(index) ?
+                     m_dimension_grid->min(index) : m_dimension_grid->max(index);
+          }
+        }
       }
+
+      // Get nearest index
       auto values = m_dimension_grid->values(index);
       auto it = std::min_element(values.begin(), values.end(),
-                                 [coord](double a, double b) {
-                                   return std::abs(a - coord) < std::abs(b - coord);
+                                 [coord_](double a, double b) {
+                                   return std::abs(a - coord_) < std::abs(b - coord_);
                                  });
 
       indices[index] = std::distance(values.begin(), it);
@@ -209,15 +226,17 @@ namespace poem {
   }
 
   template<typename T>
-  T PolarTable<T>::interp(const DimensionPoint &dimension_point, bool bound_check) const {
+  T PolarTable<T>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method_) const {
+
+    // FIXME: si on a une table de int, on devrait reagir de maniere diffente et renvoyer un nearest
+    //  remplacer bound_check par un enum ERROR, SATURATE, EXTRAPOLATE
+
+    if (m_type != POEM_DOUBLE) {
+      return nearest(dimension_point, oob_method_);
+    }
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
-      CRITICAL_ERROR_POEM
-    }
-
-    if (m_type != POEM_DOUBLE) {
-      LogCriticalError("Attempting to interpolate on a non-floating point PolarTable");
       CRITICAL_ERROR_POEM
     }
 
@@ -225,26 +244,56 @@ namespace poem {
       const_cast<PolarTable<T> *>(this)->build_interpolator();
     }
 
+    // Out of bound management
+    auto dimension_point_ = dimension_point; // TODO: voir si ca copie correctement
+    size_t index = 0;
+    for (auto &coord: dimension_point_) {
+      if (coord < m_dimension_grid->min(index) || coord > m_dimension_grid->max(index)) {
+        switch (oob_method_) {
+          case ERROR: {
+            LogCriticalError("In PolarTable {}, while calling interp, out of bound value found for "
+                             "dimension {}. Min: {}, Max: {}, Value: {}",
+                             m_name, m_dimension_grid->dimension_set()->name(index),
+                             m_dimension_grid->min(index), m_dimension_grid->max(index),
+                             coord);
+            LogCriticalError("Following your context, you may consider using SATURATE out of bound method "
+                             "in interpolation");
+            CRITICAL_ERROR_POEM
+          }
+          case SATURATE: {
+            dimension_point_[index] = coord < m_dimension_grid->min(index) ?
+                                      m_dimension_grid->min(index) : m_dimension_grid->max(index);
+          }
+            break;
+          case EXTRAPOLATE: {
+            NIY_POEM
+          }
+        }
+      }
+      index++;
+    }
+
+
     // FIXME: ce switch devrait plutot se trouver dans la class Interpolator !
     T val;
     switch (dim()) {
       case 1:
-        val = static_cast<Interpolator<T, 1> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+        val = static_cast<Interpolator<T, 1> *>(m_interpolator.get())->interp(dimension_point_, false);
         break;
       case 2:
-        val = static_cast<Interpolator<T, 2> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+        val = static_cast<Interpolator<T, 2> *>(m_interpolator.get())->interp(dimension_point_, false);
         break;
       case 3:
-        val = static_cast<Interpolator<T, 3> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+        val = static_cast<Interpolator<T, 3> *>(m_interpolator.get())->interp(dimension_point_, false);
         break;
       case 4:
-        val = static_cast<Interpolator<T, 4> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+        val = static_cast<Interpolator<T, 4> *>(m_interpolator.get())->interp(dimension_point_, false);
         break;
       case 5:
-        val = static_cast<Interpolator<T, 5> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+        val = static_cast<Interpolator<T, 5> *>(m_interpolator.get())->interp(dimension_point_, false);
         break;
       case 6:
-        val = static_cast<Interpolator<T, 6> *>(m_interpolator.get())->interp(dimension_point, bound_check);
+        val = static_cast<Interpolator<T, 6> *>(m_interpolator.get())->interp(dimension_point_, false);
         break;
       default:
         LogCriticalError("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
@@ -255,17 +304,17 @@ namespace poem {
   }
 
   template<typename T>
-  std::shared_ptr<PolarTable<T>> PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values) const {
+  std::shared_ptr<PolarTable<T>>
+  PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values, OUT_OF_BOUND_METHOD oob_method) const {
 
     // Check that names are existing
     auto dimension_set = m_dimension_grid->dimension_set();
     for (const auto &pair: prescribed_values) {
+      // Is the dimension existing
       if (!dimension_set->contains(pair.first)) {
         LogCriticalError("Slicing PolarTable \"{}\" with unknown dimension name {}", m_name, pair.first);
         CRITICAL_ERROR_POEM
       }
-      // TODO: tester ranges des valeurs
-
     }
 
     // Building a new grid
@@ -288,7 +337,14 @@ namespace poem {
     // Interpolation on every DimensionPoint
     size_t idx = 0;
     for (const auto &dimension_point: new_dimension_grid->dimension_points()) {
-      T val = interp(dimension_point, false); // Bound checking already done above
+      T val;
+      try {
+        val = interp(dimension_point, oob_method);
+      } catch (const PoemException& e) {
+        LogCriticalError("In PolarTable {}, while using slide method, out of bound error",
+                         m_name);
+        throw e;
+      }
       sliced_polar_table->set_value(idx, val);
       idx++;
     }
@@ -348,7 +404,8 @@ namespace poem {
   }
 
   template<typename T>
-  std::shared_ptr<PolarTable<T>> PolarTable<T>::resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const {
+  std::shared_ptr<PolarTable<T>>
+  PolarTable<T>::resample(std::shared_ptr<DimensionGrid> new_dimension_grid, OUT_OF_BOUND_METHOD oob_method) const {
 
     if (new_dimension_grid->dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::resample] DimensionGrid has not the same DimensionSet as the PolarTable");
@@ -378,7 +435,7 @@ namespace poem {
 
     size_t idx = 0;
     for (const auto &dimension_point: new_dimension_grid->dimension_points()) {
-      T interp_value = interp(dimension_point, false);
+      T interp_value = interp(dimension_point, oob_method);
       resampled_polar_table->set_value(idx, interp_value);
       idx++;
     }

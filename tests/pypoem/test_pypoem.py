@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # Filling with test data
     data = np.ones(dimension_grid.shape())
-    val = 0
+    val = 0.
     for i0 in range(dimension_grid.size("STW_dim")):
         for i1 in range(dimension_grid.size("TWS_dim")):
             for i2 in range(dimension_grid.size("TWA_dim")):
@@ -56,24 +56,38 @@ if __name__ == '__main__':
     assert array_copy[0, 0, 0, 0, 0] == 0.
     assert total_power.array()[0, 0, 0, 0, 0] == 999.  # array_copy was really a copy
 
-    LEEWAY = polar_MPPP.create_polar_table_double("LEEWAY", "deg", "LEEWAY Angle")
-    LEEWAY.fill_with(0.)
+    # total_power.array()[0, 0, 0, 0, 0] = 0.
+
+    polar_MPPP.create_polar_table_double("LEEWAY", "deg", "LEEWAY Angle").fill_with(0.)
     polar_MPPP.create_polar_table_int("SOLVER_STATUS", "-", "Solver Status").fill_with(0)
 
     # Slicing
-    LEEWAY_sliced = LEEWAY.slice({"TWS_dim": 10, "WA_dim": -1, "Hs_dim": 0}) # FIXME: check des bounds pour les variables...
-    assert len(LEEWAY_sliced.dimension_grid().shape()) == 5
-    assert LEEWAY_sliced.dimension_grid().size("STW_dim") == dimension_grid.size("STW_dim")
-    assert LEEWAY_sliced.dimension_grid().size("TWS_dim") == 1
-    assert LEEWAY_sliced.dimension_grid().size("TWA_dim") == dimension_grid.size("STW_dim")
-    assert LEEWAY_sliced.dimension_grid().size("WA_dim") == 1
-    assert LEEWAY_sliced.dimension_grid().size("Hs_dim") == 1
+    total_power_sliced = total_power.slice({"TWS_dim": 10, "WA_dim": 0, "Hs_dim": 0}) # FIXME: check des bounds pour les variables...
+    # print(LEEWAY_sliced.array())
 
-    LEEWAY_sliced.squeeze()
-    assert len(LEEWAY_sliced.dimension_grid().shape()) == 2
+    assert len(total_power_sliced.dimension_grid().shape()) == 5
+    assert total_power_sliced.dimension_grid().size("STW_dim") == dimension_grid.size("STW_dim")
+    assert total_power_sliced.dimension_grid().size("TWS_dim") == 1
+    assert total_power_sliced.dimension_grid().size("TWA_dim") == dimension_grid.size("STW_dim")
+    assert total_power_sliced.dimension_grid().size("WA_dim") == 1
+    assert total_power_sliced.dimension_grid().size("Hs_dim") == 1
+
+    total_power_sliced.squeeze()
+    assert len(total_power_sliced.dimension_grid().shape()) == 2
+
+    # print(total_power.array())
+
+    # Nearest
+    nearest1 = total_power.nearest({"STW_dim": 8.1, "TWS_dim": 10, "TWA_dim": 0.1, "WA_dim": 0, "Hs_dim": 0})
+    nearest2 = total_power_sliced.nearest({"STW_dim": 8.1, "TWA_dim": 0.1})
+    assert nearest1 == nearest2
+
+    # Interp
+    interp = total_power_sliced.interp({"STW_dim": 12, "TWA_dim": 89.2})
+    # print(total_power_sliced.array())
 
 
-
+    # Writing to netcdf
     pypoem.to_netcdf(polar_MPPP, "my_vessel", "Polar_MPPP.nc")
 
     if pypoem.spec_check("Polar_MPPP.nc"):

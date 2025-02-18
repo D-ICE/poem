@@ -11,12 +11,12 @@
 
 
 #define CRITICAL_ERROR_POEM                                                  \
-  std::string msg = fmt::format("{}:{} CRITICAL ERROR", __FILE__, __LINE__); \
-  throw PoemException(msg);
+  {std::string msg = fmt::format("{}:{} POEM CRITICAL ERROR", __FILE__, __LINE__); \
+  throw poem::PoemException(msg);}
 
 #define NIY_POEM                                                                  \
-  std::string msg = fmt::format("{}:{} NOT IMPLEMENTED YET", __FILE__, __LINE__); \
-  throw PoemException(msg);
+  {std::string msg = fmt::format("{}:{} POEM NOT IMPLEMENTED YET", __FILE__, __LINE__); \
+  throw poem::PoemException(msg);}
 
 
 using namespace cools::logging;

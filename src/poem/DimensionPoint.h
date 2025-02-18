@@ -28,7 +28,14 @@ namespace poem {
 
     DimensionPoint(const std::shared_ptr<DimensionSet> &dimension_set, const std::vector<double> &values) :
         m_dimension_set(dimension_set),
-        m_values(values) {}
+        m_values(values) {
+      if (values.size() != dimension_set->size()) {
+        LogCriticalError("While instantiating DimensionPoint, "
+                         "DimensionSet (size {}) and values vector (size {}) sizes mismatch",
+                         dimension_set->size(), values.size());
+        CRITICAL_ERROR_POEM
+      }
+    }
 
     std::shared_ptr<DimensionSet> dimension_set() const;
 

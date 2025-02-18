@@ -64,7 +64,7 @@ namespace poem {
     for (const auto &polar_table: children<PolarTableBase>()) {
       switch (polar_table->type()) {
         case POEM_DOUBLE:
-          new_polar->attach_polar_table(polar_table->as_polar_table_double()->resample(new_dimension_grid));
+          new_polar->attach_polar_table(polar_table->as_polar_table_double()->resample(new_dimension_grid, EXTRAPOLATE));
           break;
         case POEM_INT:
           LogWarningError("In resampling of Polar {}, PolarTable of type POEM_INT is skipped", m_name);
