@@ -114,7 +114,7 @@ pypoem-linux-tests:
     - poem_info my_vessel.nc
     - poem_layout my_vessel.nc
     - poem_tree my_vessel.nc
-    - poem_upgrade my_vessel.nc
+    - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
 
 
 pypoem-linux-multiversion:
