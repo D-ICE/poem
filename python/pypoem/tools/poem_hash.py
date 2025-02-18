@@ -20,12 +20,13 @@ def main():
     args = parser.parse_args()
 
     if os.path.isfile(args.infilename):
-        print("Generating hash for file %s" % args.infilename)
+        # print("Generating hash for file %s" % args.infilename)
         hasher = sha256.sha256()
         with open(args.infilename, 'rb') as f:
             buf = f.read()
             hasher.update(buf)
-        print("Hash is: %s" % hasher.hexdigest())
+        # print("Hash is: %s" % hasher.hexdigest())
+        print(hasher.hexdigest())
 
     else:
         print("File not found: %s" % args.infilename)
