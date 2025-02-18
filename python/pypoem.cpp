@@ -243,7 +243,11 @@ PYBIND11_MODULE(pypoem, m) {
                        R"pbdoc(Returns the PolarTable NDArray (no copy))pbdoc");
   PolarTableDouble.def("dimension_grid", &poem::PolarTable<double>::dimension_grid,
                        R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
-
+  PolarTableDouble.def("slice", &poem::PolarTable<double>::slice,
+                       R"pbdoc(Returns a sliced PolarTableDouble)pbdoc",
+                       "prescribed_values"_a);
+  PolarTableDouble.def("squeeze", py::overload_cast<>(&poem::PolarTable<double>::squeeze),
+                       R"pbdoc(Removes singleton dimensions from PolarTable (inplace))pbdoc");
 
   m.def("make_polar_table_double", &poem::make_polar_table_double,
         R"pbdoc("Build a PolarTable containing double values")pbdoc",
@@ -361,7 +365,7 @@ PYBIND11_MODULE(pypoem, m) {
 
   m.def("load", &poem::load,
         R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
-        "filename"_a, "spec_checking"_a = true, "versbose"_a = true);
+        "filename"_a, "spec_checking"_a = true, "verbose"_a = true);
 
 }
 

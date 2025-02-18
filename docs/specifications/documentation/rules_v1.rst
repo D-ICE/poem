@@ -23,13 +23,13 @@ RULE V1/R1
 
 The special ``POEM_NODE_TYPE`` attribute
     * Any NetCDF-4 Group, Coordinate Variable or Variable that own a ``POEM_NODE_TYPE`` attribute is understood as a
-      POEM object and **MUST** comply with the associated POEM specification rules when it applies [#]_. We call it a
+      *POEM object* and **MUST** comply with the associated POEM specification rules when it applies [#]_. We call it a
       *POEM group* in the following.
     * The parent of a POEM group **MUST** be a POEM group (except for root group)
     * The ``POEM_NODE_TYPE`` attribute **MUST** have one of the following values:
 
 .. csv-table:: Valid values for ``POEM_NODE_TYPE`` attribute and mapping between NetCDF-4 Data Model et POEM Data Model
-    :header: "``POEM_NODE_TYPE``", "NetCDF-4 object type", "POEM object type"
+    :header: "``POEM_NODE_TYPE``", "NetCDF-4 object type", "*POEM object* type"
     :widths: 40, 60, 100
 
     "*POLAR_NODE*", "group", "PolarNode (and not PolarSet or Polar)"
@@ -44,7 +44,7 @@ The special ``POEM_NODE_TYPE`` attribute
 
 .. note::
     Although the rules of the specification are about NetCDF-4 objects (groups, Coordinate Variables or Variables),
-    in the following we will talk about POEM objects instead of the NetCDF-4 counterpart, to avoid overloading the text.
+    in the following we will talk about *POEM objects* instead of the NetCDF-4 counterpart, to avoid overloading the text.
 
     So for example, if we talk about a PolarSet, we are talking about a NetCDF-4 group with an attribute  ``POEM_NODE_TYPE``
     with the value *POLAR_SET*
@@ -97,7 +97,7 @@ RULE V1/R5
 ----------
 
 Mandatory attributes
-    * Any POEM object **MUST** have the following attribute
+    * Any *POEM object* (:ref:`RULE V1/R1 <rule_v1_r1>`) **MUST** have the following attribute
 
       * ``description``: a one small sentence description of the variable
 

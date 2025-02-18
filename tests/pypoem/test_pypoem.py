@@ -54,10 +54,25 @@ if __name__ == '__main__':
     array_copy = total_power.array().copy()  # This is a copy
     array_copy[0, 0, 0, 0, 0] = 0.
     assert array_copy[0, 0, 0, 0, 0] == 0.
-    assert total_power.array()[0, 0, 0, 0, 0] == 999. # array_copy was really a copy
+    assert total_power.array()[0, 0, 0, 0, 0] == 999.  # array_copy was really a copy
 
-    polar_MPPP.create_polar_table_double("LEEWAY", "deg", "LEEWAY Angle").fill_with(0.)
+    LEEWAY = polar_MPPP.create_polar_table_double("LEEWAY", "deg", "LEEWAY Angle")
+    LEEWAY.fill_with(0.)
     polar_MPPP.create_polar_table_int("SOLVER_STATUS", "-", "Solver Status").fill_with(0)
+
+    # Slicing
+    LEEWAY_sliced = LEEWAY.slice({"TWS_dim": 10, "WA_dim": -1, "Hs_dim": 0}) # FIXME: check des bounds pour les variables...
+    assert len(LEEWAY_sliced.dimension_grid().shape()) == 5
+    assert LEEWAY_sliced.dimension_grid().size("STW_dim") == dimension_grid.size("STW_dim")
+    assert LEEWAY_sliced.dimension_grid().size("TWS_dim") == 1
+    assert LEEWAY_sliced.dimension_grid().size("TWA_dim") == dimension_grid.size("STW_dim")
+    assert LEEWAY_sliced.dimension_grid().size("WA_dim") == 1
+    assert LEEWAY_sliced.dimension_grid().size("Hs_dim") == 1
+
+    LEEWAY_sliced.squeeze()
+    assert len(LEEWAY_sliced.dimension_grid().shape()) == 2
+
+
 
     pypoem.to_netcdf(polar_MPPP, "my_vessel", "Polar_MPPP.nc")
 
@@ -70,7 +85,6 @@ if __name__ == '__main__':
     polar_set = pypoem.make_polar_set("polar_set", "Description of this PolarSet")
     polar_set.attach_polar(polar_MPPP)
 
-
     pypoem.to_netcdf(polar_set, "my_vessel", "my_vessel.nc")
     # pypoem.to_netcdf(polar_set, "S2Z_OWx6INTAVG_vG", "my_vessel.nc")
 
@@ -78,6 +92,5 @@ if __name__ == '__main__':
         print("my_vessel.nc COMPLIANT with POEM specs version 1")
     else:
         warnings.warn("my_vessel.nc NOT COMPLIANT with POEM specs version 1")
-
 
     pypoem.load("my_vessel.nc")
