@@ -27,7 +27,7 @@ def main():
     if args.i2:
         indent = 2
 
-    polar_node = pypoem.load(args.infilename, "vessel", True, False)
+    polar_node = pypoem.load(args.infilename, True, False)
     print(polar_node.layout(indent))
 
 

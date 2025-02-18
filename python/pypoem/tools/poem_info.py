@@ -42,7 +42,7 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    polar_node = pypoem.load(args.infilename, "vessel")
+    polar_node = pypoem.load(args.infilename)
 
     infos = list()
     get_info(polar_node, infos)

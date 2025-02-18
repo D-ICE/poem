@@ -80,4 +80,4 @@ if __name__ == '__main__':
         warnings.warn("my_vessel.nc NOT COMPLIANT with POEM specs version 1")
 
 
-    pypoem.load("my_vessel.nc", "my_vessel")
+    pypoem.load("my_vessel.nc")

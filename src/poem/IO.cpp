@@ -278,8 +278,9 @@ namespace poem {
     }
   }
 
-  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group,
-                                     const std::string &root_name) {
+//  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group,
+//                                     const std::string &root_name) {
+  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group) {
 
     std::unordered_map<std::string, std::string> dimension_map{
         {"STW_kt",  "STW_dim"},
@@ -299,12 +300,12 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-    std::string vessel_name;
-    if (vessel_name == "from-file") {
-      root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
-    } else {
-      vessel_name = root_name;
-    }
+//    std::string vessel_name;
+//    if (vessel_name == "from-file") {
+//      root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
+//    } else {
+//      vessel_name = root_name;
+//    }
 
     // Getting polar mode
     std::string vessel_type;
@@ -384,7 +385,7 @@ namespace poem {
 
     }
 
-    auto polar = make_polar(vessel_name, polar_mode, dimension_grid);
+    auto polar = make_polar("vessel", polar_mode, dimension_grid);
 
     for (const auto &polar_table: polar_tables) {
       polar->add_child(polar_table);
@@ -393,19 +394,17 @@ namespace poem {
     return polar;
   }
 
-  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup &group,
-                                        std::string group_name = "from-group") {
+  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup &group) {
 
     std::shared_ptr<PolarNode> polar_node;
 
     if (group.getAtts().contains("POEM_NODE_TYPE")) {
 
-      if (group_name == "from-group") {
-        if (group.isRootGroup()) {
-          LogCriticalError("In load_group, group_name must be explicitly specified for root group");
-          CRITICAL_ERROR_POEM
-        }
-        group_name = group.getName();
+      std::string group_name;
+      if (group.isRootGroup()) {
+        group.getAtt("VESSEL_NAME").getValues(group_name);
+      } else {
+        group_name = group.getName(false);
       }
 
       std::string node_type;
@@ -508,26 +507,18 @@ namespace poem {
 
   }
 
-  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group,
-                                     const std::string &root_name) {
+  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group) {
 
     if (!root_group.isRootGroup()) {
       LogCriticalError("In load_v1, not a root group");
       CRITICAL_ERROR_POEM
     }
 
-    std::string vessel_name;
-    if (root_name == "from-file") {
-      root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
-    } else {
-      vessel_name = root_name;
-    }
-
-    return load_group(root_group, vessel_name);
+    return load_group(root_group);
   }
 
   std::shared_ptr<PolarNode> load(const std::string &filename,
-                                  const std::string &root_name,
+//                                  const std::string &root_name,
                                   bool spec_checking,
                                   bool verbose) {
 
@@ -548,16 +539,17 @@ namespace poem {
       }
     }
 
-
     netCDF::NcFile root_group(filename, netCDF::NcFile::read);
     std::shared_ptr<PolarNode> root_node;
     switch (major_version) {
-      case 0:
-        root_node = load_v0(root_group, root_name);
+      case 0: {
+        root_node = load_v0(root_group);
+        root_node->change_name(fs::path(filename).stem());
+      }
         break;
       case 1: {
         try {
-          root_node = load_v1(root_group, root_name);
+          root_node = load_v1(root_group);
           break;
         } catch (const PoemException &e) {
           LogCriticalError("Error while reading POEM File using specification v{}: {}",

@@ -35,7 +35,7 @@ def main():
     else:
         print("Upgrading file version v%i -> v%i" % (file_version, last_version))
 
-    polar_node = pypoem.load(args.infilename, "vessel")
+    polar_node = pypoem.load(args.infilename)
     pypoem.to_netcdf(polar_node, polar_node.name(), args.outfilename)
     if pypoem.spec_check(args.outfilename):
         print("File is compliant with last POEM Specification v%i" % pypoem.current_standard_poem_version())

@@ -50,7 +50,7 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
-    polar_node = pypoem.load(args.infilename, "vessel")
+    polar_node = pypoem.load(args.infilename)
     clean(polar_node, args.keep)
     pypoem.to_netcdf(polar_node, polar_node.name(), args.outfilename)
 

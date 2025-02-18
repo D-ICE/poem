@@ -361,7 +361,7 @@ PYBIND11_MODULE(pypoem, m) {
 
   m.def("load", &poem::load,
         R"pbdoc(Writes a PolarNode, PolarSet, Polar or PolarTable to a netCDF file)pbdoc",
-        "filename"_a, "vessel_name"_a, "spec_checking"_a = true, "versbose"_a = true);
+        "filename"_a, "spec_checking"_a = true, "versbose"_a = true);
 
 }
 

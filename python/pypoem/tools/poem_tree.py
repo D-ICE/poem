@@ -50,7 +50,7 @@ def generate_ascii_tree(tree_dict: dict, ascii_tree: list, prefix='', level=0):
 
 
 def execute(filename):
-    polar_node = pypoem.load(filename, "vessel")
+    polar_node = pypoem.load(filename)
 
     tree_dict = dict()
     generate_tree_dict(tree_dict, polar_node)
