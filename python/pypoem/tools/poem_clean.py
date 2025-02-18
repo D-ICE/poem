@@ -11,7 +11,6 @@ def get_parser():
         description="""Clean a POEM File by removing every non mandatory PolarTables""",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    # Please define this argument. We need to have a way to check the version of a tool from command line
     parser.add_argument('infilename', type=str, help='Input file')
     parser.add_argument('outfilename', type=str, help='Cleaned output file')
     parser.add_argument('--keep', nargs='*', default='',

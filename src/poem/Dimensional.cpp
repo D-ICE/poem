@@ -23,7 +23,10 @@ namespace poem {
 
   const std::string &Dimensional::unit() const { return m_unit; }
 
-  void Dimensional::change_unit(const std::string &new_unit) { m_unit = new_unit; }
+  void Dimensional::change_unit(const std::string &new_unit) {
+    m_unit = new_unit;
+    check_unit();
+  }
 
   bool Dimensional::operator==(const Dimensional &other) const {
     return m_unit == other.m_unit;

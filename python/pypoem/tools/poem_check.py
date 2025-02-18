@@ -10,7 +10,6 @@ def get_parser():
         description="""Check a POEM File against POEM Specifications""",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    # Please define this argument. We need to have a way to check the version of a tool from command line
     parser.add_argument('infilename',
                         help='The file we want to check against POEM specifications')
 

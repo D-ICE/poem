@@ -10,7 +10,6 @@ def get_parser():
         description="""Get a ASCII tree view of a POEM File""",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    # Please define this argument. We need to have a way to check the version of a tool from command line
     parser.add_argument('infilename', help='Input file')
 
     return parser

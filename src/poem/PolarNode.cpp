@@ -92,13 +92,18 @@ namespace poem {
 
     if (m_polar_node_type == POLAR_TABLE) {
       paths.push_back(full_name());
-    }
-
-    if (!is_leaf()) {
+    } else {
       for (const auto &child: children<PolarNode>()) {
         child->polar_tables_paths(paths);
       }
     }
+
+//    if (!is_leaf()) {
+//      for (const auto &child: children<PolarNode>()) {
+//        child->polar_tables_paths(paths);
+//      }
+//    }
+
   }
 
   std::shared_ptr<PolarNode> PolarNode::from_path(const fs::path &path) {

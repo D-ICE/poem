@@ -272,14 +272,24 @@ namespace poem {
       if (std::find(excluded_attributes.begin(), excluded_attributes.end(), att.first) !=
           excluded_attributes.end())
         continue;
-      std::string val;
-      nc_object.getAtt(att.first).getValues(val);
-      polar_node->attributes().add_attribute(att.first, val);
+
+      try {
+        std::string val;
+        nc_object.getAtt(att.first).getValues(val);
+        polar_node->attributes().add_attribute(att.first, val);
+      } catch (const std::exception &e) {
+        continue;
+//        LogWarningError("Skip reading attribute {}", att.first);
+      }
+
     }
   }
 
-//  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group,
-//                                     const std::string &root_name) {
+  inline bool ends_with(const std::string &value, const std::string &ending) {
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+  }
+
   std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group) {
 
     std::unordered_map<std::string, std::string> dimension_map{
@@ -300,20 +310,13 @@ namespace poem {
       CRITICAL_ERROR_POEM
     }
 
-//    std::string vessel_name;
-//    if (vessel_name == "from-file") {
-//      root_group.getAtt("VESSEL_NAME").getValues(vessel_name);
-//    } else {
-//      vessel_name = root_name;
-//    }
-
     // Getting polar mode
     std::string vessel_type;
     root_group.getAtt("vessel_type").getValues(vessel_type);
     POLAR_MODE polar_mode;
-    if (vessel_type == "HYBRID") {
+    if (vessel_type.find("HYBRID") != std::string::npos) { // TODO: voir si methode robuste pour detecter le mode...
       polar_mode = HPPP;
-    } else if (vessel_type == "MOTOR") {
+    } else {
       polar_mode = MPPP;
     }
 
@@ -321,7 +324,6 @@ namespace poem {
     std::shared_ptr<DimensionGrid> dimension_grid;
     std::vector<std::shared_ptr<PolarTableBase>> polar_tables;
     for (const auto &nc_var: root_group.getVars()) {
-//      if (!nc_var.second.getAtts().contains("POEM_NODE_TYPE")) continue;
 
       if (!root_group.getCoordVars().contains(nc_var.first)) {
         // This is not a Coordinate Variable
@@ -335,9 +337,30 @@ namespace poem {
           for (const auto &nc_dim: nc_dims) {
             auto var_dim = root_group.getVar(nc_dim.getName());
             std::string unit;
-            var_dim.getAtt("unit").getValues(unit);
             std::string description;
-            var_dim.getAtt("description").getValues(description);
+            if (nc_dim.getName() == "STW_kt") {
+              unit = "kt";
+              description = "Speed Through Water";
+            } else if (nc_dim.getName() == "TWS_kt") {
+              unit = "kt";
+              description = "True Wind Speed";
+            } else if (nc_dim.getName() == "TWA_deg") {
+              unit = "deg";
+              description = "True Wind Angle";
+            } else if (nc_dim.getName() == "WA_deg") {
+              unit = "deg";
+              description = "Mean Waves Angle";
+            } else if (nc_dim.getName() == "Hs_m") {
+              unit = "m";
+              description = "Waves Significant Height";
+            } else {
+              LogCriticalError("Unknown dimension {} in POEM File v0", nc_dim.getName());
+              CRITICAL_ERROR_POEM
+            }
+
+//            var_dim.getAtt("unit").getValues(unit);
+//            var_dim.getAtt("description").getValues(description);
+
             auto dim_ = make_dimension(nc_dim.getName(), unit, description);
             if (dimension_map.contains(dim_->name())) {
               dim_->change_name(dimension_map[dim_->name()]);
@@ -357,9 +380,17 @@ namespace poem {
         }  // end building DimensionGrid
 
         std::string unit;
-        nc_var.second.getAtt("unit").getValues(unit);
         std::string description;
-        nc_var.second.getAtt("description").getValues(description);
+        if (!nc_var.second.getAtts().contains("unit")) {
+          unit = "-";
+          description = "unavailable";
+        } else {
+          nc_var.second.getAtt("unit").getValues(unit);
+          nc_var.second.getAtt("description").getValues(description);
+          if (unit.empty()) {
+            unit = "-";
+          }
+        }
 
         std::shared_ptr<PolarTableBase> polar_table;
         switch (nc_var.second.getType().getTypeClass()) {
@@ -375,9 +406,27 @@ namespace poem {
             continue;
         }
         read_attributes(nc_var.second, polar_table);
+        if (ends_with(nc_var.first, "_X")) {
+          polar_table->attributes().add_attribute("component", "surge");
+          polar_table->change_unit("kN");
+        } else if (ends_with(nc_var.first, "_Y")) {
+          polar_table->attributes().add_attribute("component", "sway");
+          polar_table->change_unit("kN");
+        } else if (ends_with(nc_var.first, "_K")) {
+          polar_table->attributes().add_attribute("component", "heeling");
+          polar_table->change_unit("kNm");
+        } else if (ends_with(nc_var.first, "_N")) {
+          polar_table->attributes().add_attribute("component", "yaw");
+        } else {
+          polar_table->attributes().add_attribute("component", "None");
+          polar_table->change_unit("kNm");
+        }
 
         if (polar_tables_map.contains(polar_table->name())) {
-          polar_table->change_name(polar_tables_map[polar_table->name()]);
+          std::string new_name = polar_tables_map[polar_table->name()];
+          LogNormalInfo(R"(Renaming PolarTable "{}" into "{}" to be compliant with last POEM specification v{})",
+          polar_table->name(), new_name, current_poem_standard_version());
+          polar_table->change_name(new_name);
         }
         polar_tables.push_back(polar_table);
 
@@ -554,8 +603,8 @@ namespace poem {
         } catch (const PoemException &e) {
           LogCriticalError("Error while reading POEM File using specification v{}: {}",
                            major_version, fs::absolute(filename).string());
-          LogCriticalError("Please spec check the file to get insight on the problem");
-          throw e;
+          LogCriticalError("Please spec check the file to get more insight on the problem");
+          CRITICAL_ERROR_POEM
         }
       }
 

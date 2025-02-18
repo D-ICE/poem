@@ -372,6 +372,11 @@ namespace poem::v1 {
     bool compliant = true;
 
     if (is_poem_object(group)) {
+      if (!group.getAtts().contains("description")) {
+        LogWarningError("Group {} does not have a description attribute", group_name(group));
+        compliant = false;
+      }
+
       auto node_type = get_attribute(group, "POEM_NODE_TYPE");
       if (node_type == "POLAR") {
         for (const auto nc_var: group.getVars()) {
