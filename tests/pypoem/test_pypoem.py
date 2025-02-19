@@ -1,10 +1,11 @@
 from pypoem import pypoem
-# import pypoem
 
 import warnings
 import numpy as np
 
 if __name__ == '__main__':
+
+    print("pypoem module is taken from %s" % pypoem.__file__)
 
     STW = pypoem.make_dimension("STW_dim", "kt", "Speed Through Water")
     TWS = pypoem.make_dimension("TWS_dim", "kt", "True Wind Speed")
@@ -62,8 +63,8 @@ if __name__ == '__main__':
     polar_MPPP.create_polar_table_int("SOLVER_STATUS", "-", "Solver Status").fill_with(0)
 
     # Slicing
-    total_power_sliced = total_power.slice({"TWS_dim": 10, "WA_dim": 0, "Hs_dim": 0}) # FIXME: check des bounds pour les variables...
-    # print(LEEWAY_sliced.array())
+    total_power_sliced = total_power.slice({"TWS_dim": 10, "WA_dim": 0, "Hs_dim": 0}, "error")
+    # print(total_power_sliced.array())
 
     assert len(total_power_sliced.dimension_grid().shape()) == 5
     assert total_power_sliced.dimension_grid().size("STW_dim") == dimension_grid.size("STW_dim")
@@ -74,12 +75,12 @@ if __name__ == '__main__':
 
     total_power_sliced.squeeze()
     assert len(total_power_sliced.dimension_grid().shape()) == 2
-
-    # print(total_power.array())
+    # print(total_power_sliced.array())
 
     # Nearest
     nearest1 = total_power.nearest({"STW_dim": 8.1, "TWS_dim": 10, "TWA_dim": 0.1, "WA_dim": 0, "Hs_dim": 0})
     nearest2 = total_power_sliced.nearest({"STW_dim": 8.1, "TWA_dim": 0.1})
+    assert nearest2 == 3042.
     assert nearest1 == nearest2
 
     # Interp

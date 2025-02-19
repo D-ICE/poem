@@ -76,14 +76,18 @@ TEST(poem, PolarTable) {
   auto shape = polar_table_double->shape();
 
   auto val_interp_int = polar_table_int->interp(dimension_point, ERROR);
+  auto val_nearest_int = polar_table_int->nearest(dimension_point, ERROR);
+  // TODO: tester egalement le squeeze sur une table de int
 
 
   // Slicing
-  std::unordered_map<std::string, double> slice{{"STW", 1.2},
+  std::unordered_map<std::string, double> slice{{"STW", 4}, // STW is out of bound
                                                 {"TWS", 2.05}};
-//  std::unordered_map<std::string, double> slice{{"STW", 4},
-//                                                {"TWS", 2.05}};
 
+  ASSERT_ANY_THROW(polar_table_double->slice(slice, ERROR));
+  ASSERT_NO_THROW(polar_table_double->slice(slice, SATURATE));
+
+  slice["STW"] = 1.2; // STW is no more out of bound
   auto sliced_polar_table = polar_table_double->slice(slice, ERROR);
 
   // <Check that the sliced Polar is ok

@@ -34,12 +34,15 @@ export CIBW_BUILD=`python -c 'import sys; version=sys.version_info[:3]; print("c
 #)
 
 pip install cibuildwheel
-rm -f linuxwheels/*
+rm -rf linuxwheels
 cibuildwheel --print-build-identifiers
 cibuildwheel --output-dir linuxwheels --platform linux --debug-traceback --allow-empty
 
 pip uninstall -y pypoem
+rm -rf tests/pypoem/pypoem
+rm tests/pypoem/*.nc
 OUTPUT=$(echo `ls linuxwheels`)
 pip install linuxwheels/$OUTPUT
+rm -rf linuxwheels
 
 cd scripts

@@ -9,8 +9,15 @@ install(TARGETS pypoem DESTINATION pypoem)
 if (POEM_BUILD_TESTS)
     set_target_properties(pypoem
             PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/tests/pypoem
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/tests/pypoem/pypoem
+#            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/tests/pypoem
     )
+    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/tests/pypoem/pypoem")
+        file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/tests/pypoem/pypoem")
+    endif ()
+    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/tests/pypoem/pypoem/__init__.py")
+        file(TOUCH "${CMAKE_SOURCE_DIR}/tests/pypoem/pypoem/__init__.py")
+    endif ()
 endif()
 
 

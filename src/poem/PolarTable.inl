@@ -225,82 +225,11 @@ namespace poem {
     return m_values[index];
   }
 
-  template<typename T>
-  T PolarTable<T>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method_) const {
-
-    // FIXME: si on a une table de int, on devrait reagir de maniere diffente et renvoyer un nearest
-    //  remplacer bound_check par un enum ERROR, SATURATE, EXTRAPOLATE
-
-    if (m_type != POEM_DOUBLE) {
-      return nearest(dimension_point, oob_method_);
-    }
-
-    if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
-      LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
-      CRITICAL_ERROR_POEM
-    }
-
-    if (!m_interpolator) {
-      const_cast<PolarTable<T> *>(this)->build_interpolator();
-    }
-
-    // Out of bound management
-    auto dimension_point_ = dimension_point; // TODO: voir si ca copie correctement
-    size_t index = 0;
-    for (auto &coord: dimension_point_) {
-      if (coord < m_dimension_grid->min(index) || coord > m_dimension_grid->max(index)) {
-        switch (oob_method_) {
-          case ERROR: {
-            LogCriticalError("In PolarTable {}, while calling interp, out of bound value found for "
-                             "dimension {}. Min: {}, Max: {}, Value: {}",
-                             m_name, m_dimension_grid->dimension_set()->name(index),
-                             m_dimension_grid->min(index), m_dimension_grid->max(index),
-                             coord);
-            LogCriticalError("Following your context, you may consider using SATURATE out of bound method "
-                             "in interpolation");
-            CRITICAL_ERROR_POEM
-          }
-          case SATURATE: {
-            dimension_point_[index] = coord < m_dimension_grid->min(index) ?
-                                      m_dimension_grid->min(index) : m_dimension_grid->max(index);
-          }
-            break;
-          case EXTRAPOLATE: {
-            NIY_POEM
-          }
-        }
-      }
-      index++;
-    }
-
-
-    // FIXME: ce switch devrait plutot se trouver dans la class Interpolator !
+  template<typename T> // FIXME: potentiellement supprimer si ca fout la grouille
+  T PolarTable<T>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const {
     T val;
-    switch (dim()) {
-      case 1:
-        val = static_cast<Interpolator<T, 1> *>(m_interpolator.get())->interp(dimension_point_, false);
-        break;
-      case 2:
-        val = static_cast<Interpolator<T, 2> *>(m_interpolator.get())->interp(dimension_point_, false);
-        break;
-      case 3:
-        val = static_cast<Interpolator<T, 3> *>(m_interpolator.get())->interp(dimension_point_, false);
-        break;
-      case 4:
-        val = static_cast<Interpolator<T, 4> *>(m_interpolator.get())->interp(dimension_point_, false);
-        break;
-      case 5:
-        val = static_cast<Interpolator<T, 5> *>(m_interpolator.get())->interp(dimension_point_, false);
-        break;
-      case 6:
-        val = static_cast<Interpolator<T, 6> *>(m_interpolator.get())->interp(dimension_point_, false);
-        break;
-      default:
-        LogCriticalError("ND interpolation not supported for dimensions higher than 6 (found {})", dim());
-        CRITICAL_ERROR_POEM
-    }
-
-    return val;
+    LogCriticalError("interp is unable to deal with type {}", typeid(val).name());
+    CRITICAL_ERROR_POEM
   }
 
   template<typename T>
@@ -337,15 +266,14 @@ namespace poem {
     // Interpolation on every DimensionPoint
     size_t idx = 0;
     for (const auto &dimension_point: new_dimension_grid->dimension_points()) {
-      T val;
       try {
-        val = interp(dimension_point, oob_method);
+        T val = interp(dimension_point, oob_method);
+        sliced_polar_table->set_value(idx, val);
       } catch (const PoemException& e) {
-        LogCriticalError("In PolarTable {}, while using slide method, out of bound error",
+        LogCriticalError("In PolarTable {}, while using slice method, out of bound error",
                          m_name);
         throw e;
       }
-      sliced_polar_table->set_value(idx, val);
       idx++;
     }
 

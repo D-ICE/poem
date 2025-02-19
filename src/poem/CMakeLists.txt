@@ -33,6 +33,7 @@ target_sources(_poem PUBLIC
         PolarNode.cpp
         Polar.cpp
         PolarSet.cpp
+        PolarTable.cpp
         Splitter.cpp
 
         specifications/spec_v0.cpp

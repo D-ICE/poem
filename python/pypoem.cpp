@@ -259,7 +259,7 @@ PYBIND11_MODULE(pypoem, m) {
                        R"pbdoc(Returns a sliced PolarTableDouble)pbdoc",
                        "prescribed_values"_a, "oob_method"_a = "error");
   PolarTableDouble.def("squeeze", py::overload_cast<>(&poem::PolarTable<double>::squeeze),
-                       R"pbdoc(Removes singleton dimensions from PolarTable (inplace))pbdoc");
+                       R"pbdoc(Removes singleton dimensions from PolarTableInt (inplace))pbdoc");
   PolarTableDouble.def("nearest", [](const poem::PolarTable<double> &self,
                                      const std::unordered_map<std::string, double> &point_dict,
                                      const std::string &oob_method) -> double {
@@ -281,7 +281,7 @@ PYBIND11_MODULE(pypoem, m) {
                          return self.nearest(poem::DimensionPoint(dimension_set, array),
                                              poem::string_to_outofbound_method(oob_method));
                        },
-                       R"pbdoc("Get the nearest value for the ")pbdoc",
+                       R"pbdoc("Get the nearest value for the values given as a dictionary")pbdoc",
                        "point_dict"_a, "oob_method"_a = "error");
   PolarTableDouble.def("interp", [](const poem::PolarTable<double> &self,
                                     const std::unordered_map<std::string, double> &point_dict,
@@ -341,62 +341,62 @@ PYBIND11_MODULE(pypoem, m) {
                     R"pbdoc(Get a copy of the PolarTableInt)pbdoc");
   PolarTableInt.def("dimension_grid", &poem::PolarTable<int>::dimension_grid,
                     R"pbdoc(Returns the DimensionGrid associated to the PolarTable)pbdoc");
-//  PolarTableInt.def("slice", [](const poem::PolarTable<int> &self,
-//                                   const std::unordered_map<std::string, double> &prescribed_values,
-//                                   const std::string &oob_method)
-//                           -> std::shared_ptr<poem::PolarTable<int>> {
-//                         return self.slice(prescribed_values, poem::string_to_outofbound_method(oob_method));
-//                       },
-//                       R"pbdoc(Returns a sliced PolarTableInt)pbdoc",
-//                       "prescribed_values"_a, "oob_method"_a = "error");
-//  PolarTableInt.def("squeeze", py::overload_cast<>(&poem::PolarTable<double>::squeeze),
-//                       R"pbdoc(Removes singleton dimensions from PolarTable (inplace))pbdoc")
-//  PolarTableInt.def("nearest", [](const poem::PolarTable<double> &self,
-//                                     const std::unordered_map<std::string, double> &point_dict,
-//                                     const std::string &oob_method) -> double {
-//                         // TODO: tester les bornes des valeurs
-//                         if (point_dict.size() != self.dim()) {
-//                           LogCriticalError("In PolarTableDouble {} of dimension {}, "
-//                                            "nearest function called with incorrect number of values {}",
-//                                            self.name(), self.dim(), point_dict.size());
-//                           CRITICAL_ERROR_POEM
-//                         }
-//
-//                         auto dimension_set = self.dimension_grid()->dimension_set();
-//                         std::vector<double> array(self.dim());
-//                         size_t i = 0;
-//                         for (const auto &dimension: *dimension_set) {
-//                           array[i] = point_dict.at(dimension->name());
-//                           i++;
-//                         }
-//                         return self.nearest(poem::DimensionPoint(dimension_set, array),
-//                                             poem::string_to_outofbound_method(oob_method));
-//                       },
-//                       R"pbdoc("Get the nearest value for the ")pbdoc",
-//                       "point_dict"_a, "oob_method"_a = "error")
-//  PolarTableInt.def("interp", [](const poem::PolarTable<double> &self,
-//                                    const std::unordered_map<std::string, double> &point_dict,
-//                                    const std::string &oob_method) -> double {
-//                         // TODO: tester les bornes des valeurs
-//                         if (point_dict.size() != self.dim()) {
-//                           LogCriticalError("In PolarTableDouble {} of dimension {}, "
-//                                            "interp function called with incorrect number of values {}",
-//                                            self.name(), self.dim(), point_dict.size());
-//                           CRITICAL_ERROR_POEM
-//                         }
-//
-//                         auto dimension_set = self.dimension_grid()->dimension_set();
-//                         std::vector<double> array(self.dim());
-//                         size_t i = 0;
-//                         for (const auto &dimension: *dimension_set) {
-//                           array[i] = point_dict.at(dimension->name());
-//                           i++;
-//                         }
-//                         return self.interp(poem::DimensionPoint(dimension_set, array),
-//                                            poem::string_to_outofbound_method(oob_method));
-//                       },
-//                       R"pbdoc("Get an interpolated value at point_dict")pbdoc",
-//                       "point_dict"_a, "oob_method"_a = "error")
+  PolarTableInt.def("slice", [](const poem::PolarTable<int> &self,
+                                const std::unordered_map<std::string, double> &prescribed_values,
+                                const std::string &oob_method)
+                        -> std::shared_ptr<poem::PolarTable<int>> {
+                      return self.slice(prescribed_values, poem::string_to_outofbound_method(oob_method));
+                    },
+                    R"pbdoc(Returns a sliced PolarTableInt)pbdoc",
+                    "prescribed_values"_a, "oob_method"_a = "error");
+  PolarTableInt.def("squeeze", py::overload_cast<>(&poem::PolarTable<int>::squeeze),
+                    R"pbdoc(Removes singleton dimensions from PolarTableInt (inplace))pbdoc");
+  PolarTableInt.def("nearest", [](const poem::PolarTable<int> &self,
+                                  const std::unordered_map<std::string, double> &point_dict,
+                                  const std::string &oob_method) -> int {
+                      // TODO: tester les bornes des valeurs
+                      if (point_dict.size() != self.dim()) {
+                        LogCriticalError("In PolarTableDouble {} of dimension {}, "
+                                         "nearest function called with incorrect number of values {}",
+                                         self.name(), self.dim(), point_dict.size());
+                        CRITICAL_ERROR_POEM
+                      }
+
+                      auto dimension_set = self.dimension_grid()->dimension_set();
+                      std::vector<double> array(self.dim());
+                      size_t i = 0;
+                      for (const auto &dimension: *dimension_set) {
+                        array[i] = point_dict.at(dimension->name());
+                        i++;
+                      }
+                      return self.nearest(poem::DimensionPoint(dimension_set, array),
+                                          poem::string_to_outofbound_method(oob_method));
+                    },
+                    R"pbdoc("Get the nearest value for the values given as a dictionary")pbdoc",
+                    "point_dict"_a, "oob_method"_a = "error");
+  PolarTableInt.def("interp", [](const poem::PolarTable<int> &self,
+                                 const std::unordered_map<std::string, double> &point_dict,
+                                 const std::string &oob_method) -> int {
+                      // TODO: tester les bornes des valeurs
+                      if (point_dict.size() != self.dim()) {
+                        LogCriticalError("In PolarTableDouble {} of dimension {}, "
+                                         "interp function called with incorrect number of values {}",
+                                         self.name(), self.dim(), point_dict.size());
+                        CRITICAL_ERROR_POEM
+                      }
+
+                      auto dimension_set = self.dimension_grid()->dimension_set();
+                      std::vector<double> array(self.dim());
+                      size_t i = 0;
+                      for (const auto &dimension: *dimension_set) {
+                        array[i] = point_dict.at(dimension->name());
+                        i++;
+                      }
+                      return self.interp(poem::DimensionPoint(dimension_set, array),
+                                         poem::string_to_outofbound_method(oob_method));
+                    },
+                    R"pbdoc("Get an interpolated value at point_dict")pbdoc",
+                    "point_dict"_a, "oob_method"_a = "error");
 
 
   m.def("make_polar_table_int", &poem::make_polar_table_int,

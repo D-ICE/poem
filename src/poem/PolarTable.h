@@ -337,7 +337,7 @@ namespace poem {
     /**
      * Get the value of the interpolation to dimension_point
      */
-    [[nodiscard]] T interp(const DimensionPoint &dimension_point_, OUT_OF_BOUND_METHOD oob_method) const;
+    [[nodiscard]] T interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const;
 
     /**
      * Get a slice in the table given values for different dimensions
@@ -374,11 +374,18 @@ namespace poem {
     void build_interpolator();
 
 
-
    private:
     std::vector<T> m_values;
 
   };
+
+  template<>
+  [[nodiscard]] double
+  PolarTable<double>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const;
+
+  template<>
+  [[nodiscard]] int
+  PolarTable<int>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const;
 
 
   template<typename T>

@@ -29,3 +29,5 @@ python/pypoem/_version.py
 
 dist
 linuxwheels
+
+tests/pypoem/pypoem
