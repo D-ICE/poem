@@ -505,15 +505,19 @@ namespace poem {
             switch (nc_var.second.getType().getTypeClass()) {
               case netCDF::NcType::nc_DOUBLE:
                 polar_table = make_polar_table_double(nc_var.first, unit, description, dimension_grid);
+                nc_var.second.getVar(polar_table->as_polar_table_double()->values().data());
                 break;
               case netCDF::NcType::nc_INT:
                 polar_table = make_polar_table_int(nc_var.first, unit, description, dimension_grid);
+                nc_var.second.getVar(polar_table->as_polar_table_int()->values().data());
                 break;
               default:
                 LogWarningError("In group {}, PolarTable {} of type {} not managed by POEM. Skip...",
                                 group.getName(true), nc_var.first, nc_var.second.getType().getTypeClassName());
                 continue;
             }
+            // FIXME: il semblerait qu'on le lise pas les valeurs de la PolarTable !!!
+
             read_attributes(nc_var.second, polar_table);
             polar_tables.push_back(polar_table);
 
@@ -525,7 +529,7 @@ namespace poem {
         POLAR_MODE polar_mode = string_to_polar_mode(polar_mode_str);
         polar_node = make_polar(group_name, polar_mode, dimension_grid);
 
-        // Attaching every PolarTable to the Polar
+        // Attaching each created PolarTable to the Polar
         for (const auto &polar_table: polar_tables) {
           polar_node->add_child(polar_table, false);
         }

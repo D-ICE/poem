@@ -12,7 +12,9 @@
 namespace poem {
 
   template<typename T>
-  PolarTable<T>::PolarTable(const std::string &name, const std::string &unit, const std::string &description,
+  PolarTable<T>::PolarTable(const std::string &name,
+                            const std::string &unit,
+                            const std::string &description,
                             POEM_DATATYPE type, std::shared_ptr<DimensionGrid> dimension_grid) :
       PolarTableBase(name, unit, description, type, dimension_grid),
       m_values(dimension_grid->size()) {

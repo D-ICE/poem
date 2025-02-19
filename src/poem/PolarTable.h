@@ -175,7 +175,6 @@ namespace poem {
     return oob_str;
   }
 
-
   /**
    * A multidimensional numerical table representing a variable
    *
@@ -367,6 +366,15 @@ namespace poem {
 
     [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid,
                                                           OUT_OF_BOUND_METHOD oob_method) const;
+
+    int memsize() const {
+      return sizeof(*this); // pour monitorer la taille de l'objet lors des devs de JIT loader
+    }
+
+    void jit_load() {NIY_POEM}
+
+    void jit_unload() {NIY_POEM}
+
 
    private:
     void reset();

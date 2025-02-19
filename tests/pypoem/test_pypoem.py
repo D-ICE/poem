@@ -6,6 +6,7 @@ import numpy as np
 if __name__ == '__main__':
 
     print("pypoem module is taken from %s" % pypoem.__file__)
+    print("pypoem version is v%s" % pypoem.poem_lib_version())
 
     STW = pypoem.make_dimension("STW_dim", "kt", "Speed Through Water")
     TWS = pypoem.make_dimension("TWS_dim", "kt", "True Wind Speed")
