@@ -54,7 +54,7 @@ cpp-tests:
     - make poem_tests -j6
     - cd bin/tests
     - ./poem_tests
-    # TODO: upload vessel.nc genere par le test poem::PolarNode sur le bucket AWS S3 de testing polarplot
+    - aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
 
 
 pypoem-linux-tests:

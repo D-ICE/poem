@@ -283,16 +283,16 @@ TEST(poem, PolarNode) {
             "/vessel/ballast_load/ballast_one_engine/MPPP/TOTAL_POWER");
 
   // Writing
-  to_netcdf(vessel, "vessel", "vessel.nc");
+  to_netcdf(vessel, "vessel", "poem_testing_spec_v1.nc");
   // Reading back
-  auto vessel_ = load("vessel.nc");
+  auto vessel_ = load("poem_testing_spec_v1.nc");
   // Writing once again
-  to_netcdf(vessel_, "vessel", "vessel_.nc");
+  to_netcdf(vessel_, "vessel", "poem_testing_spec_v1_.nc");
 
   // Reading once again
-  auto vessel__ = load("vessel_.nc");
+  auto vessel_2 = load("poem_testing_spec_v1_.nc");
 
-  ASSERT_EQ(*vessel_, *vessel__);
+  ASSERT_EQ(*vessel_, *vessel_2);
 
 }
 
@@ -342,7 +342,7 @@ TEST(poem, read_poem_v0_example) {
 //// TODO: SUPPRIMER !!!
 //TEST(poem, other) {
 //
-//  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/nok/vessel.nc");
+//  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/nok/poem_testing_spec_v1.nc");
 //
 //  auto layout = vessel->layout();
 ////  std::ofstream output("layout.json");

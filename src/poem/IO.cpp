@@ -6,6 +6,7 @@
 
 #include <semver/semver.hpp>
 #include <datetime.h>
+#include <cools/string/StringUtils.h>
 
 #include "PolarTable.h"
 #include "Polar.h"
@@ -223,7 +224,15 @@ namespace poem {
     root_group.putAtt("POEM_LIBRARY_VERSION", git::version_full());
     root_group.putAtt("POEM_SPECIFICATION_VERSION", "v" + std::to_string(current_poem_standard_version()));
     root_group.putAtt("date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
-    root_group.putAtt("VESSEL_NAME", vessel_name);
+
+    std::string vessel_name_(vessel_name);
+    cools::string::MakeItAValidVariableName(vessel_name_);
+    if (vessel_name_ != vessel_name) {
+      LogWarningError(R"(Vessel name "{}" was not compliant and has been replaced by "{}")",
+                      vessel_name, vessel_name_);
+    }
+
+    root_group.putAtt("VESSEL_NAME", vessel_name_);
 
     root_group.close();
   }
@@ -241,7 +250,7 @@ namespace poem {
     netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
 
     int major_version;
-    if (datafile.getAtts().contains("polar_type") && datafile.getAtts().contains("control_variable")) {
+    if (datafile.getAtts().contains("polar_type")) {
       major_version = 0;
 
     } else {
@@ -432,7 +441,7 @@ namespace poem {
         if (polar_tables_map.contains(polar_table->name())) {
           std::string new_name = polar_tables_map[polar_table->name()];
           LogNormalInfo(R"(Renaming PolarTable "{}" into "{}" to be compliant with last POEM specification v{})",
-          polar_table->name(), new_name, current_poem_standard_version());
+                        polar_table->name(), new_name, current_poem_standard_version());
           polar_table->change_name(new_name);
         }
         polar_tables.push_back(polar_table);
