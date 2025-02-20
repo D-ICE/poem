@@ -18,6 +18,15 @@ namespace poem {
     }
   }
 
+  bool Attributes::remove_attribute(const std::string &name) {
+    bool erased = false;
+    if (m_attributes.contains(name)) {
+      m_attributes.erase(name);
+      erased = true;
+    }
+    return erased;
+  }
+
   bool Attributes::contains(const std::string &name) const {
     return m_attributes.find(name) != m_attributes.end();
   }

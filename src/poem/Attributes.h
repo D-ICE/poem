@@ -22,6 +22,8 @@ namespace poem {
 
     void add_attributes(const Attributes &other);
 
+    bool remove_attribute(const std::string &name);
+
     bool contains(const std::string &name) const;
 
     const std::string &operator[](const std::string &name) const;
@@ -36,8 +38,9 @@ namespace poem {
 
     Iter end() const;
 
-    bool operator==(const Attributes& other) const;
-    bool operator!=(const Attributes& other) const;
+    bool operator==(const Attributes &other) const;
+
+    bool operator!=(const Attributes &other) const;
 
    private:
     Map m_attributes;

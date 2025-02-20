@@ -241,15 +241,23 @@ namespace poem {
     netCDF::NcFile datafile(std::string(filename), netCDF::NcFile::read);
 
     int major_version;
-    if (datafile.getAtts().contains("POEM_SPECIFICATION_VERSION")) {
-      std::string spec_version;
-      datafile.getAtt("POEM_SPECIFICATION_VERSION").getValues(spec_version);
-      major_version = (int) semver::version::parse(spec_version, false).major();
+    if (datafile.getAtts().contains("polar_type") && datafile.getAtts().contains("control_variable")) {
+      major_version = 0;
 
     } else {
-      // This is likely to be a file with version v0
-      major_version = 0;
+      // POEM spec version >= 1
+      if (datafile.getAtts().contains("POEM_SPECIFICATION_VERSION")) {
+        std::string spec_version;
+        datafile.getAtt("POEM_SPECIFICATION_VERSION").getValues(spec_version);
+        major_version = (int) semver::version::parse(spec_version, false).major();
+
+      } else {
+        // This is likely to be a file with version v0
+        LogCriticalError("Unable to determine specification version of this file");
+        CRITICAL_ERROR_POEM
+      }
     }
+
     datafile.close();
 
     return major_version;
@@ -262,7 +270,6 @@ namespace poem {
       "POEM_MODE",
       "POEM_LIBRARY_VERSION",
       "POEM_SPECIFICATION_VERSION",
-      "VESSEL_NAME",
       "date"
   };
 
@@ -571,7 +578,6 @@ namespace poem {
   }
 
   std::shared_ptr<PolarNode> load(const std::string &filename,
-//                                  const std::string &root_name,
                                   bool spec_checking,
                                   bool verbose) {
 

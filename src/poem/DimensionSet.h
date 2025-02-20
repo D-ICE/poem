@@ -23,35 +23,34 @@ namespace poem {
     using DimensionVector = std::vector<std::shared_ptr<Dimension>>;
     using DimensionSetConstIter = DimensionVector::const_iterator;
 
-    explicit DimensionSet(const DimensionVector dimensions);
+    explicit DimensionSet(const DimensionVector &dimensions);
 
-    size_t size() const;
+    [[nodiscard]] size_t size() const;
 
-    const std::string &name(size_t i) const;
+    [[nodiscard]] const std::string &name(size_t i) const;
 
-    size_t index(const std::string &name) const;
+    [[nodiscard]] size_t index(const std::string &name) const;
 
-    bool contains(const std::string &name) const;
+    [[nodiscard]] bool contains(const std::string &name) const;
 
-    std::shared_ptr<Dimension> dimension(size_t i) const;
+    [[nodiscard]] std::shared_ptr<Dimension> dimension(size_t i) const;
 
-    std::shared_ptr<Dimension> dimension(const std::string &name) const;
+    [[nodiscard]] std::shared_ptr<Dimension> dimension(const std::string &name) const;
 
     bool operator==(const DimensionSet& other) const;
 
     bool operator!=(const DimensionSet& other) const;
 
-    DimensionSetConstIter begin() const;
+    [[nodiscard]] DimensionSetConstIter begin() const;
 
-    DimensionSetConstIter end() const;
+    [[nodiscard]] DimensionSetConstIter end() const;
 
    private:
     DimensionVector m_dimensions;
-    std::unordered_map<std::string, size_t> m_map;
 
   };
 
-  inline std::shared_ptr<DimensionSet> make_dimension_set(const std::vector<std::shared_ptr<Dimension>> dimensions) {
+  inline std::shared_ptr<DimensionSet> make_dimension_set(const std::vector<std::shared_ptr<Dimension>> &dimensions) {
     return std::make_shared<DimensionSet>(dimensions);
   }
 

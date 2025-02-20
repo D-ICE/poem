@@ -8,25 +8,31 @@
 namespace poem {
 
 
-  DimensionSet::DimensionSet(const DimensionSet::DimensionVector dimensions) : m_dimensions(dimensions) {
-    // Building map (acceleration)
-    size_t idx = 0;
-    for (const auto &dimension: dimensions) {
-      m_map.insert({dimension->name(), idx});
-      idx++;
-    }
-  }
+  DimensionSet::DimensionSet(const DimensionSet::DimensionVector &dimensions) : m_dimensions(dimensions) {}
 
   size_t DimensionSet::size() const { return m_dimensions.size(); }
 
   const std::string &DimensionSet::name(size_t i) const { return m_dimensions.at(i)->name(); }
 
   size_t DimensionSet::index(const std::string &name) const {
-    return m_map.at(name);
+    auto it = std::find_if(m_dimensions.begin(), m_dimensions.end(),
+                           [name](const std::shared_ptr<Dimension>& dim) -> bool {
+                             return dim->name() == name;
+                           });
+
+    if (it == m_dimensions.end()) {
+      LogCriticalError("In DimensionSet, dimension {} not found", name);
+      CRITICAL_ERROR_POEM
+    }
+    return it - m_dimensions.begin(); // TODO: tester
   }
 
   bool DimensionSet::contains(const std::string &name) const {
-    return m_map.contains(name);
+    auto it = std::find_if(m_dimensions.begin(), m_dimensions.end(),
+                           [name](const std::shared_ptr<Dimension>& dim) -> bool {
+                             return dim->name() == name;
+                           });
+    return it != m_dimensions.end(); // TODO: tester
   }
 
   std::shared_ptr<Dimension> DimensionSet::dimension(size_t i) const {
