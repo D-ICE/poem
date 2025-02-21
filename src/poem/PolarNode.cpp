@@ -106,11 +106,20 @@ namespace poem {
 
   }
 
-  std::shared_ptr<PolarNode> PolarNode::from_path(const fs::path &path) {
+  std::shared_ptr<PolarNode> PolarNode::polar_node_from_path(const fs::path &path) {
 
     fs::path path_ = path;
     if (path_.is_absolute()) {
-      path_ = path_.relative_path();
+      if (path == "/") {
+        if (is_root()) {
+          path_ = m_name;
+        } else {
+          LogCriticalError("To use / as a shortcut for /VESSEL_NAME, current node must be root");
+          CRITICAL_ERROR_POEM
+        }
+      } else {
+        path_ = path_.relative_path();
+      }
     }
 
     auto iter = path_.begin();
@@ -132,10 +141,25 @@ namespace poem {
       for (; iter != path_.end(); ++iter) {
         next_path = next_path / *iter;
       }
-      polar_node = child<PolarNode>(next_node_name)->from_path(next_path);
+      polar_node = child<PolarNode>(next_node_name)->polar_node_from_path(next_path);
     }
 
     return polar_node;
+  }
+
+  bool PolarNode::exists(const fs::path &path) {
+    bool exists;
+    if (path == "/") {
+      return true;
+    }
+
+    try {
+      polar_node_from_path(path);
+    } catch (const std::exception &e) {
+      return false;
+    }
+
+    return true;
   }
 
   json PolarNode::layout() const {
@@ -146,7 +170,7 @@ namespace poem {
 
     for (const auto &path: paths) {
 
-      auto polar_table = const_cast<PolarNode *>(this)->from_path(path)->as_polar_table();
+      auto polar_table = const_cast<PolarNode *>(this)->polar_node_from_path(path)->as_polar_table();
 
       // Register DimensionGrid from parent
       auto parent = polar_table->parent<Polar>();
@@ -187,6 +211,11 @@ namespace poem {
 
   std::shared_ptr<PolarNode> make_polar_node(const std::string &name, const std::string &description) {
     return std::make_shared<PolarNode>(name, description);
+  }
+
+  std::shared_ptr<PolarNode> mount(const std::shared_ptr<PolarNode> &from_node, const std::string &from_path,
+                                   const std::shared_ptr<PolarNode> &to_node, const std::string &to_path) {
+    NIY_POEM
   }
 
 }  // poem

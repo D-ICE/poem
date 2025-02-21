@@ -178,7 +178,9 @@ PYBIND11_MODULE(pypoem, m) {
   // ===================================================================================================================
   py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
   PolarNode.doc() = R"pbdoc("A PolarNode is the generic type for tree-structured Polar")pbdoc";
+
   PolarNode.def(py::init<const std::string &, const std::string &>());
+
   PolarNode.def("name", &poem::PolarNode::name,
                 R"pbdoc(Get the name of the PolarNode)pbdoc");
   PolarNode.def("description", &poem::PolarNode::description,
@@ -187,8 +189,17 @@ PYBIND11_MODULE(pypoem, m) {
                   return self.full_name();
                 },
                 R"pbdoc(Get the full name of the PolarNode)pbdoc");
+
+  PolarNode.def("child", &poem::PolarNode::child<poem::PolarNode>,
+                R"pbdoc(Returns the child from name)pbdoc",
+                "name"_a);
   PolarNode.def("children", &poem::PolarNode::children<poem::PolarNode>,
                 R"pbdoc(Returns a list of children of current PolarNode)pbdoc");
+
+  PolarNode.def("is_polar_node", [](const poem::PolarNode &self) -> bool {
+                  return self.polar_node_type() == poem::POLAR_NODE;
+                },
+                R"pbdoc(Returns True if the PolarNode is a PolarNode)pbdoc");
   PolarNode.def("is_polar_set", [](const poem::PolarNode &self) -> bool {
                   return self.polar_node_type() == poem::POLAR_SET;
                 },
@@ -197,13 +208,43 @@ PYBIND11_MODULE(pypoem, m) {
                   return self.polar_node_type() == poem::POLAR;
                 },
                 R"pbdoc(Returns True if the PolarNode is a PolarSet)pbdoc");
-  PolarNode.def("as_polar", &poem::PolarNode::as_polar, R"pbdoc(Returns the associated Polar)pbdoc");
-  PolarNode.def("is_polar_table", [](const poem::PolarNode &self) -> bool {
+  PolarNode.def("is_polar_table", [](poem::PolarNode &self) -> bool {
                   return self.polar_node_type() == poem::POLAR_TABLE;
                 },
-                R"pbdoc(Returns True if the PolarNode is a PolarSet)pbdoc");
-//  PolarNode.def("as_polar_set", &poem::PolarNode::as_polar_set);
-//  PolarNode.def("as_polar", &poem::PolarNode::as_polar);
+                R"pbdoc(Returns True if the PolarNode is a PolarTable)pbdoc");
+  PolarNode.def("is_polar_table_double", [](poem::PolarNode &self) -> bool {
+                  return self.polar_node_type() == poem::POLAR_TABLE
+                         && (self.as_polar_table()->type() == poem::POEM_DOUBLE);
+                },
+                R"pbdoc(Returns True if the PolarNode is a PolarTableDouble)pbdoc");
+  PolarNode.def("is_polar_table_int", [](poem::PolarNode &self) -> bool {
+                  return self.polar_node_type() == poem::POLAR_TABLE
+                         && self.as_polar_table()->type() == poem::POEM_INT;
+                },
+                R"pbdoc(Returns True if the PolarNode is a PolarTableInt)pbdoc");
+
+  PolarNode.def("as_polar_set", &poem::PolarNode::as_polar_set, R"pbdoc(Returns the associated PolarSet)pbdoc");
+  PolarNode.def("as_polar", &poem::PolarNode::as_polar, R"pbdoc(Returns the associated Polar)pbdoc");
+  PolarNode.def("as_polar_table_double", [](std::shared_ptr<poem::PolarNode> &self)
+                    -> std::shared_ptr<poem::PolarTable<double>> {
+                  return self->as_polar_table()->as_polar_table_double();
+                },
+                R"pbdoc(Returns the associated PolarTableDouble)pbdoc");
+  PolarNode.def("as_polar_table_int", [](std::shared_ptr<poem::PolarNode> &self)
+                    -> std::shared_ptr<poem::PolarTable<int>> {
+                  return self->as_polar_table()->as_polar_table_int();
+                },
+                R"pbdoc(Returns the associated PolarTableInt)pbdoc");
+
+  PolarNode.def("exists", [](poem::PolarNode &self, const std::string &path) -> bool {
+                  return self.exists(path);
+                },
+                R"pbdoc(Returns True if the path exists)pbdoc");
+  PolarNode.def("polar_node_from_path", [](poem::PolarNode &self, const std::string &path)
+                    -> std::shared_ptr<poem::PolarNode> {
+                  return self.polar_node_from_path(path);
+                },
+                R"pbdoc(Get a PolarNode from path)pbdoc");
 
   PolarNode.def("layout", [](const poem::PolarNode &self, const int indent) -> std::string {
                   json json_node = self.layout();

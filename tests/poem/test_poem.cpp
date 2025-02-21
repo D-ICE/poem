@@ -312,7 +312,7 @@ TEST(poem, read_poem_v0_example) {
   vessel->polar_tables_paths(polar_tables_paths);
 
   for (const auto &path: polar_tables_paths) {
-    auto polar_table = vessel->from_path(path)->as_polar_table();
+    auto polar_table = vessel->polar_node_from_path(path)->as_polar_table();
     switch (polar_table->type()) {
       case poem::POEM_DOUBLE: {
         auto polar_table_double = polar_table->as_polar_table_double();
@@ -338,6 +338,17 @@ TEST(poem, read_poem_v0_example) {
   }
 
 }
+
+
+//TEST(poem, mount) {
+//
+//
+//  auto from_root_node = load("MPPP.nc", true, false);
+//  auto to_root_node = load("HPPP.nc", true, false);
+//
+//
+//}
+
 
 //// TODO: SUPPRIMER !!!
 //TEST(poem, other) {

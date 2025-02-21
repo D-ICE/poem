@@ -67,7 +67,9 @@ namespace poem {
 
     void polar_tables_paths(std::vector<std::string> &paths) const;
 
-    std::shared_ptr<PolarNode> from_path(const fs::path &path);
+    std::shared_ptr<PolarNode> polar_node_from_path(const fs::path &path);
+
+    bool exists(const fs::path &path);
 
     std::mutex *mutex() {
       return &m_mutex;
@@ -82,6 +84,10 @@ namespace poem {
   };
 
   std::shared_ptr<PolarNode> make_polar_node(const std::string &name, const std::string &description);
+
+  std::shared_ptr<PolarNode> mount(const std::shared_ptr<PolarNode> &from_node, const std::string &from_path,
+                                   const std::shared_ptr<PolarNode> &to_node, const std::string &to_path);
+
 
 }  // poem
 
