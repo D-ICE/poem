@@ -54,7 +54,7 @@ cpp-tests:
     - make poem_tests -j6
     - cd bin/tests
     - ./poem_tests
-    - aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
+    #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
 
 
 pypoem-linux-tests:

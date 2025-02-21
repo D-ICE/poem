@@ -5,8 +5,11 @@ import numpy as np
 
 root_node = pypoem.load("my_vessel.nc")
 
-# layout = json(root_node.layout())
+layout = json.loads(root_node.layout())
+print(layout)
 
+for polar_table in layout['polar_tables']:
+    print(polar_table)
 
 
 # We got a path from layout
