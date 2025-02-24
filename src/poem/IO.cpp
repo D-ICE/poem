@@ -379,6 +379,8 @@ namespace poem {
 
             auto dim_ = make_dimension(nc_dim.getName(), unit, description);
             if (dimension_map.contains(dim_->name())) {
+              LogNormalInfo(R"(Renaming Dimension "{}" into "{}" to be compliant with last POEM specification v{})",
+                            dim_->name(), dimension_map[dim_->name()], current_poem_standard_version());
               dim_->change_name(dimension_map[dim_->name()]);
             }
             dimensions.push_back(dim_);
@@ -412,9 +414,11 @@ namespace poem {
         switch (nc_var.second.getType().getTypeClass()) {
           case netCDF::NcType::nc_DOUBLE:
             polar_table = make_polar_table_double(nc_var.first, unit, description, dimension_grid);
+            nc_var.second.getVar(polar_table->as_polar_table_double()->values().data());
             break;
           case netCDF::NcType::nc_INT:
             polar_table = make_polar_table_int(nc_var.first, unit, description, dimension_grid);
+            nc_var.second.getVar(polar_table->as_polar_table_int()->values().data());
             break;
           default:
             LogWarningError("In group {}, PolarTable {} of type {} not managed by POEM. Skip...",

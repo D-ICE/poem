@@ -353,7 +353,8 @@ TEST(poem, read_poem_v0_example) {
 //// TODO: SUPPRIMER !!!
 //TEST(poem, other) {
 //
-//  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/nok/poem_testing_spec_v1.nc");
+////  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/nok/poem_testing_spec_v1.nc");
+//  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/ok/b799ba3fcec6fd8d48b0ea174e9fc7bd748a8b8a3af21b573669fe5f3d503faa.nc");
 //
 //  auto layout = vessel->layout();
 ////  std::ofstream output("layout.json");
