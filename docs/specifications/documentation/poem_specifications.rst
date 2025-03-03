@@ -1,3 +1,5 @@
+.. _poem_specifications:
+
 POEM Specifications
 ===================
 

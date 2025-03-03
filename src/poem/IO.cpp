@@ -7,6 +7,7 @@
 #include <semver/semver.hpp>
 #include <datetime.h>
 #include <cools/string/StringUtils.h>
+#include <dunits/dunits.h>
 
 #include "PolarTable.h"
 #include "Polar.h"
@@ -405,8 +406,12 @@ namespace poem {
         } else {
           nc_var.second.getAtt("unit").getValues(unit);
           nc_var.second.getAtt("description").getValues(description);
-          if (unit.empty()) {
-            unit = "-";
+          if (!dunits::UnitsChecker::getInstance().is_valid_unit(unit, true)) {
+            if (dunits::UnitsChecker::getInstance().is_valid_unit(unit, false)) {
+              unit = dunits::UnitsChecker::to_lower(unit);
+            } else {
+              unit = "-";
+            }
           }
         }
 

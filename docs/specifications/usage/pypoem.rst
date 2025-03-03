@@ -4,14 +4,14 @@ Python package: pypoem
 Usage
 -----
 
+.. note::
+    TODO
 
 Installation
 ------------
 
-From Pypi
-#########
+pypoem is available from Pypi repository. You can thus install pypoem using pip.
 
-From Sources
-############
+.. code-block:: bash
 
-
+    ~$ pip install pypoem
