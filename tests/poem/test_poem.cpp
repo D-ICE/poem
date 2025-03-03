@@ -350,16 +350,16 @@ TEST(poem, read_poem_v0_example) {
 //}
 
 
-// TODO: SUPPRIMER !!!
-TEST(poem, other) {
-
-//  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/nok/poem_testing_spec_v1.nc");
-  auto vessel =
-      load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/b8b20d7d7e90d74ecec3f42cb9dbfa3d37aa26c5925dc9d2bb3c9e4912c6382f.nc");
-
-  auto layout = vessel->layout();
-//  std::ofstream output("layout.json");
-//  output << std::setw(2) << layout << std::endl;
-  std::cout << layout.dump(2) << std::endl;
-
-}
+//// TODO: SUPPRIMER !!!
+//TEST(poem, other) {
+//
+////  auto vessel = load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/nok/poem_testing_spec_v1.nc");
+//  auto vessel =
+//      load("/home/frongere/Documents/DEV_SOFTWARE/poem/tmp/b8b20d7d7e90d74ecec3f42cb9dbfa3d37aa26c5925dc9d2bb3c9e4912c6382f.nc");
+//
+//  auto layout = vessel->layout();
+////  std::ofstream output("layout.json");
+////  output << std::setw(2) << layout << std::endl;
+//  std::cout << layout.dump(2) << std::endl;
+//
+//}
