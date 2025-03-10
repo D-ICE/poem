@@ -186,7 +186,7 @@ PYBIND11_MODULE(pypoem, m) {
   PolarNode.def("description", &poem::PolarNode::description,
                 R"pbdoc(Get the description of the PolarNode)pbdoc");
   PolarNode.def("full_name", [](const poem::PolarNode &self) -> std::string {
-                  return self.full_name();
+                  return self.full_name().string();
                 },
                 R"pbdoc(Get the full name of the PolarNode)pbdoc");
 

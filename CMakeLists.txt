@@ -27,6 +27,11 @@ cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
 cmake_policy(SET CMP0167 NEW) # Boost
 
+# Set CMAKE_CXX_FLAGS for MinGW/Windows
+if (WIN32)
+    string(APPEND CMAKE_CXX_FLAGS " -D_WIN32 -DDATETIME_EXPORTS")
+endif()
+
 #=============================================================================
 # Retrieving the current Git revision
 #=============================================================================

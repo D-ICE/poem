@@ -621,7 +621,7 @@ namespace poem {
     switch (major_version) {
       case 0: {
         root_node = load_v0(root_group);
-        root_node->change_name(fs::path(filename).stem());
+        root_node->change_name(fs::path(filename).stem().string());
       }
         break;
       case 1: {
