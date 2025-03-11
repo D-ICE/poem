@@ -130,6 +130,18 @@ namespace poem {
       return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
     }
 
+    #ifdef POEM_JIT
+
+    void jit_load() override;
+
+    virtual void jit_allocate() = 0;
+
+    void jit_unload() override;
+
+    virtual void jit_deallocate() = 0;
+
+    #endif //POEM_JIT
+
    protected:
     POEM_DATATYPE m_type;
     std::shared_ptr<DimensionGrid> m_dimension_grid;
@@ -367,14 +379,19 @@ namespace poem {
     [[nodiscard]] std::shared_ptr<PolarTable<T>> resample(std::shared_ptr<DimensionGrid> new_dimension_grid,
                                                           OUT_OF_BOUND_METHOD oob_method) const;
 
-    int memsize() const {
-      return sizeof(*this); // pour monitorer la taille de l'objet lors des devs de JIT loader
-    }
+    #ifdef POEM_JIT
 
-    void jit_load() {NIY_POEM}
+//    void jit_load() override;
 
-    void jit_unload() {NIY_POEM}
+    void jit_allocate() override;
 
+//    void jit_unload() override;
+//
+    void jit_deallocate() override;
+
+    int memsize() const override;
+
+    #endif //POEM_JIT
 
    private:
     void reset();

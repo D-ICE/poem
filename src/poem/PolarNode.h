@@ -75,6 +75,15 @@ namespace poem {
       return &m_mutex;
     }
 
+    #ifdef POEM_JIT
+    virtual void jit_load();
+
+    virtual void jit_unload();
+
+    virtual int memsize() const;
+
+    #endif //POEM_JIT
+
    protected:
     POLAR_NODE_TYPE m_polar_node_type;
     std::string m_description;

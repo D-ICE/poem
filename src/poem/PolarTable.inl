@@ -9,6 +9,12 @@
 
 #include "exceptions.h"
 
+#ifdef POEM_JIT
+
+#include "JIT.h"
+
+#endif
+
 namespace poem {
 
   template<typename T>
@@ -16,8 +22,11 @@ namespace poem {
                             const std::string &unit,
                             const std::string &description,
                             POEM_DATATYPE type, std::shared_ptr<DimensionGrid> dimension_grid) :
-      PolarTableBase(name, unit, description, type, dimension_grid),
-      m_values(dimension_grid->size()) {
+      PolarTableBase(name, unit, description, type, dimension_grid)
+  #ifndef POEM_JIT
+  , m_values(dimension_grid->size())
+  #endif //POEM_JIT
+  {
 
     switch (type) {
       case POEM_DOUBLE:
@@ -227,7 +236,8 @@ namespace poem {
     return m_values[index];
   }
 
-  template<typename T> // FIXME: potentiellement supprimer si ca fout la grouille
+  template<typename T>
+  // FIXME: potentiellement supprimer si ca fout la grouille
   T PolarTable<T>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const {
     T val;
     LogCriticalError("interp is unable to deal with type {}", typeid(val).name());
@@ -236,7 +246,8 @@ namespace poem {
 
   template<typename T>
   std::shared_ptr<PolarTable<T>>
-  PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values, OUT_OF_BOUND_METHOD oob_method) const {
+  PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values,
+                       OUT_OF_BOUND_METHOD oob_method) const {
 
     // Check that names are existing
     auto dimension_set = m_dimension_grid->dimension_set();
@@ -271,7 +282,7 @@ namespace poem {
       try {
         T val = interp(dimension_point, oob_method);
         sliced_polar_table->set_value(idx, val);
-      } catch (const PoemException& e) {
+      } catch (const PoemException &e) {
         LogCriticalError("In PolarTable {}, while using slice method, out of bound error",
                          m_name);
         throw e;
@@ -372,6 +383,39 @@ namespace poem {
 
     return resampled_polar_table;
   }
+
+  #ifdef POEM_JIT
+
+//  template<typename T>
+//  void PolarTable<T>::jit_load() {
+//    jit::JITManager::getInstance().load_polar_table(as_polar_table());
+//  }
+
+  template<typename T>
+  void PolarTable<T>::jit_allocate() {
+    m_values.resize(m_dimension_grid->size());
+  }
+
+//  template<typename T>
+//  void PolarTable<T>::jit_unload() {
+//    jit::JITManager::getInstance().unload_polar_table(as_polar_table());
+//    jit_deallocate();
+//  }
+
+  template<typename T>
+  void PolarTable<T>::jit_deallocate() {
+    m_values.clear();
+    m_values.shrink_to_fit();
+  }
+
+  template<typename T>
+  int PolarTable<T>::memsize() const {
+    int size = sizeof(*this);
+    size += m_values.size() * sizeof(T);
+    return size;
+  }
+
+  #endif //POEM_JIT
 
   template<typename T>
   void PolarTable<T>::reset() {

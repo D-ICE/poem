@@ -61,6 +61,10 @@ namespace poem {
 
     std::shared_ptr<Polar> resample(std::shared_ptr<DimensionGrid> new_dimension_grid) const;
 
+    #ifdef POEM_JIT
+    int memsize() const override;
+    #endif //POEM_JIT
+
    private:
     POLAR_MODE m_mode;
     std::shared_ptr<DimensionGrid> m_dimension_grid;

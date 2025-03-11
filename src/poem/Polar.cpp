@@ -81,6 +81,14 @@ namespace poem {
     return new_polar;
   }
 
+  #ifdef POEM_JIT
+  int Polar::memsize() const {
+    // Get the size of the DimensionGrid
+    return m_dimension_grid->memsize() + PolarNode::memsize();
+  }
+
+  #endif // POEM_JIT
+
   std::shared_ptr<Polar>
   make_polar(const std::string &name, POLAR_MODE mode, std::shared_ptr<DimensionGrid> dimension_grid) {
     return std::make_shared<Polar>(name, mode, dimension_grid);

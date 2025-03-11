@@ -20,6 +20,9 @@ option(POEM_BUILD_TOOLS "Build tools" ON)
 option(POEM_ALLOW_DIRTY "When OFF, poem tool usage with uncommitted changes will be " ON)
 option(POEM_BUILD_PYTHON "Build pypoem, the python interface" ON)
 option(POEM_BUILD_POC "Build proof of concept tests" ON)
+option(POEM_MONITORING "Build with monitoring features" OFF)
+option(POEM_JIT "Build with JIT" OFF)
+
 #option(POEM_DEPS_GRAPH "Build the graph dependency of the lib" ON)
 
 cmake_policy(SET CMP0135 NEW)

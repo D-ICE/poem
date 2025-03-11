@@ -71,6 +71,10 @@ namespace poem {
 
     size_t grid_to_index(const std::vector<size_t> &grid_indices) const;
 
+    #ifdef POEM_JIT
+    int memsize() const;
+    #endif //POEM_JIT
+
    private:
     void build_dimension_points() const;
 

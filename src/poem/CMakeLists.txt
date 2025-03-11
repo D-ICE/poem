@@ -46,3 +46,21 @@ set_target_properties(_poem PROPERTIES
 if (POEM_ALLOW_DIRTY)
     target_compile_definitions(_poem INTERFACE ALLOW_DIRTY)
 endif ()
+
+
+if (POEM_JIT)
+    message(STATUS "MONITORING enabled")
+    message(STATUS "JIT enabled")
+    target_compile_definitions(_poem PUBLIC POEM_JIT)
+    target_compile_definitions(_poem PUBLIC POEM_MON)
+    target_sources(_poem PRIVATE JIT.cpp)
+else ()
+    message(STATUS "JIT disabled")
+endif ()
+
+if (POEM_MONITORING AND NOT POEM_JIT)
+    message(STATUS "MONITORING enabled")
+    target_compile_definitions(_poem PUBLIC POEM_MON)
+else ()
+    message(STATUS "MONITORING disabled")
+endif ()

@@ -14,6 +14,10 @@
 #include "PolarSet.h"
 #include "specifications/specs.h"
 
+#ifdef POEM_JIT
+#include "JIT.h"
+#endif
+
 namespace poem {
 
   // ===================================================================================================================
@@ -164,6 +168,8 @@ namespace poem {
   }
 
   void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
+
+    // TODO: si JIT, on pourra ajouter la ref...
 
     switch (polar_node->polar_node_type()) {
 
@@ -530,11 +536,15 @@ namespace poem {
             switch (nc_var.second.getType().getTypeClass()) {
               case netCDF::NcType::nc_DOUBLE:
                 polar_table = make_polar_table_double(nc_var.first, unit, description, dimension_grid);
+                #ifndef POEM_JIT
                 nc_var.second.getVar(polar_table->as_polar_table_double()->values().data());
+                #endif
                 break;
               case netCDF::NcType::nc_INT:
                 polar_table = make_polar_table_int(nc_var.first, unit, description, dimension_grid);
+                #ifndef POEM_JIT
                 nc_var.second.getVar(polar_table->as_polar_table_int()->values().data());
+                #endif
                 break;
               default:
                 LogWarningError("In group {}, PolarTable {} of type {} not managed by POEM. Skip...",
@@ -595,6 +605,8 @@ namespace poem {
     return load_group(root_group);
   }
 
+
+
   std::shared_ptr<PolarNode> load(const std::string &filename,
                                   bool spec_checking,
                                   bool verbose) {
@@ -641,6 +653,26 @@ namespace poem {
         CRITICAL_ERROR_POEM
     }
     root_group.close();
+
+
+    #ifdef POEM_JIT
+    // TODO: declencher uniquement si JIT enabled (ajouter dans declaration de load ?)
+
+    std::vector<std::string> paths;
+    root_node->polar_tables_paths(paths);
+
+    // TODO: voir comment faire autrement ? On voudrait register tous les PolarNode...
+    for (const auto& path : paths) {
+      auto table = root_node->polar_node_from_path(path);
+      jit::JITManager::getInstance().register_polar_table(table->as_polar_table(), filename);
+    }
+
+    // TODO: retirer !!
+    jit::JITManager::getInstance().verbose(true);
+    root_node->jit_load();
+//    root_node->jit_unload();
+
+    #endif //POEM_JIT
 
     return root_node;
   }

@@ -209,6 +209,31 @@ namespace poem {
     return node;
   }
 
+  #ifdef POEM_JIT
+
+  void PolarNode::jit_load() {
+    for (const auto &child: children<PolarNode>()) {
+      child->jit_load();
+    }
+  }
+
+  void PolarNode::jit_unload() {
+    for (const auto &child: children<PolarNode>()) {
+      child->jit_unload();
+    }
+  }
+
+  int PolarNode::memsize() const {
+    int size = sizeof(*this);
+    for (const auto &child : children<PolarNode>()) {
+      size += child->memsize();
+    }
+    return size;
+  }
+
+  #endif //POEM_JIT
+
+
   std::shared_ptr<PolarNode> make_polar_node(const std::string &name, const std::string &description) {
     return std::make_shared<PolarNode>(name, description);
   }

@@ -150,6 +150,15 @@ namespace poem {
     return index;
   }
 
+  #ifdef POEM_JIT
+  int DimensionGrid::memsize() const {
+    int size = sizeof(*this);
+    // TODO
+
+    return size;
+  }
+  #endif //POEM_JIT
+
   void DimensionGrid::build_dimension_points() const {
     if (!is_filled()) {
       LogCriticalError("DimensionGrid is not fully filled");

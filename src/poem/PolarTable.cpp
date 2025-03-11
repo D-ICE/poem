@@ -6,6 +6,18 @@
 
 namespace poem {
 
+  #ifdef POEM_JIT
+
+  void PolarTableBase::jit_load() {
+    jit::JITManager::getInstance().load_polar_table(as_polar_table());
+  }
+
+  void PolarTableBase::jit_unload() {
+    jit::JITManager::getInstance().unload_polar_table(as_polar_table());
+  }
+
+  #endif //POEM_JIT
+
   template<>
   double PolarTable<double>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const {
 
@@ -89,5 +101,6 @@ namespace poem {
                               poem::OUT_OF_BOUND_METHOD oob_method) const {
     return nearest(dimension_point, oob_method);
   }
+
 
 }  // poem
