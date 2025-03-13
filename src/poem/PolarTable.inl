@@ -22,11 +22,11 @@ namespace poem {
                             const std::string &unit,
                             const std::string &description,
                             POEM_DATATYPE type, std::shared_ptr<DimensionGrid> dimension_grid) :
-      PolarTableBase(name, unit, description, type, dimension_grid)
-  #ifndef POEM_JIT
-  , m_values(dimension_grid->size())
-  #endif //POEM_JIT
-  {
+      PolarTableBase(name, unit, description, type, dimension_grid) {
+
+    #ifndef POEM_JIT
+    m_values.resize(dimension_grid->size());
+    #endif //POEM_JIT
 
     switch (type) {
       case POEM_DOUBLE:
@@ -86,43 +86,84 @@ namespace poem {
   }
 
   template<typename T>
+  bool PolarTable<T>::is_populated() const {
+    return m_values.size() == m_dimension_grid->size();
+  }
+
+  template<typename T>
   void PolarTable<T>::set_value(size_t idx, const T &value) {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     m_values[idx] = value;
     reset();
   }
 
   template<typename T>
   void PolarTable<T>::set_value(std::vector<size_t> grid_indices, const T &value) {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     m_values[m_dimension_grid->grid_to_index(grid_indices)] = value;
+    reset();
   }
 
   template<typename T>
   const vector<T> &PolarTable<T>::values() const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     return m_values;
   }
 
   template<typename T>
   vector<T> &PolarTable<T>::values() {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
+    reset(); // FIXME: voir ou est utilise cette methode...
+
     return m_values;
   }
 
   template<typename T>
   void PolarTable<T>::set_values(const vector<T> &new_values) {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     if (new_values.size() != m_values.size()) {
       LogCriticalError("Attempting to set values in PolarTable of different size ({} and {})",
                        m_values.size(), new_values.size());
       CRITICAL_ERROR_POEM
     }
     m_values = new_values;
+
+    reset();
   }
 
   template<typename T>
   void PolarTable<T>::fill_with(T value) {
     m_values = std::vector<T>(dimension_grid()->size(), value);
+    reset();
   }
 
   template<typename T>
   std::shared_ptr<PolarTable<T>> PolarTable<T>::copy() const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     auto polar_table = std::make_shared<PolarTable<T>>(m_name, m_unit, m_description, m_type, m_dimension_grid);
     polar_table->set_values(m_values);
     return polar_table;
@@ -130,20 +171,37 @@ namespace poem {
 
   template<typename T>
   void PolarTable<T>::multiply_by(const T &coeff) {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     for (auto &val: m_values) {
       val *= coeff;
     }
+    reset();
   }
 
   template<typename T>
   void PolarTable<T>::offset(const T &val) {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     for (auto &val_: m_values) {
       val_ += val;
     }
+    reset();
   }
 
   template<typename T>
   void PolarTable<T>::sum(std::shared_ptr<PolarTable<T>> other) {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     if (other->dimension_grid()->dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
       CRITICAL_ERROR_POEM
@@ -156,17 +214,29 @@ namespace poem {
     for (size_t idx = 0; idx < size(); ++idx) {
       m_values[idx] += other->m_values[idx];
     }
+    reset();
   }
 
   template<typename T>
   void PolarTable<T>::abs() {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     for (auto &val: m_values) {
       val = std::abs(val);
     }
+    reset();
   }
 
   template<typename T>
   T PolarTable<T>::mean() const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     T mean = 0;
     for (const auto &val: m_values) {
       mean += val;
@@ -176,6 +246,11 @@ namespace poem {
 
   template<typename T>
   bool PolarTable<T>::operator==(const PolarTableBase &other) const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     if (m_type != other.type()) return false;
     auto other_ = static_cast<const PolarTable<T> *>(&other);
     bool equal = *m_dimension_grid == *other_->m_dimension_grid;
@@ -191,6 +266,10 @@ namespace poem {
 
   template<typename T>
   T PolarTable<T>::nearest(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method_) const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::nearest] DimensionPoint has not the same DimensionSet as the PolarTable");
@@ -237,10 +316,10 @@ namespace poem {
   }
 
   template<typename T>
-  // FIXME: potentiellement supprimer si ca fout la grouille
+  // FIXME: potentiellement supprimer si ca introduit du bug...
   T PolarTable<T>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const {
-    T val;
-    LogCriticalError("interp is unable to deal with type {}", typeid(val).name());
+//    T val;
+    LogCriticalError("interp is unable to deal with type {}", typeid(T).name());
     CRITICAL_ERROR_POEM
   }
 
@@ -248,6 +327,10 @@ namespace poem {
   std::shared_ptr<PolarTable<T>>
   PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values,
                        OUT_OF_BOUND_METHOD oob_method) const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
 
     // Check that names are existing
     auto dimension_set = m_dimension_grid->dimension_set();
@@ -295,6 +378,11 @@ namespace poem {
 
   template<typename T>
   bool PolarTable<T>::squeeze() {
+
+    #ifdef POEM_JIT
+    jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     // Number of dimensions to squeeze
     size_t n = dim();
     for (size_t i = 0; i < dim(); ++i) {
@@ -333,6 +421,11 @@ namespace poem {
 
   template<typename T>
   std::shared_ptr<PolarTable<T>> PolarTable<T>::squeeze() const {
+
+    #ifdef POEM_JIT
+    const_cast<PolarTable<T>*>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
+
     std::shared_ptr<PolarTable<T>> polar_table;
 
     auto polar_table_ = copy();
@@ -386,26 +479,17 @@ namespace poem {
 
   #ifdef POEM_JIT
 
-//  template<typename T>
-//  void PolarTable<T>::jit_load() {
-//    jit::JITManager::getInstance().load_polar_table(as_polar_table());
-//  }
-
   template<typename T>
   void PolarTable<T>::jit_allocate() {
     m_values.resize(m_dimension_grid->size());
+    reset();
   }
-
-//  template<typename T>
-//  void PolarTable<T>::jit_unload() {
-//    jit::JITManager::getInstance().unload_polar_table(as_polar_table());
-//    jit_deallocate();
-//  }
 
   template<typename T>
   void PolarTable<T>::jit_deallocate() {
     m_values.clear();
     m_values.shrink_to_fit();
+    reset();
   }
 
   template<typename T>

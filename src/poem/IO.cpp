@@ -15,7 +15,9 @@
 #include "specifications/specs.h"
 
 #ifdef POEM_JIT
+
 #include "JIT.h"
+
 #endif
 
 namespace poem {
@@ -313,7 +315,7 @@ namespace poem {
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
   }
 
-  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group) {
+  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group, const std::string &filename) {
 
     std::unordered_map<std::string, std::string> dimension_map{
         {"STW_kt",  "STW_dim"},
@@ -474,7 +476,7 @@ namespace poem {
     return polar;
   }
 
-  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup &group) {
+  std::shared_ptr<PolarNode> load_group(const netCDF::NcGroup &group, const std::string &filename) {
 
     std::shared_ptr<PolarNode> polar_node;
 
@@ -538,13 +540,21 @@ namespace poem {
                 polar_table = make_polar_table_double(nc_var.first, unit, description, dimension_grid);
                 #ifndef POEM_JIT
                 nc_var.second.getVar(polar_table->as_polar_table_double()->values().data());
-                #endif
+                #else
+                if (!jit::JITManager::getInstance().enabled()) {
+                  nc_var.second.getVar(polar_table->as_polar_table_double()->values().data());
+                }
+                #endif //POEM_JIT
                 break;
               case netCDF::NcType::nc_INT:
                 polar_table = make_polar_table_int(nc_var.first, unit, description, dimension_grid);
                 #ifndef POEM_JIT
                 nc_var.second.getVar(polar_table->as_polar_table_int()->values().data());
-                #endif
+                #else
+                if (!jit::JITManager::getInstance().enabled()) {
+                  nc_var.second.getVar(polar_table->as_polar_table_int()->values().data());
+                }
+                #endif //POEM_JIT
                 break;
               default:
                 LogWarningError("In group {}, PolarTable {} of type {} not managed by POEM. Skip...",
@@ -555,6 +565,11 @@ namespace poem {
 
             read_attributes(nc_var.second, polar_table);
             polar_tables.push_back(polar_table);
+
+            #ifdef POEM_JIT
+            std::string var_path = group.getName(true) + "/" + nc_var.first;
+            jit::JITManager::getInstance().register_polar_table(polar_table, filename, var_path);
+            #endif //POEM_JIT
 
           }
         }
@@ -583,7 +598,7 @@ namespace poem {
       }
 
       for (const auto &group_: group.getGroups()) {
-        auto polar_node_ = load_group(group_.second);
+        auto polar_node_ = load_group(group_.second, filename);
         polar_node->add_child(polar_node_);
       }
 
@@ -591,21 +606,23 @@ namespace poem {
 
     read_attributes(group, polar_node);
 
+//    #ifdef POEM_JIT
+//    jit::JITManager::getInstance().register_polar_node(polar_node, filename, group.getName(true));
+//    #endif //POEM_JIT
+
     return polar_node;
 
   }
 
-  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group) {
+  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group, const std::string &filename) {
 
     if (!root_group.isRootGroup()) {
       LogCriticalError("In load_v1, not a root group");
       CRITICAL_ERROR_POEM
     }
 
-    return load_group(root_group);
+    return load_group(root_group, filename);
   }
-
-
 
   std::shared_ptr<PolarNode> load(const std::string &filename,
                                   bool spec_checking,
@@ -632,13 +649,13 @@ namespace poem {
     std::shared_ptr<PolarNode> root_node;
     switch (major_version) {
       case 0: {
-        root_node = load_v0(root_group);
+        root_node = load_v0(root_group, filename);
         root_node->change_name(fs::path(filename).stem());
       }
         break;
       case 1: {
         try {
-          root_node = load_v1(root_group);
+          root_node = load_v1(root_group, filename);
           break;
         } catch (const PoemException &e) {
           LogCriticalError("Error while reading POEM File using specification v{}: {}",
@@ -656,22 +673,13 @@ namespace poem {
 
 
     #ifdef POEM_JIT
-    // TODO: declencher uniquement si JIT enabled (ajouter dans declaration de load ?)
-
-    std::vector<std::string> paths;
-    root_node->polar_tables_paths(paths);
-
-    // TODO: voir comment faire autrement ? On voudrait register tous les PolarNode...
-    for (const auto& path : paths) {
-      auto table = root_node->polar_node_from_path(path);
-      jit::JITManager::getInstance().register_polar_table(table->as_polar_table(), filename);
-    }
-
-    // TODO: retirer !!
-    jit::JITManager::getInstance().verbose(true);
+    jit::JITManager::getInstance().verbose(false);
+    std::cout << "ROOT NODE size: " << root_node->memsize() << std::endl;
     root_node->jit_load();
-//    root_node->jit_unload();
-
+    std::cout << "ROOT NODE size: " << root_node->memsize() << std::endl;
+    root_node->jit_unload();
+    std::cout << "ROOT NODE size: " << root_node->memsize() << std::endl;
+    root_node->jit_unload();
     #endif //POEM_JIT
 
     return root_node;

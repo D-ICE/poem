@@ -9,11 +9,13 @@ namespace poem {
   #ifdef POEM_JIT
 
   void PolarTableBase::jit_load() {
-    jit::JITManager::getInstance().load_polar_table(as_polar_table());
+    if (!is_populated())
+      jit::JITManager::getInstance().load_polar_table(as_polar_table());
   }
 
   void PolarTableBase::jit_unload() {
-    jit::JITManager::getInstance().unload_polar_table(as_polar_table());
+    if (is_populated())
+      jit::JITManager::getInstance().unload_polar_table(as_polar_table());
   }
 
   #endif //POEM_JIT
@@ -21,12 +23,9 @@ namespace poem {
   template<>
   double PolarTable<double>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const {
 
-    // FIXME: si on a une table de int, on devrait reagir de maniere diffente et renvoyer un nearest
-    //  remplacer bound_check par un enum ERROR, SATURATE, EXTRAPOLATE
-
-//    if (m_type != POEM_DOUBLE) {
-//      return nearest(dimension_point, oob_method);
-//    }
+    #ifdef POEM_JIT
+    const_cast<PolarTable<double> *>(this)->jit_load(); // TODO: voir si pas trop couteux...
+    #endif //POEM_JIT
 
     if (dimension_point.dimension_set() != m_dimension_grid->dimension_set()) {
       LogCriticalError("[PolarTable::interp] DimensionPoint has not the same DimensionSet as the PolarTable");
@@ -101,6 +100,5 @@ namespace poem {
                               poem::OUT_OF_BOUND_METHOD oob_method) const {
     return nearest(dimension_point, oob_method);
   }
-
 
 }  // poem

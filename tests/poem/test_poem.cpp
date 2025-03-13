@@ -64,7 +64,7 @@ TEST(poem, PolarTable) {
     }
 
     polar_table_double->set_value(idx, val);
-    polar_table_int->set_value(idx, idx);
+    polar_table_int->set_value(idx, (int)idx);
     idx++;
   }
 

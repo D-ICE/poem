@@ -2,6 +2,7 @@
 // Created by frongere on 10/03/25.
 //
 
+#ifdef POEM_JIT
 #include <netcdf>
 
 #include "JIT.h"
@@ -11,7 +12,11 @@
 namespace poem::jit {
 
   void
-  poem::jit::JITManager::register_polar_table(const std::shared_ptr<PolarTableBase> node, const std::string &filename) {
+  poem::jit::JITManager::register_polar_table(const std::shared_ptr<PolarTableBase> &polar_table,
+                                              const std::string &filename,
+                                              const std::string &nc_full_name) {
+
+    if (!m_enabled) return;
 
     if (!fs::exists(filename)) {
       LogCriticalError("File not found: {}", filename);
@@ -19,23 +24,35 @@ namespace poem::jit {
     }
 
     auto node_monitor = NodeMonitor(fs::absolute(filename));
-//    node_monitor.nc_file = fs::absolute(filename);
+    node_monitor.nc_full_name = nc_full_name;
 
-    m_map.insert({node, node_monitor});
+    m_map.insert({polar_table, node_monitor});
 
     // TODO: continuer!!
   }
 
-  void JITManager::load_polar_table(std::shared_ptr<PolarTableBase> polar_table) {
+  void JITManager::unregister_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
+    if (!m_map.contains(polar_table)) return;
+    m_map.erase(polar_table);
+  }
+
+  void JITManager::clear() {
+    m_map.clear();
+  }
+
+  void JITManager::load_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
+
+    if (!m_enabled) return;
+    if (polar_table->is_populated()) return;
+
+    if (!m_map.contains(polar_table)) {
+      polar_table->jit_allocate();
+      return;
+    }
     auto node_monitor = m_map.at(polar_table);
-    if (node_monitor.is_loaded) return;
+    node_monitor.new_access();
 
-    //    auto path = polar_table->full_name();
-    // TODO: construire path en retirant le premier /vessel_name
-    //  Tester ce que ca fait si la Variable est directement dans le root... -> on peut juste demander a polar_table si
-    //  elle a un parent, et si c'est un root...
-
-    fs::path path = "/laden_load/laden_two_engines/VPP/STW";
+    fs::path path(node_monitor.nc_full_name);
     auto old_size = polar_table->memsize();
 
     netCDF::NcFile root_group(node_monitor.nc_file, netCDF::NcFile::read);
@@ -65,7 +82,6 @@ namespace poem::jit {
         LogCriticalError("[JITManager] POEM_DATATYPE not managed");
         CRITICAL_ERROR_POEM
     }
-//    std::cout << "Table loaded at " << std::ctime(&node_monitor.loading_time) << std::endl;
     root_group.close();
 
     auto new_size = polar_table->memsize();
@@ -73,36 +89,43 @@ namespace poem::jit {
     node_monitor.load();
 
     if (m_verbose) {
-
       LogNormalInfo("PolarTable {} has been loaded at {}. Size was {} bytes, now it is {} bytes",
-                    path.filename().string(),
+                    polar_table->full_name().string(),
                     std::ctime(&node_monitor.loading_time),
                     old_size, new_size);
     }
   }
 
-  void JITManager::unload_polar_table(std::shared_ptr<PolarTableBase> polar_table) {
+  void JITManager::unload_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
+
+    if (!m_enabled) return;
+    if (!polar_table->is_populated()) return;
+    if (!m_map.contains(polar_table)) return;
+
+    auto node_monitor = m_map.at(polar_table);
+
     auto old_size = polar_table->memsize();
     polar_table->jit_deallocate();
-    m_map.at(polar_table).unload();
+    node_monitor.unload();
     auto new_size = polar_table->memsize();
     if (m_verbose) {
       auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
       LogNormalInfo("PolarTable {} has been unloaded at {}. Size was {} bytes, now it is {} bytes",
-                    polar_table->name(),
+                    polar_table->full_name().string(),
                     std::ctime(&now),
                     old_size, new_size
-                    );
+      );
     }
   }
 
   void JITManager::flush() {
+    NIY_POEM
+    if (!m_enabled) return;
     for (auto &node: m_map) {
-      if (node.second.time_since_last_access() > m_unload_time) {
-        unload_polar_table(node.first);
-        node.second.unload();
-      }
+      node.first->jit_unload();
     }
   }
 
 }  // poem::jit
+
+#endif //POEM_JIT

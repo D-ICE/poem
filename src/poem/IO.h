@@ -66,9 +66,9 @@ namespace poem {
 
   int get_version(const std::string &filename);
 
-  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group);
+  std::shared_ptr<PolarNode> load_v0(const netCDF::NcGroup &root_group, const std::string& filename);
 
-  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group);
+  std::shared_ptr<PolarNode> load_v1(const netCDF::NcGroup &root_group, const std::string& filename);
 
   std::shared_ptr<PolarNode> load(const std::string &filename,
                                   bool spec_checking = true,

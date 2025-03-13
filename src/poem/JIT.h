@@ -20,6 +20,8 @@ namespace fs = std::filesystem;
 namespace poem {
 
 // Forward declarations
+//  class PolarNode;
+
   class PolarTableBase;
 
 
@@ -44,19 +46,21 @@ namespace poem {
 
     class NodeMonitor {
      public:
-      NodeMonitor(const std::string &nc_file) :
+      explicit NodeMonitor(const std::string &nc_file) :
           nc_file(nc_file),
-          is_loaded(false),
-          nb_access(0) {}
+          nb_access(0),
+          loading_time(),
+          last_acces_time() {}
 
       inline void load() {
-        is_loaded = true;
         loading_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        new_access();
+        last_acces_time = loading_time;
+        nb_access = 1;
       }
 
       inline void unload() {
-        is_loaded = false;
+        loading_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        last_acces_time = loading_time;
         nb_access = 0;
       }
 
@@ -65,7 +69,7 @@ namespace poem {
         last_acces_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
       }
 
-      std::chrono::duration<int> time_since_last_access() const {
+      [[nodiscard]] std::chrono::duration<int> time_since_last_access() const {
         return std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::from_time_t(last_acces_time) -
             std::chrono::system_clock::from_time_t(loading_time)
@@ -74,7 +78,8 @@ namespace poem {
 
      private:
       fs::path nc_file;
-      bool is_loaded = false;
+      std::string nc_full_name;
+
       int nb_access = 0;
 
       std::time_t loading_time;
@@ -99,6 +104,7 @@ namespace poem {
 
      private:
       JITManager() :
+          m_enabled(true),
           m_verbose(false),
           m_map(),
           m_unload_time(5) {}
@@ -109,15 +115,34 @@ namespace poem {
 
       void verbose(bool verbose) { m_verbose = verbose; }
 
-      void register_polar_table(const std::shared_ptr<PolarTableBase> polar_table, const std::string &filename);
+      bool enabled() const { return m_enabled; }
 
-      void load_polar_table(std::shared_ptr<PolarTableBase> polar_table);
+      void enable(bool enable) { m_enabled = enable; }
 
-      void unload_polar_table(std::shared_ptr<PolarTableBase> polar_table);
+      void unload_time(const int &time_seconds) {
+        m_unload_time = std::chrono::duration<int>(time_seconds);
+      }
+
+      int unload_time() const {
+        return m_unload_time.count();
+      }
+
+      void register_polar_table(const std::shared_ptr<PolarTableBase> &polar_table,
+                                const std::string &filename,
+                                const std::string &nc_full_name);
+
+      void unregister_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
+
+      void clear();
+
+      void load_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
+
+      void unload_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
 
       void flush();
 
      private:
+      bool m_enabled;
       bool m_verbose;
       std::unordered_map<std::shared_ptr<PolarTableBase>, NodeMonitor> m_map;
 

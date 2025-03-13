@@ -69,13 +69,14 @@ namespace poem {
       }
 
       NDArray array(shape);
-      std::copy(m_polar_table->values().begin(), m_polar_table->values().end(), array.data());
+      std::vector<T> values = m_polar_table->values();
+      std::copy(values.begin(), values.end(), array.data());
       this->m_interpolator->AddVar(array);
 
     }
 
    private:
-    PolarTable<T> *m_polar_table;
+    const PolarTable<T> *m_polar_table;
     std::unique_ptr<mathutils::RegularGridInterpolator<T, _dim>> m_interpolator;
   };
 
@@ -129,6 +130,8 @@ namespace poem {
       }
       return std::dynamic_pointer_cast<PolarTable<int>>(shared_from_this());
     }
+
+    virtual bool is_populated() const = 0;
 
     #ifdef POEM_JIT
 
@@ -252,6 +255,11 @@ namespace poem {
      * Get the vector of DimensionPoint corresponding to the associated DimensionGrid of the table
      */
     [[nodiscard]] const std::vector<DimensionPoint> &dimension_points() const;
+
+    /**
+     * Returns true if values of the PolarTable are populated
+     */
+    bool is_populated() const override;
 
     /**
      * Set a particular value of the table at index idx corresponding to the DimensionPoint that you can get from
@@ -381,12 +389,8 @@ namespace poem {
 
     #ifdef POEM_JIT
 
-//    void jit_load() override;
-
     void jit_allocate() override;
 
-//    void jit_unload() override;
-//
     void jit_deallocate() override;
 
     int memsize() const override;
