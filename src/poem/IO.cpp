@@ -30,8 +30,9 @@ namespace poem {
     return git::version_major();
   }
 
-  std::vector<netCDF::NcDim> to_netcdf(std::shared_ptr<DimensionGrid> dimension_grid,
-                                       netCDF::NcGroup &group) {
+  std::vector<netCDF::NcDim> to_netcdf(const std::shared_ptr<DimensionGrid> &dimension_grid,
+                                       const netCDF::NcGroup &group,
+                                       const std::string& filename) {
     // Does the group has already these dimensions (and only these dimensions with the same data)
 
     std::vector<netCDF::NcDim> dims;
@@ -113,7 +114,9 @@ namespace poem {
     return dims;
   }
 
-  void to_netcdf(const Attributes &attributes, netCDF::NcGroup &group) {
+  void to_netcdf(const Attributes &attributes,
+                 const netCDF::NcGroup &group,
+                 const std::string& filename) {
     for (const auto &attribute: attributes) {
       if (group.getAtts().contains(attribute.first)) {
         // Check that we do have the same value for this attribute!
@@ -129,7 +132,9 @@ namespace poem {
     }
   }
 
-  void to_netcdf(const Attributes &attributes, netCDF::NcVar &nc_var) {
+  void to_netcdf(const Attributes &attributes,
+                 const netCDF::NcVar &nc_var,
+                 const std::string& filename) {
     for (const auto &attribute: attributes) {
       if (nc_var.getAtts().contains(attribute.first)) {
         // Check that we do have the same value for this attribute!
@@ -148,28 +153,34 @@ namespace poem {
     }
   }
 
-  void to_netcdf(std::shared_ptr<Polar> polar, netCDF::NcGroup &group) {
+  void to_netcdf(const std::shared_ptr<Polar> &polar,
+                 const netCDF::NcGroup &group,
+                 const std::string& filename) {
     for (const auto &polar_table: polar->children<PolarTableBase>()) {
-      to_netcdf(polar_table, group);
+      to_netcdf(polar_table, group, filename);
     }
 
-    to_netcdf(polar->attributes(), group);
+    to_netcdf(polar->attributes(), group, filename);
     group.putAtt("POEM_NODE_TYPE", "POLAR");
     group.putAtt("POEM_MODE", polar_mode_to_string(polar->mode()));
     group.putAtt("description", polar->description());
   }
 
-  void to_netcdf(std::shared_ptr<PolarSet> polar_set, netCDF::NcGroup &group) {
+  void to_netcdf(const std::shared_ptr<PolarSet> &polar_set,
+                 const netCDF::NcGroup &group,
+                 const std::string& filename) {
     for (const auto &polar: polar_set->children<Polar>()) {
       auto new_group = group.addGroup(polar_mode_to_string(polar->mode()));
-      to_netcdf(polar, new_group);
+      to_netcdf(polar, new_group, filename);
     }
-    to_netcdf(polar_set->attributes(), group);
+    to_netcdf(polar_set->attributes(), group, filename);
     group.putAtt("POEM_NODE_TYPE", "POLAR_SET");
     group.putAtt("description", polar_set->description());
   }
 
-  void to_netcdf(std::shared_ptr<PolarNode> polar_node, netCDF::NcGroup &group) {
+  void to_netcdf(const std::shared_ptr<PolarNode> &polar_node,
+                 const netCDF::NcGroup &group,
+                 const std::string& filename) {
 
     // TODO: si JIT, on pourra ajouter la ref...
 
@@ -178,7 +189,7 @@ namespace poem {
       case POLAR_NODE: {
         for (const auto &next_polar_node: polar_node->children<PolarNode>()) {
           auto new_group = group.addGroup(next_polar_node->name());
-          to_netcdf(next_polar_node, new_group);
+          to_netcdf(next_polar_node, new_group, filename);
         }
         group.putAtt("POEM_NODE_TYPE", "POLAR_NODE");
         group.putAtt("description", polar_node->description());
@@ -186,12 +197,12 @@ namespace poem {
       }
 
       case POLAR_SET: {
-        to_netcdf(polar_node->as_polar_set(), group);
+        to_netcdf(polar_node->as_polar_set(), group, filename);
         break;
       }
 
       case POLAR: {
-        to_netcdf(polar_node->as_polar(), group);
+        to_netcdf(polar_node->as_polar(), group, filename);
         break;
       }
 
@@ -201,11 +212,11 @@ namespace poem {
 
         switch (type) {
           case POEM_DOUBLE:
-            to_netcdf(polar_table->as_polar_table_double(), netCDF::ncDouble, group);
+            to_netcdf(polar_table->as_polar_table_double(), netCDF::ncDouble, group, filename);
             break;
 
           case POEM_INT:
-            to_netcdf(polar_table->as_polar_table_int(), netCDF::ncInt, group);
+            to_netcdf(polar_table->as_polar_table_int(), netCDF::ncInt, group, filename);
             break;
 
           default:
@@ -219,7 +230,7 @@ namespace poem {
 
   }
 
-  void to_netcdf(std::shared_ptr<PolarNode> polar_node,
+  void to_netcdf(const std::shared_ptr<PolarNode> &polar_node,
                  const std::string &vessel_name,
                  const std::string &filename,
                  bool verbose) {
@@ -229,7 +240,7 @@ namespace poem {
                     fs::absolute(filename).string());
 
     netCDF::NcFile root_group(filename, netCDF::NcFile::replace);
-    to_netcdf(polar_node, root_group);
+    to_netcdf(polar_node, root_group, filename);
     root_group.putAtt("POEM_LIBRARY_VERSION", git::version_full());
     root_group.putAtt("POEM_SPECIFICATION_VERSION", "v" + std::to_string(current_poem_standard_version()));
     root_group.putAtt("date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
@@ -567,8 +578,9 @@ namespace poem {
             polar_tables.push_back(polar_table);
 
             #ifdef POEM_JIT
-            std::string var_path = group.getName(true) + "/" + nc_var.first;
-            jit::JITManager::getInstance().register_polar_table(polar_table, filename, var_path);
+            std::string nc_full_name =
+                group.isRootGroup() ? "/" + nc_var.first : group.getName(true) + "/" + nc_var.first;
+            jit::JITManager::getInstance().register_polar_table(polar_table, filename, nc_full_name);
             #endif //POEM_JIT
 
           }
