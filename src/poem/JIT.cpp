@@ -51,7 +51,9 @@ namespace poem::jit {
     if (!m_enabled) return false;
 
     if (!m_map.contains(polar_table)) {
-      polar_table->jit_allocate();
+      if (!polar_table->is_populated()) {
+        polar_table->jit_allocate();
+      }
       return false;
     }
     auto node_monitor = m_map.at(polar_table);
@@ -130,7 +132,7 @@ namespace poem::jit {
     return true;
   }
 
-  const NodeMonitor& JITManager::get(const std::shared_ptr<PolarTableBase> &polar_table) {
+  const NodeMonitor &JITManager::get(const std::shared_ptr<PolarTableBase> &polar_table) {
     if (!m_enabled || !m_map.contains(polar_table)) return NodeMonitor();
     return m_map.at(polar_table);
   }
