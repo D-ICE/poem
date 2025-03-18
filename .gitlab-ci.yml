@@ -12,6 +12,12 @@ include:
     - apt install -y git build-essential
     - pip install cmake
 
+  deps-windows:
+    - choco install python -y --version 3.12.4
+    - choco install git.install -y
+    - py -m pip install cibuildwheel==2.23.1
+    - py -m pip install cmake
+
   cmake:
     - mkdir build && cd build
     - cmake ..
@@ -35,25 +41,49 @@ stages:
 
 
 cpp-tests:
-  except:
-    - tags
-
   stage: build
 
-  image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
+  image: mcr.microsoft.com/windows/servercore:1809
 
   variables:
     ENABLE_TEST: "ON"
 
   before_script:
     - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .scripts, deps ]
+    - !reference [ .scripts, deps-windows ]
     - !reference [ .scripts, awscli ]
   script:
     - !reference [ .scripts, cmake ]
-    - make poem_tests -j6
+    - cmake --build . --parallel 8 --target poem_tests
     - cd bin/tests
     - ./poem_tests
+    #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
+
+  tags:
+    - windows
+  
+
+
+#cpp-tests:
+#  except:
+#    - tags
+
+#  stage: build
+
+#  image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
+
+#  variables:
+#    ENABLE_TEST: "ON"
+
+#  before_script:
+#    - !reference [ .add-ssh-key, before_script ]
+#    - !reference [ .scripts, deps ]
+#    - !reference [ .scripts, awscli ]
+#  script:
+#    - !reference [ .scripts, cmake ]
+#    - cmake --build . --parallel 8 --target poem_tests
+#    - cd bin/tests
+#    - ./poem_tests
     #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
 
 
