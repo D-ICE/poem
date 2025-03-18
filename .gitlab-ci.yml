@@ -41,6 +41,8 @@ stages:
 
 
 cpp-tests:
+  except:
+    - tags
   stage: build
 
   image: mcr.microsoft.com/windows/servercore:1809
