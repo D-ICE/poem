@@ -4,6 +4,7 @@ project(poem LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 
 #-----------------------------------------------------------------------------
 # Prevent in-source builds
