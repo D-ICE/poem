@@ -18,4 +18,8 @@
 #include "Splitter.h"
 #include "specifications/specs.h"
 
+#ifdef POEM_JIT
+#include "JIT.h"
+#endif //POEM_JIT
+
 #endif //POEM_POEM_H

@@ -68,6 +68,11 @@ TEST(poem, PolarTable) {
     idx++;
   }
 
+  #ifdef POEM_JIT
+  // Writing so that PolarTable is registered in JITManager
+  to_netcdf(polar_table_double, "vessel", "TestPolarTable.nc", false);
+  #endif //POEM_JIT
+
   // Interpolation
   DimensionPoint dimension_point(dimension_set, {1.2, 1.9, 2.8});
 
@@ -115,6 +120,9 @@ TEST(poem, PolarTable) {
   auto resampled_polar_table = polar_table_double->resample(new_dimension_grid, ERROR);
   resampled_polar_table->change_name("VAR_resampled");
 
+  #ifdef POEM_JIT
+  jit::JITManager::getInstance().get(polar_table_double).log_report();
+  #endif //POEM_JIT
 
   for (const auto &dimension_point_: resampled_polar_table->dimension_points()) {
     double val_calculated = 1.;

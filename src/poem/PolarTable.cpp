@@ -9,7 +9,6 @@ namespace poem {
   #ifdef POEM_JIT
 
   void PolarTableBase::jit_load() {
-    if (!is_populated())
       jit::JITManager::getInstance().load_polar_table(as_polar_table());
   }
 

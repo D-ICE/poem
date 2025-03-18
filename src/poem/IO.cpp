@@ -618,10 +618,6 @@ namespace poem {
 
     read_attributes(group, polar_node);
 
-//    #ifdef POEM_JIT
-//    jit::JITManager::getInstance().register_polar_node(polar_node, filename, group.getName(true));
-//    #endif //POEM_JIT
-
     return polar_node;
 
   }

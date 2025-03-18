@@ -45,45 +45,88 @@ namespace poem {
      */
 
     class NodeMonitor {
+
+      using Clock = std::chrono::system_clock;
+      using Resolution = std::chrono::duration<int, std::ratio<1, 1000>>;
+      using TimePoint = std::chrono::time_point<Clock, Resolution>;
+      using Duration_sec = std::chrono::duration<int, std::ratio<1>>;
+
      public:
+      NodeMonitor() {}
+
       explicit NodeMonitor(const std::string &nc_file) :
-          nc_file(nc_file),
-          nb_access(0),
-          loading_time(),
-          last_acces_time() {}
+          m_nc_file(nc_file),
+          m_nb_access(0) {}
 
       inline void load() {
-        loading_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        last_acces_time = loading_time;
-        nb_access = 1;
+        m_loading_time = now();
+        m_last_acces_time = m_loading_time;
+        m_nb_access = 0;
+
       }
 
       inline void unload() {
-        loading_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        last_acces_time = loading_time;
-        nb_access = 0;
+        m_loading_time = now();
+        m_last_acces_time = m_loading_time;
+        m_nb_access = 0;
+
       }
 
       inline void new_access() {
-        nb_access++;
-        last_acces_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        m_nb_access++;
+
+        m_cumulative_duration_between_access += duration_since_last_access_ms();
+        m_mean_duration_between_access = m_cumulative_duration_between_access / m_nb_access;
+
+        m_last_acces_time = now();
       }
 
-      [[nodiscard]] std::chrono::duration<int> time_since_last_access() const {
-        return std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::system_clock::from_time_t(last_acces_time) -
-            std::chrono::system_clock::from_time_t(loading_time)
-        );
+      [[nodiscard]] Resolution duration_since_last_access_ms() const {
+        return Resolution(now() - m_last_acces_time);
+      }
+
+      [[nodiscard]] Resolution duration_since_last_access_sec() const {
+        return std::chrono::duration_cast<Duration_sec>(duration_since_last_access_ms());
+      }
+
+      Resolution mean_duration_between_access() const {
+        return m_mean_duration_between_access;
+      }
+
+      double access_frequency_hz() const {
+        return 1. / (double) std::chrono::duration_cast<Duration_sec>(m_mean_duration_between_access).count();
+      }
+
+      inline static TimePoint now() {
+        return std::chrono::floor<Resolution>(Clock::now());
+      }
+
+      void log_report() const {
+        LogNormalInfo(
+            "[JIT] Table {}. Loading date: {}. Last access date: {}. Nb access: {}. Access frequency: {:.2f} Hz",
+            m_nc_full_name,
+            get_date_string(m_loading_time),
+            get_date_string(m_last_acces_time),
+            m_nb_access,
+            access_frequency_hz());
+      }
+
+      inline static std::string get_date_string(const TimePoint &time_point) {
+        auto date = Clock::to_time_t(time_point);
+        return std::strtok(std::ctime(&date), "\n");
       }
 
      private:
-      fs::path nc_file;
-      std::string nc_full_name;
+      fs::path m_nc_file;
+      std::string m_nc_full_name;
 
-      int nb_access = 0;
+      unsigned int m_nb_access = 0;
 
-      std::time_t loading_time;
-      std::time_t last_acces_time;
+      TimePoint m_loading_time;
+      TimePoint m_last_acces_time;
+
+      Resolution m_cumulative_duration_between_access;
+      Resolution m_mean_duration_between_access;
 
       friend class JITManager;
     };
@@ -107,7 +150,7 @@ namespace poem {
           m_enabled(true),
           m_verbose(false),
           m_map(),
-          m_unload_time(5) {}
+          m_time_threshold_sec(5) {}
       // END Singleton Pattern internals
 
       // Public methods
@@ -119,25 +162,29 @@ namespace poem {
 
       void enable(bool enable) { m_enabled = enable; }
 
-      void unload_time(const int &time_seconds) {
-        m_unload_time = std::chrono::duration<int>(time_seconds);
+      void duration_threshold_sec(const int &duration_sec) {
+        m_time_threshold_sec = NodeMonitor::Duration_sec(duration_sec);
       }
 
-      int unload_time() const {
-        return m_unload_time.count();
+      int time_threshold_sec() const {
+        return m_time_threshold_sec.count();
       }
 
-      void register_polar_table(const std::shared_ptr<PolarTableBase> &polar_table,
+      bool register_polar_table(const std::shared_ptr<PolarTableBase> &polar_table,
                                 const std::string &filename,
                                 const std::string &nc_full_name);
 
-      void unregister_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
+      bool unregister_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
 
       void clear();
 
-      void load_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
+      bool load_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
 
-      void unload_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
+      bool unload_polar_table(const std::shared_ptr<PolarTableBase> &polar_table);
+
+      const NodeMonitor &get(const std::shared_ptr<PolarTableBase> &polar_table);
+
+      bool flush(const std::shared_ptr<PolarTableBase> &polar_table);
 
       void flush();
 
@@ -146,7 +193,7 @@ namespace poem {
       bool m_verbose;
       std::unordered_map<std::shared_ptr<PolarTableBase>, NodeMonitor> m_map;
 
-      std::chrono::duration<int> m_unload_time;
+      NodeMonitor::Duration_sec m_time_threshold_sec;
 
     };
 

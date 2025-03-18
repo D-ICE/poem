@@ -3,6 +3,7 @@
 //
 
 #ifdef POEM_JIT
+
 #include <netcdf>
 
 #include "JIT.h"
@@ -11,12 +12,11 @@
 
 namespace poem::jit {
 
-  void
-  poem::jit::JITManager::register_polar_table(const std::shared_ptr<PolarTableBase> &polar_table,
-                                              const std::string &filename,
-                                              const std::string &nc_full_name) {
+  bool poem::jit::JITManager::register_polar_table(const std::shared_ptr<PolarTableBase> &polar_table,
+                                                   const std::string &filename,
+                                                   const std::string &nc_full_name) {
 
-    if (!m_enabled) return;
+    if (!m_enabled) return false;
 
     if (!fs::exists(filename)) {
       LogCriticalError("File not found: {}", filename);
@@ -24,38 +24,45 @@ namespace poem::jit {
     }
 
     auto node_monitor = NodeMonitor(fs::absolute(filename));
-    node_monitor.nc_full_name = nc_full_name;
+    node_monitor.m_nc_full_name = nc_full_name;
+
+    if (polar_table->is_populated()) {
+      node_monitor.load();
+    }
 
     m_map.insert({polar_table, node_monitor});
 
     // TODO: continuer!!
+    return true;
   }
 
-  void JITManager::unregister_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
-    if (!m_map.contains(polar_table)) return;
+  bool JITManager::unregister_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
+    if (!m_map.contains(polar_table)) return false;
     m_map.erase(polar_table);
+    return true;
   }
 
   void JITManager::clear() {
     m_map.clear();
   }
 
-  void JITManager::load_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
+  bool JITManager::load_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
 
-    if (!m_enabled) return;
-    if (polar_table->is_populated()) return;
+    if (!m_enabled) return false;
 
     if (!m_map.contains(polar_table)) {
       polar_table->jit_allocate();
-      return;
+      return false;
     }
     auto node_monitor = m_map.at(polar_table);
     node_monitor.new_access();
 
-    fs::path path(node_monitor.nc_full_name);
+    if (polar_table->is_populated()) return false;
+
+    fs::path path(node_monitor.m_nc_full_name);
     auto old_size = polar_table->memsize();
 
-    netCDF::NcFile root_group(node_monitor.nc_file, netCDF::NcFile::read);
+    netCDF::NcFile root_group(node_monitor.m_nc_file, netCDF::NcFile::read);
 
     // Reach the group corresponding to the Polar that hold the PolarTable
     netCDF::NcGroup group = root_group;
@@ -89,18 +96,21 @@ namespace poem::jit {
     node_monitor.load();
 
     if (m_verbose) {
-      LogNormalInfo("PolarTable {} has been loaded at {}. Size was {} bytes, now it is {} bytes",
-                    polar_table->full_name().string(),
-                    std::ctime(&node_monitor.loading_time),
-                    old_size, new_size);
+      // TODO: remettre
+//      LogNormalInfo("PolarTable {} has been loaded at {}. Size was {} bytes, now it is {} bytes",
+//                    polar_table->full_name().string(),
+//                    std::ctime(&node_monitor.m_loading_time),
+//                    old_size, new_size);
     }
+
+    return true;
   }
 
-  void JITManager::unload_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
+  bool JITManager::unload_polar_table(const std::shared_ptr<PolarTableBase> &polar_table) {
 
-    if (!m_enabled) return;
-    if (!polar_table->is_populated()) return;
-    if (!m_map.contains(polar_table)) return;
+    if (!m_enabled) return false;
+    if (!polar_table->is_populated()) return false;
+    if (!m_map.contains(polar_table)) return false;
 
     auto node_monitor = m_map.at(polar_table);
 
@@ -109,20 +119,37 @@ namespace poem::jit {
     node_monitor.unload();
     auto new_size = polar_table->memsize();
     if (m_verbose) {
-      auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+      auto now = NodeMonitor::Clock::to_time_t(NodeMonitor::now());
+//      auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
       LogNormalInfo("PolarTable {} has been unloaded at {}. Size was {} bytes, now it is {} bytes",
                     polar_table->full_name().string(),
                     std::ctime(&now),
                     old_size, new_size
       );
     }
+    return true;
+  }
+
+  const NodeMonitor& JITManager::get(const std::shared_ptr<PolarTableBase> &polar_table) {
+    if (!m_enabled || !m_map.contains(polar_table)) return NodeMonitor();
+    return m_map.at(polar_table);
+  }
+
+  bool JITManager::flush(const std::shared_ptr<PolarTableBase> &polar_table) {
+    if (!m_enabled) return false;
+    if (!m_map.contains(polar_table)) return false;
+
+    auto node_monitor = m_map.at(polar_table);
+    if (node_monitor.duration_since_last_access_sec() > m_time_threshold_sec) {
+      unload_polar_table(polar_table);
+    }
+    return true;
   }
 
   void JITManager::flush() {
-    NIY_POEM
     if (!m_enabled) return;
     for (auto &node: m_map) {
-      node.first->jit_unload();
+      flush(node.first);
     }
   }
 
