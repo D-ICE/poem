@@ -61,7 +61,6 @@ include(Add_spdlog)
 include(Add_dunits)
 include(Add_semver)
 include(Add_dtree)
-include(Add_cpp-datetime)
 
 # netcdf related dependencies
 include(Add_zlib)

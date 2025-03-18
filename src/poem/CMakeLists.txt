@@ -14,7 +14,6 @@ target_link_libraries(_poem PUBLIC
         dunits
         semver
         dtree
-        datetime
 
         Boost::headers
         Boost::multi_array
