@@ -43,6 +43,7 @@ stages:
 cpp-tests:
   except:
     - tags
+
   stage: build
 
   image: mcr.microsoft.com/windows/servercore:1809
@@ -61,7 +62,7 @@ cpp-tests:
     - ./poem_tests
     #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
 
-  tags:
+  tag:
     - windows
   
 
