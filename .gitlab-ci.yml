@@ -67,8 +67,7 @@ pypoem-windows-tests:
     - python -m pip install cibuildwheel
     - python -m pip install cython
     - python -m pip install where
-    - alias cibuildwheel="python -m cibuildwheel"
-    - alias where="python -m where"
+    - PATH=$PATH:$(find $HOME/AppData/Local/Packages -name "Scripts")
   script:
     - python --version
     - cibuildwheel --print-build-identifiers # list wheels
@@ -104,6 +103,7 @@ pypoem-windows-multiversion:
     - python -m pip install cibuildwheel
     - python -m pip install cython
     - python -m pip install where
+    - PATH=$PATH:$(find $HOME/AppData/Local/Packages -name "Scripts")
     - WHEEL=`ls wheels_testing`
   script:
     - python -m cibuildwheel --print-build-identifiers # list wheels
