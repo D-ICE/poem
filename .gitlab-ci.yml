@@ -64,9 +64,12 @@ pypoem-windows-tests:
     CIBW_DEBUG_TRACEBACK: True
     CIBW_BUILD_VERBOSITY: 0
   before_script:
-    - python -m pip install cibuildwheel
-    - python -m pip install cython
-    - python -m pip install where
+    - pip install --upgrade pip
+    - pip install cibuildwheel
+    - pip install cython
+    - pip install where
+    - pip install numpy
+    - pip install argparse
     - PATH=$PATH:$(find $HOME/AppData/Local/Packages -name "Scripts")
   script:
     - python --version
@@ -100,14 +103,17 @@ pypoem-windows-multiversion:
     CIBW_DEBUG_TRACEBACK: True
     CIBW_BUILD_VERBOSITY: 0
   before_script:
-    - python -m pip install cibuildwheel
-    - python -m pip install cython
-    - python -m pip install where
+    - pip install --upgrade pip
+    - pip install cibuildwheel
+    - pip install cython
+    - pip install where
+    - pip install numpy
+    - pip install argparse
     - PATH=$PATH:$(find $HOME/AppData/Local/Packages -name "Scripts")
     - WHEEL=`ls wheels_testing`
   script:
-    - python -m cibuildwheel --print-build-identifiers # list wheels
-    - python -m cibuildwheel --output-dir wheels
+    - cibuildwheel --print-build-identifiers # list wheels
+    - cibuildwheel --output-dir wheels
     - ls wheels
   artifacts:
     paths:
