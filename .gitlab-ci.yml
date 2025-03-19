@@ -63,6 +63,10 @@ pypoem-windows-tests:
     CIBW_ALLOW_EMPTY: True
     CIBW_DEBUG_TRACEBACK: True
     CIBW_BUILD_VERBOSITY: 0
+  before_script:
+    - pip install cibuildwheel
+    - pip install cython
+    - pip install where
   script:
     - python --version
     - cibuildwheel --print-build-identifiers # list wheels
@@ -94,6 +98,10 @@ pypoem-windows-multiversion:
     CIBW_ALLOW_EMPTY: True
     CIBW_DEBUG_TRACEBACK: True
     CIBW_BUILD_VERBOSITY: 0
+  before_script:
+    - pip install cibuildwheel
+    - pip install cython
+    - pip install where
   script:
     - cibuildwheel --print-build-identifiers # list wheels
     - cibuildwheel --output-dir wheels
