@@ -1,7 +1,6 @@
 include:
   - project: 'common/ci-utils'
     file:
-      - '/templates/.use-dice-workfklow-rules.yml'
       - '/templates/.add-ssh-key.yml'
       - '/templates/.add-aws-key.yml'
 
