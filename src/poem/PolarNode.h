@@ -55,6 +55,10 @@ namespace poem {
 
     std::shared_ptr<PolarTableBase> as_polar_table();
 
+    void attach_polar_node(const std::shared_ptr<PolarNode>& polar_node);
+
+    void attach_polar_set(const std::shared_ptr<PolarSet>& polar_set);
+
     bool operator==(const PolarNode &other) const;
 
     bool operator!=(const PolarNode &other) const;
