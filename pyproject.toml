@@ -43,6 +43,7 @@ classifiers = [
 #    "Development Status :: 5 - Production/Stable",
 #    "Typing :: Typed",
 ]
+license = "MIT"
 
 dependencies = [
     "argparse",
