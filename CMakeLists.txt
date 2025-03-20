@@ -30,7 +30,7 @@ cmake_policy(SET CMP0167 NEW) # Boost
 
 # Set CMAKE_CXX_FLAGS for MinGW/Windows
 if (WIN32)
-    string(APPEND CMAKE_CXX_FLAGS " -D_WIN32 -DDATETIME_EXPORTS -d2FH4-")
+    string(APPEND CMAKE_CXX_FLAGS " -D_WIN32 -DDATETIME_EXPORTS")
 endif()
 
 #=============================================================================
