@@ -41,7 +41,8 @@
     - windows
 
 .libpoem-tests:
-  except: tags
+  except: 
+    - tags
   stage: build
   variables:
     ENABLE_TEST: "ON"
