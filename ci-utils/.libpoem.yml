@@ -30,7 +30,7 @@
     - apt remove cmake
     - apt install -y git build-essential
     - pip install cmake
-    - CMAKE_OUTPUTDIR=
+    - CMAKE_OUTPUTDIR=""
 
 .libpoem-windows:
   before_script:
