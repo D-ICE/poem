@@ -40,6 +40,10 @@
   before_script:
     - !reference [ .add-ssh-key, before_script ]
     - !reference [ .libpoem-scripts, awscli ]
+    - pip install cmake
+    - pip install cython
+    - pip install argparse
+    - pip install pybind11
     - CMAKE_OUTPUTDIR=/Release
   tags:
     - windows-test
