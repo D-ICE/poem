@@ -1,13 +1,11 @@
-.libpoem-all:
-  variables:
-    ENABLE_TEST: "ON"
-  before_script: # install awscli
+.libpoem-scripts:
+  awscli:
     - pip install awscli
     - mkdir -p $HOME/.aws
     - echo "[default]" > $HOME/.aws/credentials
     - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
     - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
-  script: # run cmake
+  cmake:
     - mkdir build && cd build
     - cmake ..
       -DCMAKE_BUILD_TYPE=Release
@@ -16,8 +14,6 @@
       -DPOEM_ALLOW_DIRTY=OFF
       -DPOEM_BUILD_PYTHON=ON
       -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
-
-.libpoem-scripts:
   build:
     - cmake --build . --parallel 8 --target poem_tests --config Release
   test:    
@@ -27,6 +23,8 @@
 .libpoem-linux:
   image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
   before_script:
+    - !reference [ .add-ssh-key, before_script ]
+    - !reference [ .libpoem-scripts, awscli ]
     - apt update
     - apt upgrade -y
     - apt remove cmake
@@ -36,15 +34,19 @@
 
 .libpoem-windows:
   before_script:
+    - !reference [ .add-ssh-key, before_script ]
+    - !reference [ .libpoem-scripts, awscli ]
     - CMAKE_OUTPUTDIR=/Release
   tags:
     - windows
 
 .libpoem-tests:
-  extends: .libpoem-all
   except: tags
   stage: build
+  variables:
+    ENABLE_TEST: "ON"
   script:
+    - !reference [ .libpoem-scripts, cmake ]
     - !reference [ .libpoem-scripts, build ]
     - !reference [ .libpoem-scripts, test ]
 
