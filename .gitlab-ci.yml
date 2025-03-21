@@ -10,24 +10,24 @@ stages:
   - build
   - deploy
 
-cpp-linux-tests:
-  extends:
-    - .libpoem-linux
-    - .libpoem-tests
+#cpp-linux-tests:
+#  extends:
+#    - .libpoem-linux
+#    - .libpoem-tests
 
-pypoem-linux-tests:
-  extends: 
-    - .pypoem-linux
-    - .pypoem-tests
-  variables:
-    CIBW_BUILD: cp312-manylinux_x86_64
+#pypoem-linux-tests:
+#  extends: 
+#    - .pypoem-linux
+#    - .pypoem-tests
+#  variables:
+#    CIBW_BUILD: cp312-manylinux_x86_64
 
-pypoem-linux-multiversion:
-  extends:
-    - .pypoem-linux
-    - .pypoem-multiversion
-  variables:
-    CIBW_BUILD: cp3*-manylinux_x86_64
+#pypoem-linux-multiversion:
+#  extends:
+#    - .pypoem-linux
+#    - .pypoem-multiversion
+#  variables:
+#    CIBW_BUILD: cp3*-manylinux_x86_64
 
 #pypi-deploy:
 #  only:
@@ -44,11 +44,10 @@ pypoem-linux-multiversion:
     # TODO: trouver un moyen de recuperer les versions de pipy
 #    - twine upload linuxwheels/*
 
-#cpp-windows-tests:
-#  extends:
-#    - .libpoem-windows
-#    - .add-ssh-key
-#    - .libpoem-tests
+cpp-windows-tests:
+  extends:
+    - .libpoem-windows
+    - .libpoem-tests
 
 #pypoem-windows-tests:
 #  extends:

@@ -42,7 +42,7 @@
     - !reference [ .libpoem-scripts, awscli ]
     - CMAKE_OUTPUTDIR=/Release
   tags:
-    - windows
+    - windows-test
 
 .libpoem-tests:
   extends:

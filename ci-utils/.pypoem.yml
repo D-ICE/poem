@@ -4,6 +4,25 @@
     CIBW_DEBUG_TRACEBACK: True
     CIBW_BUILD_VERBOSITY: 0
 
+.pypoem-scripts:
+  build:
+    - python --version
+    - cibuildwheel --print-build-identifiers # list wheels
+    - cibuildwheel --output-dir wheels
+    - pip install wheels/$(ls wheels)
+  test:
+    - cd tests/pypoem
+    - python test_pypoem.py
+    - poem_check my_vessel.nc
+    - poem_tree my_vessel.nc
+    - poem_clean my_vessel.nc my_vessel_clean.nc
+    - poem_tree my_vessel_clean.nc
+    - poem_hash my_vessel.nc
+    - poem_info my_vessel.nc
+    - poem_layout my_vessel.nc
+    - poem_tree my_vessel.nc
+    - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
+
 .pypoem-linux:
   image: python:3.12-bullseye
   services:
@@ -44,25 +63,6 @@
     - pip install argparse
   tags:
     - windows-test
-
-.pypoem-scripts:
-  build:
-    - python --version
-    - cibuildwheel --print-build-identifiers # list wheels
-    - cibuildwheel --output-dir wheels
-    - pip install wheels/$(ls wheels)
-  test:
-    - cd tests/pypoem
-    - python test_pypoem.py
-    - poem_check my_vessel.nc
-    - poem_tree my_vessel.nc
-    - poem_clean my_vessel.nc my_vessel_clean.nc
-    - poem_tree my_vessel_clean.nc
-    - poem_hash my_vessel.nc
-    - poem_info my_vessel.nc
-    - poem_layout my_vessel.nc
-    - poem_tree my_vessel.nc
-    - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
 
 .pypoem-tests:
   extends: .pypoem-base
