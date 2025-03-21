@@ -46,16 +46,15 @@ stages:
     - pip install cmake
     - CMAKE_OUTPUTDIR=
 
-.libpoem-windows:
-  before_script:
-    - CMAKE_OUTPUTDIR=/Release
-  tags:
-    - windows
+#.libpoem-windows:
+#  before_script:
+#    - CMAKE_OUTPUTDIR=/Release
+#  tags:
+#    - windows
 
 .libpoem-tests:
   extends: .libpoem-all
   except: tags
-  stage: build
   script:
     - !reference [ .libpoem-scripts, build ]
     - !reference [ .libpoem-scripts, test ]
@@ -63,6 +62,7 @@ stages:
     #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
 
 cpp-linux-tests:
+  stage: build
   extends:
     - .libpoem-linux
     - .add-ssh-key
