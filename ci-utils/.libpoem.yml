@@ -1,3 +1,7 @@
+.libpoem-base:
+  variables:
+    ENABLE_TEST: "ON"
+
 .libpoem-scripts:
   awscli:
     - pip install awscli
@@ -41,11 +45,11 @@
     - windows
 
 .libpoem-tests:
+  extends:
+    - .libpoem-base
   except: 
     - tags
   stage: build
-  variables:
-    ENABLE_TEST: "ON"
   script:
     - !reference [ .libpoem-scripts, cmake ]
     - !reference [ .libpoem-scripts, build ]

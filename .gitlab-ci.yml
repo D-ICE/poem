@@ -3,88 +3,31 @@ include:
     file:
       - '/templates/.add-ssh-key.yml'
       - '/templates/.add-aws-key.yml'
-#  - 'ci-utils/.libpoem.yml'
-#  - 'ci-utils/.pypoem.yml'
+  - 'ci-utils/.libpoem.yml'
+  - 'ci-utils/.pypoem.yml'
 
 stages:
   - build
   - deploy
-
-.libpoem-scripts:
-  awscli:
-    - pip install awscli
-    - mkdir -p $HOME/.aws
-    - echo "[default]" > $HOME/.aws/credentials
-    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
-    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
-  cmake:
-    - mkdir build && cd build
-    - cmake ..
-      -DCMAKE_BUILD_TYPE=Release
-      -DPOEM_BUILD_TESTS=$ENABLE_TEST
-      -DPOEM_BUILD_TOOLS=ON
-      -DPOEM_ALLOW_DIRTY=OFF
-      -DPOEM_BUILD_PYTHON=ON
-      -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
-  build:
-    - cmake --build . --parallel 8 --target poem_tests --config Release
-  test:    
-    - cd bin/tests
-    - .$CMAKE_OUTPUTDIR/poem_tests
-
-.libpoem-linux:
-  image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
-  before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .libpoem-scripts, awscli ]
-    - apt update
-    - apt upgrade -y
-    - apt remove cmake
-    - apt install -y git build-essential
-    - pip install cmake
-    - CMAKE_OUTPUTDIR=""
-
-.libpoem-windows:
-  before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .libpoem-scripts, awscli ]
-    - CMAKE_OUTPUTDIR=/Release
-  tags:
-    - windows
-
-.libpoem-tests:
-  except: 
-    - tags
-  stage: build
-  variables:
-    ENABLE_TEST: "ON"
-  script:
-    - !reference [ .libpoem-scripts, cmake ]
-    - !reference [ .libpoem-scripts, build ]
-    - !reference [ .libpoem-scripts, test ]
-
-    #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
 
 cpp-linux-tests:
   extends:
     - .libpoem-linux
     - .libpoem-tests
 
-#pypoem-linux-tests:
-#  extends: 
-#    - .pypoem-linux
-#    - .add-ssh-key
-#    - .pypoem-tests
-#  variables:
-#    CIBW_BUILD: cp312-manylinux_x86_64
+pypoem-linux-tests:
+  extends: 
+    - .pypoem-linux
+    - .pypoem-tests
+  variables:
+    CIBW_BUILD: cp312-manylinux_x86_64
 
-#pypoem-linux-multiversion:
-#  extends:
-#    - .pypoem-linux
-#    - .add-ssh-key
-#    - .pypoem-multiversion
-#  variables:
-#    CIBW_BUILD: cp3*-manylinux_x86_64
+pypoem-linux-multiversion:
+  extends:
+    - .pypoem-linux
+    - .pypoem-multiversion
+  variables:
+    CIBW_BUILD: cp3*-manylinux_x86_64
 
 #pypi-deploy:
 #  only:

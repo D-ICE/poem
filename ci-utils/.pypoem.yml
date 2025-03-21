@@ -1,4 +1,4 @@
-.pypoem-all:
+.pypoem-base:
   variables:
     CIBW_ALLOW_EMPTY: True
     CIBW_DEBUG_TRACEBACK: True
@@ -25,6 +25,7 @@
   #      cat python/pypoem/_version.py
 
   before_script:
+    - !reference [ .add-ssh-key, before_script ]
     - curl -sSL https://get.docker.com/ | sh # install docker
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
@@ -64,17 +65,19 @@
     - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
 
 .pypoem-tests:
-  extends: .pypoem-all
+  extends: .pypoem-base
   include: 'ci-utils/.pypoem.yml'
-  except: tags
+  except: 
+    - tags
   stage: build
   script:
     - !reference [ .pypoem-scripts, build ]
     - !reference [ .pypoem-scripts, test ]
 
 .pypoem-multiversion:
-  extends: .pypoem-all
-  only: tags
+  extends: .pypoem-base
+  only: 
+    - tags
   stage: build
   script:
     - !reference [ .pypoem-scripts, build ]
