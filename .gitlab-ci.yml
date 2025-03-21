@@ -4,7 +4,7 @@ include:
       - '/templates/.add-ssh-key.yml'
       - '/templates/.add-aws-key.yml'
   - 'ci-utils/.libpoem.yml'
-  - 'ci-utils/.pypoem.yml'
+#  - 'ci-utils/.pypoem.yml'
 
 stages:
   - build
@@ -16,21 +16,21 @@ cpp-linux-tests:
     - .add-ssh-key
     - .libpoem-tests
 
-pypoem-linux-tests:
-  extends: 
-    - .pypoem-linux
-    - .add-ssh-key
-    - .pypoem-tests
-  variables:
-    CIBW_BUILD: cp312-manylinux_x86_64
+#pypoem-linux-tests:
+#  extends: 
+#    - .pypoem-linux
+#    - .add-ssh-key
+#    - .pypoem-tests
+#  variables:
+#    CIBW_BUILD: cp312-manylinux_x86_64
 
-pypoem-linux-multiversion:
-  extends:
-    - .pypoem-linux
-    - .add-ssh-key
-    - .pypoem-multiversion
-  variables:
-    CIBW_BUILD: cp3*-manylinux_x86_64
+#pypoem-linux-multiversion:
+#  extends:
+#    - .pypoem-linux
+#    - .add-ssh-key
+#    - .pypoem-multiversion
+#  variables:
+#    CIBW_BUILD: cp3*-manylinux_x86_64
 
 #pypi-deploy:
 #  only:
