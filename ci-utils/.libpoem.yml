@@ -37,8 +37,9 @@
     - CMAKE_OUTPUTDIR=""
 
 .libpoem-windows:
-  pre_clone_script:
-    - runas /user:dice /savecred bash
+  hooks:
+    pre_get_sources_script:
+      - runas /user:dice /savecred bash
   before_script:
     - !reference [ .add-ssh-key, before_script ]
     - !reference [ .libpoem-scripts, awscli ]
