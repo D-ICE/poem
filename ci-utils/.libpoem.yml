@@ -57,8 +57,6 @@
   script:
     - !reference [ .libpoem-scripts, cmake ]
     - !reference [ .libpoem-scripts, build ]
-  after_script:
-    - runas /user:dice /savecred bash
     - !reference [ .libpoem-scripts, test ]
 
     #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/

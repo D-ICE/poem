@@ -45,6 +45,8 @@ stages:
 #    - twine upload linuxwheels/*
 
 essai-user:
+  stage:
+    build
   script:
     - runas /user:dice /savecred echo "coucou"
   tags:
