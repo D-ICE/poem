@@ -44,17 +44,23 @@ stages:
     # TODO: trouver un moyen de recuperer les versions de pipy
 #    - twine upload linuxwheels/*
 
-cpp-windows-tests:
-  extends:
-    - .libpoem-windows
-    - .libpoem-tests
+essai-user:
+  script:
+    - runas /user:dice /savecred echo "coucou"
+  tags:
+    windows-test
 
-pypoem-windows-tests:
-  extends:
-    - .pypoem-windows 
-    - .pypoem-tests
-  variables:
-    CIBW_BUILD: cp313-win_amd64
+#cpp-windows-tests:
+#  extends:
+#    - .libpoem-windows
+#    - .libpoem-tests
+
+#pypoem-windows-tests:
+#  extends:
+#    - .pypoem-windows 
+#    - .pypoem-tests
+#  variables:
+#    CIBW_BUILD: cp313-win_amd64
 
 #pypoem-windows-multiversion:
 #  extends:
