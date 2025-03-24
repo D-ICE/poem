@@ -54,7 +54,7 @@
   variables:
     CIBW_PLATFORM: windows
   before_script:
-    - runas /user:dice /savecred bash
+    - echo $HOME
     - pip install --upgrade pip
     - pip install cibuildwheel
     - pip install cython
