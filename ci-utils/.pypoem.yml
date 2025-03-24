@@ -53,9 +53,6 @@
 .pypoem-windows:
   variables:
     CIBW_PLATFORM: windows
-  hooks:
-    pre_get_sources_script:
-      - runas /user:dice /savecred bash
   before_script:
     - pip install --upgrade pip
     - pip install cibuildwheel
@@ -73,6 +70,8 @@
   stage: build
   script:
     - !reference [ .pypoem-scripts, build ]
+  after_script:
+    - runas /user:dice /savecred bash
     - !reference [ .pypoem-scripts, test ]
 
 .pypoem-multiversion:
@@ -82,6 +81,7 @@
   stage: build
   script:
     - !reference [ .pypoem-scripts, build ]
+  after_script:
     - ls wheels
   artifacts:
     paths:
