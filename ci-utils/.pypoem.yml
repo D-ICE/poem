@@ -54,7 +54,7 @@
   variables:
     CIBW_PLATFORM: windows
   before_script:
-    - PATH=$PATH:$(find $HOME/AppData/Local/Packages -name "Scripts")
+    - runas /user:dice /savecred bash
     - pip install --upgrade pip
     - pip install cibuildwheel
     - pip install cython
@@ -85,3 +85,15 @@
     paths:
       - wheels
     expire_in: 3 hours
+
+.pypi-deploy:
+  only:
+    - tags
+  stage: deploy
+  variables:
+    TWINE_USERNAME: $TWINE_USERNAME
+    TWINE_PASSWORD: $TWINE_PASSWORD
+  script:
+    # TODO: trouver un moyen de recuperer les versions de pipy
+    - twine upload wheels
+
