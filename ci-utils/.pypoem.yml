@@ -49,7 +49,7 @@
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
     - pip install numpy
-    - pip uninstall pypoem
+    - pip uninstall -y pypoem
 
 .pypoem-windows:
   variables:
@@ -62,7 +62,7 @@
     - pip install where
     - pip install numpy
     - pip install argparse
-    - pip uninstall pypoem
+    - pip uninstall -y pypoem
   tags:
     - windows-test
 
