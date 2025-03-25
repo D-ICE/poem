@@ -49,17 +49,20 @@
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
     - pip install numpy
+    - pip uninstall pypoem
 
 .pypoem-windows:
   variables:
     CIBW_PLATFORM: windows
   before_script:
+    - chcp 65001
     - pip install --upgrade pip
     - pip install cibuildwheel
     - pip install cython
     - pip install where
     - pip install numpy
     - pip install argparse
+    - pip uninstall pypoem
   tags:
     - windows-test
 
