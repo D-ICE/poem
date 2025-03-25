@@ -55,7 +55,7 @@
   variables:
     CIBW_PLATFORM: windows
   before_script:
-    - /c/Windows/System32/chcp.com 850
+    - /c/Windows/System32/chcp.com 65001
     - pip install --upgrade pip
     - pip install cibuildwheel
     - pip install cython
@@ -72,6 +72,7 @@
     - tags
   stage: build
   script:
+    - !reference [ .pypoem-scripts, build ]
     - !reference [ .pypoem-scripts, test ]
 
 .pypoem-multiversion:
