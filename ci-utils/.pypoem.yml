@@ -70,8 +70,6 @@
   stage: build
   script:
     - !reference [ .pypoem-scripts, build ]
-  after_script:
-    - runas /user:dice /savecred bash
     - !reference [ .pypoem-scripts, test ]
 
 .pypoem-multiversion:
@@ -81,7 +79,6 @@
   stage: build
   script:
     - !reference [ .pypoem-scripts, build ]
-  after_script:
     - ls wheels
   artifacts:
     paths:
