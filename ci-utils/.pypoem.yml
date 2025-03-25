@@ -55,7 +55,7 @@
   variables:
     CIBW_PLATFORM: windows
   before_script:
-    - chcp 65001
+    - /c/Windows/System32/chcp.com 850
     - pip install --upgrade pip
     - pip install cibuildwheel
     - pip install cython
