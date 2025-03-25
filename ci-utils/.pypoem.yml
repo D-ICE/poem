@@ -57,7 +57,7 @@
   before_script:
     - export PYTHONIOENCODING="utf-8"
     - pip install --upgrade pip
-    - pip install cibuildwheel
+    - pip install cibuildwheel==2.22.0
     - pip install cython
     - pip install where
     - pip install numpy
