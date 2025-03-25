@@ -72,7 +72,6 @@
     - tags
   stage: build
   script:
-    - !reference [ .pypoem-scripts, build ]
     - !reference [ .pypoem-scripts, test ]
 
 .pypoem-multiversion:
