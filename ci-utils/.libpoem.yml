@@ -1,16 +1,23 @@
 .libpoem-base:
   variables:
     ENABLE_TEST: "ON"
+    CMAKE_BUILD_PARALLEL_LEVEL: 8
 
 .libpoem-scripts:
-  awscli:
+  prepare:
+    - !reference [ .add-ssh-key, before_script ]
     - pip install awscli
     - mkdir -p $HOME/.aws
     - echo "[default]" > $HOME/.aws/credentials
     - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
     - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
-  cmake:
-    - mkdir build && cd build
+    - pip install cmake
+    - pip install cython
+    - pip install argparse
+    - pip install pybind11
+    - mkdir build
+  configure:
+    - cd build
     - cmake ..
       -DCMAKE_BUILD_TYPE=Release
       -DPOEM_BUILD_TESTS=$ENABLE_TEST
@@ -18,33 +25,34 @@
       -DPOEM_ALLOW_DIRTY=OFF
       -DPOEM_BUILD_PYTHON=ON
       -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
+    - cd ..
   build:
+    - cd build
     - cmake --build . --parallel 8 --target poem_tests --config Release
+    - cd ..
   test:    
-    - cd bin/tests
+    - cd build/bin/tests
     - .$CMAKE_OUTPUTDIR/poem_tests
+    - cd ../../..
+  clean:
+    - rm -Rf build
 
 .libpoem-linux:
   image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
+  variables:
+    CMAKE_OUTPUTDIR:
   before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .libpoem-scripts, awscli ]
     - apt update
     - apt upgrade -y
     - apt remove cmake
     - apt install -y git build-essential
-    - pip install cmake
-    - CMAKE_OUTPUTDIR=""
+    - !reference [ .libpoem-scripts, prepare ]
 
 .libpoem-windows:
+  variables:
+    CMAKE_OUTPUTDIR: /Release
   before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .libpoem-scripts, awscli ]
-    - pip install cmake
-    - pip install cython
-    - pip install argparse
-    - pip install pybind11
-    - CMAKE_OUTPUTDIR=/Release
+    - !reference [ .libpoem-scripts, prepare ]
   tags:
     - windows-test
 
@@ -55,7 +63,7 @@
     - tags
   stage: build
   script:
-    - !reference [ .libpoem-scripts, cmake ]
+    - !reference [ .libpoem-scripts, configure ]
     - !reference [ .libpoem-scripts, build ]
     - !reference [ .libpoem-scripts, test ]
 

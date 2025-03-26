@@ -10,40 +10,32 @@ stages:
   - build
   - deploy
 
-#cpp-linux-tests:
-#  extends:
-#    - .libpoem-linux
-#    - .libpoem-tests
+#linux
+cpp-linux-tests:
+  extends:
+    - .libpoem-linux
+    - .libpoem-tests
 
-#pypoem-linux-tests:
-#  extends: 
-#    - .pypoem-linux
-#    - .pypoem-tests
-#  variables:
-#    CIBW_BUILD: cp312-manylinux_x86_64
+pypoem-linux-tests:
+  extends: 
+    - .pypoem-linux
+    - .pypoem-tests
+  variables:
+    CIBW_BUILD: cp312-manylinux_x86_64
 
-#pypoem-linux-multiversion:
-#  extends:
-#    - .pypoem-linux
-#    - .pypoem-multiversion
-#  variables:
-#    CIBW_BUILD: cp3*-manylinux_x86_64
+pypoem-linux-multiversion:
+  extends:
+    - .pypoem-linux
+    - .pypoem-multiversion
+  variables:
+    CIBW_BUILD: cp3*-manylinux_x86_64
 
-#pypi-deploy:
-#  only:
-#    - tags
-#  stage: deploy
-#  image: python:3.12-bullseye
-#  variables:
-#    TWINE_USERNAME: $TWINE_USERNAME
-#    TWINE_PASSWORD: $TWINE_PASSWORD
-#  before_script:
-#    - pip install twine
-#    - ls linuxwheels
-#  script:
-    # TODO: trouver un moyen de recuperer les versions de pipy
-#    - twine upload linuxwheels/*
+pypi-linux-deploy:
+  extends:
+    - .pypoem-linux
+    - .pypoem-deploy
 
+#windows
 cpp-windows-tests:
   extends:
     - .libpoem-windows
@@ -56,22 +48,14 @@ pypoem-windows-tests:
   variables:
     CIBW_BUILD: cp313-win_amd64
 
-#pypoem-windows-multiversion:
-#  extends:
-#    - .pypoem-windows 
-#    - .pypoem-multiversion
-#  variables:
-#    CIBW_BUILD: cp3*-win_amd64
+pypoem-windows-multiversion:
+  extends:
+    - .pypoem-windows 
+    - .pypoem-multiversion
+  variables:
+    CIBW_BUILD: cp3*-win_amd64
 
-#pypi-windows-deploy:
-#  only:
-#    - tags
-#  stage: deploy
-#  variables:
-#    TWINE_USERNAME: $TWINE_USERNAME
-#    TWINE_PASSWORD: $TWINE_PASSWORD
-#  script:
-#    # TODO: trouver un moyen de recuperer les versions de pipy
-#    - twine upload wheels/*
-#  tags:
-#    - windows
+pypi-windows-deploy:
+  extends:
+    - .pypoem-windows
+    - .pypoem-deploy

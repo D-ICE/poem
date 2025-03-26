@@ -5,6 +5,15 @@
     CIBW_BUILD_VERBOSITY: 0
 
 .pypoem-scripts:
+  prepare:
+    - !reference [ .add-ssh-key, before_script ]
+    - pip install --upgrade pip
+    - pip install cibuildwheel==2.22.0
+    - pip install cython
+    - pip install where
+    - pip install numpy
+    - pip install argparse
+    - pip uninstall -y pypoem
   build:
     - python --version
     - cibuildwheel --print-build-identifiers # list wheels
@@ -22,6 +31,9 @@
     - poem_layout my_vessel.nc
     - poem_tree my_vessel.nc
     - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
+    - cd ../..
+  clean:
+    - rm -Rf build
 
 .pypoem-linux:
   image: python:3.12-bullseye
@@ -44,25 +56,15 @@
   #      cat python/pypoem/_version.py
 
   before_script:
-    - !reference [ .add-ssh-key, before_script ]
+    - !reference [ .pypoem-scripts, prepare ]
     - curl -sSL https://get.docker.com/ | sh # install docker
-    - pip install --upgrade pip
-    - pip install cibuildwheel==2.22.0
-    - pip install numpy
-    - pip uninstall -y pypoem
 
 .pypoem-windows:
   variables:
     CIBW_PLATFORM: windows
+    PYTHONIOENCODING: utf-8
   before_script:
-    - export PYTHONIOENCODING="utf-8"
-    - pip install --upgrade pip
-    - pip install cibuildwheel==2.22.0
-    - pip install cython
-    - pip install where
-    - pip install numpy
-    - pip install argparse
-    - pip uninstall -y pypoem
+    - !reference [ .pypoem-scripts, prepare ]
   tags:
     - windows-test
 
@@ -95,7 +97,9 @@
   variables:
     TWINE_USERNAME: $TWINE_USERNAME
     TWINE_PASSWORD: $TWINE_PASSWORD
+  before_script:
+    - pip install twine
   script:
     # TODO: trouver un moyen de recuperer les versions de pipy
-    - twine upload wheels
+    - twine upload wheels/*
 
