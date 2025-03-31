@@ -92,7 +92,7 @@
       - wheels
     expire_in: 3 hours
 
-.pypi-deploy:
+.pypoem-deploy:
   only:
     - tags
   stage: deploy
