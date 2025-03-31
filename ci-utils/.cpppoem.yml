@@ -1,9 +1,11 @@
-.libpoem-base:
+.cpppoem-base:
   variables:
     ENABLE_TEST: "ON"
     CMAKE_BUILD_PARALLEL_LEVEL: 8
+  after_script:
+    - !reference [ .cpppoem-scripts, cleanup ]
 
-.libpoem-scripts:
+.cpppoem-scripts:
   prepare:
     - !reference [ .add-ssh-key, before_script ]
     - pip install awscli
@@ -32,39 +34,39 @@
     - cd ..
   test:    
     - cd build/bin/tests
-    - .$CMAKE_OUTPUTDIR/poem_tests
+    - .$CMAKE_BUILD_SUBDIRECTORY/poem_tests
     - cd ../../..
-  clean:
+  cleanup:
     - rm -Rf build
 
-.libpoem-linux:
+.cpppoem-linux:
   image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
   variables:
-    CMAKE_OUTPUTDIR:
+    CMAKE_BUILD_SUBDIRECTORY:
   before_script:
     - apt update
     - apt upgrade -y
     - apt remove cmake
     - apt install -y git build-essential
-    - !reference [ .libpoem-scripts, prepare ]
+    - !reference [ .cpppoem-scripts, prepare ]
 
-.libpoem-windows:
+.cpppoem-windows:
   variables:
-    CMAKE_OUTPUTDIR: /Release
+    CMAKE_BUILD_SUBDIRECTORY: /Release
   before_script:
-    - !reference [ .libpoem-scripts, prepare ]
+    - !reference [ .cpppoem-scripts, prepare ]
   tags:
     - windows-test
 
-.libpoem-tests:
+.cpppoem-tests:
   extends:
-    - .libpoem-base
+    - .cpppoem-base
   except: 
     - tags
   stage: build
   script:
-    - !reference [ .libpoem-scripts, configure ]
-    - !reference [ .libpoem-scripts, build ]
-    - !reference [ .libpoem-scripts, test ]
+    - !reference [ .cpppoem-scripts, configure ]
+    - !reference [ .cpppoem-scripts, build ]
+    - !reference [ .cpppoem-scripts, test ]
 
     #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/

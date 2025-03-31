@@ -3,7 +3,7 @@ include:
     file:
       - '/templates/.add-ssh-key.yml'
       - '/templates/.add-aws-key.yml'
-  - 'ci-utils/.libpoem.yml'
+  - 'ci-utils/.cpppoem.yml'
   - 'ci-utils/.pypoem.yml'
 
 stages:
@@ -13,8 +13,8 @@ stages:
 #linux
 cpp-linux-tests:
   extends:
-    - .libpoem-linux
-    - .libpoem-tests
+    - .cpppoem-linux
+    - .cpppoem-tests
 
 pypoem-linux-tests:
   extends: 
@@ -38,8 +38,8 @@ pypi-linux-deploy:
 #windows
 cpp-windows-tests:
   extends:
-    - .libpoem-windows
-    - .libpoem-tests
+    - .cpppoem-windows
+    - .cpppoem-tests
 
 pypoem-windows-tests:
   extends:

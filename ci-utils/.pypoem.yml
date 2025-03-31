@@ -3,6 +3,8 @@
     CIBW_ALLOW_EMPTY: True
     CIBW_DEBUG_TRACEBACK: True
     CIBW_BUILD_VERBOSITY: 0
+  after_script:
+    - !reference [ .pypoem-scripts, cleanup ]
 
 .pypoem-scripts:
   prepare:
@@ -32,7 +34,7 @@
     - poem_tree my_vessel.nc
     - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
     - cd ../..
-  clean:
+  cleanup:
     - rm -Rf build
 
 .pypoem-linux:
@@ -90,7 +92,7 @@
       - wheels
     expire_in: 3 hours
 
-.pypoem-deploy:
+.pypi-deploy:
   only:
     - tags
   stage: deploy
