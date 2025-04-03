@@ -10,7 +10,7 @@ include:
     - apt upgrade -y
     - apt remove cmake
     - apt install -y git build-essential
-    - pip install cmake
+    - pip install cmake==3.31.6
 
   cmake:
     - mkdir build && cd build
