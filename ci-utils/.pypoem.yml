@@ -11,6 +11,7 @@
     - !reference [ .add-ssh-key, before_script ]
     - pip install --upgrade pip
     - pip install cibuildwheel==2.22.0
+    - pip install cmake==3.31.6
     - pip install cython
     - pip install where
     - pip install numpy
