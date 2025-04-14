@@ -235,6 +235,14 @@ PYBIND11_MODULE(pypoem, m) {
                   return self->as_polar_table()->as_polar_table_int();
                 },
                 R"pbdoc(Returns the associated PolarTableInt)pbdoc");
+  PolarNode.def("attach_polar_node", &poem::PolarNode::attach_polar_node,
+                R"pbdoc("attach a PolarNode to this PolarNode")pbdoc",
+                "polar_node"_a
+                );
+  PolarNode.def("attach_polar_set", &poem::PolarNode::attach_polar_set,
+                R"pbdoc("attach a PolarSet to this PolarNode")pbdoc",
+                "polar_set"_a
+                );
 
   PolarNode.def("exists", [](poem::PolarNode &self, const std::string &path) -> bool {
                   return self.exists(path);
@@ -496,7 +504,7 @@ PYBIND11_MODULE(pypoem, m) {
   PolarSet.def("description", &poem::PolarSet::description,
                R"pbdoc(Get the description of the PolarSet)pbdoc");
   PolarSet.def("attach_polar", &poem::PolarSet::attach_polar,
-               R"pbdoc()pbdoc",
+               R"pbdoc("attach a Polar to this PolarSet")pbdoc",
                "polar"_a);
 
   m.def("make_polar_set", &poem::make_polar_set,

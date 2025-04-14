@@ -69,6 +69,21 @@ namespace poem {
     return std::dynamic_pointer_cast<PolarTableBase>(shared_from_this());
   }
 
+  void PolarNode::attach_polar_node(const std::shared_ptr<PolarNode>& polar_node) {
+    for (const auto& child : children<PolarNode>()) {
+      if (polar_node->name() == child->name()) {
+        LogCriticalError("PolarNode {} has already a child named {}",
+                         m_name, polar_node->name());
+        CRITICAL_ERROR_POEM
+      }
+    }
+    add_child(polar_node);
+  }
+
+  void PolarNode::attach_polar_set(const std::shared_ptr<PolarSet>& polar_set) {
+    attach_polar_node(polar_set);
+  }
+
   bool PolarNode::operator==(const PolarNode &other) const {
     bool equal = true;
     equal &= m_name == other.m_name;

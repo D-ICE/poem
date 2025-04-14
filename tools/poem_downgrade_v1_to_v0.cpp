@@ -53,6 +53,14 @@ int main(int argc, char *argv[]) {
   polar->polar_table("SOLVER_STATUS")->change_name("SolverStatus");
   polar->polar_table("TOTAL_POWER")->change_name("BrakePower");
 
+  // Changing 0 to 1 into SolverStatus PolarTable
+  auto solver_status = polar->polar_table("SolverStatus");
+  for (auto& value : solver_status->as_polar_table_int()->values()) {
+    if (value == 0) {
+      value = 1;
+    }
+  }
+
   // Writing
   std::string outfilename = fs::path(program.get<std::string>("output_file")).string();
   to_netcdf(polar, vessel_name, outfilename);
