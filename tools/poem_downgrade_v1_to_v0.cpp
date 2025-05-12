@@ -23,7 +23,11 @@ int main(int argc, char *argv[]) {
     std::exit(1);
   }
 
-  std::string infilename = fs::canonical(fs::path(program.get<std::string>("intput_file")));
+  fs::path infilename = fs::canonical(fs::path(program.get<std::string>("intput_file")));
+
+//  infilename.filename();
+//
+//  auto a = fs::path::filename(infilename);
 
   auto polar = load(infilename, true, true)->as_polar();
   auto vessel_name = polar->attributes().get("VESSEL_NAME");
@@ -62,6 +66,8 @@ int main(int argc, char *argv[]) {
   }
 
   // Writing
+
+
   std::string outfilename = fs::path(program.get<std::string>("output_file"));
   to_netcdf(polar, vessel_name, outfilename);
 

@@ -191,3 +191,6 @@ pypi-deploy:
   script:
     # TODO: trouver un moyen de recuperer les versions de pipy
     - twine upload linuxwheels/*
+
+
+# TODO: ajouter une section pour la gestion de le documentation vers dice-internal
