@@ -106,7 +106,7 @@ namespace poem {
   void PolarNode::polar_tables_paths(std::vector<std::string> &paths) const {
 
     if (m_polar_node_type == POLAR_TABLE) {
-      paths.push_back(full_name());
+      paths.push_back(full_name().string());
     } else {
       for (const auto &child: children<PolarNode>()) {
         child->polar_tables_paths(paths);
@@ -124,7 +124,8 @@ namespace poem {
   std::shared_ptr<PolarNode> PolarNode::polar_node_from_path(const fs::path &path) {
 
     fs::path path_ = path;
-    if (path_.is_absolute()) {
+//    if (path_.is_absolute()) {
+    if (path_.string().front() == '/') {
       if (path == "/") {
         if (is_root()) {
           path_ = m_name;
@@ -189,7 +190,7 @@ namespace poem {
 
       // Register DimensionGrid from parent
       auto parent = polar_table->parent<Polar>();
-      auto parent_full_name = parent->full_name();
+      auto parent_full_name = parent->full_name().string();
 
       if (!node["dimension_grids"].contains(parent_full_name)) {
         // DimensionGrid of parent does not exist yet

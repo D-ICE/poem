@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 3.20)
 project(poem LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 
 #-----------------------------------------------------------------------------
 # Prevent in-source builds
@@ -26,6 +28,7 @@ cmake_policy(SET CMP0135 NEW)
 cmake_policy(SET CMP0077 NEW)
 cmake_policy(SET CMP0076 NEW)
 cmake_policy(SET CMP0167 NEW) # Boost
+
 
 #=============================================================================
 # Retrieving the current Git revision
@@ -55,7 +58,6 @@ include(Add_spdlog)
 include(Add_dunits)
 include(Add_semver)
 include(Add_dtree)
-include(Add_cpp-datetime)
 
 # netcdf related dependencies
 include(Add_zlib)

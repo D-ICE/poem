@@ -1,0 +1,72 @@
+.cpppoem-base:
+  variables:
+    ENABLE_TEST: "ON"
+    CMAKE_BUILD_PARALLEL_LEVEL: 8
+  after_script:
+    - !reference [ .cpppoem-scripts, cleanup ]
+
+.cpppoem-scripts:
+  prepare:
+    - !reference [ .add-ssh-key, before_script ]
+    - pip install awscli
+    - mkdir -p $HOME/.aws
+    - echo "[default]" > $HOME/.aws/credentials
+    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
+    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
+    - pip install cmake==3.31.6
+    - pip install cython
+    - pip install argparse
+    - pip install pybind11
+    - mkdir build
+  configure:
+    - cd build
+    - cmake ..
+      -DCMAKE_BUILD_TYPE=Release
+      -DPOEM_BUILD_TESTS=$ENABLE_TEST
+      -DPOEM_BUILD_TOOLS=ON
+      -DPOEM_ALLOW_DIRTY=OFF
+      -DPOEM_BUILD_PYTHON=ON
+      -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
+    - cd ..
+  build:
+    - cd build
+    - cmake --build . --parallel 8 --target poem_tests --config Release
+    - cd ..
+  test:    
+    - cd build/bin/tests
+    - .$CMAKE_BUILD_SUBDIRECTORY/poem_tests
+    - cd ../../..
+  cleanup:
+    - rm -Rf build
+
+.cpppoem-linux:
+  image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
+  variables:
+    CMAKE_BUILD_SUBDIRECTORY:
+  before_script:
+    - apt update
+    - apt upgrade -y
+    - apt remove cmake
+    - apt install -y git build-essential
+    - !reference [ .cpppoem-scripts, prepare ]
+
+.cpppoem-windows:
+  variables:
+    CMAKE_BUILD_SUBDIRECTORY: /Release
+  before_script:
+    - !reference [ .cpppoem-scripts, prepare ]
+  tags:
+    - windows-test
+
+.cpppoem-tests:
+  extends:
+    - .cpppoem-base
+  except: 
+    - tags
+  stage: build
+  script:
+    - !reference [ .cpppoem-scripts, configure ]
+    - !reference [ .cpppoem-scripts, build ]
+    - !reference [ .cpppoem-scripts, test ]
+
+    #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/

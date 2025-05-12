@@ -3,194 +3,59 @@ include:
     file:
       - '/templates/.add-ssh-key.yml'
       - '/templates/.add-aws-key.yml'
-
-.scripts:
-  deps:
-    - apt update
-    - apt upgrade -y
-    - apt remove cmake
-    - apt install -y git build-essential
-    - pip install cmake==3.31.6
-
-  cmake:
-    - mkdir build && cd build
-    - cmake ..
-      -DCMAKE_BUILD_TYPE=Release
-      -DPOEM_BUILD_TESTS=$ENABLE_TEST
-      -DPOEM_BUILD_TOOLS=ON
-      -DPOEM_ALLOW_DIRTY=OFF
-      -DPOEM_BUILD_PYTHON=ON
-      -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
-
-  awscli:
-    - pip install awscli
-    - mkdir -p $HOME/.aws
-    - echo "[default]" > $HOME/.aws/credentials
-    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> $HOME/.aws/credentials
-    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> $HOME/.aws/credentials
+  - 'ci-utils/.cpppoem.yml'
+  - 'ci-utils/.pypoem.yml'
 
 stages:
   - build
   - deploy
 
-
-cpp-tests:
-  except:
-    - tags
-
-  stage: build
-
-  image: "python:3.12-bullseye" # TODO: on pourra prendre une debian autre...
-
-  variables:
-    ENABLE_TEST: "ON"
-
-  before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - !reference [ .scripts, deps ]
-    - !reference [ .scripts, awscli ]
-  script:
-    - !reference [ .scripts, cmake ]
-    - make poem_tests -j6
-    - cd bin/tests
-    - ./poem_tests
-    #- aws s3 cp poem_testing_spec_v1.nc s3://shiplify-polarplot-data/TestingPolars/
-
+#linux
+cpp-linux-tests:
+  extends:
+    - .cpppoem-linux
+    - .cpppoem-tests
 
 pypoem-linux-tests:
-  except:
-    - tags
-
-  stage: build
-
-  image: python:3.12-bullseye
-  services:
-    - docker:dind # using Docker In Docker as a service
-
+  extends: 
+    - .pypoem-linux
+    - .pypoem-tests
   variables:
-
-    CIBW_PLATFORM: linux
-
     CIBW_BUILD: cp312-manylinux_x86_64
 
-    CIBW_ALLOW_EMPTY: True
-
-    CIBW_DEBUG_TRACEBACK: True
-
-    CIBW_BUILD_VERBOSITY: 0
-
-    CIBW_BEFORE_ALL: >
-      yum update &&
-      yum install -y openssh-clients &&
-      eval $(ssh-agent -s) &&
-      mkdir -p ~/.ssh &&
-      echo "$GITLAB_CI_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa &&
-      chmod 700 ~/.ssh &&
-      chmod 700 ~/.ssh/id_rsa &&
-      echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
-
-  #    CIBW_REPAIR_WHEEL_COMMAND: >
-  #      cat build/src/poem/version.h
-  #      cat python/pypoem/_version.py
-
-  before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - curl -sSL https://get.docker.com/ | sh # install docker
-    - pip install --upgrade pip
-    - pip install cibuildwheel==2.22.0
-    - pip install numpy
-
-  script:
-    - python --version
-    - cibuildwheel --print-build-identifiers # list wheels
-    - cibuildwheel --output-dir linuxwheels_testing
-    - WHEEL=`ls linuxwheels_testing`
-    - pip install linuxwheels_testing/$WHEEL
-    - cd tests/pypoem
-    - python test_pypoem.py
-    - poem_check my_vessel.nc
-    - poem_tree my_vessel.nc
-    - poem_clean my_vessel.nc my_vessel_clean.nc
-    - poem_tree my_vessel_clean.nc
-    - poem_hash my_vessel.nc
-    - poem_info my_vessel.nc
-    - poem_layout my_vessel.nc
-    - poem_tree my_vessel.nc
-    - poem_upgrade my_vessel.nc my_vessel_upgraded.nc
-
-
 pypoem-linux-multiversion:
-  only:
-    - tags
-
-  stage: build
-
-  image: python:3.12-bullseye
-  services:
-    - docker:dind # using Docker In Docker as a service
-
+  extends:
+    - .pypoem-linux
+    - .pypoem-multiversion
   variables:
-
-    CIBW_PLATFORM: linux
-
     CIBW_BUILD: cp3*-manylinux_x86_64
 
-    CIBW_ALLOW_EMPTY: True
+pypi-linux-deploy:
+  extends:
+    - .pypoem-linux
+    - .pypoem-deploy
 
-    CIBW_DEBUG_TRACEBACK: True
+#windows
+cpp-windows-tests:
+  extends:
+    - .cpppoem-windows
+    - .cpppoem-tests
 
-    CIBW_BUILD_VERBOSITY: 0
-
-    CIBW_BEFORE_ALL: >
-      yum update &&
-      yum install -y openssh-clients &&
-      eval $(ssh-agent -s) &&
-      mkdir -p ~/.ssh &&
-      echo "$GITLAB_CI_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa &&
-      chmod 700 ~/.ssh &&
-      chmod 700 ~/.ssh/id_rsa &&
-      echo "$GITLAB_CI_SSH_KNOWN_HOST" | tr -d '\r' > ~/.ssh/known_hosts
-
-  #    CIBW_REPAIR_WHEEL_COMMAND: >
-  #      cat build/src/poem/version.h
-  #      cat python/pypoem/_version.py
-
-  before_script:
-    - !reference [ .add-ssh-key, before_script ]
-    - curl -sSL https://get.docker.com/ | sh # install docker
-    - pip install --upgrade pip
-    - pip install cibuildwheel==2.22.0
-
-  script:
-    - cibuildwheel --print-build-identifiers # list wheels
-    - cibuildwheel --output-dir linuxwheels
-    - ls linuxwheels
-
-  artifacts:
-    paths:
-      - linuxwheels
-    expire_in: 3 hours
-
-
-pypi-deploy:
-  only:
-    - tags
-
-  stage: deploy
-
-  image: python:3.12-bullseye
-
+pypoem-windows-tests:
+  extends:
+    - .pypoem-windows 
+    - .pypoem-tests
   variables:
-    TWINE_USERNAME: $TWINE_USERNAME
-    TWINE_PASSWORD: $TWINE_PASSWORD
+    CIBW_BUILD: cp313-win_amd64
 
-  before_script:
-    - pip install twine
-    - ls linuxwheels
+pypoem-windows-multiversion:
+  extends:
+    - .pypoem-windows 
+    - .pypoem-multiversion
+  variables:
+    CIBW_BUILD: cp3*-win_amd64
 
-  script:
-    # TODO: trouver un moyen de recuperer les versions de pipy
-    - twine upload linuxwheels/*
-
-
-# TODO: ajouter une section pour la gestion de le documentation vers dice-internal
+pypi-windows-deploy:
+  extends:
+    - .pypoem-windows
+    - .pypoem-deploy

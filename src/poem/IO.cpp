@@ -5,7 +5,9 @@
 #include "IO.h"
 
 #include <semver/semver.hpp>
-#include <datetime.h>
+#include <cstdio>
+#include <ctime>
+
 #include <cools/string/StringUtils.h>
 #include <dunits/dunits.h>
 
@@ -224,7 +226,13 @@ namespace poem {
     to_netcdf(polar_node, root_group);
     root_group.putAtt("POEM_LIBRARY_VERSION", git::version_full());
     root_group.putAtt("POEM_SPECIFICATION_VERSION", "v" + std::to_string(current_poem_standard_version()));
-    root_group.putAtt("date", jed_utils::datetime().to_string("yyyy-MM-dd HH:mm:ss tt"));
+    auto now = time(nullptr) ;
+    auto pNow = localtime(&now) ;
+    char tBuffer[32] ;
+    strftime(tBuffer, 32, "%Y-%m-%d %H:%M:%S %p", pNow) ;
+    root_group.putAtt("date", tBuffer);
+
+    
 
     std::string vessel_name_(vessel_name);
     cools::string::MakeItAValidVariableName(vessel_name_);
@@ -621,7 +629,7 @@ namespace poem {
     switch (major_version) {
       case 0: {
         root_node = load_v0(root_group);
-        root_node->change_name(fs::path(filename).stem());
+        root_node->change_name(fs::path(filename).stem().string());
       }
         break;
       case 1: {

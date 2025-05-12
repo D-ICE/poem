@@ -66,8 +66,6 @@ int main(int argc, char *argv[]) {
   }
 
   // Writing
-
-
   std::string outfilename = fs::path(program.get<std::string>("output_file"));
   to_netcdf(polar, vessel_name, outfilename);
 
