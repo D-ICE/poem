@@ -113,12 +113,6 @@ namespace poem {
       }
     }
 
-//    if (!is_leaf()) {
-//      for (const auto &child: children<PolarNode>()) {
-//        child->polar_tables_paths(paths);
-//      }
-//    }
-
   }
 
   std::shared_ptr<PolarNode> PolarNode::polar_node_from_path(const fs::path &path) {

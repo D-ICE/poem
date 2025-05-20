@@ -174,6 +174,7 @@ namespace poem {
           auto new_group = group.addGroup(next_polar_node->name());
           to_netcdf(next_polar_node, new_group);
         }
+        to_netcdf(polar_node->attributes(), group);
         group.putAtt("POEM_NODE_TYPE", "POLAR_NODE");
         group.putAtt("description", polar_node->description());
         break;

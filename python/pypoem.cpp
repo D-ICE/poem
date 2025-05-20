@@ -174,6 +174,19 @@ PYBIND11_MODULE(pypoem, m) {
   POLAR_MODE.export_values();
 
   // ===================================================================================================================
+  // Attributes
+  // ===================================================================================================================
+  py::class_<poem::Attributes> Attributes(m, "Attributes");
+  Attributes.doc() = R"pbdoc("Attributes of a POEM general Node")pbdoc";
+
+  Attributes.def("add_attribute", &poem::Attributes::add_attribute,
+                 R"pbdoc("Add an attribute")pbdoc",
+                 "name"_a, "value"_a);
+  Attributes.def("get", &poem::Attributes::get,
+                 R"pbdoc("Get attribute value")pbdoc",
+                 "name"_a);
+
+  // ===================================================================================================================
   // PolarNode
   // ===================================================================================================================
   py::class_<poem::PolarNode, std::shared_ptr<poem::PolarNode>> PolarNode(m, "PolarNode");
@@ -238,11 +251,11 @@ PYBIND11_MODULE(pypoem, m) {
   PolarNode.def("attach_polar_node", &poem::PolarNode::attach_polar_node,
                 R"pbdoc("attach a PolarNode to this PolarNode")pbdoc",
                 "polar_node"_a
-                );
+  );
   PolarNode.def("attach_polar_set", &poem::PolarNode::attach_polar_set,
                 R"pbdoc("attach a PolarSet to this PolarNode")pbdoc",
                 "polar_set"_a
-                );
+  );
 
   PolarNode.def("exists", [](poem::PolarNode &self, const std::string &path) -> bool {
                   return self.exists(path);
@@ -260,6 +273,15 @@ PYBIND11_MODULE(pypoem, m) {
                 },
                 R"pbdoc(Returns a json string as a layout for the tree starting at current PolarNode)pbdoc",
                 "indent"_a = -1);
+
+  PolarNode.def("attributes", py::overload_cast<>(&poem::PolarNode::attributes),
+                py::return_value_policy::reference,
+                R"pbdoc(Get a PolarNode from path)pbdoc");
+//  PolarNode.def("attributes", [](poem::PolarNode &self) -> poem::Attributes & {
+//                  return self.attributes();
+//                },
+//                py::return_value_policy::reference,
+//                R"pbdoc(Get a PolarNode from path)pbdoc");
 
   m.def("make_polar_node", &poem::make_polar_node,
         R"pbdoc("Build a PolarNode")pbdoc",
