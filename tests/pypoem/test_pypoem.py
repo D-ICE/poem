@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     # Test adding an attribute
     polar_MPPP.attributes().add_attribute("attribute", "value")
-    print(polar_MPPP.attributes().get("coucou"))
+    print("Attribute: %s" % polar_MPPP.attributes().get("attribute"))
 
     # TEST PolarSet
     polar_set = pypoem.make_polar_set("polar_set", "Description of this PolarSet")
