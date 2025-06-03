@@ -157,6 +157,16 @@ namespace poem {
   }
 
   template<typename T>
+  T PolarTable<T>::min() const {
+    return *std::min_element(m_values.cbegin(), m_values.cend());
+  }
+
+  template<typename T>
+  T PolarTable<T>::max() const {
+    return *std::max_element(m_values.cbegin(), m_values.cend());
+  }
+
+  template<typename T>
   T PolarTable<T>::mean() const {
     T mean = 0;
     for (const auto &val: m_values) {
@@ -227,7 +237,8 @@ namespace poem {
     return m_values[index];
   }
 
-  template<typename T> // FIXME: potentiellement supprimer si ca fout la grouille
+  template<typename T>
+  // FIXME: potentiellement supprimer si ca fout la grouille
   T PolarTable<T>::interp(const DimensionPoint &dimension_point, OUT_OF_BOUND_METHOD oob_method) const {
     T val;
     LogCriticalError("interp is unable to deal with type {}", typeid(val).name());
@@ -236,7 +247,8 @@ namespace poem {
 
   template<typename T>
   std::shared_ptr<PolarTable<T>>
-  PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values, OUT_OF_BOUND_METHOD oob_method) const {
+  PolarTable<T>::slice(std::unordered_map<std::string, double> prescribed_values,
+                       OUT_OF_BOUND_METHOD oob_method) const {
 
     // Check that names are existing
     auto dimension_set = m_dimension_grid->dimension_set();
@@ -271,7 +283,7 @@ namespace poem {
       try {
         T val = interp(dimension_point, oob_method);
         sliced_polar_table->set_value(idx, val);
-      } catch (const PoemException& e) {
+      } catch (const PoemException &e) {
         LogCriticalError("In PolarTable {}, while using slice method, out of bound error",
                          m_name);
         throw e;

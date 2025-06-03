@@ -308,6 +308,16 @@ namespace poem {
     void abs();
 
     /**
+     * Returns the min value of the table
+     */
+    T min() const;
+
+    /**
+     * Returns the max value of the table
+     */
+    T max() const;
+
+    /**
      * Calculates the mean of the table
      * @return
      */
