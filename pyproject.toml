@@ -26,7 +26,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
-    "License :: OSI Approved :: MIT License",
+#    "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows",
 #    "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
@@ -43,7 +43,7 @@ classifiers = [
 #    "Development Status :: 5 - Production/Stable",
 #    "Typing :: Typed",
 ]
-license = "MIT"
+#license = "MIT"
 
 dependencies = [
     "argparse",
