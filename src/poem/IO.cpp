@@ -453,7 +453,7 @@ namespace poem {
           polar_table->attributes().add_attribute("component", "yaw");
         } else {
           polar_table->attributes().add_attribute("component", "None");
-          polar_table->change_unit("kNm");
+//          polar_table->change_unit("kNm");
         }
 
         if (polar_tables_map.contains(polar_table->name())) {
@@ -628,11 +628,13 @@ namespace poem {
     netCDF::NcFile root_group(filename, netCDF::NcFile::read);
     std::shared_ptr<PolarNode> root_node;
     switch (major_version) {
+
       case 0: {
         root_node = load_v0(root_group);
-        root_node->change_name(fs::path(filename).stem().string());
+        root_node->change_name(fs::path(filename).stem().string()); // FIXME: pourquoi Luc a introduit ca ?
       }
         break;
+
       case 1: {
         try {
           root_node = load_v1(root_group);
@@ -643,6 +645,7 @@ namespace poem {
           LogCriticalError("Please spec check the file to get more insight on the problem");
           CRITICAL_ERROR_POEM
         }
+
       }
 
       default:
